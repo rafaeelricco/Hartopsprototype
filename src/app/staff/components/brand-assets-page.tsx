@@ -5,6 +5,7 @@
 // =============================================================================
 
 import { useState, useMemo, useRef, useCallback } from "react";
+import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   Package,
   HelpCircle,
@@ -37,7 +38,7 @@ import {
   CircleAlert,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
 import {
   INITIAL_SKUS,
   INITIAL_FAQS,
@@ -55,7 +56,10 @@ type Tab = "products" | "help";
 type ViewMode = "grid" | "list";
 type SKUStatus = "active" | "discontinued" | "draft";
 
-const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
+const STATUS_STYLE: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
   active: { bg: "#ECFDF5", text: "#0F766E", label: "Active" },
   discontinued: { bg: "#FEF2F2", text: "#B91C1C", label: "Discontinued" },
   draft: { bg: "#F1F5F9", text: "#64748B", label: "Draft" },
@@ -110,21 +114,20 @@ export function BrandAssetsPage() {
   const [faqs, setFaqs] = useState<FAQItem[]>(INITIAL_FAQS);
 
   const unpushedCount = useMemo(
-    () => faqs.filter((f) => !f.pushedAt || new Date(f.updatedAt) > new Date(f.pushedAt)).length,
+    () =>
+      faqs.filter(
+        (f) => !f.pushedAt || new Date(f.updatedAt) > new Date(f.pushedAt),
+      ).length,
     [faqs],
   );
 
   return (
     <div className="p-6 font-[Inter]">
       {/* Header */}
-      <div className="mb-6">
-        <h2 style={{ fontSize: "1.25rem", color: "#0F172A" }} className="mb-1">
-          Brand Assets
-        </h2>
-        <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
-          Manage your product library and help resources for field teams.
-        </p>
-      </div>
+      <PageHeader
+        title="Brand Assets"
+        subtitle="Manage your product library and help resources for field teams."
+      />
 
       {/* Tabs — #5 badges */}
       <div className="flex items-center gap-1 mb-6 border-b border-[#E2E8F0]">
@@ -148,7 +151,11 @@ export function BrandAssetsPage() {
       {tab === "products" ? (
         <ProductLibrary skus={skus} setSkus={setSkus} />
       ) : (
-        <HelpResources faqs={faqs} setFaqs={setFaqs} unpushedCount={unpushedCount} />
+        <HelpResources
+          faqs={faqs}
+          setFaqs={setFaqs}
+          unpushedCount={unpushedCount}
+        />
       )}
     </div>
   );
@@ -230,7 +237,8 @@ function ProductLibrary({
   const [viewingSku, setViewingSku] = useState<SKU | null>(null); // #6
   const [showAutoUpload, setShowAutoUpload] = useState(false);
 
-  const hasFilters = search !== "" || categoryFilter !== "all" || statusFilter !== "all";
+  const hasFilters =
+    search !== "" || categoryFilter !== "all" || statusFilter !== "all";
 
   const filtered = useMemo(() => {
     let result = skus;
@@ -243,8 +251,10 @@ function ProductLibrary({
           s.description.toLowerCase().includes(q),
       );
     }
-    if (categoryFilter !== "all") result = result.filter((s) => s.category === categoryFilter);
-    if (statusFilter !== "all") result = result.filter((s) => s.status === statusFilter);
+    if (categoryFilter !== "all")
+      result = result.filter((s) => s.category === categoryFilter);
+    if (statusFilter !== "all")
+      result = result.filter((s) => s.status === statusFilter);
     return result;
   }, [skus, search, categoryFilter, statusFilter]);
 
@@ -283,7 +293,9 @@ function ProductLibrary({
   function handleAutoUploadConfirm(newSkus: SKU[]) {
     setSkus((prev) => [...newSkus, ...prev]);
     setShowAutoUpload(false);
-    toast.success(`${newSkus.length} product${newSkus.length !== 1 ? "s" : ""} imported via Auto Upload`);
+    toast.success(
+      `${newSkus.length} product${newSkus.length !== 1 ? "s" : ""} imported via Auto Upload`,
+    );
   }
 
   function clearFilters() {
@@ -297,20 +309,49 @@ function ProductLibrary({
       {/* #4 — Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
-          { label: "Total SKUs", value: stats.total, color: "#0F172A", bg: "#F8FAFC" },
-          { label: "Active", value: stats.active, color: "#0F766E", bg: "#ECFDF5" },
-          { label: "Draft", value: stats.draft, color: "#64748B", bg: "#F1F5F9" },
-          { label: "Discontinued", value: stats.disc, color: "#B91C1C", bg: "#FEF2F2" },
+          {
+            label: "Total SKUs",
+            value: stats.total,
+            color: "#0F172A",
+            bg: "#F8FAFC",
+          },
+          {
+            label: "Active",
+            value: stats.active,
+            color: "#0F766E",
+            bg: "#ECFDF5",
+          },
+          {
+            label: "Draft",
+            value: stats.draft,
+            color: "#64748B",
+            bg: "#F1F5F9",
+          },
+          {
+            label: "Discontinued",
+            value: stats.disc,
+            color: "#B91C1C",
+            bg: "#FEF2F2",
+          },
         ].map((s) => (
           <div
             key={s.label}
             className="rounded-xl px-4 py-3 border border-[#E2E8F0]"
             style={{ background: s.bg }}
           >
-            <p style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.03em" }}>
+            <p
+              style={{
+                fontSize: "0.6875rem",
+                color: "#94A3B8",
+                letterSpacing: "0.03em",
+              }}
+            >
               {s.label}
             </p>
-            <p className="mt-0.5" style={{ fontSize: "1.25rem", color: s.color }}>
+            <p
+              className="mt-0.5"
+              style={{ fontSize: "1.25rem", color: s.color }}
+            >
               {s.value}
             </p>
           </div>
@@ -353,7 +394,9 @@ function ProductLibrary({
           >
             <option value="all">All Categories</option>
             {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
 
@@ -439,10 +482,16 @@ function ProductLibrary({
           <>
             <span style={{ color: "#E2E8F0" }}>|</span>
             {search && (
-              <FilterChip label={`"${search}"`} onRemove={() => setSearch("")} />
+              <FilterChip
+                label={`"${search}"`}
+                onRemove={() => setSearch("")}
+              />
             )}
             {categoryFilter !== "all" && (
-              <FilterChip label={categoryFilter} onRemove={() => setCategoryFilter("all")} />
+              <FilterChip
+                label={categoryFilter}
+                onRemove={() => setCategoryFilter("all")}
+              />
             )}
             {statusFilter !== "all" && (
               <FilterChip
@@ -465,7 +514,11 @@ function ProductLibrary({
       {/* Products */}
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center">
-          <Package size={32} style={{ color: "#E2E8F0" }} className="mx-auto mb-3" />
+          <Package
+            size={32}
+            style={{ color: "#E2E8F0" }}
+            className="mx-auto mb-3"
+          />
           <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
             No products match your filters.
           </p>
@@ -486,7 +539,10 @@ function ProductLibrary({
               key={sku.id}
               sku={sku}
               onClick={() => setViewingSku(sku)} // #6
-              onEdit={() => { setIsCreating(false); setEditingSku(sku); }}
+              onEdit={() => {
+                setIsCreating(false);
+                setEditingSku(sku);
+              }}
               onDelete={() => setDeletingSku(sku)}
             />
           ))}
@@ -495,7 +551,10 @@ function ProductLibrary({
         <SKUListView
           skus={filtered}
           onView={(s) => setViewingSku(s)} // #6
-          onEdit={(s) => { setIsCreating(false); setEditingSku(s); }}
+          onEdit={(s) => {
+            setIsCreating(false);
+            setEditingSku(s);
+          }}
           onDelete={(s) => setDeletingSku(s)}
         />
       )}
@@ -504,8 +563,15 @@ function ProductLibrary({
       {viewingSku && (
         <SKUDetailOverlay
           sku={viewingSku}
-          onEdit={() => { setIsCreating(false); setEditingSku(viewingSku); setViewingSku(null); }}
-          onDelete={() => { setDeletingSku(viewingSku); setViewingSku(null); }}
+          onEdit={() => {
+            setIsCreating(false);
+            setEditingSku(viewingSku);
+            setViewingSku(null);
+          }}
+          onDelete={() => {
+            setDeletingSku(viewingSku);
+            setViewingSku(null);
+          }}
           onClose={() => setViewingSku(null)}
         />
       )}
@@ -516,7 +582,10 @@ function ProductLibrary({
           sku={editingSku}
           isNew={isCreating}
           onSave={handleSave}
-          onClose={() => { setEditingSku(null); setIsCreating(false); }}
+          onClose={() => {
+            setEditingSku(null);
+            setIsCreating(false);
+          }}
         />
       )}
 
@@ -542,14 +611,23 @@ function ProductLibrary({
 
 // ── Filter chip (#7) ─────────────────────────────────────────────────────────
 
-function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+function FilterChip({
+  label,
+  onRemove,
+}: {
+  label: string;
+  onRemove: () => void;
+}) {
   return (
     <span
       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F1F5F9]"
       style={{ fontSize: "0.6875rem", color: "#64748B" }}
     >
       {label}
-      <button onClick={onRemove} className="hover:text-[#0F172A] transition-colors">
+      <button
+        onClick={onRemove}
+        className="hover:text-[#0F172A] transition-colors"
+      >
         <X size={10} />
       </button>
     </span>
@@ -590,13 +668,19 @@ function SKUGridCard({
         </span>
         <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
-            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
             className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition-colors"
           >
             <Pencil size={12} style={{ color: "#0F172A" }} />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
             className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition-colors"
           >
             <Trash2 size={12} style={{ color: "#B91C1C" }} />
@@ -607,18 +691,30 @@ function SKUGridCard({
         <div className="flex items-center gap-2 mb-1">
           <span
             className="px-1.5 py-0.5 rounded bg-[#F1F5F9] flex-shrink-0"
-            style={{ fontSize: "0.625rem", color: "#64748B", fontFamily: "monospace" }}
+            style={{
+              fontSize: "0.625rem",
+              color: "#64748B",
+              fontFamily: "monospace",
+            }}
           >
             {sku.skuCode}
           </span>
           {sku.abv !== "0.0%" && (
-            <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>{sku.abv}</span>
+            <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>
+              {sku.abv}
+            </span>
           )}
         </div>
-        <p className="truncate mb-1" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+        <p
+          className="truncate mb-1"
+          style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+        >
           {sku.productName}
         </p>
-        <p className="truncate" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+        <p
+          className="truncate"
+          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        >
           {sku.category} &middot; {sku.unitSize}
         </p>
       </div>
@@ -642,14 +738,30 @@ function SKUListView({
   return (
     <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[700px]" style={{ borderCollapse: "separate", borderSpacing: 0 }}>
+        <table
+          className="w-full min-w-[700px]"
+          style={{ borderCollapse: "separate", borderSpacing: 0 }}
+        >
           <thead>
             <tr className="border-b border-[#E2E8F0]">
-              {["Product", "SKU Code", "Category", "Size", "ABV", "Status", "Updated", ""].map((h) => (
+              {[
+                "Product",
+                "SKU Code",
+                "Category",
+                "Size",
+                "ABV",
+                "Status",
+                "Updated",
+                "",
+              ].map((h) => (
                 <th
                   key={h}
                   className="px-4 py-3 text-left"
-                  style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.04em" }}
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#94A3B8",
+                    letterSpacing: "0.04em",
+                  }}
                 >
                   {h}
                 </th>
@@ -675,7 +787,10 @@ function SKUListView({
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <span className="truncate max-w-[180px]" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                      <span
+                        className="truncate max-w-[180px]"
+                        style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+                      >
                         {sku.productName}
                       </span>
                     </div>
@@ -683,30 +798,67 @@ function SKUListView({
                   <td className="px-4 py-3">
                     <span
                       className="px-1.5 py-0.5 rounded bg-[#F1F5F9]"
-                      style={{ fontSize: "0.6875rem", color: "#64748B", fontFamily: "monospace" }}
+                      style={{
+                        fontSize: "0.6875rem",
+                        color: "#64748B",
+                        fontFamily: "monospace",
+                      }}
                     >
                       {sku.skuCode}
                     </span>
                   </td>
-                  <td className="px-4 py-3" style={{ fontSize: "0.8125rem", color: "#64748B" }}>{sku.category}</td>
-                  <td className="px-4 py-3" style={{ fontSize: "0.8125rem", color: "#64748B" }}>{sku.unitSize}</td>
-                  <td className="px-4 py-3" style={{ fontSize: "0.8125rem", color: "#64748B" }}>{sku.abv}</td>
+                  <td
+                    className="px-4 py-3"
+                    style={{ fontSize: "0.8125rem", color: "#64748B" }}
+                  >
+                    {sku.category}
+                  </td>
+                  <td
+                    className="px-4 py-3"
+                    style={{ fontSize: "0.8125rem", color: "#64748B" }}
+                  >
+                    {sku.unitSize}
+                  </td>
+                  <td
+                    className="px-4 py-3"
+                    style={{ fontSize: "0.8125rem", color: "#64748B" }}
+                  >
+                    {sku.abv}
+                  </td>
                   <td className="px-4 py-3">
-                    <span className="px-2 py-0.5 rounded-md" style={{ fontSize: "0.6875rem", background: st.bg, color: st.text }}>
+                    <span
+                      className="px-2 py-0.5 rounded-md"
+                      style={{
+                        fontSize: "0.6875rem",
+                        background: st.bg,
+                        color: st.text,
+                      }}
+                    >
                       {st.label}
                     </span>
                   </td>
-                  <td className="px-4 py-3" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{fmtDate(sku.updatedAt)}</td>
+                  <td
+                    className="px-4 py-3"
+                    style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                  >
+                    {fmtDate(sku.updatedAt)}
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={(e) => { e.stopPropagation(); onEdit(sku); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(sku);
+                        }}
                         className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors"
                       >
                         <Pencil size={13} style={{ color: "#64748B" }} />
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); onDelete(sku); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(sku);
+                        }}
                         className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors"
                       >
                         <Trash2 size={13} style={{ color: "#B91C1C" }} />
@@ -775,21 +927,36 @@ function SKUDetailOverlay({
                 >
                   {sku.skuCode}
                 </span>
-                <span className="px-2 py-0.5 rounded-md" style={{ fontSize: "0.6875rem", background: st.bg, color: st.text }}>
+                <span
+                  className="px-2 py-0.5 rounded-md"
+                  style={{
+                    fontSize: "0.6875rem",
+                    background: st.bg,
+                    color: st.text,
+                  }}
+                >
                   {st.label}
                 </span>
               </div>
-              <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>{sku.productName}</h3>
+              <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
+                {sku.productName}
+              </h3>
             </div>
             {!sku.imageUrl && (
-              <button onClick={onClose} className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors">
+              <button
+                onClick={onClose}
+                className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+              >
                 <X size={16} style={{ color: "#64748B" }} />
               </button>
             )}
           </div>
 
           {/* Description */}
-          <p className="mb-5" style={{ fontSize: "0.875rem", color: "#334155", lineHeight: 1.65 }}>
+          <p
+            className="mb-5"
+            style={{ fontSize: "0.875rem", color: "#334155", lineHeight: 1.65 }}
+          >
             {sku.description}
           </p>
 
@@ -802,13 +969,29 @@ function SKUDetailOverlay({
               { label: "Created", value: fmtDate(sku.createdAt) },
             ].map((m) => (
               <div key={m.label}>
-                <p style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.03em" }}>{m.label}</p>
-                <p className="mt-0.5" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{m.value || "—"}</p>
+                <p
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#94A3B8",
+                    letterSpacing: "0.03em",
+                  }}
+                >
+                  {m.label}
+                </p>
+                <p
+                  className="mt-0.5"
+                  style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+                >
+                  {m.value || "—"}
+                </p>
               </div>
             ))}
           </div>
 
-          <p className="mb-5" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+          <p
+            className="mb-5"
+            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+          >
             Last updated {fmtDate(sku.updatedAt)}
           </p>
 
@@ -859,7 +1042,11 @@ function SKUEditModal({
   const [form, setForm] = useState<SKU>({ ...sku });
 
   function update<K extends keyof SKU>(key: K, val: SKU[K]) {
-    setForm((prev) => ({ ...prev, [key]: val, updatedAt: new Date().toISOString().split("T")[0] }));
+    setForm((prev) => ({
+      ...prev,
+      [key]: val,
+      updatedAt: new Date().toISOString().split("T")[0],
+    }));
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -885,7 +1072,10 @@ function SKUEditModal({
           <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
             {isNew ? "Add Product" : "Edit Product"}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+          >
             <X size={16} style={{ color: "#64748B" }} />
           </button>
         </div>
@@ -920,7 +1110,9 @@ function SKUEditModal({
               >
                 <option value="">Select...</option>
                 {SKU_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </FormField>
@@ -1032,8 +1224,13 @@ function DeleteConfirmDialog({
             <AlertTriangle size={18} style={{ color: "#B91C1C" }} />
           </div>
           <div>
-            <p style={{ fontSize: "0.9375rem", color: "#0F172A" }}>Remove item?</p>
-            <p className="line-clamp-2" style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
+            <p style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
+              Remove item?
+            </p>
+            <p
+              className="line-clamp-2"
+              style={{ fontSize: "0.8125rem", color: "#94A3B8" }}
+            >
               &ldquo;{name}&rdquo; will be permanently removed.
             </p>
           </div>
@@ -1089,7 +1286,10 @@ function AutoUploadDrawer({
 
     const interval = setInterval(() => {
       setProgress((p) => {
-        if (p >= 100) { clearInterval(interval); return 100; }
+        if (p >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
         return p + Math.random() * 18 + 5;
       });
     }, 300);
@@ -1151,14 +1351,21 @@ function AutoUploadDrawer({
   function toggleItem(idx: number) {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
       return next;
     });
   }
 
   // #2 — inline edit helper
-  function updateAIField(idx: number, field: keyof AIPrefilledSKU, value: string) {
-    setAiResults((prev) => prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item)));
+  function updateAIField(
+    idx: number,
+    field: keyof AIPrefilledSKU,
+    value: string,
+  ) {
+    setAiResults((prev) =>
+      prev.map((item, i) => (i === idx ? { ...item, [field]: value } : item)),
+    );
   }
 
   const stageIdx = STAGES.indexOf(stage);
@@ -1180,7 +1387,10 @@ function AutoUploadDrawer({
             <Sparkles size={16} style={{ color: "#0F766E" }} />
             <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Auto Upload</h3>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-[#F1F5F9] rounded-md transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1.5 hover:bg-[#F1F5F9] rounded-md transition-colors"
+          >
             <X size={16} style={{ color: "#64748B" }} />
           </button>
         </div>
@@ -1191,20 +1401,44 @@ function AutoUploadDrawer({
             {STAGES.map((s, i) => (
               <div key={s} className="flex items-center gap-2">
                 {i > 0 && (
-                  <div className="w-8 h-px" style={{ background: stageIdx >= i ? "#0F766E" : "#E2E8F0" }} />
+                  <div
+                    className="w-8 h-px"
+                    style={{
+                      background: stageIdx >= i ? "#0F766E" : "#E2E8F0",
+                    }}
+                  />
                 )}
                 <div
                   className="w-6 h-6 rounded-full flex items-center justify-center"
                   style={{
                     fontSize: "0.625rem",
-                    background: stageIdx === i ? "#0F766E" : stageIdx > i ? "#ECFDF5" : "#F1F5F9",
-                    color: stageIdx === i ? "#fff" : stageIdx > i ? "#0F766E" : "#94A3B8",
+                    background:
+                      stageIdx === i
+                        ? "#0F766E"
+                        : stageIdx > i
+                          ? "#ECFDF5"
+                          : "#F1F5F9",
+                    color:
+                      stageIdx === i
+                        ? "#fff"
+                        : stageIdx > i
+                          ? "#0F766E"
+                          : "#94A3B8",
                   }}
                 >
                   {stageIdx > i ? <Check size={10} /> : i + 1}
                 </div>
-                <span style={{ fontSize: "0.6875rem", color: stageIdx === i ? "#0F172A" : "#94A3B8" }}>
-                  {s === "upload" ? "Upload" : s === "processing" ? "AI Processing" : "Review"}
+                <span
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: stageIdx === i ? "#0F172A" : "#94A3B8",
+                  }}
+                >
+                  {s === "upload"
+                    ? "Upload"
+                    : s === "processing"
+                      ? "AI Processing"
+                      : "Review"}
                 </span>
               </div>
             ))}
@@ -1213,8 +1447,12 @@ function AutoUploadDrawer({
           {/* ── Upload stage (#3 drag-and-drop) ── */}
           {stage === "upload" && (
             <div>
-              <p className="mb-4" style={{ fontSize: "0.8125rem", color: "#64748B" }}>
-                Upload a CSV or Excel file containing product data. Our AI will extract and pre-fill SKU fields for your review.
+              <p
+                className="mb-4"
+                style={{ fontSize: "0.8125rem", color: "#64748B" }}
+              >
+                Upload a CSV or Excel file containing product data. Our AI will
+                extract and pre-fill SKU fields for your review.
               </p>
               <div
                 className="border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer"
@@ -1233,8 +1471,16 @@ function AutoUploadDrawer({
                   style={{ color: dragging ? "#0F766E" : "#94A3B8" }}
                   className="mx-auto mb-3 transition-colors"
                 />
-                <p style={{ fontSize: "0.875rem", color: dragging ? "#0F766E" : "#0F172A" }} className="mb-1">
-                  {dragging ? "Drop your file here" : "Drop your file here or click to browse"}
+                <p
+                  style={{
+                    fontSize: "0.875rem",
+                    color: dragging ? "#0F766E" : "#0F172A",
+                  }}
+                  className="mb-1"
+                >
+                  {dragging
+                    ? "Drop your file here"
+                    : "Drop your file here or click to browse"}
                 </p>
                 <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
                   Accepts .csv, .xlsx, .xls
@@ -1253,22 +1499,41 @@ function AutoUploadDrawer({
           {/* ── Processing stage ── */}
           {stage === "processing" && (
             <div className="text-center py-8">
-              <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center" style={{ background: "#0F766E12" }}>
-                <Loader2 size={28} className="animate-spin" style={{ color: "#0F766E" }} />
+              <div
+                className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+                style={{ background: "#0F766E12" }}
+              >
+                <Loader2
+                  size={28}
+                  className="animate-spin"
+                  style={{ color: "#0F766E" }}
+                />
               </div>
-              <p style={{ fontSize: "0.9375rem", color: "#0F172A" }} className="mb-1">
+              <p
+                style={{ fontSize: "0.9375rem", color: "#0F172A" }}
+                className="mb-1"
+              >
                 AI is extracting product data...
               </p>
-              <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-4">
+              <p
+                style={{ fontSize: "0.8125rem", color: "#94A3B8" }}
+                className="mb-4"
+              >
                 Processing <span style={{ color: "#0F172A" }}>{fileName}</span>
               </p>
               <div className="w-full max-w-xs mx-auto h-2 rounded-full bg-[#E2E8F0] overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(progress, 100)}%`, background: "#0F766E" }}
+                  style={{
+                    width: `${Math.min(progress, 100)}%`,
+                    background: "#0F766E",
+                  }}
                 />
               </div>
-              <p className="mt-2" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+              <p
+                className="mt-2"
+                style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+              >
                 {Math.min(Math.round(progress), 100)}%
               </p>
             </div>
@@ -1277,11 +1542,22 @@ function AutoUploadDrawer({
           {/* ── Review stage (#2 inline edit) ── */}
           {stage === "review" && (
             <div>
-              <p className="mb-1" style={{ fontSize: "0.8125rem", color: "#64748B" }}>
-                AI extracted <span style={{ color: "#0F172A" }}>{aiResults.length} products</span> from your file. Review and correct the pre-filled data below.
+              <p
+                className="mb-1"
+                style={{ fontSize: "0.8125rem", color: "#64748B" }}
+              >
+                AI extracted{" "}
+                <span style={{ color: "#0F172A" }}>
+                  {aiResults.length} products
+                </span>{" "}
+                from your file. Review and correct the pre-filled data below.
               </p>
-              <p className="mb-4" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-                Click any field to edit. Low-confidence fields are highlighted with an amber border. Uncheck items you don't want to import.
+              <p
+                className="mb-4"
+                style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+              >
+                Click any field to edit. Low-confidence fields are highlighted
+                with an amber border. Uncheck items you don't want to import.
               </p>
 
               <div className="space-y-3 mb-6">
@@ -1294,37 +1570,61 @@ function AutoUploadDrawer({
                     <div
                       key={idx}
                       className={`border rounded-xl p-4 transition-colors ${
-                        isSelected ? "border-[#0F766E] bg-[#FAFFFE]" : "border-[#E2E8F0] opacity-50"
+                        isSelected
+                          ? "border-[#0F766E] bg-[#FAFFFE]"
+                          : "border-[#E2E8F0] opacity-50"
                       }`}
                     >
                       {/* Row 1: checkbox + name + confidence */}
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2">
-                          <button onClick={() => toggleItem(idx)} className="flex-shrink-0 mt-0.5">
+                          <button
+                            onClick={() => toggleItem(idx)}
+                            className="flex-shrink-0 mt-0.5"
+                          >
                             {isSelected ? (
-                              <CheckCircle2 size={18} style={{ color: "#0F766E" }} />
+                              <CheckCircle2
+                                size={18}
+                                style={{ color: "#0F766E" }}
+                              />
                             ) : (
-                              <CircleDot size={18} style={{ color: "#CBD5E1" }} />
+                              <CircleDot
+                                size={18}
+                                style={{ color: "#CBD5E1" }}
+                              />
                             )}
                           </button>
                           <div className="flex-1 min-w-0">
                             <InlineEditInput
                               value={item.productName}
-                              onChange={(v) => updateAIField(idx, "productName", v)}
-                              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+                              onChange={(v) =>
+                                updateAIField(idx, "productName", v)
+                              }
+                              style={{
+                                fontSize: "0.8125rem",
+                                color: "#0F172A",
+                              }}
                               warn={lowFields.includes("productName")}
                             />
                             <InlineEditInput
                               value={item.skuCode}
                               onChange={(v) => updateAIField(idx, "skuCode", v)}
-                              style={{ fontSize: "0.6875rem", color: "#64748B", fontFamily: "monospace" }}
+                              style={{
+                                fontSize: "0.6875rem",
+                                color: "#64748B",
+                                fontFamily: "monospace",
+                              }}
                               warn={lowFields.includes("skuCode")}
                             />
                           </div>
                         </div>
                         <span
                           className="flex items-center gap-1 px-2 py-0.5 rounded-md flex-shrink-0"
-                          style={{ fontSize: "0.625rem", color: confColor, background: confColor + "12" }}
+                          style={{
+                            fontSize: "0.625rem",
+                            color: confColor,
+                            background: confColor + "12",
+                          }}
                         >
                           <Sparkles size={9} />
                           {Math.round(item.confidence * 100)}% match
@@ -1371,7 +1671,11 @@ function AutoUploadDrawer({
 
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => { setStage("upload"); setFileName(null); setAiResults([]); }}
+                  onClick={() => {
+                    setStage("upload");
+                    setFileName(null);
+                    setAiResults([]);
+                  }}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-[#F1F5F9] transition-colors"
                   style={{ fontSize: "0.8125rem", color: "#64748B" }}
                 >
@@ -1425,7 +1729,9 @@ function InlineEditInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onBlur={() => setEditing(false)}
-        onKeyDown={(e) => { if (e.key === "Enter") setEditing(false); }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") setEditing(false);
+        }}
         className="w-full px-1.5 py-0.5 rounded border outline-none"
         style={{
           ...style,
@@ -1447,7 +1753,13 @@ function InlineEditInput({
       title="Click to edit"
     >
       {value || <span style={{ color: "#CBD5E1" }}>{placeholder ?? "—"}</span>}
-      {warn && <CircleAlert size={10} className="inline ml-1" style={{ color: "#D97706" }} />}
+      {warn && (
+        <CircleAlert
+          size={10}
+          className="inline ml-1"
+          style={{ color: "#D97706" }}
+        />
+      )}
     </button>
   );
 }
@@ -1492,7 +1804,13 @@ function InlineEditTextarea({
       title="Click to edit"
     >
       {value}
-      {warn && <CircleAlert size={10} className="inline ml-1" style={{ color: "#D97706" }} />}
+      {warn && (
+        <CircleAlert
+          size={10}
+          className="inline ml-1"
+          style={{ color: "#D97706" }}
+        />
+      )}
     </button>
   );
 }
@@ -1516,7 +1834,10 @@ function InlineEditSelect({
       <select
         autoFocus
         value={value}
-        onChange={(e) => { onChange(e.target.value); setEditing(false); }}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setEditing(false);
+        }}
         onBlur={() => setEditing(false)}
         className="w-full px-1.5 py-0.5 rounded border outline-none"
         style={{
@@ -1526,7 +1847,9 @@ function InlineEditSelect({
         }}
       >
         {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
+          <option key={o} value={o}>
+            {o}
+          </option>
         ))}
       </select>
     );
@@ -1543,7 +1866,13 @@ function InlineEditSelect({
       title="Click to change"
     >
       {value}
-      {warn && <CircleAlert size={10} className="inline ml-1" style={{ color: "#D97706" }} />}
+      {warn && (
+        <CircleAlert
+          size={10}
+          className="inline ml-1"
+          style={{ color: "#D97706" }}
+        />
+      )}
     </button>
   );
 }
@@ -1574,14 +1903,21 @@ function HelpResources({
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (f) => f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q),
+        (f) =>
+          f.question.toLowerCase().includes(q) ||
+          f.answer.toLowerCase().includes(q),
       );
     }
-    if (categoryFilter !== "all") result = result.filter((f) => f.category === categoryFilter);
-    return result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    if (categoryFilter !== "all")
+      result = result.filter((f) => f.category === categoryFilter);
+    return result.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
   }, [faqs, search, categoryFilter]);
 
-  const allExpanded = filtered.length > 0 && filtered.every((f) => expandedIds.has(f.id));
+  const allExpanded =
+    filtered.length > 0 && filtered.every((f) => expandedIds.has(f.id));
 
   // #8 — Expand all / Collapse all
   function toggleExpandAll() {
@@ -1595,7 +1931,8 @@ function HelpResources({
   function toggleExpanded(id: string) {
     setExpandedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
@@ -1606,7 +1943,11 @@ function HelpResources({
       if (exists)
         return prev.map((f) =>
           f.id === faq.id
-            ? { ...faq, updatedAt: new Date().toISOString(), version: f.version + 1 }
+            ? {
+                ...faq,
+                updatedAt: new Date().toISOString(),
+                version: f.version + 1,
+              }
             : f,
         );
       return [faq, ...prev];
@@ -1626,7 +1967,9 @@ function HelpResources({
     setPushingId(id);
     setTimeout(() => {
       setFaqs((prev) =>
-        prev.map((f) => (f.id === id ? { ...f, pushedAt: new Date().toISOString() } : f)),
+        prev.map((f) =>
+          f.id === id ? { ...f, pushedAt: new Date().toISOString() } : f,
+        ),
       );
       setPushingId(null);
       toast.success("FAQ pushed to field teams");
@@ -1649,7 +1992,11 @@ function HelpResources({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div className="flex items-center gap-2 flex-wrap flex-1">
           <div className="relative flex-1 max-w-xs">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#94A3B8" }} />
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2"
+              style={{ color: "#94A3B8" }}
+            />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -1658,7 +2005,10 @@ function HelpResources({
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             />
             {search && (
-              <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2"
+              >
                 <X size={12} style={{ color: "#94A3B8" }} />
               </button>
             )}
@@ -1671,7 +2021,9 @@ function HelpResources({
           >
             <option value="all">All Categories</option>
             {FAQ_CATEGORIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
 
@@ -1682,7 +2034,11 @@ function HelpResources({
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] transition-colors"
               style={{ fontSize: "0.8125rem", color: "#64748B" }}
             >
-              {allExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />}
+              {allExpanded ? (
+                <ChevronsDownUp size={14} />
+              ) : (
+                <ChevronsUpDown size={14} />
+              )}
               {allExpanded ? "Collapse All" : "Expand All"}
             </button>
           )}
@@ -1696,7 +2052,11 @@ function HelpResources({
               className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[#0F766E] hover:bg-[#ECFDF5] transition-colors disabled:opacity-60"
               style={{ fontSize: "0.8125rem", color: "#0F766E" }}
             >
-              {pushingId === "all" ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              {pushingId === "all" ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Send size={14} />
+              )}
               Push All ({unpushedCount})
             </button>
           )}
@@ -1727,7 +2087,8 @@ function HelpResources({
         {filtered.length} FAQ{filtered.length !== 1 ? "s" : ""}
         {unpushedCount > 0 && (
           <span style={{ color: "#D97706" }}>
-            {" "}&middot; {unpushedCount} pending push
+            {" "}
+            &middot; {unpushedCount} pending push
           </span>
         )}
       </p>
@@ -1735,14 +2096,21 @@ function HelpResources({
       {/* FAQ List */}
       {filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center">
-          <HelpCircle size={32} style={{ color: "#E2E8F0" }} className="mx-auto mb-3" />
-          <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>No FAQs match your filters.</p>
+          <HelpCircle
+            size={32}
+            style={{ color: "#E2E8F0" }}
+            className="mx-auto mb-3"
+          />
+          <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
+            No FAQs match your filters.
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((faq) => {
             const isExpanded = expandedIds.has(faq.id);
-            const needsPush = !faq.pushedAt || new Date(faq.updatedAt) > new Date(faq.pushedAt);
+            const needsPush =
+              !faq.pushedAt || new Date(faq.updatedAt) > new Date(faq.pushedAt);
 
             return (
               <div
@@ -1757,10 +2125,16 @@ function HelpResources({
                   <ChevronRight
                     size={14}
                     className="flex-shrink-0 transition-transform"
-                    style={{ color: "#94A3B8", transform: isExpanded ? "rotate(90deg)" : "rotate(0)" }}
+                    style={{
+                      color: "#94A3B8",
+                      transform: isExpanded ? "rotate(90deg)" : "rotate(0)",
+                    }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="truncate" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                    <p
+                      className="truncate"
+                      style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+                    >
                       {faq.question}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
@@ -1784,7 +2158,11 @@ function HelpResources({
                       />
                     )}
                     {faq.pushedAt && !needsPush && (
-                      <CheckCircle2 size={14} style={{ color: "#0F766E" }} className="flex-shrink-0" />
+                      <CheckCircle2
+                        size={14}
+                        style={{ color: "#0F766E" }}
+                        className="flex-shrink-0"
+                      />
                     )}
                   </div>
                 </button>
@@ -1794,14 +2172,21 @@ function HelpResources({
                   <div className="px-5 pb-4 border-t border-[#F1F5F9]">
                     <div
                       className="py-3 whitespace-pre-wrap"
-                      style={{ fontSize: "0.8125rem", color: "#334155", lineHeight: 1.65 }}
+                      style={{
+                        fontSize: "0.8125rem",
+                        color: "#334155",
+                        lineHeight: 1.65,
+                      }}
                     >
                       {renderFormattedText(faq.answer)}
                     </div>
 
                     <div className="flex items-center gap-4 pt-3 border-t border-[#F1F5F9] flex-wrap">
                       {faq.pushedAt && (
-                        <span className="flex items-center gap-1" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                        <span
+                          className="flex items-center gap-1"
+                          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                        >
                           <Send size={10} />
                           Last pushed {fmtDateTime(faq.pushedAt)}
                         </span>
@@ -1809,24 +2194,38 @@ function HelpResources({
                       <div className="flex items-center gap-1 ml-auto">
                         {needsPush && (
                           <button
-                            onClick={(e) => { e.stopPropagation(); handlePush(faq.id); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePush(faq.id);
+                            }}
                             disabled={!!pushingId}
                             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#ECFDF5] transition-colors disabled:opacity-60"
                             style={{ fontSize: "0.75rem", color: "#0F766E" }}
                           >
-                            {pushingId === faq.id ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                            {pushingId === faq.id ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : (
+                              <Send size={12} />
+                            )}
                             Push
                           </button>
                         )}
                         <button
-                          onClick={(e) => { e.stopPropagation(); setIsCreating(false); setEditingFaq(faq); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsCreating(false);
+                            setEditingFaq(faq);
+                          }}
                           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors"
                           style={{ fontSize: "0.75rem", color: "#64748B" }}
                         >
                           <Pencil size={12} /> Edit
                         </button>
                         <button
-                          onClick={(e) => { e.stopPropagation(); setDeletingFaq(faq); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingFaq(faq);
+                          }}
                           className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#FEF2F2] transition-colors"
                           style={{ fontSize: "0.75rem", color: "#B91C1C" }}
                         >
@@ -1848,7 +2247,10 @@ function HelpResources({
           faq={editingFaq}
           isNew={isCreating}
           onSave={handleSave}
-          onClose={() => { setEditingFaq(null); setIsCreating(false); }}
+          onClose={() => {
+            setEditingFaq(null);
+            setIsCreating(false);
+          }}
         />
       )}
 
@@ -1901,7 +2303,8 @@ function FAQEditModal({
     const text = form.answer;
     const selected = text.substring(start, end);
     const replacement = prefix + (selected || "text") + suffix;
-    const newText = text.substring(0, start) + replacement + text.substring(end);
+    const newText =
+      text.substring(0, start) + replacement + text.substring(end);
     setForm((p) => ({ ...p, answer: newText }));
     // Restore cursor after React re-render
     requestAnimationFrame(() => {
@@ -1918,7 +2321,8 @@ function FAQEditModal({
     const text = form.answer;
     // Find start of current line
     const lineStart = text.lastIndexOf("\n", start - 1) + 1;
-    const newText = text.substring(0, lineStart) + prefix + text.substring(lineStart);
+    const newText =
+      text.substring(0, lineStart) + prefix + text.substring(lineStart);
     setForm((p) => ({ ...p, answer: newText }));
     requestAnimationFrame(() => {
       el.focus();
@@ -1940,7 +2344,10 @@ function FAQEditModal({
           <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
             {isNew ? "Add FAQ" : "Edit FAQ"}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors">
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+          >
             <X size={16} style={{ color: "#64748B" }} />
           </button>
         </div>
@@ -1949,13 +2356,17 @@ function FAQEditModal({
           <FormField label="Category">
             <select
               value={form.category}
-              onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, category: e.target.value }))
+              }
               className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
               style={{ fontSize: "0.8125rem" }}
             >
               <option value="">Select...</option>
               {FAQ_CATEGORIES.map((c) => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>
+                  {c}
+                </option>
               ))}
             </select>
           </FormField>
@@ -1963,7 +2374,9 @@ function FAQEditModal({
           <FormField label="Question *">
             <input
               value={form.question}
-              onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, question: e.target.value }))
+              }
               className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
               style={{ fontSize: "0.8125rem" }}
               placeholder="What should educators know about...?"
@@ -2021,19 +2434,27 @@ function FAQEditModal({
                 /* Live preview pane */
                 <div
                   className="px-3 py-3 min-h-[160px] whitespace-pre-wrap"
-                  style={{ fontSize: "0.8125rem", color: "#334155", lineHeight: 1.65 }}
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "#334155",
+                    lineHeight: 1.65,
+                  }}
                 >
                   {form.answer ? (
                     renderFormattedText(form.answer)
                   ) : (
-                    <span style={{ color: "#CBD5E1" }}>Preview will appear here...</span>
+                    <span style={{ color: "#CBD5E1" }}>
+                      Preview will appear here...
+                    </span>
                   )}
                 </div>
               ) : (
                 <textarea
                   ref={answerRef}
                   value={form.answer}
-                  onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, answer: e.target.value }))
+                  }
                   rows={8}
                   className="w-full px-3 py-2 outline-none resize-none"
                   style={{ fontSize: "0.8125rem", lineHeight: 1.6 }}
@@ -2044,7 +2465,8 @@ function FAQEditModal({
           </FormField>
 
           <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-            Use the toolbar to format text. **Bold**, *italic*, • bullets, and ## headings are supported.
+            Use the toolbar to format text. **Bold**, *italic*, • bullets, and
+            ## headings are supported.
           </p>
 
           <div className="flex items-center justify-end gap-2 pt-2">
@@ -2107,7 +2529,11 @@ function FormField({
     <div>
       <label
         className="block mb-1.5"
-        style={{ fontSize: "0.6875rem", color: "#64748B", letterSpacing: "0.02em" }}
+        style={{
+          fontSize: "0.6875rem",
+          color: "#64748B",
+          letterSpacing: "0.02em",
+        }}
       >
         {label}
       </label>

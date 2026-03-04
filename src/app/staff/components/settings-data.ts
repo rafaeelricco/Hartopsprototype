@@ -30,7 +30,11 @@ export const CURRENT_USER: UserProfile = {
 
 // ── Team members ────────────────────────────────────────────────────────────
 
-export type TeamRole = "Admin" | "Operating Staff" | "Field Educator" | "Viewer";
+export type TeamRole =
+  | "Admin"
+  | "Operating Staff"
+  | "Field Educator"
+  | "Viewer";
 
 export interface TeamMember {
   id: string;
@@ -43,7 +47,12 @@ export interface TeamMember {
   color: string;
 }
 
-export const TEAM_ROLES: TeamRole[] = ["Admin", "Operating Staff", "Field Educator", "Viewer"];
+export const TEAM_ROLES: TeamRole[] = [
+  "Admin",
+  "Operating Staff",
+  "Field Educator",
+  "Viewer",
+];
 
 export const INITIAL_TEAM: TeamMember[] = [
   {
@@ -152,7 +161,8 @@ export const INITIAL_NOTIFICATIONS: NotificationPref[] = [
   {
     id: "notif-3",
     label: "Event phase transitions",
-    description: "When an event moves from draft to scheduled, active, or completed",
+    description:
+      "When an event moves from draft to scheduled, active, or completed",
     category: "Events",
     email: true,
     push: true,
@@ -161,7 +171,8 @@ export const INITIAL_NOTIFICATIONS: NotificationPref[] = [
   {
     id: "notif-4",
     label: "Live event alerts",
-    description: "Real-time updates during active events (check-ins, milestones)",
+    description:
+      "Real-time updates during active events (check-ins, milestones)",
     category: "Events",
     email: false,
     push: true,
@@ -307,4 +318,9 @@ export const TIMEZONES = [
 ] as const;
 
 export const DATE_FORMATS = ["MM/DD/YYYY", "DD/MM/YYYY", "YYYY-MM-DD"] as const;
-export const DASHBOARD_DEFAULTS = ["Last 30 days", "Last 3 months", "Last 6 months", "Last 12 months"] as const;
+export const DASHBOARD_DEFAULTS = [
+  "Last 30 days",
+  "Last 3 months",
+  "Last 6 months",
+  "Last 12 months",
+] as const;

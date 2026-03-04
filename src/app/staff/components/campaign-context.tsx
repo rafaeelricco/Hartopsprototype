@@ -3,7 +3,13 @@
 // Wraps the layout so both CampaignLibrary and CampaignDetail can read/write.
 // =============================================================================
 
-import { createContext, useContext, useState, useMemo, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  type ReactNode,
+} from "react";
 import { INITIAL_CAMPAIGNS, generateId, type Campaign } from "./campaign-data";
 import { INITIAL_EVENTS, generateEventId, type EventItem } from "./event-data";
 
@@ -13,10 +19,20 @@ interface CampaignContextValue {
   getCampaign: (id: string) => Campaign | undefined;
   getEvent: (id: string) => EventItem | undefined;
   getEventsForCampaign: (campaignId: string) => EventItem[];
-  createCampaign: (data: { name: string; description: string }) => string | null;
-  createEvent: (event: Omit<EventItem, "id" | "createdAt" | "status">) => EventItem;
+  createCampaign: (data: {
+    name: string;
+    description: string;
+  }) => string | null;
+  createEvent: (
+    event: Omit<EventItem, "id" | "createdAt" | "status">,
+  ) => EventItem;
   updateEventStatus: (eventId: string, status: EventItem["status"]) => void;
-  updateEventFields: (eventId: string, fields: Partial<Pick<EventItem, "name" | "location" | "date" | "duration" | "venueType">>) => void;
+  updateEventFields: (
+    eventId: string,
+    fields: Partial<
+      Pick<EventItem, "name" | "location" | "date" | "duration" | "venueType">
+    >,
+  ) => void;
   existingCampaignNames: string[];
 }
 
@@ -26,9 +42,16 @@ const DEFAULT_VALUE: CampaignContextValue = {
   events: INITIAL_EVENTS,
   getCampaign: (id) => INITIAL_CAMPAIGNS.find((c) => c.id === id),
   getEvent: (id) => INITIAL_EVENTS.find((e) => e.id === id),
-  getEventsForCampaign: (cid) => INITIAL_EVENTS.filter((e) => e.campaignId === cid),
+  getEventsForCampaign: (cid) =>
+    INITIAL_EVENTS.filter((e) => e.campaignId === cid),
   createCampaign: () => null,
-  createEvent: (p) => ({ ...p, id: "tmp", status: "draft", createdAt: new Date().toISOString().slice(0, 10) }) as EventItem,
+  createEvent: (p) =>
+    ({
+      ...p,
+      id: "tmp",
+      status: "draft",
+      createdAt: new Date().toISOString().slice(0, 10),
+    }) as EventItem,
   updateEventStatus: () => {},
   updateEventFields: () => {},
   existingCampaignNames: INITIAL_CAMPAIGNS.map((c) => c.name.toLowerCase()),
@@ -46,7 +69,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
 
   const existingCampaignNames = useMemo(
     () => campaigns.map((c) => c.name.toLowerCase()),
-    [campaigns]
+    [campaigns],
   );
 
   function getCampaign(id: string) {
@@ -61,7 +84,10 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     return events.filter((e) => e.campaignId === campaignId);
   }
 
-  function createCampaign(data: { name: string; description: string }): string | null {
+  function createCampaign(data: {
+    name: string;
+    description: string;
+  }): string | null {
     if (existingCampaignNames.includes(data.name.toLowerCase())) {
       return "Name already in use.";
     }
@@ -78,7 +104,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
   }
 
   function createEvent(
-    partial: Omit<EventItem, "id" | "createdAt" | "status">
+    partial: Omit<EventItem, "id" | "createdAt" | "status">,
   ): EventItem {
     const newEvent: EventItem = {
       ...partial,
@@ -92,29 +118,26 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       prev.map((c) =>
         c.id === partial.campaignId
           ? { ...c, eventCount: c.eventCount + 1 }
-          : c
-      )
+          : c,
+      ),
     );
     return newEvent;
   }
 
   function updateEventStatus(eventId: string, status: EventItem["status"]) {
     setEvents((prev) =>
-      prev.map((e) =>
-        e.id === eventId
-          ? { ...e, status }
-          : e
-      )
+      prev.map((e) => (e.id === eventId ? { ...e, status } : e)),
     );
   }
 
-  function updateEventFields(eventId: string, fields: Partial<Pick<EventItem, "name" | "location" | "date" | "duration" | "venueType">>) {
+  function updateEventFields(
+    eventId: string,
+    fields: Partial<
+      Pick<EventItem, "name" | "location" | "date" | "duration" | "venueType">
+    >,
+  ) {
     setEvents((prev) =>
-      prev.map((e) =>
-        e.id === eventId
-          ? { ...e, ...fields }
-          : e
-      )
+      prev.map((e) => (e.id === eventId ? { ...e, ...fields } : e)),
     );
   }
 

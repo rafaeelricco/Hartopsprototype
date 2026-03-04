@@ -8,13 +8,16 @@ export function SignIn() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>(
+    {},
+  );
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const e: typeof errors = {};
     if (!email.trim()) e.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email)) e.email = "Enter a valid email address";
+    else if (!/\S+@\S+\.\S+/.test(email))
+      e.email = "Enter a valid email address";
     if (!password) e.password = "Password is required";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -31,7 +34,10 @@ export function SignIn() {
   };
 
   return (
-    <AuthLayout heading="Welcome back" subheading="Sign in to your Hart Agency dashboard">
+    <AuthLayout
+      heading="Welcome back"
+      subheading="Sign in to your Hart Agency dashboard"
+    >
       <form onSubmit={handleSubmit} noValidate>
         <AuthInput
           label="Email address"
@@ -53,7 +59,10 @@ export function SignIn() {
         />
 
         <div className="flex items-center justify-between mb-6">
-          <label className="flex items-center gap-2 cursor-pointer" style={{ fontSize: "0.875rem" }}>
+          <label
+            className="flex items-center gap-2 cursor-pointer"
+            style={{ fontSize: "0.875rem" }}
+          >
             <input
               type="checkbox"
               className="w-4 h-4 rounded border-[#E2E8F0] accent-[#7D152D]"
@@ -82,7 +91,9 @@ export function SignIn() {
 
       <div className="mt-8 flex items-center gap-3">
         <div className="h-px flex-1 bg-[#E2E8F0]" />
-        <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>or continue with</span>
+        <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
+          or continue with
+        </span>
         <div className="h-px flex-1 bg-[#E2E8F0]" />
       </div>
 
@@ -124,9 +135,16 @@ export function SignIn() {
         </button>
       </div>
 
-      <p className="mt-8 text-center" style={{ fontSize: "0.875rem", color: "#64748B" }}>
+      <p
+        className="mt-8 text-center"
+        style={{ fontSize: "0.875rem", color: "#64748B" }}
+      >
         Don't have an account?{" "}
-        <Link to="/staff/sign-up" className="hover:underline" style={{ color: "#0F766E" }}>
+        <Link
+          to="/staff/sign-up"
+          className="hover:underline"
+          style={{ color: "#0F766E" }}
+        >
           Create an account
         </Link>
       </p>

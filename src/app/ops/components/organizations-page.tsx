@@ -26,14 +26,86 @@ interface Organization {
 /* ------------------------------------------------------------------ */
 
 const SEED_ORGANIZATIONS: Organization[] = [
-  { id: 1, name: "Acme Corp", industry: "Technology", plan: "Enterprise", status: "Active", events: 34, members: 12, joined: "Jan 15, 2025" },
-  { id: 2, name: "Vanguard LLC", industry: "Finance", plan: "Professional", status: "Active", events: 28, members: 8, joined: "Feb 3, 2025" },
-  { id: 3, name: "Zenith Group", industry: "Healthcare", plan: "Enterprise", status: "Active", events: 22, members: 15, joined: "Mar 22, 2025" },
-  { id: 4, name: "Nova Systems", industry: "Technology", plan: "Starter", status: "Active", events: 19, members: 5, joined: "Apr 10, 2025" },
-  { id: 5, name: "Apex Holdings", industry: "Finance", plan: "Professional", status: "Inactive", events: 15, members: 6, joined: "May 1, 2025" },
-  { id: 6, name: "Meridian Partners", industry: "Retail", plan: "Enterprise", status: "Active", events: 12, members: 20, joined: "Jun 18, 2025" },
-  { id: 7, name: "Catalyst Inc.", industry: "Education", plan: "Starter", status: "Active", events: 8, members: 3, joined: "Jul 5, 2025" },
-  { id: 8, name: "Pinnacle Ventures", industry: "Finance", plan: "Professional", status: "Active", events: 11, members: 7, joined: "Aug 12, 2025" },
+  {
+    id: 1,
+    name: "Acme Corp",
+    industry: "Technology",
+    plan: "Enterprise",
+    status: "Active",
+    events: 34,
+    members: 12,
+    joined: "Jan 15, 2025",
+  },
+  {
+    id: 2,
+    name: "Vanguard LLC",
+    industry: "Finance",
+    plan: "Professional",
+    status: "Active",
+    events: 28,
+    members: 8,
+    joined: "Feb 3, 2025",
+  },
+  {
+    id: 3,
+    name: "Zenith Group",
+    industry: "Healthcare",
+    plan: "Enterprise",
+    status: "Active",
+    events: 22,
+    members: 15,
+    joined: "Mar 22, 2025",
+  },
+  {
+    id: 4,
+    name: "Nova Systems",
+    industry: "Technology",
+    plan: "Starter",
+    status: "Active",
+    events: 19,
+    members: 5,
+    joined: "Apr 10, 2025",
+  },
+  {
+    id: 5,
+    name: "Apex Holdings",
+    industry: "Finance",
+    plan: "Professional",
+    status: "Inactive",
+    events: 15,
+    members: 6,
+    joined: "May 1, 2025",
+  },
+  {
+    id: 6,
+    name: "Meridian Partners",
+    industry: "Retail",
+    plan: "Enterprise",
+    status: "Active",
+    events: 12,
+    members: 20,
+    joined: "Jun 18, 2025",
+  },
+  {
+    id: 7,
+    name: "Catalyst Inc.",
+    industry: "Education",
+    plan: "Starter",
+    status: "Active",
+    events: 8,
+    members: 3,
+    joined: "Jul 5, 2025",
+  },
+  {
+    id: 8,
+    name: "Pinnacle Ventures",
+    industry: "Finance",
+    plan: "Professional",
+    status: "Active",
+    events: 11,
+    members: 7,
+    joined: "Aug 12, 2025",
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -46,7 +118,8 @@ export function OrganizationsPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
 
   // Change #1: stateful org list so the wizard can persist new entries
-  const [organizations, setOrganizations] = useState<Organization[]>(SEED_ORGANIZATIONS);
+  const [organizations, setOrganizations] =
+    useState<Organization[]>(SEED_ORGANIZATIONS);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
@@ -61,9 +134,27 @@ export function OrganizationsPage() {
 
   // Wizard submit handler — creates a new org from the wizard data
   const handleWizardSubmit = useCallback(
-    (data: { companyName: string; industry: string; primaryContact: string; inviteEmail: string }) => {
+    (data: {
+      companyName: string;
+      industry: string;
+      primaryContact: string;
+      inviteEmail: string;
+    }) => {
       const now = new Date("2026-03-04");
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       const joinedStr = `${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 
       const nextId = Math.max(...organizations.map((o) => o.id), 0) + 1;
@@ -89,7 +180,10 @@ export function OrganizationsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-foreground">Organizations</h1>
-          <p className="text-muted-foreground mt-1" style={{ fontSize: "0.875rem" }}>
+          <p
+            className="text-muted-foreground mt-1"
+            style={{ fontSize: "0.875rem" }}
+          >
             Manage client organizations and their configurations.
           </p>
         </div>
@@ -121,7 +215,15 @@ export function OrganizationsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  {["Organization", "Industry", "Plan", "Status", "Events", "Members", "Joined"].map((h) => (
+                  {[
+                    "Organization",
+                    "Industry",
+                    "Plan",
+                    "Status",
+                    "Events",
+                    "Members",
+                    "Joined",
+                  ].map((h) => (
                     <th
                       key={h}
                       className="text-left px-5 py-3 text-muted-foreground"
@@ -139,7 +241,10 @@ export function OrganizationsPage() {
                 {filtered.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-5 py-12 text-center">
-                      <p className="text-muted-foreground" style={{ fontSize: "0.875rem" }}>
+                      <p
+                        className="text-muted-foreground"
+                        style={{ fontSize: "0.875rem" }}
+                      >
                         No organizations match your search.
                       </p>
                     </td>
@@ -148,7 +253,9 @@ export function OrganizationsPage() {
                   filtered.map((org) => (
                     <tr
                       key={org.id}
-                      onClick={() => navigate(`/dashboard/organizations/${org.id}`)}
+                      onClick={() =>
+                        navigate(`/dashboard/organizations/${org.id}`)
+                      }
                       className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     >
                       <td className="px-5 py-3">
@@ -156,16 +263,25 @@ export function OrganizationsPage() {
                           <div className="flex items-center justify-center size-8 rounded-md bg-muted">
                             <Building2 className="size-4 text-muted-foreground" />
                           </div>
-                          <span style={{ fontSize: "0.875rem", fontWeight: 500 }} className="text-foreground">
+                          <span
+                            style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                            className="text-foreground"
+                          >
                             {org.name}
                           </span>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                      <td
+                        className="px-5 py-3 text-muted-foreground"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
                         {org.industry}
                       </td>
                       <td className="px-5 py-3">
-                        <Badge variant="outline" style={{ fontSize: "0.6875rem" }}>
+                        <Badge
+                          variant="outline"
+                          style={{ fontSize: "0.6875rem" }}
+                        >
                           {org.plan}
                         </Badge>
                       </td>
@@ -182,13 +298,22 @@ export function OrganizationsPage() {
                           {org.status}
                         </Badge>
                       </td>
-                      <td className="px-5 py-3 text-muted-foreground tabular-nums" style={{ fontSize: "0.8125rem" }}>
+                      <td
+                        className="px-5 py-3 text-muted-foreground tabular-nums"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
                         {org.events}
                       </td>
-                      <td className="px-5 py-3 text-muted-foreground tabular-nums" style={{ fontSize: "0.8125rem" }}>
+                      <td
+                        className="px-5 py-3 text-muted-foreground tabular-nums"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
                         {org.members}
                       </td>
-                      <td className="px-5 py-3 text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                      <td
+                        className="px-5 py-3 text-muted-foreground"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
                         {org.joined}
                       </td>
                     </tr>

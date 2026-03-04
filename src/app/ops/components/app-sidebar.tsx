@@ -12,7 +12,8 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 
-const LOGO_URL = "https://lirp.cdn-website.com/516d69f6/dms3rep/multi/opt/hart-2Bagency-2Blogo-217w.png";
+const LOGO_URL =
+  "https://lirp.cdn-website.com/516d69f6/dms3rep/multi/opt/hart-2Bagency-2Blogo-217w.png";
 
 import {
   Sidebar,
@@ -37,7 +38,11 @@ import {
 
 const mainNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/ops/dashboard" },
-  { label: "Organizations", icon: Building2, path: "/ops/dashboard/organizations" },
+  {
+    label: "Organizations",
+    icon: Building2,
+    path: "/ops/dashboard/organizations",
+  },
   { label: "Events", icon: CalendarDays, path: "/ops/dashboard/events" },
 ];
 
@@ -56,7 +61,8 @@ export function AppSidebar() {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === "/ops/dashboard") return location.pathname === "/ops/dashboard";
+    if (path === "/ops/dashboard")
+      return location.pathname === "/ops/dashboard";
     if (path === "#") return false;
     return location.pathname.startsWith(path);
   };
@@ -80,10 +86,16 @@ export function AppSidebar() {
                 />
               </div>
               <div className="grid flex-1 text-left leading-tight">
-                <span className="truncate" style={{ fontSize: "0.875rem", fontWeight: 600 }}>
+                <span
+                  className="truncate"
+                  style={{ fontSize: "0.875rem", fontWeight: 600 }}
+                >
                   Hart Ops
                 </span>
-                <span className="truncate text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                <span
+                  className="truncate text-muted-foreground"
+                  style={{ fontSize: "0.75rem" }}
+                >
                   Super Admin
                 </span>
               </div>
@@ -173,10 +185,16 @@ export function AppSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left leading-tight">
-                    <span className="truncate" style={{ fontSize: "0.875rem", fontWeight: 500 }}>
+                    <span
+                      className="truncate"
+                      style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                    >
                       Admin Hart
                     </span>
-                    <span className="truncate text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                    <span
+                      className="truncate text-muted-foreground"
+                      style={{ fontSize: "0.75rem" }}
+                    >
                       admin@hartops.com
                     </span>
                   </div>
@@ -202,23 +220,37 @@ export function AppSidebar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left leading-tight">
-                    <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>Admin Hart</span>
-                    <span className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                    <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>
+                      Admin Hart
+                    </span>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.75rem" }}
+                    >
                       admin@hartops.com
                     </span>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/ops/dashboard/settings")} className="cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => navigate("/ops/dashboard/settings")}
+                  className="cursor-pointer"
+                >
                   <Settings className="size-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/ops/dashboard/help")} className="cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => navigate("/ops/dashboard/help")}
+                  className="cursor-pointer"
+                >
                   <LifeBuoy className="size-4 mr-2" />
                   Get Help
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/")} className="cursor-pointer">
+                <DropdownMenuItem
+                  onClick={() => navigate("/")}
+                  className="cursor-pointer"
+                >
                   <LogOut className="size-4 mr-2" />
                   Sign Out
                 </DropdownMenuItem>

@@ -40,7 +40,7 @@ function generateChartPoints(
   labels: string[],
   baseCurrent: number,
   basePrevious: number,
-  variance: number
+  variance: number,
 ): ChartPoint[] {
   const points: ChartPoint[] = [];
   let cur = baseCurrent;

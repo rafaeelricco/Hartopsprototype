@@ -37,7 +37,7 @@ const faqs = [
     id: 2,
     question: "How do I create and manage events?",
     answer:
-      "Go to the Events page and click \"Create Event\". You can set the event name, date, location, and assign it to an organization. Once created, you can edit or cancel events from the event list.",
+      'Go to the Events page and click "Create Event". You can set the event name, date, location, and assign it to an organization. Once created, you can edit or cancel events from the event list.',
     category: "Events",
   },
   {
@@ -120,11 +120,7 @@ export function HelpPage() {
     <div className="p-6 space-y-6 w-full">
       {/* Page Header */}
       <div>
-        <h1
-          className="text-foreground"
-        >
-          Get Help
-        </h1>
+        <h1 className="text-foreground">Get Help</h1>
         <p
           className="text-muted-foreground mt-1"
           style={{ fontSize: "0.875rem" }}
@@ -259,10 +255,7 @@ export function HelpPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Badge
-                      variant="outline"
-                      style={{ fontSize: "0.6875rem" }}
-                    >
+                    <Badge variant="outline" style={{ fontSize: "0.6875rem" }}>
                       {faq.category}
                     </Badge>
                     {expandedFaq === faq.id ? (

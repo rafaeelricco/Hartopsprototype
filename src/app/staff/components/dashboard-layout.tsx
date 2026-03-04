@@ -18,7 +18,7 @@ import {
   ChevronDown,
   Bell,
 } from "lucide-react";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
 import { TIMEFRAMES, type Timeframe } from "./dashboard-data";
 
 const LOGO_URL =
@@ -51,12 +51,18 @@ export function DashboardLayout() {
 
   const pageTitle =
     PAGE_TITLES[location.pathname] ??
-    (location.pathname.startsWith("/staff/campaigns/") ? "Campaigns" :
-     location.pathname.startsWith("/staff/events/") ? "Events" : "Dashboard");
+    (location.pathname.startsWith("/staff/campaigns/")
+      ? "Campaigns"
+      : location.pathname.startsWith("/staff/events/")
+        ? "Events"
+        : "Dashboard");
   const isDashboard = location.pathname === "/staff/dashboard";
 
   return (
-    <div className="min-h-screen flex font-[Inter]" style={{ background: "#F8FAFC" }}>
+    <div
+      className="min-h-screen flex font-[Inter]"
+      style={{ background: "#F8FAFC" }}
+    >
       {/* ------------------------------------------------------------------ */}
       {/* Sidebar                                                            */}
       {/* ------------------------------------------------------------------ */}
@@ -87,15 +93,21 @@ export function DashboardLayout() {
         <nav className="flex-1 px-3 py-4 overflow-y-auto">
           <p
             className="px-3 mb-2 uppercase tracking-wider"
-            style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.06em" }}
+            style={{
+              fontSize: "0.6875rem",
+              color: "#94A3B8",
+              letterSpacing: "0.06em",
+            }}
           >
             Menu
           </p>
           {NAV_ITEMS.map((item) => {
             const active =
               location.pathname === item.path ||
-              (item.path === "/staff/campaigns" && location.pathname.startsWith("/staff/campaigns/")) ||
-              (item.path === "/staff/events" && location.pathname.startsWith("/staff/events/"));
+              (item.path === "/staff/campaigns" &&
+                location.pathname.startsWith("/staff/campaigns/")) ||
+              (item.path === "/staff/events" &&
+                location.pathname.startsWith("/staff/events/"));
             return (
               <Link
                 key={item.path}
@@ -177,7 +189,9 @@ export function DashboardLayout() {
             >
               <Menu size={22} />
             </button>
-            <h1 style={{ fontSize: "1.25rem", color: "#0F172A" }}>{pageTitle}</h1>
+            <h1 style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+              {pageTitle}
+            </h1>
           </div>
 
           <div className="flex items-center gap-3">

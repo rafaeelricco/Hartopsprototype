@@ -29,7 +29,10 @@ export function ForgotPassword() {
 
   if (sent) {
     return (
-      <AuthLayout heading="Check your email" subheading={`We sent a reset link to ${email}`}>
+      <AuthLayout
+        heading="Check your email"
+        subheading={`We sent a reset link to ${email}`}
+      >
         <div className="flex flex-col items-center text-center py-4">
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
@@ -37,12 +40,18 @@ export function ForgotPassword() {
           >
             <CheckCircle2 size={32} style={{ color: "#0F766E" }} />
           </div>
-          <p className="mb-2" style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
+          <p
+            className="mb-2"
+            style={{ fontSize: "0.9375rem", color: "#0F172A" }}
+          >
             Password reset email sent
           </p>
-          <p className="mb-8" style={{ fontSize: "0.875rem", color: "#64748B" }}>
-            Click the link in the email to reset your password. If you don't see it, check your
-            spam folder.
+          <p
+            className="mb-8"
+            style={{ fontSize: "0.875rem", color: "#64748B" }}
+          >
+            Click the link in the email to reset your password. If you don't see
+            it, check your spam folder.
           </p>
           <button
             onClick={() => {

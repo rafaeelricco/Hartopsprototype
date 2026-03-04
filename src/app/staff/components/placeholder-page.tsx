@@ -37,7 +37,10 @@ export function PlaceholderPage() {
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-6" style={{ minHeight: "calc(100vh - 60px)" }}>
+    <div
+      className="flex-1 flex items-center justify-center p-6"
+      style={{ minHeight: "calc(100vh - 60px)" }}
+    >
       <div className="text-center max-w-sm">
         <div
           className="mx-auto w-14 h-14 rounded-xl flex items-center justify-center mb-5"

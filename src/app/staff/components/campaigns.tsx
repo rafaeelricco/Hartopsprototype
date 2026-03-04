@@ -6,6 +6,7 @@
 
 import { useState, useMemo } from "react";
 import { Link } from "react-router";
+import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   Plus,
   Search,
@@ -37,11 +38,12 @@ const STATUS_STYLES: Record<
 const STATUS_FILTERS: Campaign["status"][] = ["active", "draft", "completed"];
 
 export function Campaigns() {
-  const { campaigns, createCampaign, existingCampaignNames } = useCampaignContext();
+  const { campaigns, createCampaign, existingCampaignNames } =
+    useCampaignContext();
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<Campaign["status"] | "all">(
-    "all"
+    "all",
   );
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -56,7 +58,7 @@ export function Campaigns() {
       result = result.filter(
         (c) =>
           c.name.toLowerCase().includes(q) ||
-          c.description.toLowerCase().includes(q)
+          c.description.toLowerCase().includes(q),
       );
     }
     return result;
@@ -67,7 +69,7 @@ export function Campaigns() {
   const safePage = Math.min(currentPage, totalPages);
   const paginatedCampaigns = filtered.slice(
     (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE
+    safePage * PAGE_SIZE,
   );
 
   // Reset to page 1 when filters change
@@ -101,22 +103,24 @@ export function Campaigns() {
       {/* ---------------------------------------------------------------- */}
       {/* Header                                                           */}
       {/* ---------------------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
+      <PageHeader
+        subtitle={
+          <>
             {campaigns.length} campaigns &middot; {activeCount} active &middot;{" "}
             {totalEvents} total events
-          </p>
-        </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90"
-          style={{ background: "#7D152D", fontSize: "0.875rem" }}
-        >
-          <Plus size={16} strokeWidth={2.5} />
-          Create Campaign
-        </button>
-      </div>
+          </>
+        }
+        actions={
+          <button
+            onClick={() => setModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90"
+            style={{ background: "#7D152D", fontSize: "0.875rem" }}
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            Create Campaign
+          </button>
+        }
+      />
 
       {/* ---------------------------------------------------------------- */}
       {/* Toolbar — search + status pills                                  */}
@@ -248,7 +252,7 @@ export function Campaigns() {
                     >
                       {page}
                     </button>
-                  )
+                  ),
                 )}
 
                 <button
@@ -301,8 +305,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       <div className="flex items-center gap-1.5 mb-3">
         <CalendarDays size={14} style={{ color: "#0F766E" }} />
         <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-          {campaign.eventCount}{" "}
-          {campaign.eventCount === 1 ? "event" : "events"}
+          {campaign.eventCount} {campaign.eventCount === 1 ? "event" : "events"}
         </span>
       </div>
 

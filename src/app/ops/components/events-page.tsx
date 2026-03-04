@@ -471,12 +471,12 @@ export function EventsPage() {
           e.name.toLowerCase().includes(q) ||
           e.organization.toLowerCase().includes(q) ||
           e.id.toLowerCase().includes(q) ||
-          e.location.toLowerCase().includes(q)
+          e.location.toLowerCase().includes(q),
       );
     }
     if (statusFilter !== "all") {
       result = result.filter(
-        (e) => e.status.toLowerCase() === statusFilter.toLowerCase()
+        (e) => e.status.toLowerCase() === statusFilter.toLowerCase(),
       );
     }
     if (orgFilter !== "all") {
@@ -484,7 +484,7 @@ export function EventsPage() {
     }
     if (typeFilter !== "all") {
       result = result.filter(
-        (e) => e.type.toLowerCase() === typeFilter.toLowerCase()
+        (e) => e.type.toLowerCase() === typeFilter.toLowerCase(),
       );
     }
     return result;
@@ -495,7 +495,7 @@ export function EventsPage() {
   const safePage = Math.min(page, totalPages);
   const paged = filtered.slice(
     (safePage - 1) * PAGE_SIZE,
-    safePage * PAGE_SIZE
+    safePage * PAGE_SIZE,
   );
 
   // Reset page when filters change
@@ -545,12 +545,7 @@ export function EventsPage() {
           value={eventsThisWeek}
           accent={false}
         />
-        <StatCard
-          icon={Radio}
-          label="Live Now"
-          value={liveNow}
-          accent={true}
-        />
+        <StatCard icon={Radio} label="Live Now" value={liveNow} accent={true} />
       </div>
 
       {/* Filters Row */}
@@ -820,7 +815,7 @@ export function EventsPage() {
                     >
                       {p}
                     </Button>
-                  )
+                  ),
                 )}
                 <Button
                   variant="outline"
@@ -877,10 +872,7 @@ function StatCard({
           />
         </div>
         <div>
-          <p
-            className="text-muted-foreground"
-            style={{ fontSize: "0.75rem" }}
-          >
+          <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
             {label}
           </p>
           <p

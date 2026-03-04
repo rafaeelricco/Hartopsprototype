@@ -6,6 +6,7 @@
 
 import { useState, useMemo } from "react";
 import { Link } from "react-router";
+import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   List,
   CalendarDays,
@@ -27,16 +28,27 @@ const STATUS_META: Record<
 > = {
   active: { bg: "#ECFDF5", text: "#0F766E", dot: "#0F766E", label: "Active" },
   draft: { bg: "#F1F5F9", text: "#64748B", dot: "#94A3B8", label: "Draft" },
-  completed: { bg: "#FEF2F2", text: "#B91C1C", dot: "#B91C1C", label: "Completed" },
-  scheduled: { bg: "#EFF6FF", text: "#1D4ED8", dot: "#3B82F6", label: "Scheduled" },
+  completed: {
+    bg: "#FEF2F2",
+    text: "#B91C1C",
+    dot: "#B91C1C",
+    label: "Completed",
+  },
+  scheduled: {
+    bg: "#EFF6FF",
+    text: "#1D4ED8",
+    dot: "#3B82F6",
+    label: "Scheduled",
+  },
 };
 
-const PHASE_META: Record<string, { label: string; color: string; bg: string }> = {
-  draft: { label: "Editable", color: "#64748B", bg: "#F1F5F9" },
-  scheduled: { label: "Editable", color: "#1D4ED8", bg: "#EFF6FF" },
-  active: { label: "Live Feed", color: "#0F766E", bg: "#ECFDF5" },
-  completed: { label: "Locked", color: "#B91C1C", bg: "#FEF2F2" },
-};
+const PHASE_META: Record<string, { label: string; color: string; bg: string }> =
+  {
+    draft: { label: "Editable", color: "#64748B", bg: "#F1F5F9" },
+    scheduled: { label: "Editable", color: "#1D4ED8", bg: "#EFF6FF" },
+    active: { label: "Live Feed", color: "#0F766E", bg: "#ECFDF5" },
+    completed: { label: "Locked", color: "#B91C1C", bg: "#FEF2F2" },
+  };
 
 const STATUS_FILTERS: (EventItem["status"] | "all")[] = [
   "all",
@@ -67,7 +79,9 @@ export function EventsPage() {
 
   const [view, setView] = useState<ViewMode>("list");
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">(
+    "all",
+  );
   const [campaignFilter, setCampaignFilter] = useState<string>("all");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
@@ -97,7 +111,7 @@ export function EventsPage() {
       result = result.filter(
         (e) =>
           e.name.toLowerCase().includes(q) ||
-          e.location.toLowerCase().includes(q)
+          e.location.toLowerCase().includes(q),
       );
     }
     return result;
@@ -128,56 +142,68 @@ export function EventsPage() {
   return (
     <div className="p-6 font-[Inter]">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <h2 style={{ fontSize: "1.25rem", color: "#0F172A" }} className="mb-1">
-            Events
-          </h2>
-          <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
-            Monitor and manage events across all campaigns.
-          </p>
-        </div>
-
-        {/* View toggle */}
-        <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
-          <button
-            onClick={() => setView("list")}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all ${
-              view === "list" ? "bg-white text-[#0F172A] shadow-sm" : "text-[#64748B] hover:text-[#0F172A]"
-            }`}
-            style={{ fontSize: "0.8125rem" }}
-          >
-            <List size={15} />
-            List
-          </button>
-          <button
-            onClick={() => setView("calendar")}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all ${
-              view === "calendar" ? "bg-white text-[#0F172A] shadow-sm" : "text-[#64748B] hover:text-[#0F172A]"
-            }`}
-            style={{ fontSize: "0.8125rem" }}
-          >
-            <CalendarDays size={15} />
-            Calendar
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Events"
+        subtitle="Monitor and manage events across all campaigns."
+        actions={
+          <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
+            <button
+              onClick={() => setView("list")}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all ${
+                view === "list"
+                  ? "bg-white text-[#0F172A] shadow-sm"
+                  : "text-[#64748B] hover:text-[#0F172A]"
+              }`}
+              style={{ fontSize: "0.8125rem" }}
+            >
+              <List size={15} />
+              List
+            </button>
+            <button
+              onClick={() => setView("calendar")}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all ${
+                view === "calendar"
+                  ? "bg-white text-[#0F172A] shadow-sm"
+                  : "text-[#64748B] hover:text-[#0F172A]"
+              }`}
+              style={{ fontSize: "0.8125rem" }}
+            >
+              <CalendarDays size={15} />
+              Calendar
+            </button>
+          </div>
+        }
+      />
 
       {/* Stat summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {(
           [
-            { key: "draft" as const, label: "Draft / Editable", color: "#64748B" },
+            {
+              key: "draft" as const,
+              label: "Draft / Editable",
+              color: "#64748B",
+            },
             { key: "scheduled" as const, label: "Scheduled", color: "#1D4ED8" },
-            { key: "active" as const, label: "Active / Live", color: "#0F766E" },
-            { key: "completed" as const, label: "Completed / Locked", color: "#B91C1C" },
+            {
+              key: "active" as const,
+              label: "Active / Live",
+              color: "#0F766E",
+            },
+            {
+              key: "completed" as const,
+              label: "Completed / Locked",
+              color: "#B91C1C",
+            },
           ] as const
         ).map((s) => {
           const count = events.filter((e) => e.status === s.key).length;
           return (
             <button
               key={s.key}
-              onClick={() => setStatusFilter(statusFilter === s.key ? "all" : s.key)}
+              onClick={() =>
+                setStatusFilter(statusFilter === s.key ? "all" : s.key)
+              }
               className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm ${
                 statusFilter === s.key
                   ? "border-[#7D152D] ring-1 ring-[#7D152D]/20"
@@ -185,7 +211,10 @@ export function EventsPage() {
               }`}
             >
               <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>
-              <p style={{ fontSize: "1.25rem", color: s.color }} className="mt-0.5">
+              <p
+                style={{ fontSize: "1.25rem", color: s.color }}
+                className="mt-0.5"
+              >
                 {count}
               </p>
             </button>
@@ -215,7 +244,7 @@ export function EventsPage() {
         <div className="flex items-center gap-1.5 flex-wrap">
           {STATUS_FILTERS.map((f) => {
             const isActive = statusFilter === f;
-            const label = f === "all" ? "All" : STATUS_META[f]?.label ?? f;
+            const label = f === "all" ? "All" : (STATUS_META[f]?.label ?? f);
             return (
               <button
                 key={f}
@@ -320,20 +349,34 @@ function EventTableView({
   return (
     <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[780px]" style={{ borderCollapse: "separate", borderSpacing: 0 }}>
+        <table
+          className="w-full min-w-[780px]"
+          style={{ borderCollapse: "separate", borderSpacing: 0 }}
+        >
           <thead>
             <tr className="border-b border-[#E2E8F0]">
-              {["Event Name", "Campaign", "Location", "Date", "Status", "Phase", "Modules", ""].map(
-                (h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left"
-                    style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.04em" }}
-                  >
-                    {h}
-                  </th>
-                )
-              )}
+              {[
+                "Event Name",
+                "Campaign",
+                "Location",
+                "Date",
+                "Status",
+                "Phase",
+                "Modules",
+                "",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="px-4 py-3 text-left"
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#94A3B8",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -368,7 +411,9 @@ function EventTableView({
                         {campaign.name}
                       </span>
                     ) : (
-                      <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>—</span>
+                      <span style={{ fontSize: "0.75rem", color: "#CBD5E1" }}>
+                        —
+                      </span>
                     )}
                   </td>
                   {/* Location */}
@@ -378,25 +423,36 @@ function EventTableView({
                       style={{ fontSize: "0.75rem", color: "#64748B" }}
                       title={event.location}
                     >
-                      <MapPin size={11} className="flex-shrink-0" style={{ color: "#94A3B8" }} />
+                      <MapPin
+                        size={11}
+                        className="flex-shrink-0"
+                        style={{ color: "#94A3B8" }}
+                      />
                       {event.location}
                     </span>
                   </td>
                   {/* Date */}
                   <td className="px-4 py-3.5 whitespace-nowrap">
                     <span style={{ fontSize: "0.75rem", color: "#64748B" }}>
-                      {new Date(event.date + "T12:00:00").toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {new Date(event.date + "T12:00:00").toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        },
+                      )}
                     </span>
                   </td>
                   {/* Status */}
                   <td className="px-4 py-3.5">
                     <span
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md whitespace-nowrap"
-                      style={{ fontSize: "0.6875rem", background: st.bg, color: st.text }}
+                      style={{
+                        fontSize: "0.6875rem",
+                        background: st.bg,
+                        color: st.text,
+                      }}
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0"
@@ -409,7 +465,11 @@ function EventTableView({
                   <td className="px-4 py-3.5">
                     <span
                       className="inline-block px-2 py-0.5 rounded-md whitespace-nowrap"
-                      style={{ fontSize: "0.6875rem", background: ph.bg, color: ph.color }}
+                      style={{
+                        fontSize: "0.6875rem",
+                        background: ph.bg,
+                        color: ph.color,
+                      }}
                     >
                       {ph.label}
                     </span>
@@ -447,7 +507,9 @@ function EventCalendarView({
 }: {
   eventsByDate: Map<string, EventItem[]>;
   calMonth: { year: number; month: number };
-  setCalMonth: React.Dispatch<React.SetStateAction<{ year: number; month: number }>>;
+  setCalMonth: React.Dispatch<
+    React.SetStateAction<{ year: number; month: number }>
+  >;
 }) {
   const { year, month } = calMonth;
 
@@ -470,8 +532,14 @@ function EventCalendarView({
     setCalMonth((prev) => {
       let m = prev.month + delta;
       let y = prev.year;
-      if (m < 0) { m = 11; y--; }
-      if (m > 11) { m = 0; y++; }
+      if (m < 0) {
+        m = 11;
+        y--;
+      }
+      if (m > 11) {
+        m = 0;
+        y++;
+      }
       return { year: y, month: m };
     });
   }
@@ -487,7 +555,8 @@ function EventCalendarView({
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+  const isCurrentMonth =
+    today.getFullYear() === year && today.getMonth() === month;
 
   return (
     <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
@@ -610,7 +679,10 @@ function EventCalendarView({
                       title={`${ev.name} — ${ev.location}`}
                     >
                       <span className="truncate">{ev.name}</span>
-                      <span style={{ color: st.text, opacity: 0.6 }}> · {geo}</span>
+                      <span style={{ color: st.text, opacity: 0.6 }}>
+                        {" "}
+                        · {geo}
+                      </span>
                     </Link>
                   );
                 })}
@@ -631,13 +703,23 @@ function EventCalendarView({
       {/* Weekend clustering legend */}
       <div className="px-5 py-3 border-t border-[#E2E8F0] flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm" style={{ background: "#7D152D10" }} />
-          <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>Weekend</span>
+          <div
+            className="w-3 h-3 rounded-sm"
+            style={{ background: "#7D152D10" }}
+          />
+          <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            Weekend
+          </span>
         </div>
         {Object.entries(STATUS_META).map(([key, val]) => (
           <div key={key} className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-sm" style={{ background: val.bg }} />
-            <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{val.label}</span>
+            <div
+              className="w-3 h-3 rounded-sm"
+              style={{ background: val.bg }}
+            />
+            <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+              {val.label}
+            </span>
           </div>
         ))}
       </div>

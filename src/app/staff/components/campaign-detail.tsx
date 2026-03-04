@@ -23,11 +23,24 @@ import { useCampaignContext } from "./campaign-context";
 import { EventWizard } from "./event-wizard";
 import { OBJECTIVES, type EventItem } from "./event-data";
 
-const STATUS_LABELS: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+const STATUS_LABELS: Record<
+  string,
+  { bg: string; text: string; dot: string; label: string }
+> = {
   active: { bg: "#ECFDF5", text: "#0F766E", dot: "#0F766E", label: "Active" },
   draft: { bg: "#F1F5F9", text: "#64748B", dot: "#94A3B8", label: "Draft" },
-  completed: { bg: "#FEF2F2", text: "#B91C1C", dot: "#B91C1C", label: "Completed" },
-  scheduled: { bg: "#EFF6FF", text: "#1D4ED8", dot: "#3B82F6", label: "Scheduled" },
+  completed: {
+    bg: "#FEF2F2",
+    text: "#B91C1C",
+    dot: "#B91C1C",
+    label: "Completed",
+  },
+  scheduled: {
+    bg: "#EFF6FF",
+    text: "#1D4ED8",
+    dot: "#3B82F6",
+    label: "Scheduled",
+  },
 };
 
 const VENUE_LABELS: Record<string, string> = {
@@ -52,7 +65,9 @@ export function CampaignDetail() {
   const [wizardOpen, setWizardOpen] = useState(false);
 
   // Gap #6: filtering and sorting state
-  const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">(
+    "all",
+  );
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const campaign = getCampaign(id ?? "");
@@ -104,9 +119,13 @@ export function CampaignDetail() {
 
   // Event stats (from all events, not filtered)
   const draftEvents = allEvents.filter((e) => e.status === "draft").length;
-  const scheduledEvents = allEvents.filter((e) => e.status === "scheduled").length;
+  const scheduledEvents = allEvents.filter(
+    (e) => e.status === "scheduled",
+  ).length;
   const activeEvents = allEvents.filter((e) => e.status === "active").length;
-  const completedEvents = allEvents.filter((e) => e.status === "completed").length;
+  const completedEvents = allEvents.filter(
+    (e) => e.status === "completed",
+  ).length;
 
   // Gap #7: Use campaign.eventCount for total, actual array for detail
   const totalEventCount = Math.max(campaign.eventCount, allEvents.length);
@@ -146,7 +165,11 @@ export function CampaignDetail() {
               </span>
             </div>
             <p
-              style={{ fontSize: "0.9375rem", color: "#64748B", lineHeight: 1.6 }}
+              style={{
+                fontSize: "0.9375rem",
+                color: "#64748B",
+                lineHeight: 1.6,
+              }}
               className="mb-4"
             >
               {campaign.description || "No description provided."}
@@ -156,8 +179,7 @@ export function CampaignDetail() {
                 <CalendarDays size={14} style={{ color: "#0F766E" }} />
                 {/* Gap #7: Show totalEventCount consistently */}
                 <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-                  {totalEventCount}{" "}
-                  {totalEventCount === 1 ? "event" : "events"}
+                  {totalEventCount} {totalEventCount === 1 ? "event" : "events"}
                 </span>
               </div>
               <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
@@ -189,14 +211,36 @@ export function CampaignDetail() {
       {allEvents.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
-            { label: "Draft", count: draftEvents, color: "#64748B", key: "draft" as const },
-            { label: "Scheduled", count: scheduledEvents, color: "#1D4ED8", key: "scheduled" as const },
-            { label: "Active", count: activeEvents, color: "#0F766E", key: "active" as const },
-            { label: "Completed", count: completedEvents, color: "#B91C1C", key: "completed" as const },
+            {
+              label: "Draft",
+              count: draftEvents,
+              color: "#64748B",
+              key: "draft" as const,
+            },
+            {
+              label: "Scheduled",
+              count: scheduledEvents,
+              color: "#1D4ED8",
+              key: "scheduled" as const,
+            },
+            {
+              label: "Active",
+              count: activeEvents,
+              color: "#0F766E",
+              key: "active" as const,
+            },
+            {
+              label: "Completed",
+              count: completedEvents,
+              color: "#B91C1C",
+              key: "completed" as const,
+            },
           ].map((s) => (
             <button
               key={s.label}
-              onClick={() => setStatusFilter(statusFilter === s.key ? "all" : s.key)}
+              onClick={() =>
+                setStatusFilter(statusFilter === s.key ? "all" : s.key)
+              }
               className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm ${
                 statusFilter === s.key
                   ? "border-[#7D152D] ring-1 ring-[#7D152D]/20"
@@ -204,7 +248,10 @@ export function CampaignDetail() {
               }`}
             >
               <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>
-              <p style={{ fontSize: "1.25rem", color: s.color }} className="mt-0.5">
+              <p
+                style={{ fontSize: "1.25rem", color: s.color }}
+                className="mt-0.5"
+              >
                 {s.count}
               </p>
             </button>
@@ -248,7 +295,8 @@ export function CampaignDetail() {
             <div className="flex items-center gap-1.5">
               {EVENT_STATUS_FILTERS.map((f) => {
                 const isActive = statusFilter === f;
-                const label = f === "all" ? "All" : STATUS_LABELS[f]?.label ?? f;
+                const label =
+                  f === "all" ? "All" : (STATUS_LABELS[f]?.label ?? f);
                 return (
                   <button
                     key={f}
@@ -275,7 +323,11 @@ export function CampaignDetail() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors"
               style={{ fontSize: "0.8125rem" }}
             >
-              {sortDir === "desc" ? <ArrowDown size={13} /> : <ArrowUp size={13} />}
+              {sortDir === "desc" ? (
+                <ArrowDown size={13} />
+              ) : (
+                <ArrowUp size={13} />
+              )}
               Date {sortDir === "desc" ? "newest" : "oldest"}
             </button>
           </div>
@@ -283,7 +335,10 @@ export function CampaignDetail() {
           {/* Event cards */}
           {events.length === 0 ? (
             <div className="bg-white rounded-xl border border-[#E2E8F0] p-8 flex flex-col items-center justify-center text-center">
-              <p style={{ fontSize: "0.9375rem", color: "#0F172A" }} className="mb-1">
+              <p
+                style={{ fontSize: "0.9375rem", color: "#0F172A" }}
+                className="mb-1"
+              >
                 No {statusFilter} events
               </p>
               <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
@@ -327,7 +382,7 @@ export function CampaignDetail() {
 function EventCard({ event }: { event: EventItem }) {
   const status = STATUS_LABELS[event.status] ?? STATUS_LABELS.draft;
   const objectiveLabels = OBJECTIVES.filter((o) =>
-    event.objectives.includes(o.id)
+    event.objectives.includes(o.id),
   ).map((o) => o.label);
 
   return (
@@ -351,7 +406,11 @@ function EventCard({ event }: { event: EventItem }) {
           </p>
           <span
             className="flex items-center gap-1 flex-shrink-0 px-2 py-0.5 rounded-md"
-            style={{ fontSize: "0.6875rem", background: status.bg, color: status.text }}
+            style={{
+              fontSize: "0.6875rem",
+              background: status.bg,
+              color: status.text,
+            }}
           >
             <span
               className="w-1.5 h-1.5 rounded-full inline-block"
@@ -363,22 +422,34 @@ function EventCard({ event }: { event: EventItem }) {
 
         {/* Meta row */}
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+          <span
+            className="flex items-center gap-1"
+            style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+          >
             <MapPin size={12} />
             <span className="truncate max-w-[200px]">{event.location}</span>
           </span>
-          <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+          <span
+            className="flex items-center gap-1"
+            style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+          >
             <CalendarDays size={12} />
             {new Date(event.date + "T12:00:00").toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
             })}
           </span>
-          <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+          <span
+            className="flex items-center gap-1"
+            style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+          >
             <Clock size={12} />
             {event.duration}
           </span>
-          <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+          <span
+            className="flex items-center gap-1"
+            style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+          >
             <Building2 size={12} />
             {VENUE_LABELS[event.venueType] || event.venueType}
           </span>
@@ -392,7 +463,11 @@ function EventCard({ event }: { event: EventItem }) {
               <span
                 key={label}
                 className="px-2 py-0.5 rounded-md"
-                style={{ fontSize: "0.6875rem", background: "#7D152D0A", color: "#7D152D" }}
+                style={{
+                  fontSize: "0.6875rem",
+                  background: "#7D152D0A",
+                  color: "#7D152D",
+                }}
               >
                 {label}
               </span>

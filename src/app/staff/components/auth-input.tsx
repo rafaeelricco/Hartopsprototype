@@ -6,7 +6,13 @@ interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-export function AuthInput({ label, error, type, className, ...props }: AuthInputProps) {
+export function AuthInput({
+  label,
+  error,
+  type,
+  className,
+  ...props
+}: AuthInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === "password";
 
@@ -26,7 +32,11 @@ export function AuthInput({ label, error, type, className, ...props }: AuthInput
               ? "border-[#EF4444] focus:ring-[#EF4444]/30"
               : "border-[#E2E8F0] focus:ring-[#7D152D]/30 focus:border-[#7D152D]"
           } ${className ?? ""}`}
-          style={{ background: "#FFFFFF", fontSize: "0.9375rem", color: "#0F172A" }}
+          style={{
+            background: "#FFFFFF",
+            fontSize: "0.9375rem",
+            color: "#0F172A",
+          }}
           {...props}
         />
         {isPassword && (

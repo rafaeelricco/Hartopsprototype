@@ -4,6 +4,7 @@
 // =============================================================================
 
 import { useState, useMemo } from "react";
+import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   User,
   Bell,
@@ -37,7 +38,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
 import {
   CURRENT_USER,
   INITIAL_TEAM,
@@ -56,7 +57,12 @@ import {
 
 // ── Shared helpers ───────────────────────────────────────────────────────────
 
-type SettingsTab = "profile" | "notifications" | "team" | "preferences" | "integrations";
+type SettingsTab =
+  | "profile"
+  | "notifications"
+  | "team"
+  | "preferences"
+  | "integrations";
 
 function fmtRelative(iso: string) {
   if (!iso) return "Never";
@@ -92,21 +98,21 @@ export function SettingsPage() {
     { key: "profile", icon: <User size={15} />, label: "Profile" },
     { key: "notifications", icon: <Bell size={15} />, label: "Notifications" },
     { key: "team", icon: <Users size={15} />, label: "Team" },
-    { key: "preferences", icon: <SlidersHorizontal size={15} />, label: "Preferences" },
+    {
+      key: "preferences",
+      icon: <SlidersHorizontal size={15} />,
+      label: "Preferences",
+    },
     { key: "integrations", icon: <Puzzle size={15} />, label: "Integrations" },
   ];
 
   return (
     <div className="p-6 font-[Inter]">
       {/* Header */}
-      <div className="mb-6">
-        <h2 style={{ fontSize: "1.25rem", color: "#0F172A" }} className="mb-1">
-          Settings
-        </h2>
-        <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
-          Manage your account, team, and application preferences.
-        </p>
-      </div>
+      <PageHeader
+        title="Settings"
+        subtitle="Manage your account, team, and application preferences."
+      />
 
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 border-b border-[#E2E8F0] overflow-x-auto">
@@ -115,7 +121,10 @@ export function SettingsPage() {
             key={t.key}
             onClick={() => setTab(t.key)}
             className="flex items-center gap-2 px-4 py-3 transition-colors relative whitespace-nowrap"
-            style={{ fontSize: "0.8125rem", color: tab === t.key ? "#7D152D" : "#64748B" }}
+            style={{
+              fontSize: "0.8125rem",
+              color: tab === t.key ? "#7D152D" : "#64748B",
+            }}
           >
             {t.icon}
             {t.label}
@@ -178,7 +187,11 @@ function ProfileTab() {
             </div>
             <button
               className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => toast.info("Avatar upload is simulated — no file will be stored.")}
+              onClick={() =>
+                toast.info(
+                  "Avatar upload is simulated — no file will be stored.",
+                )
+              }
             >
               <Camera size={18} style={{ color: "#fff" }} />
             </button>
@@ -191,14 +204,24 @@ function ProfileTab() {
               </p>
               <span
                 className="px-2 py-0.5 rounded-md"
-                style={{ fontSize: "0.625rem", background: "#7D152D14", color: "#7D152D" }}
+                style={{
+                  fontSize: "0.625rem",
+                  background: "#7D152D14",
+                  color: "#7D152D",
+                }}
               >
                 {profile.role}
               </span>
             </div>
-            <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>{profile.email}</p>
-            <p className="mt-0.5" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-              {profile.company} &middot; {profile.timezone.replace("America/", "").replace("_", " ")}
+            <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+              {profile.email}
+            </p>
+            <p
+              className="mt-0.5"
+              style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+            >
+              {profile.company} &middot;{" "}
+              {profile.timezone.replace("America/", "").replace("_", " ")}
             </p>
           </div>
 
@@ -249,12 +272,16 @@ function ProfileTab() {
             <FieldGroup label="Timezone">
               <select
                 value={profile.timezone}
-                onChange={(e) => setProfile((p) => ({ ...p, timezone: e.target.value }))}
+                onChange={(e) =>
+                  setProfile((p) => ({ ...p, timezone: e.target.value }))
+                }
                 className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D] bg-white"
                 style={{ fontSize: "0.8125rem", color: "#0F172A" }}
               >
                 {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>{tz.replace("_", " ")}</option>
+                  <option key={tz} value={tz}>
+                    {tz.replace("_", " ")}
+                  </option>
                 ))}
               </select>
             </FieldGroup>
@@ -265,7 +292,11 @@ function ProfileTab() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 style={{ background: "#7D152D", fontSize: "0.8125rem" }}
               >
-                {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                {saving ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Check size={14} />
+                )}
                 {saving ? "Saving..." : "Save Changes"}
               </button>
               <button
@@ -284,12 +315,19 @@ function ProfileTab() {
       <SectionCard title="Security">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: "#F1F5F9" }}
+            >
               <Lock size={16} style={{ color: "#64748B" }} />
             </div>
             <div>
-              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Password</p>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Last changed 45 days ago</p>
+              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                Password
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                Last changed 45 days ago
+              </p>
             </div>
           </div>
           <button
@@ -302,12 +340,19 @@ function ProfileTab() {
         </div>
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F1F5F9]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: "#F1F5F9" }}
+            >
               <Shield size={16} style={{ color: "#64748B" }} />
             </div>
             <div>
-              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Two-factor authentication</p>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Add an extra layer of security to your account</p>
+              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                Two-factor authentication
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                Add an extra layer of security to your account
+              </p>
             </div>
           </div>
           <ToggleSwitch
@@ -321,13 +366,18 @@ function ProfileTab() {
       <SectionCard>
         <div className="flex items-center justify-between">
           <div>
-            <p style={{ fontSize: "0.8125rem", color: "#B91C1C" }}>Delete account</p>
+            <p style={{ fontSize: "0.8125rem", color: "#B91C1C" }}>
+              Delete account
+            </p>
             <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-              Permanently remove your account and all associated data. This action cannot be undone.
+              Permanently remove your account and all associated data. This
+              action cannot be undone.
             </p>
           </div>
           <button
-            onClick={() => toast.error("Account deletion is disabled in this demo.")}
+            onClick={() =>
+              toast.error("Account deletion is disabled in this demo.")
+            }
             className="px-3 py-2 rounded-lg border border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors flex-shrink-0"
             style={{ fontSize: "0.8125rem", color: "#B91C1C" }}
           >
@@ -356,9 +406,18 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!current || !next || !confirm) { toast.error("All fields are required."); return; }
-    if (next.length < 8) { toast.error("New password must be at least 8 characters."); return; }
-    if (next !== confirm) { toast.error("Passwords do not match."); return; }
+    if (!current || !next || !confirm) {
+      toast.error("All fields are required.");
+      return;
+    }
+    if (next.length < 8) {
+      toast.error("New password must be at least 8 characters.");
+      return;
+    }
+    if (next !== confirm) {
+      toast.error("Passwords do not match.");
+      return;
+    }
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
@@ -371,7 +430,10 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
     <Overlay onClose={onClose}>
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
         <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Change Password</h3>
-        <button onClick={onClose} className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors">
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+        >
           <X size={16} style={{ color: "#64748B" }} />
         </button>
       </div>
@@ -385,8 +447,16 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
               className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
               style={{ fontSize: "0.8125rem" }}
             />
-            <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-2.5 top-1/2 -translate-y-1/2">
-              {showCurrent ? <EyeOff size={14} style={{ color: "#94A3B8" }} /> : <Eye size={14} style={{ color: "#94A3B8" }} />}
+            <button
+              type="button"
+              onClick={() => setShowCurrent(!showCurrent)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2"
+            >
+              {showCurrent ? (
+                <EyeOff size={14} style={{ color: "#94A3B8" }} />
+              ) : (
+                <Eye size={14} style={{ color: "#94A3B8" }} />
+              )}
             </button>
           </div>
         </FieldGroup>
@@ -400,13 +470,19 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
               style={{ fontSize: "0.8125rem" }}
               placeholder="Min. 8 characters"
             />
-            <button type="button" onClick={() => setShowNext(!showNext)} className="absolute right-2.5 top-1/2 -translate-y-1/2">
-              {showNext ? <EyeOff size={14} style={{ color: "#94A3B8" }} /> : <Eye size={14} style={{ color: "#94A3B8" }} />}
+            <button
+              type="button"
+              onClick={() => setShowNext(!showNext)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2"
+            >
+              {showNext ? (
+                <EyeOff size={14} style={{ color: "#94A3B8" }} />
+              ) : (
+                <Eye size={14} style={{ color: "#94A3B8" }} />
+              )}
             </button>
           </div>
-          {next.length > 0 && (
-            <PasswordStrength password={next} />
-          )}
+          {next.length > 0 && <PasswordStrength password={next} />}
         </FieldGroup>
         <FieldGroup label="Confirm new password">
           <input
@@ -418,10 +494,20 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
           />
         </FieldGroup>
         <div className="flex items-center justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors" style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
             Cancel
           </button>
-          <button type="submit" disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60" style={{ background: "#7D152D", fontSize: "0.8125rem" }}>
+          <button
+            type="submit"
+            disabled={saving}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+          >
             {saving && <Loader2 size={14} className="animate-spin" />}
             {saving ? "Updating..." : "Update Password"}
           </button>
@@ -451,7 +537,9 @@ function PasswordStrength({ password }: { password: string }) {
           />
         ))}
       </div>
-      <span style={{ fontSize: "0.625rem", color: colors[score - 1] ?? "#94A3B8" }}>
+      <span
+        style={{ fontSize: "0.625rem", color: colors[score - 1] ?? "#94A3B8" }}
+      >
         {labels[score - 1] ?? "Too short"}
       </span>
     </div>
@@ -463,7 +551,9 @@ function PasswordStrength({ password }: { password: string }) {
 // =============================================================================
 
 function NotificationsTab() {
-  const [prefs, setPrefs] = useState<NotificationPref[]>([...INITIAL_NOTIFICATIONS]);
+  const [prefs, setPrefs] = useState<NotificationPref[]>([
+    ...INITIAL_NOTIFICATIONS,
+  ]);
   const [saving, setSaving] = useState(false);
 
   function toggle(id: string, channel: "email" | "push" | "inApp") {
@@ -494,13 +584,22 @@ function NotificationsTab() {
     <div className="max-w-2xl space-y-5">
       {/* Channel legend */}
       <div className="flex items-center gap-6 mb-1">
-        <span className="flex items-center gap-1.5" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+        <span
+          className="flex items-center gap-1.5"
+          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        >
           <Mail size={12} /> Email
         </span>
-        <span className="flex items-center gap-1.5" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+        <span
+          className="flex items-center gap-1.5"
+          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        >
           <Smartphone size={12} /> Push
         </span>
-        <span className="flex items-center gap-1.5" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+        <span
+          className="flex items-center gap-1.5"
+          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        >
           <MonitorSmartphone size={12} /> In-App
         </span>
       </div>
@@ -514,8 +613,12 @@ function NotificationsTab() {
                 className={`flex items-center gap-4 py-3 ${idx < items.length - 1 ? "border-b border-[#F1F5F9]" : ""}`}
               >
                 <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{item.label}</p>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{item.description}</p>
+                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                    {item.label}
+                  </p>
+                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    {item.description}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   <ToggleSwitch
@@ -550,7 +653,11 @@ function NotificationsTab() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           style={{ background: "#7D152D", fontSize: "0.8125rem" }}
         >
-          {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+          {saving ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Check size={14} />
+          )}
           {saving ? "Saving..." : "Save Preferences"}
         </button>
       </div>
@@ -573,15 +680,21 @@ function TeamTab() {
     let result = members;
     if (search) {
       const q = search.toLowerCase();
-      result = result.filter((m) => m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q));
+      result = result.filter(
+        (m) =>
+          m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q),
+      );
     }
-    if (roleFilter !== "all") result = result.filter((m) => m.role === roleFilter);
+    if (roleFilter !== "all")
+      result = result.filter((m) => m.role === roleFilter);
     return result;
   }, [members, search, roleFilter]);
 
   const roleCounts = useMemo(() => {
     const map: Record<string, number> = {};
-    members.forEach((m) => { map[m.role] = (map[m.role] ?? 0) + 1; });
+    members.forEach((m) => {
+      map[m.role] = (map[m.role] ?? 0) + 1;
+    });
     return map;
   }, [members]);
 
@@ -613,7 +726,10 @@ function TeamTab() {
     toast.success("Role updated");
   }
 
-  const STATUS_STYLE: Record<string, { bg: string; text: string; label: string }> = {
+  const STATUS_STYLE: Record<
+    string,
+    { bg: string; text: string; label: string }
+  > = {
     active: { bg: "#ECFDF5", text: "#0F766E", label: "Active" },
     invited: { bg: "#EFF6FF", text: "#2563EB", label: "Invited" },
     deactivated: { bg: "#F1F5F9", text: "#94A3B8", label: "Deactivated" },
@@ -624,18 +740,51 @@ function TeamTab() {
       {/* Role summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: "Total", value: members.length, color: "#0F172A", bg: "#F8FAFC" },
-          { label: "Active", value: members.filter((m) => m.status === "active").length, color: "#0F766E", bg: "#ECFDF5" },
-          { label: "Invited", value: members.filter((m) => m.status === "invited").length, color: "#2563EB", bg: "#EFF6FF" },
-          { label: "Field Educators", value: roleCounts["Field Educator"] ?? 0, color: "#7C3AED", bg: "#F5F3FF" },
+          {
+            label: "Total",
+            value: members.length,
+            color: "#0F172A",
+            bg: "#F8FAFC",
+          },
+          {
+            label: "Active",
+            value: members.filter((m) => m.status === "active").length,
+            color: "#0F766E",
+            bg: "#ECFDF5",
+          },
+          {
+            label: "Invited",
+            value: members.filter((m) => m.status === "invited").length,
+            color: "#2563EB",
+            bg: "#EFF6FF",
+          },
+          {
+            label: "Field Educators",
+            value: roleCounts["Field Educator"] ?? 0,
+            color: "#7C3AED",
+            bg: "#F5F3FF",
+          },
         ].map((s) => (
           <div
             key={s.label}
             className="rounded-xl px-4 py-3 border border-[#E2E8F0]"
             style={{ background: s.bg }}
           >
-            <p style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.03em" }}>{s.label}</p>
-            <p className="mt-0.5" style={{ fontSize: "1.25rem", color: s.color }}>{s.value}</p>
+            <p
+              style={{
+                fontSize: "0.6875rem",
+                color: "#94A3B8",
+                letterSpacing: "0.03em",
+              }}
+            >
+              {s.label}
+            </p>
+            <p
+              className="mt-0.5"
+              style={{ fontSize: "1.25rem", color: s.color }}
+            >
+              {s.value}
+            </p>
           </div>
         ))}
       </div>
@@ -644,7 +793,11 @@ function TeamTab() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap flex-1">
           <div className="relative flex-1 max-w-xs">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "#94A3B8" }} />
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2"
+              style={{ color: "#94A3B8" }}
+            />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -661,7 +814,9 @@ function TeamTab() {
           >
             <option value="all">All Roles</option>
             {TEAM_ROLES.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
         </div>
@@ -682,14 +837,21 @@ function TeamTab() {
       {/* Members table */}
       <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px]" style={{ borderCollapse: "separate", borderSpacing: 0 }}>
+          <table
+            className="w-full min-w-[640px]"
+            style={{ borderCollapse: "separate", borderSpacing: 0 }}
+          >
             <thead>
               <tr className="border-b border-[#E2E8F0]">
                 {["Member", "Role", "Status", "Last Active", ""].map((h) => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left"
-                    style={{ fontSize: "0.6875rem", color: "#94A3B8", letterSpacing: "0.04em" }}
+                    style={{
+                      fontSize: "0.6875rem",
+                      color: "#94A3B8",
+                      letterSpacing: "0.04em",
+                    }}
                   >
                     {h}
                   </th>
@@ -700,7 +862,10 @@ function TeamTab() {
               {filtered.map((m) => {
                 const st = STATUS_STYLE[m.status] ?? STATUS_STYLE.active;
                 return (
-                  <tr key={m.id} className="border-b border-[#F8FAFC] last:border-0 hover:bg-[#FAFBFC] transition-colors">
+                  <tr
+                    key={m.id}
+                    className="border-b border-[#F8FAFC] last:border-0 hover:bg-[#FAFBFC] transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div
@@ -710,30 +875,54 @@ function TeamTab() {
                           {m.initials}
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{m.name}</p>
-                          <p className="truncate" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{m.email}</p>
+                          <p
+                            className="truncate"
+                            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+                          >
+                            {m.name}
+                          </p>
+                          <p
+                            className="truncate"
+                            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                          >
+                            {m.email}
+                          </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <select
                         value={m.role}
-                        onChange={(e) => handleRoleChange(m.id, e.target.value as TeamRole)}
+                        onChange={(e) =>
+                          handleRoleChange(m.id, e.target.value as TeamRole)
+                        }
                         className="px-2 py-1 rounded-md border border-[#E2E8F0] bg-white outline-none cursor-pointer"
                         style={{ fontSize: "0.75rem", color: "#64748B" }}
                         disabled={m.email === CURRENT_USER.email}
                       >
                         {TEAM_ROLES.map((r) => (
-                          <option key={r} value={r}>{r}</option>
+                          <option key={r} value={r}>
+                            {r}
+                          </option>
                         ))}
                       </select>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-0.5 rounded-md" style={{ fontSize: "0.6875rem", background: st.bg, color: st.text }}>
+                      <span
+                        className="px-2 py-0.5 rounded-md"
+                        style={{
+                          fontSize: "0.6875rem",
+                          background: st.bg,
+                          color: st.text,
+                        }}
+                      >
                         {st.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    <td
+                      className="px-4 py-3"
+                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                    >
                       {m.lastActive ? fmtRelative(m.lastActive) : "—"}
                     </td>
                     <td className="px-4 py-3">
@@ -756,7 +945,10 @@ function TeamTab() {
 
       {/* Invite modal */}
       {showInvite && (
-        <InviteModal onInvite={handleInvite} onClose={() => setShowInvite(false)} />
+        <InviteModal
+          onInvite={handleInvite}
+          onClose={() => setShowInvite(false)}
+        />
       )}
 
       {/* Remove confirm */}
@@ -795,8 +987,13 @@ function InviteModal({
   return (
     <Overlay onClose={onClose}>
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-        <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Invite Team Member</h3>
-        <button onClick={onClose} className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors">
+        <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
+          Invite Team Member
+        </h3>
+        <button
+          onClick={onClose}
+          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+        >
           <X size={16} style={{ color: "#64748B" }} />
         </button>
       </div>
@@ -817,18 +1014,30 @@ function InviteModal({
             style={{ fontSize: "0.8125rem" }}
           >
             {TEAM_ROLES.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>
+                {r}
+              </option>
             ))}
           </select>
         </FieldGroup>
         <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-          An invitation email will be sent. The member can sign in after accepting.
+          An invitation email will be sent. The member can sign in after
+          accepting.
         </p>
         <div className="flex items-center justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors" style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
             Cancel
           </button>
-          <button type="submit" className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90" style={{ background: "#7D152D", fontSize: "0.8125rem" }}>
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+          >
             Send Invitation
           </button>
         </div>
@@ -864,12 +1073,19 @@ function PreferencesTab() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: "#F1F5F9" }}
+              >
                 <LayoutDashboard size={16} style={{ color: "#64748B" }} />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Default timeframe</p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Initial timeframe filter when you open the dashboard</p>
+                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                  Default timeframe
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  Initial timeframe filter when you open the dashboard
+                </p>
               </div>
             </div>
             <select
@@ -879,7 +1095,9 @@ function PreferencesTab() {
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             >
               {DASHBOARD_DEFAULTS.map((d) => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>
+                  {d}
+                </option>
               ))}
             </select>
           </div>
@@ -891,12 +1109,19 @@ function PreferencesTab() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: "#F1F5F9" }}
+              >
                 <CalendarDays size={16} style={{ color: "#64748B" }} />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Date format</p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>How dates are displayed across the application</p>
+                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                  Date format
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  How dates are displayed across the application
+                </p>
               </div>
             </div>
             <select
@@ -906,19 +1131,28 @@ function PreferencesTab() {
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             >
               {DATE_FORMATS.map((f) => (
-                <option key={f} value={f}>{f}</option>
+                <option key={f} value={f}>
+                  {f}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-[#F1F5F9]">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: "#F1F5F9" }}
+              >
                 <LayoutGrid size={16} style={{ color: "#64748B" }} />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Product Library view</p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Default view mode for the Brand Assets product library</p>
+                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                  Product Library view
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  Default view mode for the Brand Assets product library
+                </p>
               </div>
             </div>
             <div className="inline-flex rounded-lg border border-[#E2E8F0] overflow-hidden">
@@ -949,12 +1183,19 @@ function PreferencesTab() {
 
           <div className="flex items-center justify-between pt-4 border-t border-[#F1F5F9]">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                style={{ background: "#F1F5F9" }}
+              >
                 <SlidersHorizontal size={16} style={{ color: "#64748B" }} />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Compact mode</p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Reduce spacing and padding for denser layouts</p>
+                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                  Compact mode
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  Reduce spacing and padding for denser layouts
+                </p>
               </div>
             </div>
             <ToggleSwitch checked={compactMode} onChange={setCompactMode} />
@@ -966,12 +1207,19 @@ function PreferencesTab() {
       <SectionCard title="Behavior">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center"
+              style={{ background: "#F1F5F9" }}
+            >
               <CheckCircle2 size={16} style={{ color: "#64748B" }} />
             </div>
             <div>
-              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>Auto-save drafts</p>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>Automatically save event and campaign drafts as you edit</p>
+              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                Auto-save drafts
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                Automatically save event and campaign drafts as you edit
+              </p>
             </div>
           </div>
           <ToggleSwitch checked={autoSave} onChange={setAutoSave} />
@@ -985,7 +1233,11 @@ function PreferencesTab() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           style={{ background: "#7D152D", fontSize: "0.8125rem" }}
         >
-          {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+          {saving ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Check size={14} />
+          )}
           {saving ? "Saving..." : "Save Preferences"}
         </button>
       </div>
@@ -998,7 +1250,9 @@ function PreferencesTab() {
 // =============================================================================
 
 function IntegrationsTab() {
-  const [integrations, setIntegrations] = useState<Integration[]>([...INITIAL_INTEGRATIONS]);
+  const [integrations, setIntegrations] = useState<Integration[]>([
+    ...INITIAL_INTEGRATIONS,
+  ]);
   const [syncing, setSyncing] = useState<string | null>(null);
 
   function toggleConnect(id: string) {
@@ -1006,7 +1260,9 @@ function IntegrationsTab() {
     if (!int) return;
     if (int.connected) {
       setIntegrations((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, connected: false, lastSync: null } : i)),
+        prev.map((i) =>
+          i.id === id ? { ...i, connected: false, lastSync: null } : i,
+        ),
       );
       toast.success(`${int.name} disconnected`);
     } else {
@@ -1015,7 +1271,9 @@ function IntegrationsTab() {
       setTimeout(() => {
         setIntegrations((prev) =>
           prev.map((i) =>
-            i.id === id ? { ...i, connected: true, lastSync: new Date().toISOString() } : i,
+            i.id === id
+              ? { ...i, connected: true, lastSync: new Date().toISOString() }
+              : i,
           ),
         );
         setSyncing(null);
@@ -1028,7 +1286,9 @@ function IntegrationsTab() {
     setSyncing(id);
     setTimeout(() => {
       setIntegrations((prev) =>
-        prev.map((i) => (i.id === id ? { ...i, lastSync: new Date().toISOString() } : i)),
+        prev.map((i) =>
+          i.id === id ? { ...i, lastSync: new Date().toISOString() } : i,
+        ),
       );
       setSyncing(null);
       toast.success("Sync completed");
@@ -1043,7 +1303,10 @@ function IntegrationsTab() {
       {/* Connected */}
       {connected.length > 0 && (
         <div>
-          <p className="mb-3 flex items-center gap-2" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+          <p
+            className="mb-3 flex items-center gap-2"
+            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+          >
             <Link2 size={14} style={{ color: "#0F766E" }} />
             Connected ({connected.length})
           </p>
@@ -1053,19 +1316,36 @@ function IntegrationsTab() {
                 key={int.id}
                 className="bg-white rounded-xl border border-[#E2E8F0] px-5 py-4 flex items-center gap-4 hover:shadow-sm transition-shadow"
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#ECFDF5", fontSize: "1.25rem" }}>
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: "#ECFDF5", fontSize: "1.25rem" }}
+                >
                   {int.icon}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{int.name}</p>
-                    <span className="px-1.5 py-0.5 rounded-md" style={{ fontSize: "0.5625rem", background: "#ECFDF5", color: "#0F766E" }}>
+                    <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                      {int.name}
+                    </p>
+                    <span
+                      className="px-1.5 py-0.5 rounded-md"
+                      style={{
+                        fontSize: "0.5625rem",
+                        background: "#ECFDF5",
+                        color: "#0F766E",
+                      }}
+                    >
                       Connected
                     </span>
                   </div>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{int.description}</p>
+                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    {int.description}
+                  </p>
                   {int.lastSync && (
-                    <p className="mt-0.5 flex items-center gap-1" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                    <p
+                      className="mt-0.5 flex items-center gap-1"
+                      style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                    >
                       <Clock size={9} /> Last synced {fmtRelative(int.lastSync)}
                     </p>
                   )}
@@ -1078,7 +1358,11 @@ function IntegrationsTab() {
                     title="Sync now"
                   >
                     {syncing === int.id ? (
-                      <Loader2 size={14} className="animate-spin" style={{ color: "#0F766E" }} />
+                      <Loader2
+                        size={14}
+                        className="animate-spin"
+                        style={{ color: "#0F766E" }}
+                      />
                     ) : (
                       <RefreshCw size={14} style={{ color: "#64748B" }} />
                     )}
@@ -1100,7 +1384,10 @@ function IntegrationsTab() {
       {/* Available */}
       {available.length > 0 && (
         <div>
-          <p className="mb-3 flex items-center gap-2" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+          <p
+            className="mb-3 flex items-center gap-2"
+            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+          >
             <Link2Off size={14} style={{ color: "#94A3B8" }} />
             Available ({available.length})
           </p>
@@ -1110,12 +1397,19 @@ function IntegrationsTab() {
                 key={int.id}
                 className="bg-white rounded-xl border border-[#E2E8F0] px-5 py-4 flex items-center gap-4 hover:shadow-sm transition-shadow"
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#F1F5F9", fontSize: "1.25rem" }}>
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: "#F1F5F9", fontSize: "1.25rem" }}
+                >
                   {int.icon}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{int.name}</p>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{int.description}</p>
+                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                    {int.name}
+                  </p>
+                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    {int.description}
+                  </p>
                 </div>
                 <button
                   onClick={() => toggleConnect(int.id)}
@@ -1139,7 +1433,8 @@ function IntegrationsTab() {
       {/* API Key section */}
       <SectionCard title="API Access">
         <p className="mb-3" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-          Use your API key to integrate Hart Agency data with external tools. Keep it secret.
+          Use your API key to integrate Hart Agency data with external tools.
+          Keep it secret.
         </p>
         <APIKeyField />
       </SectionCard>
@@ -1163,7 +1458,9 @@ function APIKeyField() {
       <div className="flex-1 relative">
         <input
           readOnly
-          value={visible ? key : key.replace(/./g, "•").substring(0, 32) + "..."}
+          value={
+            visible ? key : key.replace(/./g, "•").substring(0, 32) + "..."
+          }
           className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] font-mono outline-none"
           style={{ fontSize: "0.75rem", color: "#64748B" }}
         />
@@ -1171,7 +1468,11 @@ function APIKeyField() {
           onClick={() => setVisible(!visible)}
           className="absolute right-2.5 top-1/2 -translate-y-1/2"
         >
-          {visible ? <EyeOff size={13} style={{ color: "#94A3B8" }} /> : <Eye size={13} style={{ color: "#94A3B8" }} />}
+          {visible ? (
+            <EyeOff size={13} style={{ color: "#94A3B8" }} />
+          ) : (
+            <Eye size={13} style={{ color: "#94A3B8" }} />
+          )}
         </button>
       </div>
       <button
@@ -1189,7 +1490,13 @@ function APIKeyField() {
 // Shared UI Primitives
 // =============================================================================
 
-function SectionCard({ title, children }: { title?: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  children,
+}: {
+  title?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
       {title && (
@@ -1202,12 +1509,22 @@ function SectionCard({ title, children }: { title?: string; children: React.Reac
   );
 }
 
-function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
+function FieldGroup({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <label
         className="block mb-1.5"
-        style={{ fontSize: "0.6875rem", color: "#64748B", letterSpacing: "0.02em" }}
+        style={{
+          fontSize: "0.6875rem",
+          color: "#64748B",
+          letterSpacing: "0.02em",
+        }}
       >
         {label}
       </label>
@@ -1279,7 +1596,13 @@ function ToggleSwitch({
   );
 }
 
-function Overlay({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+function Overlay({
+  children,
+  onClose,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -1315,21 +1638,37 @@ function ConfirmDialog({
       style={{ background: "rgba(15,23,42,0.6)" }}
       onClick={onCancel}
     >
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#FEF2F2" }}>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: "#FEF2F2" }}
+          >
             <AlertTriangle size={18} style={{ color: "#B91C1C" }} />
           </div>
           <div>
             <p style={{ fontSize: "0.9375rem", color: "#0F172A" }}>{title}</p>
-            <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>{description}</p>
+            <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
+              {description}
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-2">
-          <button onClick={onCancel} className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors" style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
             Cancel
           </button>
-          <button onClick={onConfirm} className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90" style={{ background: "#B91C1C", fontSize: "0.8125rem" }}>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            style={{ background: "#B91C1C", fontSize: "0.8125rem" }}
+          >
             {confirmLabel}
           </button>
         </div>

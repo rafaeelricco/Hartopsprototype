@@ -157,7 +157,14 @@ export function getQuickStats(scope: ReportScope = "all"): QuickStatsResult {
       socialMentions: acc.socialMentions + c.socialMentions,
       photoCount: acc.photoCount + c.photoCount,
     }),
-    { samples: 0, consumerReach: 0, totalSales: 0, events: 0, socialMentions: 0, photoCount: 0 }
+    {
+      samples: 0,
+      consumerReach: 0,
+      totalSales: 0,
+      events: 0,
+      socialMentions: 0,
+      photoCount: 0,
+    },
   );
 
   return {
@@ -167,16 +174,36 @@ export function getQuickStats(scope: ReportScope = "all"): QuickStatsResult {
     events: Math.round(totals.events * m),
     socialMentions: Math.round(totals.socialMentions * m),
     photoCount: Math.round(totals.photoCount * m),
-    samplesDelta: scope === "all" ? 18.7 : scope === "6m" ? 24.3 : scope === "3m" ? 12.5 : 8.2,
-    reachDelta: scope === "all" ? 22.1 : scope === "6m" ? 19.6 : scope === "3m" ? 11.4 : 6.8,
-    salesDelta: scope === "all" ? 28.9 : scope === "6m" ? 35.1 : scope === "3m" ? 15.3 : 10.4,
+    samplesDelta:
+      scope === "all"
+        ? 18.7
+        : scope === "6m"
+          ? 24.3
+          : scope === "3m"
+            ? 12.5
+            : 8.2,
+    reachDelta:
+      scope === "all"
+        ? 22.1
+        : scope === "6m"
+          ? 19.6
+          : scope === "3m"
+            ? 11.4
+            : 6.8,
+    salesDelta:
+      scope === "all"
+        ? 28.9
+        : scope === "6m"
+          ? 35.1
+          : scope === "3m"
+            ? 15.3
+            : 10.4,
   };
 }
 
 // ── Top 3 campaign IDs by total sales — used as the default comparison set ──
 
-export const DEFAULT_COMPARISON_IDS: string[] = CAMPAIGN_METRICS
-  .slice()
+export const DEFAULT_COMPARISON_IDS: string[] = CAMPAIGN_METRICS.slice()
   .sort((a, b) => b.totalSales - a.totalSales)
   .slice(0, 3)
   .map((c) => c.campaignId);
@@ -324,7 +351,10 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
 export function getGalleryEvents(): { eventId: string; eventName: string }[] {
   const map = new Map<string, string>();
   PROOF_PHOTOS.forEach((p) => map.set(p.eventId, p.eventName));
-  return Array.from(map.entries()).map(([eventId, eventName]) => ({ eventId, eventName }));
+  return Array.from(map.entries()).map(([eventId, eventName]) => ({
+    eventId,
+    eventName,
+  }));
 }
 
 // ── Monthly trend data — scope-aware slicing ────────────────────────────────

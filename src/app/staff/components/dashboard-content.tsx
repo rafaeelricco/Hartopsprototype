@@ -16,8 +16,20 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { TrendingUp, Users, ShoppingCart, Calendar, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { getDashboardData, type Timeframe, type StatCard, type ChartPoint } from "./dashboard-data";
+import {
+  TrendingUp,
+  Users,
+  ShoppingCart,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
+import {
+  getDashboardData,
+  type Timeframe,
+  type StatCard,
+  type ChartPoint,
+} from "./dashboard-data";
 
 const STAT_ICONS = [TrendingUp, Users, ShoppingCart, Calendar];
 
@@ -109,11 +121,18 @@ export function DashboardContent() {
               </div>
               <span
                 className="mb-1"
-                style={{ fontSize: "1.75rem", color: "#0F172A", lineHeight: 1.2 }}
+                style={{
+                  fontSize: "1.75rem",
+                  color: "#0F172A",
+                  lineHeight: 1.2,
+                }}
               >
                 {card.value}
               </span>
-              <span className="flex items-center gap-1" style={{ fontSize: "0.8125rem" }}>
+              <span
+                className="flex items-center gap-1"
+                style={{ fontSize: "0.8125rem" }}
+              >
                 {card.up ? (
                   <ArrowUpRight size={14} style={{ color: "#0F766E" }} />
                 ) : (
@@ -139,7 +158,11 @@ export function DashboardContent() {
           </h3>
           <span
             className="px-2.5 py-1 rounded-md"
-            style={{ fontSize: "0.75rem", color: "#64748B", background: "#F1F5F9" }}
+            style={{
+              fontSize: "0.75rem",
+              color: "#64748B",
+              background: "#F1F5F9",
+            }}
           >
             {timeframe}
           </span>
@@ -163,7 +186,11 @@ export function DashboardContent() {
                 <stop offset="95%" stopColor="#0F766E" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="#E2E8F0"
+              vertical={false}
+            />
             <XAxis
               dataKey="date"
               tick={{ fontSize: 11, fill: "#94A3B8" }}

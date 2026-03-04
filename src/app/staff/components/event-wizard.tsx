@@ -74,7 +74,12 @@ const STEPS = [
   { num: 4, label: "Customization", icon: Settings2 },
 ];
 
-export function EventWizard({ campaignId, open, onClose, onCreated }: EventWizardProps) {
+export function EventWizard({
+  campaignId,
+  open,
+  onClose,
+  onCreated,
+}: EventWizardProps) {
   const { createEvent } = useCampaignContext();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<WizardData>(INITIAL_DATA);
@@ -85,12 +90,16 @@ export function EventWizard({ campaignId, open, onClose, onCreated }: EventWizar
   // Derived data modules from selected objectives
   const mappedModules = useMemo(
     () => getDataModulesForObjectives(data.objectives),
-    [data.objectives]
+    [data.objectives],
   );
 
   // Get modules grouped by objective for report preview
   const modulesByObjective = useMemo(() => {
-    const groups: { objectiveId: string; label: string; modules: DataModule[] }[] = [];
+    const groups: {
+      objectiveId: string;
+      label: string;
+      modules: DataModule[];
+    }[] = [];
     for (const objId of data.objectives) {
       const obj = OBJECTIVES.find((o) => o.id === objId);
       const mods = OBJECTIVE_MODULE_MAP[objId] ?? [];
@@ -172,13 +181,10 @@ export function EventWizard({ campaignId, open, onClose, onCreated }: EventWizar
 
   // ── Field updaters ────────────────────────────────────────────────────────
 
-  const updateField = useCallback(
-    (field: keyof WizardData, value: string) => {
-      setData((d) => ({ ...d, [field]: value }));
-      setErrors((e) => (e[field] ? { ...e, [field]: "" } : e));
-    },
-    []
-  );
+  const updateField = useCallback((field: keyof WizardData, value: string) => {
+    setData((d) => ({ ...d, [field]: value }));
+    setErrors((e) => (e[field] ? { ...e, [field]: "" } : e));
+  }, []);
 
   function toggleObjective(id: string) {
     setData((d) => ({
@@ -236,7 +242,11 @@ export function EventWizard({ campaignId, open, onClose, onCreated }: EventWizar
                   <div
                     className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
                     style={{
-                      background: isDone ? "#0F766E" : isActive ? "#7D152D" : "#E2E8F0",
+                      background: isDone
+                        ? "#0F766E"
+                        : isActive
+                          ? "#7D152D"
+                          : "#E2E8F0",
                       color: isDone || isActive ? "#FFF" : "#94A3B8",
                       fontSize: "0.75rem",
                     }}
@@ -247,7 +257,11 @@ export function EventWizard({ campaignId, open, onClose, onCreated }: EventWizar
                     className="hidden sm:block"
                     style={{
                       fontSize: "0.75rem",
-                      color: isActive ? "#0F172A" : isDone ? "#0F766E" : "#94A3B8",
+                      color: isActive
+                        ? "#0F172A"
+                        : isDone
+                          ? "#0F766E"
+                          : "#94A3B8",
                     }}
                   >
                     {s.label}
@@ -389,7 +403,12 @@ function Step1Basics({
       </p>
 
       {/* Name */}
-      <FieldWrapper label="Event Name" required error={errors.name} icon={<FileText size={15} style={{ color: "#94A3B8" }} />}>
+      <FieldWrapper
+        label="Event Name"
+        required
+        error={errors.name}
+        icon={<FileText size={15} style={{ color: "#94A3B8" }} />}
+      >
         <input
           type="text"
           value={data.name}
@@ -402,7 +421,12 @@ function Step1Basics({
       </FieldWrapper>
 
       {/* Location */}
-      <FieldWrapper label="Location" required error={errors.location} icon={<MapPin size={15} style={{ color: "#94A3B8" }} />}>
+      <FieldWrapper
+        label="Location"
+        required
+        error={errors.location}
+        icon={<MapPin size={15} style={{ color: "#94A3B8" }} />}
+      >
         <input
           type="text"
           value={data.location}
@@ -416,7 +440,12 @@ function Step1Basics({
 
       {/* Date + Duration row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FieldWrapper label="Date" required error={errors.date} icon={<Calendar size={15} style={{ color: "#94A3B8" }} />}>
+        <FieldWrapper
+          label="Date"
+          required
+          error={errors.date}
+          icon={<Calendar size={15} style={{ color: "#94A3B8" }} />}
+        >
           <input
             type="date"
             value={data.date}
@@ -426,7 +455,12 @@ function Step1Basics({
           />
         </FieldWrapper>
 
-        <FieldWrapper label="Duration" required error={errors.duration} icon={<Clock size={15} style={{ color: "#94A3B8" }} />}>
+        <FieldWrapper
+          label="Duration"
+          required
+          error={errors.duration}
+          icon={<Clock size={15} style={{ color: "#94A3B8" }} />}
+        >
           <select
             value={data.duration}
             onChange={(e) => updateField("duration", e.target.value)}
@@ -435,7 +469,9 @@ function Step1Basics({
           >
             <option value="">Select duration...</option>
             {DURATION_OPTIONS.map((d) => (
-              <option key={d} value={d}>{d}</option>
+              <option key={d} value={d}>
+                {d}
+              </option>
             ))}
           </select>
         </FieldWrapper>
@@ -443,7 +479,10 @@ function Step1Basics({
 
       {/* Venue Type */}
       <div className="mb-1">
-        <label className="flex items-center gap-1.5 mb-2" style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+        <label
+          className="flex items-center gap-1.5 mb-2"
+          style={{ fontSize: "0.875rem", color: "#0F172A" }}
+        >
           <Building2 size={15} style={{ color: "#94A3B8" }} />
           Venue Type <span style={{ color: "#EF4444" }}>*</span>
         </label>
@@ -461,10 +500,22 @@ function Step1Basics({
                     : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1]"
                 }`}
               >
-                <p style={{ fontSize: "0.875rem", color: selected ? "#7D152D" : "#0F172A" }}>
+                <p
+                  style={{
+                    fontSize: "0.875rem",
+                    color: selected ? "#7D152D" : "#0F172A",
+                  }}
+                >
                   {v.label}
                 </p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8", lineHeight: 1.4 }} className="mt-0.5">
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#94A3B8",
+                    lineHeight: 1.4,
+                  }}
+                  className="mt-0.5"
+                >
                   {v.description}
                 </p>
               </button>
@@ -472,7 +523,10 @@ function Step1Basics({
           })}
         </div>
         {errors.venueType && (
-          <p className="mt-1.5" style={{ fontSize: "0.8125rem", color: "#EF4444" }}>
+          <p
+            className="mt-1.5"
+            style={{ fontSize: "0.8125rem", color: "#EF4444" }}
+          >
             {errors.venueType}
           </p>
         )}
@@ -513,13 +567,18 @@ function Step2Objectives({
         </span>
       </div>
       <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-5">
-        Objectives drive the entire downstream report structure. Select all that apply.
+        Objectives drive the entire downstream report structure. Select all that
+        apply.
       </p>
 
       {error && (
         <div
           className="mb-4 px-3 py-2 rounded-lg"
-          style={{ background: "#FEF2F2", fontSize: "0.8125rem", color: "#EF4444" }}
+          style={{
+            background: "#FEF2F2",
+            fontSize: "0.8125rem",
+            color: "#EF4444",
+          }}
         >
           {error}
         </div>
@@ -552,7 +611,12 @@ function Step2Objectives({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <p style={{ fontSize: "0.9375rem", color: isSelected ? "#7D152D" : "#0F172A" }}>
+                  <p
+                    style={{
+                      fontSize: "0.9375rem",
+                      color: isSelected ? "#7D152D" : "#0F172A",
+                    }}
+                  >
                     {obj.label}
                   </p>
                   <span
@@ -565,7 +629,14 @@ function Step2Objectives({
                     {moduleCount} modules
                   </span>
                 </div>
-                <p style={{ fontSize: "0.8125rem", color: "#94A3B8", lineHeight: 1.5 }} className="mt-0.5">
+                <p
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "#94A3B8",
+                    lineHeight: 1.5,
+                  }}
+                  className="mt-0.5"
+                >
                   {obj.description}
                 </p>
               </div>
@@ -591,13 +662,17 @@ function Step3ReportPreview({
 }: {
   data: WizardData;
   modules: DataModule[];
-  modulesByObjective: { objectiveId: string; label: string; modules: DataModule[] }[];
+  modulesByObjective: {
+    objectiveId: string;
+    label: string;
+    modules: DataModule[];
+  }[];
   showEducator: boolean;
   onToggleEducator: () => void;
   generating: boolean;
 }) {
   const selectedObjectives = OBJECTIVES.filter((o) =>
-    data.objectives.includes(o.id)
+    data.objectives.includes(o.id),
   );
 
   // Gap #3: Generation transition
@@ -617,7 +692,8 @@ function Step3ReportPreview({
           Generating report preview...
         </p>
         <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
-          Mapping {data.objectives.length} objective{data.objectives.length !== 1 ? "s" : ""} to data modules
+          Mapping {data.objectives.length} objective
+          {data.objectives.length !== 1 ? "s" : ""} to data modules
         </p>
         {/* Animated progress bar */}
         <div className="w-48 h-1.5 rounded-full bg-[#F1F5F9] mt-4 overflow-hidden">
@@ -655,7 +731,11 @@ function Step3ReportPreview({
               ? "text-white"
               : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
           }`}
-          style={showEducator ? { background: "#0F766E", fontSize: "0.75rem" } : { fontSize: "0.75rem" }}
+          style={
+            showEducator
+              ? { background: "#0F766E", fontSize: "0.75rem" }
+              : { fontSize: "0.75rem" }
+          }
         >
           <Smartphone size={13} />
           Educator View
@@ -673,9 +753,14 @@ function Step3ReportPreview({
           {/* Report title bar */}
           <div
             className="px-5 py-4 border-b border-[#E2E8F0]"
-            style={{ background: "linear-gradient(135deg, #7D152D 0%, #5C0F21 100%)" }}
+            style={{
+              background: "linear-gradient(135deg, #7D152D 0%, #5C0F21 100%)",
+            }}
           >
-            <p style={{ fontSize: "0.6875rem", color: "rgba(255,255,255,0.6)" }} className="mb-0.5 uppercase tracking-wider">
+            <p
+              style={{ fontSize: "0.6875rem", color: "rgba(255,255,255,0.6)" }}
+              className="mb-0.5 uppercase tracking-wider"
+            >
               Event Report
             </p>
             <p style={{ fontSize: "1.0625rem", color: "#FFF" }}>
@@ -683,22 +768,43 @@ function Step3ReportPreview({
             </p>
             <div className="flex items-center gap-3 mt-1.5">
               {data.location && (
-                <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}>
+                <span
+                  className="flex items-center gap-1"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "rgba(255,255,255,0.7)",
+                  }}
+                >
                   <MapPin size={12} /> {data.location}
                 </span>
               )}
               {data.date && (
-                <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}>
+                <span
+                  className="flex items-center gap-1"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "rgba(255,255,255,0.7)",
+                  }}
+                >
                   <Calendar size={12} />{" "}
-                  {new Date(data.date + "T12:00:00").toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {new Date(data.date + "T12:00:00").toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    },
+                  )}
                 </span>
               )}
               {data.duration && (
-                <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}>
+                <span
+                  className="flex items-center gap-1"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "rgba(255,255,255,0.7)",
+                  }}
+                >
                   <Clock size={12} /> {data.duration}
                 </span>
               )}
@@ -708,19 +814,29 @@ function Step3ReportPreview({
           {/* Objectives summary strip */}
           <div className="px-5 py-3 border-b border-[#F1F5F9] bg-[#FAFBFC]">
             <div className="flex items-center gap-2 flex-wrap">
-              <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }} className="uppercase tracking-wider">
+              <span
+                style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                className="uppercase tracking-wider"
+              >
                 Objectives
               </span>
               {selectedObjectives.map((o) => (
                 <span
                   key={o.id}
                   className="px-2 py-0.5 rounded-md"
-                  style={{ fontSize: "0.6875rem", background: "#7D152D0F", color: "#7D152D" }}
+                  style={{
+                    fontSize: "0.6875rem",
+                    background: "#7D152D0F",
+                    color: "#7D152D",
+                  }}
                 >
                   {o.label}
                 </span>
               ))}
-              <span className="ml-auto" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+              <span
+                className="ml-auto"
+                style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+              >
                 {modules.length} data modules
               </span>
             </div>
@@ -730,13 +846,19 @@ function Step3ReportPreview({
           {modulesByObjective.map((group, gi) => (
             <div
               key={group.objectiveId}
-              className={gi < modulesByObjective.length - 1 ? "border-b border-[#F1F5F9]" : ""}
+              className={
+                gi < modulesByObjective.length - 1
+                  ? "border-b border-[#F1F5F9]"
+                  : ""
+              }
             >
               {/* Section header */}
               <div className="px-5 pt-4 pb-2 flex items-center gap-2">
                 <div
                   className="w-1.5 h-5 rounded-full"
-                  style={{ background: SECTION_COLORS[gi % SECTION_COLORS.length] }}
+                  style={{
+                    background: SECTION_COLORS[gi % SECTION_COLORS.length],
+                  }}
                 />
                 <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
                   {group.label}
@@ -778,19 +900,36 @@ function Step3ReportPreview({
               style={{ background: "#7D152D" }}
             >
               <span style={{ fontSize: "0.6875rem", color: "#FFF" }}>9:41</span>
-              <span style={{ fontSize: "0.6875rem", color: "#FFF" }}>Hart Agency</span>
+              <span style={{ fontSize: "0.6875rem", color: "#FFF" }}>
+                Hart Agency
+              </span>
               <span style={{ fontSize: "0.6875rem", color: "#FFF" }}>100%</span>
             </div>
 
             {/* Event header with progress ring */}
-            <div className="px-4 py-3 border-b border-[#F1F5F9]" style={{ background: "#FAFBFC" }}>
+            <div
+              className="px-4 py-3 border-b border-[#F1F5F9]"
+              style={{ background: "#FAFBFC" }}
+            >
               <div className="flex items-center gap-3">
                 {/* Progress ring */}
                 <div className="relative flex-shrink-0">
                   <svg width="40" height="40" viewBox="0 0 40 40">
-                    <circle cx="20" cy="20" r="16" fill="none" stroke="#E2E8F0" strokeWidth="3" />
                     <circle
-                      cx="20" cy="20" r="16" fill="none" stroke="#0F766E" strokeWidth="3"
+                      cx="20"
+                      cy="20"
+                      r="16"
+                      fill="none"
+                      stroke="#E2E8F0"
+                      strokeWidth="3"
+                    />
+                    <circle
+                      cx="20"
+                      cy="20"
+                      r="16"
+                      fill="none"
+                      stroke="#0F766E"
+                      strokeWidth="3"
                       strokeDasharray={`${(1 / modules.length) * 100.5} 100.5`}
                       strokeLinecap="round"
                       transform="rotate(-90 20 20)"
@@ -804,11 +943,18 @@ function Step3ReportPreview({
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="truncate" style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+                  <p
+                    className="truncate"
+                    style={{ fontSize: "0.875rem", color: "#0F172A" }}
+                  >
                     {data.name || "Untitled Event"}
                   </p>
-                  <p className="truncate" style={{ fontSize: "0.625rem", color: "#94A3B8" }}>
-                    {data.location || "Location TBD"} &middot; {data.duration || "TBD"}
+                  <p
+                    className="truncate"
+                    style={{ fontSize: "0.625rem", color: "#94A3B8" }}
+                  >
+                    {data.location || "Location TBD"} &middot;{" "}
+                    {data.duration || "TBD"}
                   </p>
                 </div>
               </div>
@@ -843,7 +989,9 @@ function Step3ReportPreview({
                             border: isFirst ? "none" : "2px solid #CBD5E1",
                           }}
                         >
-                          {isFirst && <Check size={11} style={{ color: "#FFF" }} />}
+                          {isFirst && (
+                            <Check size={11} style={{ color: "#FFF" }} />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p
@@ -913,27 +1061,43 @@ function Step3ReportPreview({
 
 // ── Sample module card for report preview (Gap #1) ──────────────────────────
 
-const SECTION_COLORS = ["#7D152D", "#0F766E", "#1D4ED8", "#D97706", "#7C3AED", "#059669"];
+const SECTION_COLORS = [
+  "#7D152D",
+  "#0F766E",
+  "#1D4ED8",
+  "#D97706",
+  "#7C3AED",
+  "#059669",
+];
 
 function SampleModuleCard({ mod }: { mod: DataModule }) {
   const { sampleType, sampleValue, label } = mod;
 
   return (
     <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-      <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }} className="mb-1.5 truncate">
+      <p
+        style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        className="mb-1.5 truncate"
+      >
         {label}
       </p>
 
       {sampleType === "score" && (
         <div className="flex items-end gap-2">
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {sampleValue}
+          </span>
           <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>/10</span>
           <div className="flex-1 flex items-end gap-px ml-1">
             {[0.3, 0.5, 0.7, 0.85, 0.65].map((h, i) => (
               <div
                 key={i}
                 className="flex-1 rounded-t-sm"
-                style={{ height: `${h * 24}px`, background: "#7D152D", opacity: 0.15 + i * 0.15 }}
+                style={{
+                  height: `${h * 24}px`,
+                  background: "#7D152D",
+                  opacity: 0.15 + i * 0.15,
+                }}
               />
             ))}
           </div>
@@ -942,14 +1106,18 @@ function SampleModuleCard({ mod }: { mod: DataModule }) {
 
       {sampleType === "number" && (
         <div className="flex items-end gap-1">
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {sampleValue}
+          </span>
           <TrendingUp size={14} style={{ color: "#0F766E", marginBottom: 2 }} />
         </div>
       )}
 
       {sampleType === "percent" && (
         <div>
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {sampleValue}
+          </span>
           <div className="mt-1.5 h-1.5 rounded-full bg-[#E2E8F0] overflow-hidden">
             <div
               className="h-full rounded-full"
@@ -964,20 +1132,22 @@ function SampleModuleCard({ mod }: { mod: DataModule }) {
 
       {sampleType === "currency" && (
         <div className="flex items-end gap-1">
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {sampleValue}
+          </span>
           <BarChart3 size={14} style={{ color: "#1D4ED8", marginBottom: 2 }} />
         </div>
       )}
 
       {sampleType === "text" && (
         <div className="flex items-center gap-1.5">
-          <span style={{ fontSize: "1rem", color: "#0F172A" }}>{sampleValue}</span>
+          <span style={{ fontSize: "1rem", color: "#0F172A" }}>
+            {sampleValue}
+          </span>
         </div>
       )}
 
-      {!sampleType && (
-        <div className="h-5 w-16 rounded bg-[#E2E8F0]" />
-      )}
+      {!sampleType && <div className="h-5 w-16 rounded bg-[#E2E8F0]" />}
     </div>
   );
 }
@@ -1026,7 +1196,11 @@ function Step4Advanced({
             </span>
             <span
               className="px-2 py-0.5 rounded-md"
-              style={{ fontSize: "0.6875rem", background: "#0F766E1A", color: "#0F766E" }}
+              style={{
+                fontSize: "0.6875rem",
+                background: "#0F766E1A",
+                color: "#0F766E",
+              }}
             >
               {autoMappedModules.length} modules
             </span>
@@ -1044,9 +1218,16 @@ function Step4Advanced({
                 <span
                   key={mod.id}
                   className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
-                  style={{ fontSize: "0.6875rem", background: "#0F766E0A", color: "#0F766E" }}
+                  style={{
+                    fontSize: "0.6875rem",
+                    background: "#0F766E0A",
+                    color: "#0F766E",
+                  }}
                 >
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#0F766E" }} />
+                  <div
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: "#0F766E" }}
+                  />
                   {mod.label}
                 </span>
               ))}
@@ -1056,7 +1237,10 @@ function Step4Advanced({
       </div>
 
       {/* Additional modules label */}
-      <p style={{ fontSize: "0.75rem", color: "#94A3B8" }} className="uppercase tracking-wider mb-3">
+      <p
+        style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+        className="uppercase tracking-wider mb-3"
+      >
         Additional modules
       </p>
 
@@ -1084,10 +1268,22 @@ function Step4Advanced({
                 {isSelected && <Check size={13} style={{ color: "#FFF" }} />}
               </div>
               <div className="flex-1">
-                <p style={{ fontSize: "0.9375rem", color: isSelected ? "#0F766E" : "#0F172A" }}>
+                <p
+                  style={{
+                    fontSize: "0.9375rem",
+                    color: isSelected ? "#0F766E" : "#0F172A",
+                  }}
+                >
                   {mod.label}
                 </p>
-                <p style={{ fontSize: "0.8125rem", color: "#94A3B8", lineHeight: 1.5 }} className="mt-0.5">
+                <p
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "#94A3B8",
+                    lineHeight: 1.5,
+                  }}
+                  className="mt-0.5"
+                >
                   {mod.description}
                 </p>
               </div>
@@ -1134,7 +1330,10 @@ function FieldWrapper({
 }) {
   return (
     <div className="mb-4">
-      <label className="flex items-center gap-1.5 mb-1.5" style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+      <label
+        className="flex items-center gap-1.5 mb-1.5"
+        style={{ fontSize: "0.875rem", color: "#0F172A" }}
+      >
         {icon}
         {label}
         {required && <span style={{ color: "#EF4444" }}>*</span>}

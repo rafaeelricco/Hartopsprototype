@@ -141,7 +141,9 @@ function StatCard({
     <Card className="gap-0">
       <CardHeader className="pb-2 pt-5 px-5">
         <div className="flex items-center justify-between">
-          <CardDescription style={{ fontSize: "0.8125rem" }}>{title}</CardDescription>
+          <CardDescription style={{ fontSize: "0.8125rem" }}>
+            {title}
+          </CardDescription>
           <div className="flex items-center justify-center size-8 rounded-md bg-[#7D152D]/8">
             <Icon className="size-4 text-[#7D152D]" />
           </div>
@@ -170,7 +172,10 @@ function StatCard({
           >
             {change}
           </span>
-          <span className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+          <span
+            className="text-muted-foreground"
+            style={{ fontSize: "0.75rem" }}
+          >
             {changeLabel}
           </span>
         </div>
@@ -186,12 +191,11 @@ export function Dashboard() {
     <div className="p-6 space-y-6 w-full">
       {/* Header */}
       <div>
-        <h1
-          className="text-foreground"
+        <h1 className="text-foreground">Dashboard</h1>
+        <p
+          className="text-muted-foreground mt-1"
+          style={{ fontSize: "0.875rem" }}
         >
-          Dashboard
-        </h1>
-        <p className="text-muted-foreground mt-1" style={{ fontSize: "0.875rem" }}>
           Platform overview and key metrics at a glance.
         </p>
       </div>
@@ -250,7 +254,10 @@ export function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-4">
-            <ChartContainer config={growthChartConfig} className="h-[260px] w-full">
+            <ChartContainer
+              config={growthChartConfig}
+              className="h-[260px] w-full"
+            >
               <AreaChart
                 data={growthData}
                 margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
@@ -258,7 +265,11 @@ export function Dashboard() {
                 <defs>
                   <linearGradient id="fillOrgs" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#7D152D" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="#7D152D" stopOpacity={0.02} />
+                    <stop
+                      offset="100%"
+                      stopColor="#7D152D"
+                      stopOpacity={0.02}
+                    />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
@@ -317,7 +328,10 @@ export function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-4">
-            <ChartContainer config={activityChartConfig} className="h-[260px] w-full">
+            <ChartContainer
+              config={activityChartConfig}
+              className="h-[260px] w-full"
+            >
               <BarChart
                 data={weeklyActivity}
                 margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
@@ -443,12 +457,17 @@ export function Dashboard() {
                         {event.name}
                       </p>
                     </div>
-                    <p className="text-muted-foreground truncate" style={{ fontSize: "0.75rem" }}>
+                    <p
+                      className="text-muted-foreground truncate"
+                      style={{ fontSize: "0.75rem" }}
+                    >
                       {event.org} · {event.date}
                     </p>
                   </div>
                   <Badge
-                    variant={event.status === "Active" ? "default" : "secondary"}
+                    variant={
+                      event.status === "Active" ? "default" : "secondary"
+                    }
                     className={
                       event.status === "Active"
                         ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-50"

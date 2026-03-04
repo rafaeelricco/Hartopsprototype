@@ -41,15 +41,19 @@ export function ForgotPassword() {
           </div>
           <div className="space-y-1">
             <h2 className="text-foreground">Check your email</h2>
-            <p className="text-muted-foreground" style={{ fontSize: '0.875rem' }}>
-              We sent a password reset link to <span className="text-foreground">{email}</span>.
-              Please check your inbox.
+            <p
+              className="text-muted-foreground"
+              style={{ fontSize: "0.875rem" }}
+            >
+              We sent a password reset link to{" "}
+              <span className="text-foreground">{email}</span>. Please check
+              your inbox.
             </p>
           </div>
           <Link
             to="/"
             className="inline-flex items-center gap-1.5 text-primary hover:opacity-80 transition-opacity mt-2"
-            style={{ fontSize: '0.875rem' }}
+            style={{ fontSize: "0.875rem" }}
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Sign In
@@ -60,14 +64,10 @@ export function ForgotPassword() {
   }
 
   return (
-    <AuthLayout>
-      <div className="space-y-1 mb-6">
-        <h2 className="text-foreground">Forgot Password</h2>
-        <p className="text-muted-foreground" style={{ fontSize: '0.875rem' }}>
-          Enter your email and we'll send you a link to reset your password.
-        </p>
-      </div>
-
+    <AuthLayout
+      title="Forgot Password"
+      subtitle="Enter your email and we'll send you a link to reset your password."
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
           <label htmlFor="email" className="block text-foreground">
@@ -88,7 +88,9 @@ export function ForgotPassword() {
             } bg-card px-3 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors`}
           />
           {error && (
-            <p className="text-destructive" style={{ fontSize: '0.8125rem' }}>{error}</p>
+            <p className="text-destructive" style={{ fontSize: "0.8125rem" }}>
+              {error}
+            </p>
           )}
         </div>
 
@@ -104,7 +106,7 @@ export function ForgotPassword() {
           <Link
             to="/"
             className="inline-flex items-center gap-1.5 text-primary hover:opacity-80 transition-opacity"
-            style={{ fontSize: '0.875rem' }}
+            style={{ fontSize: "0.875rem" }}
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Sign In

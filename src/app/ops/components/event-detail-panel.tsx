@@ -74,13 +74,11 @@ export function EventDetailPanel({
   if (!event) return null;
 
   const capacityPercent = Math.round(
-    (event.attendeesRegistered / event.capacity) * 100
+    (event.attendeesRegistered / event.capacity) * 100,
   );
   const checkinPercent =
     event.attendeesRegistered > 0
-      ? Math.round(
-          (event.attendeesCheckedIn / event.attendeesRegistered) * 100
-        )
+      ? Math.round((event.attendeesCheckedIn / event.attendeesRegistered) * 100)
       : 0;
 
   return (
@@ -149,10 +147,7 @@ export function EventDetailPanel({
               Attendance
             </p>
             <div className="grid grid-cols-3 gap-3 mb-4">
-              <MiniStat
-                label="Registered"
-                value={event.attendeesRegistered}
-              />
+              <MiniStat label="Registered" value={event.attendeesRegistered} />
               <MiniStat label="Checked In" value={event.attendeesCheckedIn} />
               <MiniStat label="Capacity" value={event.capacity} />
             </div>
@@ -213,11 +208,7 @@ export function EventDetailPanel({
                 label="Organization"
                 value={event.organization}
               />
-              <DetailRow
-                icon={CalendarDays}
-                label="Date"
-                value={event.date}
-              />
+              <DetailRow icon={CalendarDays} label="Date" value={event.date} />
               <DetailRow
                 icon={Clock}
                 label="Time"
@@ -282,8 +273,8 @@ export function EventDetailPanel({
               className="text-muted-foreground"
               style={{ fontSize: "0.75rem", lineHeight: 1.5 }}
             >
-              This is a read-only monitoring view. Event creation and editing
-              is managed by the organization's tenant administrators.
+              This is a read-only monitoring view. Event creation and editing is
+              managed by the organization's tenant administrators.
             </p>
           </div>
         </div>
@@ -328,10 +319,7 @@ function DetailRow({
     <div className="flex items-start gap-3">
       <Icon className="size-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p
-          className="text-muted-foreground"
-          style={{ fontSize: "0.6875rem" }}
-        >
+        <p className="text-muted-foreground" style={{ fontSize: "0.6875rem" }}>
           {label}
         </p>
         <p className="text-foreground" style={{ fontSize: "0.8125rem" }}>

@@ -115,7 +115,10 @@ export function AddOrganizationWizard({
     [onOpenChange, reset],
   );
 
-  const updateField = <K extends keyof WizardData>(key: K, value: WizardData[K]) => {
+  const updateField = <K extends keyof WizardData>(
+    key: K,
+    value: WizardData[K],
+  ) => {
     setData((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => {
       const copy = { ...prev };
@@ -128,7 +131,8 @@ export function AddOrganizationWizard({
 
   const validateStep1 = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!data.companyName.trim()) errs.companyName = "Company Name is required.";
+    if (!data.companyName.trim())
+      errs.companyName = "Company Name is required.";
     else if (
       existingNames.some(
         (n) => n.toLowerCase() === data.companyName.trim().toLowerCase(),
@@ -136,7 +140,8 @@ export function AddOrganizationWizard({
     )
       errs.companyName = "An organization with this name already exists.";
     if (!data.industry) errs.industry = "Industry is required.";
-    if (!data.primaryContact.trim()) errs.primaryContact = "Primary Contact is required.";
+    if (!data.primaryContact.trim())
+      errs.primaryContact = "Primary Contact is required.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -163,11 +168,7 @@ export function AddOrganizationWizard({
   const handleCompanyNameBlur = () => {
     const name = data.companyName.trim();
     if (!name) return; // don't show "already exists" for empty — that fires on Next
-    if (
-      existingNames.some(
-        (n) => n.toLowerCase() === name.toLowerCase(),
-      )
-    ) {
+    if (existingNames.some((n) => n.toLowerCase() === name.toLowerCase())) {
       setErrors((prev) => ({
         ...prev,
         companyName: "An organization with this name already exists.",
@@ -197,7 +198,10 @@ export function AddOrganizationWizard({
     if (!file) return;
     const allowed = ["image/png", "image/svg+xml"];
     if (!allowed.includes(file.type)) {
-      setErrors((prev) => ({ ...prev, logo: "Only PNG or SVG files are allowed." }));
+      setErrors((prev) => ({
+        ...prev,
+        logo: "Only PNG or SVG files are allowed.",
+      }));
       return;
     }
     setErrors((prev) => {
@@ -207,11 +211,16 @@ export function AddOrganizationWizard({
     });
     const reader = new FileReader();
     reader.onload = () =>
-      setData((prev) => ({ ...prev, logoFile: file, logoPreview: reader.result as string }));
+      setData((prev) => ({
+        ...prev,
+        logoFile: file,
+        logoPreview: reader.result as string,
+      }));
     reader.readAsDataURL(file);
   };
 
-  const removeLogo = () => updateField("logoFile", null) || updateField("logoPreview", null);
+  const removeLogo = () =>
+    updateField("logoFile", null) || updateField("logoPreview", null);
 
   /* ---- drop handler ---------------------------------------------- */
 
@@ -221,7 +230,10 @@ export function AddOrganizationWizard({
     if (!file) return;
     const allowed = ["image/png", "image/svg+xml"];
     if (!allowed.includes(file.type)) {
-      setErrors((prev) => ({ ...prev, logo: "Only PNG or SVG files are allowed." }));
+      setErrors((prev) => ({
+        ...prev,
+        logo: "Only PNG or SVG files are allowed.",
+      }));
       return;
     }
     setErrors((prev) => {
@@ -231,7 +243,11 @@ export function AddOrganizationWizard({
     });
     const reader = new FileReader();
     reader.onload = () =>
-      setData((prev) => ({ ...prev, logoFile: file, logoPreview: reader.result as string }));
+      setData((prev) => ({
+        ...prev,
+        logoFile: file,
+        logoPreview: reader.result as string,
+      }));
     reader.readAsDataURL(file);
   };
 
@@ -239,7 +255,10 @@ export function AddOrganizationWizard({
 
   const FieldError = ({ field }: { field: string }) =>
     errors[field] ? (
-      <p className="flex items-center gap-1 text-destructive mt-1" style={{ fontSize: "0.75rem" }}>
+      <p
+        className="flex items-center gap-1 text-destructive mt-1"
+        style={{ fontSize: "0.75rem" }}
+      >
         <AlertCircle className="size-3 shrink-0" />
         {errors[field]}
       </p>
@@ -257,7 +276,10 @@ export function AddOrganizationWizard({
             </div>
             <div>
               <h3 className="text-foreground">Organization Created</h3>
-              <p className="text-muted-foreground mt-1" style={{ fontSize: "0.875rem" }}>
+              <p
+                className="text-muted-foreground mt-1"
+                style={{ fontSize: "0.875rem" }}
+              >
                 <span className="text-foreground" style={{ fontWeight: 500 }}>
                   {data.companyName}
                 </span>{" "}
@@ -331,7 +353,10 @@ export function AddOrganizationWizard({
                       className={`hidden sm:inline ${
                         isCurrent ? "text-foreground" : "text-muted-foreground"
                       }`}
-                      style={{ fontSize: "0.8125rem", fontWeight: isCurrent ? 500 : 400 }}
+                      style={{
+                        fontSize: "0.8125rem",
+                        fontWeight: isCurrent ? 500 : 400,
+                      }}
                     >
                       {s.label}
                     </span>
@@ -349,7 +374,10 @@ export function AddOrganizationWizard({
             <>
               {/* Company Name */}
               <div className="space-y-1.5">
-                <label className="block text-foreground" style={{ fontSize: "0.8125rem" }}>
+                <label
+                  className="block text-foreground"
+                  style={{ fontSize: "0.8125rem" }}
+                >
                   Company Name <span className="text-destructive">*</span>
                 </label>
                 <input
@@ -365,8 +393,12 @@ export function AddOrganizationWizard({
 
               {/* Logo Upload */}
               <div className="space-y-1.5">
-                <label className="block text-foreground" style={{ fontSize: "0.8125rem" }}>
-                  Logo <span className="text-muted-foreground">(PNG or SVG)</span>
+                <label
+                  className="block text-foreground"
+                  style={{ fontSize: "0.8125rem" }}
+                >
+                  Logo{" "}
+                  <span className="text-muted-foreground">(PNG or SVG)</span>
                 </label>
                 {data.logoPreview ? (
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/40">
@@ -394,12 +426,20 @@ export function AddOrganizationWizard({
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={handleDrop}
                     className="flex flex-col items-center justify-center gap-2 p-6 rounded-lg border border-dashed border-border hover:border-[#7D152D]/40 transition-colors cursor-pointer"
-                    onClick={() => document.getElementById("logo-upload")?.click()}
+                    onClick={() =>
+                      document.getElementById("logo-upload")?.click()
+                    }
                   >
                     <Upload className="size-5 text-muted-foreground" />
-                    <p className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <p
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       Drag & drop or{" "}
-                      <span className="text-[#7D152D]" style={{ fontWeight: 500 }}>
+                      <span
+                        className="text-[#7D152D]"
+                        style={{ fontWeight: 500 }}
+                      >
                         browse
                       </span>
                     </p>
@@ -417,7 +457,10 @@ export function AddOrganizationWizard({
 
               {/* Industry */}
               <div className="space-y-1.5">
-                <label className="block text-foreground" style={{ fontSize: "0.8125rem" }}>
+                <label
+                  className="block text-foreground"
+                  style={{ fontSize: "0.8125rem" }}
+                >
                   Industry <span className="text-destructive">*</span>
                 </label>
                 <select
@@ -438,13 +481,18 @@ export function AddOrganizationWizard({
 
               {/* Primary Contact */}
               <div className="space-y-1.5">
-                <label className="block text-foreground" style={{ fontSize: "0.8125rem" }}>
+                <label
+                  className="block text-foreground"
+                  style={{ fontSize: "0.8125rem" }}
+                >
                   Primary Contact <span className="text-destructive">*</span>
                 </label>
                 <input
                   type="text"
                   value={data.primaryContact}
-                  onChange={(e) => updateField("primaryContact", e.target.value)}
+                  onChange={(e) =>
+                    updateField("primaryContact", e.target.value)
+                  }
                   placeholder="Full name of main contact"
                   className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors"
                 />
@@ -457,16 +505,25 @@ export function AddOrganizationWizard({
           {step === 2 && (
             <>
               <div className="rounded-lg border border-border bg-muted/30 p-4">
-                <p className="text-foreground" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>
+                <p
+                  className="text-foreground"
+                  style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                >
                   Invite the initial Trial Client Staff user
                 </p>
-                <p className="text-muted-foreground mt-1" style={{ fontSize: "0.75rem" }}>
-                  This person will receive an activation email and can then invite additional team
-                  members from within their organization.
+                <p
+                  className="text-muted-foreground mt-1"
+                  style={{ fontSize: "0.75rem" }}
+                >
+                  This person will receive an activation email and can then
+                  invite additional team members from within their organization.
                 </p>
               </div>
               <div className="space-y-1.5">
-                <label className="block text-foreground" style={{ fontSize: "0.8125rem" }}>
+                <label
+                  className="block text-foreground"
+                  style={{ fontSize: "0.8125rem" }}
+                >
                   Email Address <span className="text-destructive">*</span>
                 </label>
                 <input
@@ -481,7 +538,8 @@ export function AddOrganizationWizard({
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 flex items-start gap-2">
                 <AlertCircle className="size-4 text-amber-600 mt-0.5 shrink-0" />
                 <p className="text-amber-800" style={{ fontSize: "0.75rem" }}>
-                  Disposable email domains (e.g. mailinator.com, yopmail.com) are not accepted.
+                  Disposable email domains (e.g. mailinator.com, yopmail.com)
+                  are not accepted.
                 </p>
               </div>
             </>
@@ -500,28 +558,52 @@ export function AddOrganizationWizard({
                     Organization Details
                   </p>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 gap-x-4">
-                    <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       Company
                     </span>
-                    <span className="text-foreground" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>
+                    <span
+                      className="text-foreground"
+                      style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                    >
                       {data.companyName}
                     </span>
-                    <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       Industry
                     </span>
-                    <span className="text-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       {data.industry}
                     </span>
-                    <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       Primary Contact
                     </span>
-                    <span className="text-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       {data.primaryContact}
                     </span>
-                    <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       Logo
                     </span>
-                    <span className="text-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       {data.logoFile ? (
                         <span className="flex items-center gap-2">
                           <img
@@ -532,7 +614,9 @@ export function AddOrganizationWizard({
                           {data.logoFile.name}
                         </span>
                       ) : (
-                        <span className="text-muted-foreground italic">None</span>
+                        <span className="text-muted-foreground italic">
+                          None
+                        </span>
                       )}
                     </span>
                   </div>
@@ -546,19 +630,28 @@ export function AddOrganizationWizard({
                     Initial User
                   </p>
                   <div className="grid grid-cols-[120px_1fr] gap-y-2 gap-x-4">
-                    <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       Invite Email
                     </span>
-                    <span className="text-foreground" style={{ fontSize: "0.8125rem" }}>
+                    <span
+                      className="text-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
                       {data.inviteEmail}
                     </span>
                   </div>
                 </div>
               </div>
               <div className="rounded-lg border border-border bg-muted/30 p-3">
-                <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-                  Clicking <strong>Create Organization</strong> will create the tenant and send an
-                  activation email to the invited user.
+                <p
+                  className="text-muted-foreground"
+                  style={{ fontSize: "0.75rem" }}
+                >
+                  Clicking <strong>Create Organization</strong> will create the
+                  tenant and send an activation email to the invited user.
                 </p>
               </div>
             </div>

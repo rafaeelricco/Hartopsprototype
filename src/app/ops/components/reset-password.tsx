@@ -15,7 +15,9 @@ export function ResetPassword() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
+  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>(
+    {},
+  );
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -59,8 +61,12 @@ export function ResetPassword() {
           </div>
           <div className="space-y-1">
             <h2 className="text-foreground">Password Updated</h2>
-            <p className="text-muted-foreground" style={{ fontSize: '0.875rem' }}>
-              Your password has been successfully reset. Redirecting to Sign In...
+            <p
+              className="text-muted-foreground"
+              style={{ fontSize: "0.875rem" }}
+            >
+              Your password has been successfully reset. Redirecting to Sign
+              In...
             </p>
           </div>
         </div>
@@ -69,14 +75,10 @@ export function ResetPassword() {
   }
 
   return (
-    <AuthLayout>
-      <div className="space-y-1 mb-6">
-        <h2 className="text-foreground">Reset Password</h2>
-        <p className="text-muted-foreground" style={{ fontSize: '0.875rem' }}>
-          Create a new password for your account.
-        </p>
-      </div>
-
+    <AuthLayout
+      title="Reset Password"
+      subtitle="Create a new password for your account."
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* New Password */}
         <div className="space-y-1.5">
@@ -89,7 +91,8 @@ export function ResetPassword() {
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
-              if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+              if (errors.password)
+                setErrors((prev) => ({ ...prev, password: undefined }));
             }}
             placeholder="Create a password"
             error={errors.password}
@@ -105,8 +108,8 @@ export function ResetPassword() {
                       password.length === 0
                         ? "bg-border"
                         : passed
-                        ? "bg-green-500"
-                        : "bg-destructive"
+                          ? "bg-green-500"
+                          : "bg-destructive"
                     }`}
                   />
                   <span
@@ -114,10 +117,10 @@ export function ResetPassword() {
                       password.length === 0
                         ? "text-muted-foreground"
                         : passed
-                        ? "text-green-600"
-                        : "text-destructive"
+                          ? "text-green-600"
+                          : "text-destructive"
                     }`}
-                    style={{ fontSize: '0.75rem' }}
+                    style={{ fontSize: "0.75rem" }}
                   >
                     {rule.label}
                   </span>
@@ -126,7 +129,9 @@ export function ResetPassword() {
             })}
           </div>
           {errors.password && (
-            <p className="text-destructive" style={{ fontSize: '0.8125rem' }}>{errors.password}</p>
+            <p className="text-destructive" style={{ fontSize: "0.8125rem" }}>
+              {errors.password}
+            </p>
           )}
         </div>
 
@@ -141,13 +146,16 @@ export function ResetPassword() {
             value={confirmPassword}
             onChange={(e) => {
               setConfirmPassword(e.target.value);
-              if (errors.confirm) setErrors((prev) => ({ ...prev, confirm: undefined }));
+              if (errors.confirm)
+                setErrors((prev) => ({ ...prev, confirm: undefined }));
             }}
             placeholder="Re-enter your password"
             error={errors.confirm}
           />
           {errors.confirm && (
-            <p className="text-destructive" style={{ fontSize: '0.8125rem' }}>{errors.confirm}</p>
+            <p className="text-destructive" style={{ fontSize: "0.8125rem" }}>
+              {errors.confirm}
+            </p>
           )}
         </div>
 

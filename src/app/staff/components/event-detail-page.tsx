@@ -50,8 +50,18 @@ const STATUS_LABELS: Record<
 > = {
   active: { bg: "#ECFDF5", text: "#0F766E", dot: "#0F766E", label: "Active" },
   draft: { bg: "#F1F5F9", text: "#64748B", dot: "#94A3B8", label: "Draft" },
-  completed: { bg: "#FEF2F2", text: "#B91C1C", dot: "#B91C1C", label: "Completed" },
-  scheduled: { bg: "#EFF6FF", text: "#1D4ED8", dot: "#3B82F6", label: "Scheduled" },
+  completed: {
+    bg: "#FEF2F2",
+    text: "#B91C1C",
+    dot: "#B91C1C",
+    label: "Completed",
+  },
+  scheduled: {
+    bg: "#EFF6FF",
+    text: "#1D4ED8",
+    dot: "#3B82F6",
+    label: "Scheduled",
+  },
 };
 
 const VENUE_LABELS: Record<string, string> = {
@@ -70,7 +80,13 @@ function getPhase(status: EventItem["status"]): LifecyclePhase {
 
 const PHASE_META: Record<
   LifecyclePhase,
-  { label: string; description: string; icon: typeof Edit3; color: string; bg: string }
+  {
+    label: string;
+    description: string;
+    icon: typeof Edit3;
+    color: string;
+    bg: string;
+  }
 > = {
   1: {
     label: "Editable Configuration",
@@ -98,22 +114,86 @@ const PHASE_META: Record<
 // ── Live feed mock data pool ─────────────────────────────────────────────────
 
 const FEED_POOL = [
-  { module: "Brand Visibility Score", value: "Score: 8.4/10", type: "metric" as const },
-  { module: "Photo Documentation", value: "3 photos uploaded", type: "photo" as const },
-  { module: "Impressions Tracker", value: "342 impressions", type: "metric" as const },
-  { module: "Consumer Feedback", value: "Rating: 4.7/5 (12 responses)", type: "metric" as const },
-  { module: "Sales Volume Tracker", value: "47 units sold", type: "metric" as const },
-  { module: "Photo Documentation", value: "2 photos uploaded", type: "photo" as const },
-  { module: "Engagement Metrics", value: "89 interactions logged", type: "metric" as const },
-  { module: "Social Mentions", value: "6 new mentions", type: "metric" as const },
-  { module: "Brand Visibility Score", value: "Updated to 8.7/10", type: "metric" as const },
-  { module: "Sales Volume Tracker", value: "63 units sold (+16)", type: "metric" as const },
-  { module: "Photo Documentation", value: "5 photos uploaded", type: "photo" as const },
-  { module: "Consumer Feedback", value: "Rating: 4.8/5 (19 responses)", type: "metric" as const },
-  { module: "Impressions Tracker", value: "518 impressions (+176)", type: "metric" as const },
-  { module: "Engagement Metrics", value: "124 interactions (+35)", type: "metric" as const },
-  { module: "Social Mentions", value: "11 new mentions (+5)", type: "metric" as const },
-  { module: "Photo Documentation", value: "1 photo uploaded", type: "photo" as const },
+  {
+    module: "Brand Visibility Score",
+    value: "Score: 8.4/10",
+    type: "metric" as const,
+  },
+  {
+    module: "Photo Documentation",
+    value: "3 photos uploaded",
+    type: "photo" as const,
+  },
+  {
+    module: "Impressions Tracker",
+    value: "342 impressions",
+    type: "metric" as const,
+  },
+  {
+    module: "Consumer Feedback",
+    value: "Rating: 4.7/5 (12 responses)",
+    type: "metric" as const,
+  },
+  {
+    module: "Sales Volume Tracker",
+    value: "47 units sold",
+    type: "metric" as const,
+  },
+  {
+    module: "Photo Documentation",
+    value: "2 photos uploaded",
+    type: "photo" as const,
+  },
+  {
+    module: "Engagement Metrics",
+    value: "89 interactions logged",
+    type: "metric" as const,
+  },
+  {
+    module: "Social Mentions",
+    value: "6 new mentions",
+    type: "metric" as const,
+  },
+  {
+    module: "Brand Visibility Score",
+    value: "Updated to 8.7/10",
+    type: "metric" as const,
+  },
+  {
+    module: "Sales Volume Tracker",
+    value: "63 units sold (+16)",
+    type: "metric" as const,
+  },
+  {
+    module: "Photo Documentation",
+    value: "5 photos uploaded",
+    type: "photo" as const,
+  },
+  {
+    module: "Consumer Feedback",
+    value: "Rating: 4.8/5 (19 responses)",
+    type: "metric" as const,
+  },
+  {
+    module: "Impressions Tracker",
+    value: "518 impressions (+176)",
+    type: "metric" as const,
+  },
+  {
+    module: "Engagement Metrics",
+    value: "124 interactions (+35)",
+    type: "metric" as const,
+  },
+  {
+    module: "Social Mentions",
+    value: "11 new mentions (+5)",
+    type: "metric" as const,
+  },
+  {
+    module: "Photo Documentation",
+    value: "1 photo uploaded",
+    type: "photo" as const,
+  },
 ];
 
 function makeTime(index: number): string {
@@ -151,24 +231,38 @@ function ConfirmDialog({
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(15,23,42,0.4)" }}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(15,23,42,0.4)" }}
+    >
       <div
         className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-6">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#FEF3C7" }}>
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ background: "#FEF3C7" }}
+            >
               <AlertTriangle size={18} style={{ color: "#D97706" }} />
             </div>
             <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>{title}</h3>
           </div>
-          <p style={{ fontSize: "0.875rem", color: "#64748B", lineHeight: 1.6 }} className="mb-3">
+          <p
+            style={{ fontSize: "0.875rem", color: "#64748B", lineHeight: 1.6 }}
+            className="mb-3"
+          >
             {description}
           </p>
           <div
             className="px-3.5 py-2.5 rounded-lg"
-            style={{ background: "#FEF3C7", fontSize: "0.8125rem", color: "#92400E", lineHeight: 1.5 }}
+            style={{
+              background: "#FEF3C7",
+              fontSize: "0.8125rem",
+              color: "#92400E",
+              lineHeight: 1.5,
+            }}
           >
             {warning}
           </div>
@@ -200,7 +294,8 @@ function ConfirmDialog({
 
 export function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
-  const { getEvent, getCampaign, updateEventStatus, updateEventFields } = useCampaignContext();
+  const { getEvent, getCampaign, updateEventStatus, updateEventFields } =
+    useCampaignContext();
 
   const event = getEvent(eventId ?? "");
   const campaign = event ? getCampaign(event.campaignId) : undefined;
@@ -221,9 +316,16 @@ export function EventDetailPage() {
     description: string,
     warning: string,
     confirmLabel: string,
-    confirmColor: string
+    confirmColor: string,
   ) {
-    setConfirmAction({ status, title, description, warning, confirmLabel, confirmColor });
+    setConfirmAction({
+      status,
+      title,
+      description,
+      warning,
+      confirmLabel,
+      confirmColor,
+    });
   }
 
   function executeTransition() {
@@ -267,10 +369,10 @@ export function EventDetailPage() {
 
   const mappedModules = getDataModulesForObjectives(event.objectives);
   const advModules = ADVANCED_MODULES.filter((m) =>
-    event.advancedModules.includes(m.id)
+    event.advancedModules.includes(m.id),
   );
   const objectiveDetails = OBJECTIVES.filter((o) =>
-    event.objectives.includes(o.id)
+    event.objectives.includes(o.id),
   );
   const modulesByObjective = event.objectives.map((objId) => {
     const obj = OBJECTIVES.find((o) => o.id === objId);
@@ -312,7 +414,11 @@ export function EventDetailPage() {
               </h2>
               <span
                 className="flex items-center gap-1 px-2.5 py-0.5 rounded-md"
-                style={{ fontSize: "0.6875rem", background: status.bg, color: status.text }}
+                style={{
+                  fontSize: "0.6875rem",
+                  background: status.bg,
+                  color: status.text,
+                }}
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full inline-block"
@@ -333,26 +439,41 @@ export function EventDetailPage() {
                   {campaign.name}
                 </Link>
               )}
-              <span className="flex items-center gap-1" style={{ fontSize: "0.875rem", color: "#64748B" }}>
+              <span
+                className="flex items-center gap-1"
+                style={{ fontSize: "0.875rem", color: "#64748B" }}
+              >
                 <MapPin size={14} />
                 {event.location}
               </span>
             </div>
             <div className="flex items-center gap-4 flex-wrap">
-              <span className="flex items-center gap-1.5" style={{ fontSize: "0.875rem", color: "#64748B" }}>
+              <span
+                className="flex items-center gap-1.5"
+                style={{ fontSize: "0.875rem", color: "#64748B" }}
+              >
                 <CalendarDays size={14} />
-                {new Date(event.date + "T12:00:00").toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
+                {new Date(event.date + "T12:00:00").toLocaleDateString(
+                  "en-US",
+                  {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  },
+                )}
               </span>
-              <span className="flex items-center gap-1.5" style={{ fontSize: "0.875rem", color: "#64748B" }}>
+              <span
+                className="flex items-center gap-1.5"
+                style={{ fontSize: "0.875rem", color: "#64748B" }}
+              >
                 <Clock size={14} />
                 {event.duration}
               </span>
-              <span className="flex items-center gap-1.5" style={{ fontSize: "0.875rem", color: "#64748B" }}>
+              <span
+                className="flex items-center gap-1.5"
+                style={{ fontSize: "0.875rem", color: "#64748B" }}
+              >
                 <Building2 size={14} />
                 {VENUE_LABELS[event.venueType] || event.venueType}
               </span>
@@ -369,7 +490,7 @@ export function EventDetailPage() {
                   "This will mark the event as scheduled. It will still be editable until the event starts.",
                   "Once the event goes live, you will no longer be able to edit its configuration.",
                   "Schedule Event",
-                  "#1D4ED8"
+                  "#1D4ED8",
                 )
               }
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
@@ -388,7 +509,7 @@ export function EventDetailPage() {
                   "Starting the event transitions it to the Live Data Feed phase. Field educators will begin submitting data.",
                   "This action is irreversible. The event configuration will become read-only and cannot be modified.",
                   "Start Event",
-                  "#0F766E"
+                  "#0F766E",
                 )
               }
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
@@ -407,7 +528,7 @@ export function EventDetailPage() {
                   "Locking the report finalizes all collected data and generates the final event report.",
                   "This action is permanent. Once locked, the report cannot be edited or unlocked. All data becomes read-only.",
                   "Lock Report",
-                  "#B91C1C"
+                  "#B91C1C",
                 )
               }
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
@@ -442,7 +563,11 @@ export function EventDetailPage() {
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
                     style={{
-                      background: isCurrent ? pm.color : isDone ? "#0F766E" : "#F1F5F9",
+                      background: isCurrent
+                        ? pm.color
+                        : isDone
+                          ? "#0F766E"
+                          : "#F1F5F9",
                       color: isCurrent || isDone ? "#FFF" : "#94A3B8",
                     }}
                   >
@@ -456,7 +581,11 @@ export function EventDetailPage() {
                     <p
                       style={{
                         fontSize: "0.8125rem",
-                        color: isCurrent ? pm.color : isDone ? "#0F766E" : "#94A3B8",
+                        color: isCurrent
+                          ? pm.color
+                          : isDone
+                            ? "#0F766E"
+                            : "#94A3B8",
                       }}
                     >
                       Phase {p}
@@ -487,7 +616,10 @@ export function EventDetailPage() {
           className="mt-4 px-4 py-3 rounded-lg flex items-start gap-3"
           style={{ background: phaseMeta.bg }}
         >
-          <phaseMeta.icon size={16} style={{ color: phaseMeta.color, marginTop: 2 }} />
+          <phaseMeta.icon
+            size={16}
+            style={{ color: phaseMeta.color, marginTop: 2 }}
+          />
           <div>
             <p style={{ fontSize: "0.8125rem", color: phaseMeta.color }}>
               {phaseMeta.label}
@@ -547,19 +679,43 @@ function Phase1Editable({
       <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
         <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center gap-2">
           <Edit3 size={15} style={{ color: "#1D4ED8" }} />
-          <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>Event Configuration</span>
+          <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
+            Event Configuration
+          </span>
           <span
             className="ml-auto px-2 py-0.5 rounded-md inline-flex items-center gap-1"
-            style={{ fontSize: "0.6875rem", background: "#EFF6FF", color: "#1D4ED8" }}
+            style={{
+              fontSize: "0.6875rem",
+              background: "#EFF6FF",
+              color: "#1D4ED8",
+            }}
           >
             <Pencil size={9} />
             Editable
           </span>
         </div>
         <div className="px-5 py-4 space-y-1">
-          <EditableField eventId={event.id} field="name" label="Event Name" value={event.name} type="text" />
-          <EditableField eventId={event.id} field="location" label="Location" value={event.location} type="text" />
-          <EditableField eventId={event.id} field="date" label="Date" value={event.date} type="date" />
+          <EditableField
+            eventId={event.id}
+            field="name"
+            label="Event Name"
+            value={event.name}
+            type="text"
+          />
+          <EditableField
+            eventId={event.id}
+            field="location"
+            label="Location"
+            value={event.location}
+            type="text"
+          />
+          <EditableField
+            eventId={event.id}
+            field="date"
+            label="Date"
+            value={event.date}
+            type="date"
+          />
           <EditableField
             eventId={event.id}
             field="duration"
@@ -599,7 +755,11 @@ function Phase1Editable({
                 <span
                   key={o.id}
                   className="px-3 py-1.5 rounded-lg"
-                  style={{ fontSize: "0.8125rem", background: "#7D152D0F", color: "#7D152D" }}
+                  style={{
+                    fontSize: "0.8125rem",
+                    background: "#7D152D0F",
+                    color: "#7D152D",
+                  }}
                 >
                   {o.label}
                 </span>
@@ -621,16 +781,26 @@ function Phase1Editable({
                 key={m.id}
                 className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#F8FAFC]"
               >
-                <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#0F766E" }} />
+                <div
+                  className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                  style={{ background: "#0F766E" }}
+                />
                 <div>
-                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{m.label}</p>
-                  <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{m.description}</p>
+                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                    {m.label}
+                  </p>
+                  <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                    {m.description}
+                  </p>
                 </div>
               </div>
             ))}
             {advModules.length > 0 && (
               <>
-                <p className="pt-2" style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                <p
+                  className="pt-2"
+                  style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                >
                   ADVANCED MODULES
                 </p>
                 {advModules.map((m) => (
@@ -638,10 +808,17 @@ function Phase1Editable({
                     key={m.id}
                     className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#F8FAFC]"
                   >
-                    <div className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style={{ background: "#D97706" }} />
+                    <div
+                      className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                      style={{ background: "#D97706" }}
+                    />
                     <div>
-                      <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{m.label}</p>
-                      <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{m.description}</p>
+                      <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                        {m.label}
+                      </p>
+                      <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                        {m.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -725,7 +902,9 @@ function EditableField({
       >
         <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>{label}</span>
         <span className="flex items-center gap-2">
-          <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>{shown}</span>
+          <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+            {shown}
+          </span>
           <Pencil
             size={11}
             className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -753,7 +932,9 @@ function EditableField({
               const val = typeof o === "string" ? o : o.value;
               const lab = typeof o === "string" ? o : o.label;
               return (
-                <option key={val} value={val}>{lab}</option>
+                <option key={val} value={val}>
+                  {lab}
+                </option>
               );
             })}
           </select>
@@ -765,7 +946,11 @@ function EditableField({
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
             className="px-2 py-1 rounded-md border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30"
-            style={{ fontSize: "0.8125rem", color: "#0F172A", maxWidth: type === "date" ? 160 : 200 }}
+            style={{
+              fontSize: "0.8125rem",
+              color: "#0F172A",
+              maxWidth: type === "date" ? 160 : 200,
+            }}
           />
         )}
         <button
@@ -801,7 +986,13 @@ function Phase2LiveFeed({
   modules: DataModule[];
 }) {
   const [feedItems, setFeedItems] = useState<
-    { time: string; module: string; value: string; type: "metric" | "photo"; id: number }[]
+    {
+      time: string;
+      module: string;
+      value: string;
+      type: "metric" | "photo";
+      id: number;
+    }[]
   >([]);
   const nextIdx = useRef(0);
   const [elapsed, setElapsed] = useState(0);
@@ -842,13 +1033,17 @@ function Phase2LiveFeed({
   }, []);
 
   const completedCount = Math.min(feedItems.length, modules.length);
-  const progressPct = modules.length > 0 ? Math.round((completedCount / modules.length) * 100) : 0;
+  const progressPct =
+    modules.length > 0
+      ? Math.round((completedCount / modules.length) * 100)
+      : 0;
 
   const elapsedMin = Math.floor(elapsed / 60);
   const elapsedSec = elapsed % 60;
-  const elapsedLabel = elapsedMin > 0
-    ? `${elapsedMin}m ${String(elapsedSec).padStart(2, "0")}s`
-    : `${elapsedSec}s`;
+  const elapsedLabel =
+    elapsedMin > 0
+      ? `${elapsedMin}m ${String(elapsedSec).padStart(2, "0")}s`
+      : `${elapsedSec}s`;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -859,18 +1054,23 @@ function Phase2LiveFeed({
             <Radio size={15} style={{ color: "#0F766E" }} />
             <span
               className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
-              style={{ background: "#0F766E", animation: "livePulse 2s ease-in-out infinite" }}
+              style={{
+                background: "#0F766E",
+                animation: "livePulse 2s ease-in-out infinite",
+              }}
             />
           </div>
           <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
             Live Data Feed
           </span>
-          <span
-            className="ml-auto flex items-center gap-2"
-          >
+          <span className="ml-auto flex items-center gap-2">
             <span
               className="px-2.5 py-0.5 rounded-md"
-              style={{ fontSize: "0.6875rem", background: "#ECFDF5", color: "#0F766E" }}
+              style={{
+                fontSize: "0.6875rem",
+                background: "#ECFDF5",
+                color: "#0F766E",
+              }}
             >
               Receiving data
             </span>
@@ -886,7 +1086,12 @@ function Phase2LiveFeed({
             <div
               key={item.id}
               className="px-5 py-3.5 flex items-start gap-3"
-              style={{ animation: item.id === feedItems[0]?.id ? "feedSlideIn 0.4s ease-out" : "none" }}
+              style={{
+                animation:
+                  item.id === feedItems[0]?.id
+                    ? "feedSlideIn 0.4s ease-out"
+                    : "none",
+              }}
             >
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
@@ -908,7 +1113,10 @@ function Phase2LiveFeed({
                   {item.value}
                 </p>
               </div>
-              <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }} className="flex-shrink-0">
+              <span
+                style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                className="flex-shrink-0"
+              >
                 {item.time}
               </span>
             </div>
@@ -918,10 +1126,14 @@ function Phase2LiveFeed({
         <div className="px-5 py-3 border-t border-[#E2E8F0] bg-[#FAFBFC] flex items-center gap-2">
           <span
             className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ background: "#0F766E", animation: "livePulse 2s ease-in-out infinite" }}
+            style={{
+              background: "#0F766E",
+              animation: "livePulse 2s ease-in-out infinite",
+            }}
           />
           <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-            Simulating near real-time feed from field educators · {feedItems.length} entries received
+            Simulating near real-time feed from field educators ·{" "}
+            {feedItems.length} entries received
           </p>
         </div>
       </div>
@@ -939,9 +1151,21 @@ function Phase2LiveFeed({
           <div className="flex items-center gap-3 mb-3">
             <div className="relative w-14 h-14">
               <svg width="56" height="56" viewBox="0 0 56 56">
-                <circle cx="28" cy="28" r="24" fill="none" stroke="#E2E8F0" strokeWidth="4" />
                 <circle
-                  cx="28" cy="28" r="24" fill="none" stroke="#0F766E" strokeWidth="4"
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  fill="none"
+                  stroke="#E2E8F0"
+                  strokeWidth="4"
+                />
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  fill="none"
+                  stroke="#0F766E"
+                  strokeWidth="4"
                   strokeDasharray={`${progressPct * 1.508} 150.8`}
                   strokeLinecap="round"
                   transform="rotate(-90 28 28)"
@@ -983,7 +1207,10 @@ function Phase2LiveFeed({
             {modules.map((m, i) => {
               const done = i < completedCount;
               return (
-                <div key={m.id} className="flex items-center gap-2 transition-all">
+                <div
+                  key={m.id}
+                  className="flex items-center gap-2 transition-all"
+                >
                   <div
                     className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
                     style={{
@@ -991,7 +1218,9 @@ function Phase2LiveFeed({
                       border: done ? "none" : "2px solid #E2E8F0",
                     }}
                   >
-                    {done && <CheckCircle2 size={10} style={{ color: "#FFF" }} />}
+                    {done && (
+                      <CheckCircle2 size={10} style={{ color: "#FFF" }} />
+                    )}
                   </div>
                   <span
                     className="truncate transition-colors"
@@ -1022,7 +1251,11 @@ function Phase2LiveFeed({
               <span
                 key={o.id}
                 className="px-2.5 py-1 rounded-lg"
-                style={{ fontSize: "0.75rem", background: "#7D152D0F", color: "#7D152D" }}
+                style={{
+                  fontSize: "0.75rem",
+                  background: "#7D152D0F",
+                  color: "#7D152D",
+                }}
               >
                 {o.label}
               </span>
@@ -1049,7 +1282,14 @@ function Phase2LiveFeed({
 // Phase 3 — Locked Final Report
 // =============================================================================
 
-const SECTION_COLORS = ["#7D152D", "#0F766E", "#1D4ED8", "#D97706", "#7C3AED", "#059669"];
+const SECTION_COLORS = [
+  "#7D152D",
+  "#0F766E",
+  "#1D4ED8",
+  "#D97706",
+  "#7C3AED",
+  "#059669",
+];
 
 function Phase3Locked({
   event,
@@ -1057,7 +1297,11 @@ function Phase3Locked({
   advModules,
 }: {
   event: EventItem;
-  modulesByObjective: { objectiveId: string; label: string; modules: DataModule[] }[];
+  modulesByObjective: {
+    objectiveId: string;
+    label: string;
+    modules: DataModule[];
+  }[];
   advModules: { id: string; label: string; description: string }[];
 }) {
   return (
@@ -1082,7 +1326,9 @@ function Phase3Locked({
       <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
         <div
           className="px-6 py-5 border-b border-[#E2E8F0]"
-          style={{ background: "linear-gradient(135deg, #7D152D 0%, #5C0F21 100%)" }}
+          style={{
+            background: "linear-gradient(135deg, #7D152D 0%, #5C0F21 100%)",
+          }}
         >
           <p
             style={{ fontSize: "0.6875rem", color: "rgba(255,255,255,0.6)" }}
@@ -1092,10 +1338,16 @@ function Phase3Locked({
           </p>
           <p style={{ fontSize: "1.125rem", color: "#FFF" }}>{event.name}</p>
           <div className="flex items-center gap-4 mt-2 flex-wrap">
-            <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}>
+            <span
+              className="flex items-center gap-1"
+              style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}
+            >
               <MapPin size={12} /> {event.location}
             </span>
-            <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}>
+            <span
+              className="flex items-center gap-1"
+              style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}
+            >
               <CalendarDays size={12} />{" "}
               {new Date(event.date + "T12:00:00").toLocaleDateString("en-US", {
                 month: "short",
@@ -1103,7 +1355,10 @@ function Phase3Locked({
                 year: "numeric",
               })}
             </span>
-            <span className="flex items-center gap-1" style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}>
+            <span
+              className="flex items-center gap-1"
+              style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.7)" }}
+            >
               <Clock size={12} /> {event.duration}
             </span>
           </div>
@@ -1112,12 +1367,18 @@ function Phase3Locked({
         {modulesByObjective.map((group, gi) => (
           <div
             key={group.objectiveId}
-            className={gi < modulesByObjective.length - 1 ? "border-b border-[#F1F5F9]" : ""}
+            className={
+              gi < modulesByObjective.length - 1
+                ? "border-b border-[#F1F5F9]"
+                : ""
+            }
           >
             <div className="px-6 pt-5 pb-2 flex items-center gap-2">
               <div
                 className="w-1.5 h-5 rounded-full"
-                style={{ background: SECTION_COLORS[gi % SECTION_COLORS.length] }}
+                style={{
+                  background: SECTION_COLORS[gi % SECTION_COLORS.length],
+                }}
               />
               <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
                 {group.label}
@@ -1138,7 +1399,10 @@ function Phase3Locked({
         {advModules.length > 0 && (
           <div className="border-t border-[#F1F5F9]">
             <div className="px-6 pt-5 pb-2 flex items-center gap-2">
-              <div className="w-1.5 h-5 rounded-full" style={{ background: "#D97706" }} />
+              <div
+                className="w-1.5 h-5 rounded-full"
+                style={{ background: "#D97706" }}
+              />
               <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
                 Advanced Modules
               </span>
@@ -1152,11 +1416,19 @@ function Phase3Locked({
                   key={mod.id}
                   className="p-3 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]"
                 >
-                  <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }} className="mb-1.5">
+                  <p
+                    style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                    className="mb-1.5"
+                  >
                     {mod.label}
                   </p>
-                  <p style={{ fontSize: "1rem", color: "#0F172A" }}>Collected</p>
-                  <p style={{ fontSize: "0.625rem", color: "#94A3B8" }} className="mt-1">
+                  <p style={{ fontSize: "1rem", color: "#0F172A" }}>
+                    Collected
+                  </p>
+                  <p
+                    style={{ fontSize: "0.625rem", color: "#94A3B8" }}
+                    className="mt-1"
+                  >
                     {mod.description}
                   </p>
                 </div>
@@ -1174,7 +1446,9 @@ function Phase3Locked({
               year: "numeric",
             })}
           </span>
-          <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>Hart Agency</span>
+          <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            Hart Agency
+          </span>
         </div>
       </div>
     </div>
@@ -1184,20 +1458,29 @@ function Phase3Locked({
 function LockedModuleCard({ mod }: { mod: DataModule }) {
   return (
     <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-      <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }} className="mb-1.5 truncate">
+      <p
+        style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        className="mb-1.5 truncate"
+      >
         {mod.label}
       </p>
 
       {mod.sampleType === "score" && (
         <div className="flex items-end gap-2">
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{mod.sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {mod.sampleValue}
+          </span>
           <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>/10</span>
           <div className="flex-1 flex items-end gap-px ml-1">
             {[0.3, 0.5, 0.7, 0.85, 0.65].map((h, i) => (
               <div
                 key={i}
                 className="flex-1 rounded-t-sm"
-                style={{ height: `${h * 24}px`, background: "#7D152D", opacity: 0.15 + i * 0.15 }}
+                style={{
+                  height: `${h * 24}px`,
+                  background: "#7D152D",
+                  opacity: 0.15 + i * 0.15,
+                }}
               />
             ))}
           </div>
@@ -1206,14 +1489,18 @@ function LockedModuleCard({ mod }: { mod: DataModule }) {
 
       {mod.sampleType === "number" && (
         <div className="flex items-end gap-1">
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{mod.sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {mod.sampleValue}
+          </span>
           <TrendingUp size={14} style={{ color: "#0F766E", marginBottom: 2 }} />
         </div>
       )}
 
       {mod.sampleType === "percent" && (
         <div>
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{mod.sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {mod.sampleValue}
+          </span>
           <div className="mt-1.5 h-1.5 rounded-full bg-[#E2E8F0] overflow-hidden">
             <div
               className="h-full rounded-full"
@@ -1225,18 +1512,20 @@ function LockedModuleCard({ mod }: { mod: DataModule }) {
 
       {mod.sampleType === "currency" && (
         <div className="flex items-end gap-1">
-          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>{mod.sampleValue}</span>
+          <span style={{ fontSize: "1.25rem", color: "#0F172A" }}>
+            {mod.sampleValue}
+          </span>
           <BarChart3 size={14} style={{ color: "#1D4ED8", marginBottom: 2 }} />
         </div>
       )}
 
       {mod.sampleType === "text" && (
-        <span style={{ fontSize: "1rem", color: "#0F172A" }}>{mod.sampleValue}</span>
+        <span style={{ fontSize: "1rem", color: "#0F172A" }}>
+          {mod.sampleValue}
+        </span>
       )}
 
-      {!mod.sampleType && (
-        <div className="h-5 w-16 rounded bg-[#E2E8F0]" />
-      )}
+      {!mod.sampleType && <div className="h-5 w-16 rounded bg-[#E2E8F0]" />}
     </div>
   );
 }
