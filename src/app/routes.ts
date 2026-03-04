@@ -11,6 +11,8 @@ import { EventsPage } from "./components/events-page";
 import { ReportsPage } from "./components/reports-page";
 import { SettingsPage } from "./components/settings-page";
 import { HelpPage } from "./components/help-page";
+import { TermsOfServicePage } from "./components/terms-of-service";
+import { PrivacyPolicyPage } from "./components/privacy-policy";
 import { NotFound } from "./components/not-found";
 
 export const router = createBrowserRouter([
@@ -18,6 +20,8 @@ export const router = createBrowserRouter([
   { path: "/forgot-password", Component: ForgotPassword },
   { path: "/reset-password", Component: ResetPassword },
   { path: "/activate", Component: ActivateAccount },
+  { path: "/terms", Component: TermsOfServicePage },
+  { path: "/privacy", Component: PrivacyPolicyPage },
   {
     path: "/dashboard",
     Component: AppShell,

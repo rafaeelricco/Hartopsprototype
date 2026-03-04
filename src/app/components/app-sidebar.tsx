@@ -11,7 +11,9 @@ import {
   Search,
   MoreHorizontal,
 } from "lucide-react";
-import logoImage from "figma:asset/4aefc8a4ebd9ee8a486a9bd5fc1e93239dafa3d3.png";
+
+const LOGO_URL = "https://lirp.cdn-website.com/516d69f6/dms3rep/multi/opt/hart-2Bagency-2Blogo-217w.png";
+
 import {
   Sidebar,
   SidebarContent,
@@ -70,11 +72,11 @@ export function AppSidebar() {
               onClick={() => navigate("/dashboard")}
               className="cursor-pointer"
             >
-              <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D] shrink-0">
+              <div className="flex items-center justify-center size-8 shrink-0">
                 <img
-                  src={logoImage}
+                  src={LOGO_URL}
                   alt="Hart Ops"
-                  className="h-4 w-auto brightness-0 invert"
+                  className="h-8 w-auto object-contain"
                 />
               </div>
               <div className="grid flex-1 text-left leading-tight">
@@ -211,7 +213,7 @@ export function AppSidebar() {
                   <Settings className="size-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate("/dashboard/help")} className="cursor-pointer">
                   <LifeBuoy className="size-4 mr-2" />
                   Get Help
                 </DropdownMenuItem>

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  FileBarChart,
   Download,
   FileSpreadsheet,
   TrendingUp,
@@ -13,7 +12,9 @@ import {
   Megaphone,
   User,
   ArrowUpDown,
-  ChevronRight,
+  Activity,
+  Users,
+  CalendarCheck,
 } from "lucide-react";
 import {
   Card,
@@ -26,7 +27,6 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { Progress } from "./ui/progress";
-import { Separator } from "./ui/separator";
 import {
   Select,
   SelectContent,
@@ -85,19 +85,19 @@ const TOP_CLIENTS = [
 ];
 
 const TOP_CAMPAIGNS = [
-  { rank: 1, name: "Spring Product Launch", org: "Multi-org", events: 14, qualityScore: 96 },
-  { rank: 2, name: "Customer Appreciation Week", org: "Zenith Group", events: 8, qualityScore: 93 },
-  { rank: 3, name: "Q1 Brand Awareness", org: "Multi-org", events: 12, qualityScore: 89 },
-  { rank: 4, name: "Holiday Season Campaign", org: "Multi-org", events: 10, qualityScore: 87 },
-  { rank: 5, name: "Annual Giving Drive", org: "Acme Corp", events: 6, qualityScore: 84 },
+  { rank: 1, name: "Spring Product Launch", org: "Multi-org", events: 14, qualityScore: 96, trend: "up" as const },
+  { rank: 2, name: "Customer Appreciation Week", org: "Zenith Group", events: 8, qualityScore: 93, trend: "up" as const },
+  { rank: 3, name: "Q1 Brand Awareness", org: "Multi-org", events: 12, qualityScore: 89, trend: "stable" as const },
+  { rank: 4, name: "Holiday Season Campaign", org: "Multi-org", events: 10, qualityScore: 87, trend: "down" as const },
+  { rank: 5, name: "Annual Giving Drive", org: "Acme Corp", events: 6, qualityScore: 84, trend: "stable" as const },
 ];
 
 const TOP_EDUCATORS = [
-  { rank: 1, name: "John Doe", org: "Acme Corp", eventsLed: 12, qualityScore: 97 },
-  { rank: 2, name: "Maria Lopez", org: "Zenith Group", eventsLed: 9, qualityScore: 95 },
-  { rank: 3, name: "Sarah Chen", org: "Vanguard LLC", eventsLed: 11, qualityScore: 92 },
-  { rank: 4, name: "Alex Kim", org: "Nova Systems", eventsLed: 8, qualityScore: 90 },
-  { rank: 5, name: "Diana Ross", org: "Meridian Partners", eventsLed: 7, qualityScore: 88 },
+  { rank: 1, name: "John Doe", org: "Acme Corp", eventsLed: 12, qualityScore: 97, trend: "up" as const },
+  { rank: 2, name: "Maria Lopez", org: "Zenith Group", eventsLed: 9, qualityScore: 95, trend: "up" as const },
+  { rank: 3, name: "Sarah Chen", org: "Vanguard LLC", eventsLed: 11, qualityScore: 92, trend: "stable" as const },
+  { rank: 4, name: "Alex Kim", org: "Nova Systems", eventsLed: 8, qualityScore: 90, trend: "stable" as const },
+  { rank: 5, name: "Diana Ross", org: "Meridian Partners", eventsLed: 7, qualityScore: 88, trend: "down" as const },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -109,6 +109,7 @@ const PLATFORM_QUALITY = {
   photos: 91,
   questions: 84,
   inventory: 86,
+  changeFromLastMonth: 2,
 };
 
 const QUALITY_TREND = [
@@ -129,7 +130,7 @@ interface OrgQuality {
   questions: number;
   inventory: number;
   trend: "up" | "down" | "stable";
-  change: number; // pp change
+  change: number;
   events: number;
 }
 
@@ -145,17 +146,52 @@ const ORG_QUALITY: OrgQuality[] = [
 ];
 
 /* ------------------------------------------------------------------ */
+/* Mock data — Campaign Quality (change #2)                            */
+/* ------------------------------------------------------------------ */
+
+interface CampaignQuality {
+  id: number;
+  name: string;
+  org: string;
+  overall: number;
+  photos: number;
+  questions: number;
+  inventory: number;
+  trend: "up" | "down" | "stable";
+  change: number;
+  events: number;
+}
+
+const CAMPAIGN_QUALITY: CampaignQuality[] = [
+  { id: 1, name: "Spring Product Launch", org: "Multi-org", overall: 96, photos: 98, questions: 94, inventory: 96, trend: "up", change: 3, events: 14 },
+  { id: 2, name: "Customer Appreciation Week", org: "Zenith Group", overall: 93, photos: 95, questions: 90, inventory: 94, trend: "up", change: 2, events: 8 },
+  { id: 3, name: "Q1 Brand Awareness", org: "Multi-org", overall: 89, photos: 91, questions: 86, inventory: 90, trend: "stable", change: 0, events: 12 },
+  { id: 4, name: "Holiday Season Campaign", org: "Multi-org", overall: 87, photos: 90, questions: 83, inventory: 88, trend: "down", change: -2, events: 10 },
+  { id: 5, name: "Annual Giving Drive", org: "Acme Corp", overall: 84, photos: 87, questions: 80, inventory: 85, trend: "stable", change: 0, events: 6 },
+  { id: 6, name: "Back-to-School Outreach", org: "Vanguard LLC", overall: 78, photos: 80, questions: 73, inventory: 81, trend: "down", change: -4, events: 9 },
+  { id: 7, name: "Year-End Review Push", org: "Apex Holdings", overall: 68, photos: 72, questions: 62, inventory: 70, trend: "down", change: -6, events: 5 },
+];
+
+/* ------------------------------------------------------------------ */
+/* Percentage dataKeys set (change #3 — tooltip fix)                   */
+/* ------------------------------------------------------------------ */
+
+const PERCENTAGE_KEYS = new Set([
+  "overall", "photos", "questions", "inventory", "qualityScore",
+]);
+
+/* ------------------------------------------------------------------ */
 /* Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
-function TrendIcon({ trend }: { trend: "up" | "down" | "stable" }) {
+function TrendIcon({ trend, className = "size-4" }: { trend: "up" | "down" | "stable"; className?: string }) {
   switch (trend) {
     case "up":
-      return <TrendingUp className="size-4 text-green-600" />;
+      return <TrendingUp className={`${className} text-green-600`} />;
     case "down":
-      return <TrendingDown className="size-4 text-red-500" />;
+      return <TrendingDown className={`${className} text-red-500`} />;
     case "stable":
-      return <Minus className="size-4 text-muted-foreground" />;
+      return <Minus className={`${className} text-muted-foreground`} />;
   }
 }
 
@@ -169,7 +205,7 @@ function TrendBadge({ trend, change }: { trend: "up" | "down" | "stable"; change
 
   return (
     <Badge variant="secondary" className={color} style={{ fontSize: "0.6875rem" }}>
-      <TrendIcon trend={trend} />
+      <TrendIcon trend={trend} className="size-3.5" />
       <span className="ml-0.5">
         {trend === "stable" ? "Stable" : `${change > 0 ? "+" : ""}${change}pp`}
       </span>
@@ -192,7 +228,7 @@ function getScoreBarColor(score: number) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Custom Recharts tooltip                                             */
+/* Custom Recharts tooltip (change #3 — fixed operator precedence)     */
 /* ------------------------------------------------------------------ */
 
 function CustomTooltip({ active, payload, label }: any) {
@@ -202,21 +238,32 @@ function CustomTooltip({ active, payload, label }: any) {
       <p className="text-foreground mb-1" style={{ fontSize: "0.75rem", fontWeight: 600 }}>
         {label}
       </p>
-      {payload.map((entry: any, i: number) => (
-        <div key={i} className="flex items-center gap-2">
-          <span
-            className="inline-block size-2 rounded-full"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-muted-foreground" style={{ fontSize: "0.6875rem" }}>
-            {entry.name}: {entry.value}
-            {typeof entry.value === "number" && entry.dataKey?.includes("quality") || entry.dataKey?.includes("overall") || entry.dataKey?.includes("photos") || entry.dataKey?.includes("questions") || entry.dataKey?.includes("inventory") ? "%" : ""}
-          </span>
-        </div>
-      ))}
+      {payload.map((entry: any, i: number) => {
+        const isPercentage = PERCENTAGE_KEYS.has(entry.dataKey);
+        return (
+          <div key={i} className="flex items-center gap-2">
+            <span
+              className="inline-block size-2 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="text-muted-foreground" style={{ fontSize: "0.6875rem" }}>
+              {entry.name}: {entry.value}{isPercentage ? "%" : ""}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Tab label helpers (change #7 — contextual export labels)            */
+/* ------------------------------------------------------------------ */
+
+const TAB_EXPORT_LABELS: Record<string, string> = {
+  dashboard: "Dashboard",
+  "data-quality": "Quality Report",
+};
 
 /* ------------------------------------------------------------------ */
 /* Main Component                                                      */
@@ -224,6 +271,9 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export function ReportsPage() {
   const [dateRange, setDateRange] = useState("6m");
+  const [activeTab, setActiveTab] = useState("dashboard");
+
+  const exportLabel = TAB_EXPORT_LABELS[activeTab] || "Report";
 
   return (
     <div className="p-6 space-y-6 w-full">
@@ -235,6 +285,7 @@ export function ReportsPage() {
             Platform-wide performance metrics and data quality monitoring.
           </p>
         </div>
+        {/* Change #7: contextual export labels */}
         <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="outline"
@@ -242,7 +293,7 @@ export function ReportsPage() {
             style={{ fontSize: "0.8125rem" }}
           >
             <Download className="size-4" />
-            Export PDF
+            Export {exportLabel} PDF
           </Button>
           <Button
             variant="outline"
@@ -250,13 +301,27 @@ export function ReportsPage() {
             style={{ fontSize: "0.8125rem" }}
           >
             <FileSpreadsheet className="size-4" />
-            Export Excel
+            Export {exportLabel} Excel
           </Button>
         </div>
       </div>
 
+      {/* Change #6: Date range selector above tabs — shared across both */}
+      <div className="flex items-center justify-end">
+        <Select value={dateRange} onValueChange={setDateRange}>
+          <SelectTrigger className="w-[160px] cursor-pointer" style={{ fontSize: "0.8125rem" }}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="3m">Last 3 Months</SelectItem>
+            <SelectItem value="6m">Last 6 Months</SelectItem>
+            <SelectItem value="12m">Last 12 Months</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Tabs */}
-      <Tabs defaultValue="dashboard">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="bg-transparent border-b border-border rounded-none w-full justify-start h-auto p-0 gap-0">
           {["Dashboard", "Data Quality"].map((tab) => (
             <TabsTrigger
@@ -274,21 +339,96 @@ export function ReportsPage() {
         {/* Dashboard Tab                                                 */}
         {/* ============================================================ */}
         <TabsContent value="dashboard" className="mt-6 space-y-6">
-          {/* Date range selector */}
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
-              Showing platform-wide trends
-            </p>
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[160px] cursor-pointer" style={{ fontSize: "0.8125rem" }}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3m">Last 3 Months</SelectItem>
-                <SelectItem value="6m">Last 6 Months</SelectItem>
-                <SelectItem value="12m">Last 12 Months</SelectItem>
-              </SelectContent>
-            </Select>
+
+          {/* Change #1: Platform Health summary row — DQ Score visible on landing */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Primary KPI — Data Quality Score */}
+            <Card className="gap-0 border-[#7D152D]/20">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/10">
+                    <Activity className="size-4 text-[#7D152D]" />
+                  </div>
+                  <span className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                    Data Quality Score
+                  </span>
+                </div>
+                <div className="flex items-end gap-2">
+                  <p
+                    className="text-[#7D152D] tabular-nums"
+                    style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1.1 }}
+                  >
+                    {PLATFORM_QUALITY.overall}%
+                  </p>
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <TrendingUp className="size-3 text-green-600" />
+                    <span className="text-green-600" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>
+                      +{PLATFORM_QUALITY.changeFromLastMonth}pp
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total Events */}
+            <Card className="gap-0">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/10">
+                    <CalendarCheck className="size-4 text-[#7D152D]" />
+                  </div>
+                  <span className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                    Total Events
+                  </span>
+                </div>
+                <p
+                  className="text-foreground tabular-nums"
+                  style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1.1 }}
+                >
+                  414
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Total Organizations */}
+            <Card className="gap-0">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/10">
+                    <Building2 className="size-4 text-[#7D152D]" />
+                  </div>
+                  <span className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                    Organizations
+                  </span>
+                </div>
+                <p
+                  className="text-foreground tabular-nums"
+                  style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1.1 }}
+                >
+                  8
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Total Users */}
+            <Card className="gap-0">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/10">
+                    <Users className="size-4 text-[#7D152D]" />
+                  </div>
+                  <span className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                    Active Users
+                  </span>
+                </div>
+                <p
+                  className="text-foreground tabular-nums"
+                  style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1.1 }}
+                >
+                  280
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Growth Charts Row */}
@@ -393,7 +533,7 @@ export function ReportsPage() {
             </Card>
           </div>
 
-          {/* Top Performers */}
+          {/* Top Performers — change #4: trend indicators on all tables */}
           <div>
             <p className="text-foreground mb-4" style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
               Top Performers
@@ -438,7 +578,7 @@ export function ReportsPage() {
                 </CardContent>
               </Card>
 
-              {/* Top Campaigns */}
+              {/* Top Campaigns — change #4: added Trend column */}
               <Card className="gap-0">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
@@ -453,6 +593,7 @@ export function ReportsPage() {
                         <th className="text-left px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>#</th>
                         <th className="text-left px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>Campaign</th>
                         <th className="text-right px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>Score</th>
+                        <th className="text-right px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>Trend</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -466,6 +607,9 @@ export function ReportsPage() {
                           <td className={`px-4 py-2.5 text-right tabular-nums ${getScoreColor(c.qualityScore)}`} style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
                             {c.qualityScore}%
                           </td>
+                          <td className="px-4 py-2.5 text-right">
+                            <TrendIcon trend={c.trend} />
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -473,7 +617,7 @@ export function ReportsPage() {
                 </CardContent>
               </Card>
 
-              {/* Top Educators */}
+              {/* Top Educators — change #4: added Trend column */}
               <Card className="gap-0">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
@@ -488,6 +632,7 @@ export function ReportsPage() {
                         <th className="text-left px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>#</th>
                         <th className="text-left px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>Educator</th>
                         <th className="text-right px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>Score</th>
+                        <th className="text-right px-4 py-2 text-muted-foreground" style={{ fontSize: "0.6875rem", fontWeight: 500 }}>Trend</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -500,6 +645,9 @@ export function ReportsPage() {
                           </td>
                           <td className={`px-4 py-2.5 text-right tabular-nums ${getScoreColor(e.qualityScore)}`} style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
                             {e.qualityScore}%
+                          </td>
+                          <td className="px-4 py-2.5 text-right">
+                            <TrendIcon trend={e.trend} />
                           </td>
                         </tr>
                       ))}
@@ -532,13 +680,13 @@ export function ReportsPage() {
                 <div className="flex items-center gap-1.5 mt-2">
                   <TrendingUp className="size-3.5 text-green-600" />
                   <span className="text-green-600" style={{ fontSize: "0.75rem", fontWeight: 500 }}>
-                    +2pp from last month
+                    +{PLATFORM_QUALITY.changeFromLastMonth}pp from last month
                   </span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Dimension Breakdown */}
+            {/* Dimension Breakdown — change #5: normalized opacity to /10 */}
             <DimensionCard
               icon={Camera}
               label="Photos"
@@ -707,6 +855,92 @@ export function ReportsPage() {
             </CardContent>
           </Card>
 
+          {/* Change #2: Per-Campaign Quality Breakdown */}
+          <Card className="gap-0">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle style={{ fontSize: "0.875rem" }}>Campaign Quality Breakdown</CardTitle>
+                  <CardDescription style={{ fontSize: "0.75rem" }}>
+                    Per-campaign data quality scores across organizations
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      {["Campaign", "Organization", "Overall", "Photos", "Questions", "Inventory", "Events", "Trend"].map((h) => (
+                        <th
+                          key={h}
+                          className={`px-5 py-3 text-muted-foreground ${h === "Campaign" || h === "Organization" ? "text-left" : "text-right"}`}
+                          style={{ fontSize: "0.75rem", fontWeight: 500 }}
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            {h}
+                            <ArrowUpDown className="size-3" />
+                          </span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {CAMPAIGN_QUALITY.map((cq) => (
+                      <tr
+                        key={cq.id}
+                        className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                      >
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center size-7 rounded-md bg-muted shrink-0">
+                              <Megaphone className="size-3.5 text-muted-foreground" />
+                            </div>
+                            <span className="text-foreground" style={{ fontSize: "0.8125rem", fontWeight: 500 }}>
+                              {cq.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3">
+                          <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                            {cq.org}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <span className={`tabular-nums ${getScoreColor(cq.overall)}`} style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
+                            {cq.overall}%
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <span className="text-muted-foreground tabular-nums" style={{ fontSize: "0.8125rem" }}>
+                            {cq.photos}%
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <span className="text-muted-foreground tabular-nums" style={{ fontSize: "0.8125rem" }}>
+                            {cq.questions}%
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <span className="text-muted-foreground tabular-nums" style={{ fontSize: "0.8125rem" }}>
+                            {cq.inventory}%
+                          </span>
+                        </td>
+                        <td className="px-5 py-3 text-right text-muted-foreground tabular-nums" style={{ fontSize: "0.8125rem" }}>
+                          {cq.events}
+                        </td>
+                        <td className="px-5 py-3 text-right">
+                          <TrendBadge trend={cq.trend} change={cq.change} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Feedback Loop CTA */}
           <Card className="gap-0 border-amber-200 bg-amber-50/50">
             <CardContent className="p-4 flex items-start gap-3">
@@ -718,11 +952,22 @@ export function ReportsPage() {
                   Quality Attention Required
                 </p>
                 <p className="text-muted-foreground mt-0.5" style={{ fontSize: "0.75rem", lineHeight: 1.5 }}>
-                  {ORG_QUALITY.filter((o) => o.trend === "down").length} organization(s) show declining
+                  {ORG_QUALITY.filter((o) => o.trend === "down").length} organization(s) and{" "}
+                  {CAMPAIGN_QUALITY.filter((c) => c.trend === "down").length} campaign(s) show declining
                   data quality scores.{" "}
-                  <strong>{ORG_QUALITY.filter((o) => o.overall < 75).map((o) => o.name).join(", ")}</strong>{" "}
-                  {ORG_QUALITY.filter((o) => o.overall < 75).length === 1 ? "is" : "are"} below the 75% threshold
-                  and may require investigation.
+                  {(() => {
+                    const lowOrgs = ORG_QUALITY.filter((o) => o.overall < 75).map((o) => o.name);
+                    const lowCampaigns = CAMPAIGN_QUALITY.filter((c) => c.overall < 75).map((c) => c.name);
+                    const combined = [...lowOrgs, ...lowCampaigns];
+                    if (combined.length === 0) return null;
+                    return (
+                      <>
+                        <strong>{combined.join(", ")}</strong>{" "}
+                        {combined.length === 1 ? "is" : "are"} below the 75% threshold
+                        and may require investigation.
+                      </>
+                    );
+                  })()}
                 </p>
               </div>
             </CardContent>
@@ -734,7 +979,7 @@ export function ReportsPage() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Dimension Card (sub-component)                                      */
+/* Dimension Card (sub-component) — change #5: normalized bg opacity   */
 /* ------------------------------------------------------------------ */
 
 function DimensionCard({
@@ -752,7 +997,7 @@ function DimensionCard({
     <Card className="gap-0">
       <CardContent className="p-5">
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/8">
+          <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/10">
             <Icon className="size-4 text-[#7D152D]" />
           </div>
           <span className="text-foreground" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>

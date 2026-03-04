@@ -158,6 +158,23 @@ export function AddOrganizationWizard({
     return Object.keys(errs).length === 0;
   };
 
+  /* ---- blur validation for Company Name (change #2) --------------- */
+
+  const handleCompanyNameBlur = () => {
+    const name = data.companyName.trim();
+    if (!name) return; // don't show "already exists" for empty — that fires on Next
+    if (
+      existingNames.some(
+        (n) => n.toLowerCase() === name.toLowerCase(),
+      )
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        companyName: "An organization with this name already exists.",
+      }));
+    }
+  };
+
   /* ---- navigation ------------------------------------------------ */
 
   const goNext = () => {
@@ -339,6 +356,7 @@ export function AddOrganizationWizard({
                   type="text"
                   value={data.companyName}
                   onChange={(e) => updateField("companyName", e.target.value)}
+                  onBlur={handleCompanyNameBlur}
                   placeholder="e.g. Acme Corp"
                   className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors"
                 />

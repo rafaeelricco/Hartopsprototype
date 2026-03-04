@@ -1,5 +1,6 @@
 import React from "react";
-import logoImage from "figma:asset/4aefc8a4ebd9ee8a486a9bd5fc1e93239dafa3d3.png";
+
+const LOGO_URL = "https://lirp.cdn-website.com/516d69f6/dms3rep/multi/opt/hart-2Bagency-2Blogo-217w.png";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center">
         <img
-          src={logoImage}
+          src={LOGO_URL}
           alt="Hart Ops"
           className="h-16 w-auto"
         />
@@ -26,11 +27,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       <p className="mt-6 text-center text-muted-foreground" style={{ fontSize: '0.8125rem' }}>
         By clicking continue, you agree to our{" "}
         <br />
-        <a href="#" className="text-primary underline hover:opacity-80">
+        <a href="/terms" className="text-primary underline hover:opacity-80">
           Terms of Service
         </a>{" "}
         and{" "}
-        <a href="#" className="text-primary underline hover:opacity-80">
+        <a href="/privacy" className="text-primary underline hover:opacity-80">
           Privacy Policy
         </a>
         .
