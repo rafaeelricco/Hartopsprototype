@@ -27,11 +27,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       <p className="mt-6 text-center text-muted-foreground" style={{ fontSize: '0.8125rem' }}>
         By clicking continue, you agree to our{" "}
         <br />
-        <a href="/terms" className="text-primary underline hover:opacity-80">
+        <a href="/ops/terms" className="text-primary underline hover:opacity-80">
           Terms of Service
         </a>{" "}
         and{" "}
-        <a href="/privacy" className="text-primary underline hover:opacity-80">
+        <a href="/ops/privacy" className="text-primary underline hover:opacity-80">
           Privacy Policy
         </a>
         .

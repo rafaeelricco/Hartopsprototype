@@ -17,16 +17,16 @@ import {
   Ticket,
   Eye,
 } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Card, CardContent } from "../../shared/components/ui/card";
+import { Badge } from "../../shared/components/ui/badge";
+import { Button } from "../../shared/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../../shared/components/ui/select";
 import { EventDetailPanel } from "./event-detail-panel";
 
 /* ------------------------------------------------------------------ */

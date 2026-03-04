@@ -18,10 +18,10 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "./ui/sheet";
-import { Badge } from "./ui/badge";
-import { Separator } from "./ui/separator";
-import { Progress } from "./ui/progress";
+} from "../../shared/components/ui/sheet";
+import { Badge } from "../../shared/components/ui/badge";
+import { Separator } from "../../shared/components/ui/separator";
+import { Progress } from "../../shared/components/ui/progress";
 import type { EventRecord } from "./events-page";
 
 /* ------------------------------------------------------------------ */

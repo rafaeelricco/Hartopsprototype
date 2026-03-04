@@ -6,9 +6,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
+} from "../../shared/components/ui/dialog";
+import { Button } from "../../shared/components/ui/button";
+import { Badge } from "../../shared/components/ui/badge";
 import {
   Check,
   ChevronLeft,

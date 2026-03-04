@@ -25,29 +25,29 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "./ui/sidebar";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+} from "../../shared/components/ui/sidebar";
+import { Avatar, AvatarFallback } from "../../shared/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../../shared/components/ui/dropdown-menu";
 
 const mainNavItems = [
-  { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Organizations", icon: Building2, path: "/dashboard/organizations" },
-  { label: "Events", icon: CalendarDays, path: "/dashboard/events" },
+  { label: "Dashboard", icon: LayoutDashboard, path: "/ops/dashboard" },
+  { label: "Organizations", icon: Building2, path: "/ops/dashboard/organizations" },
+  { label: "Events", icon: CalendarDays, path: "/ops/dashboard/events" },
 ];
 
 const documentsNavItems = [
-  { label: "Reports", icon: FileBarChart, path: "/dashboard/reports" },
+  { label: "Reports", icon: FileBarChart, path: "/ops/dashboard/reports" },
 ];
 
 const footerNavItems = [
-  { label: "Settings", icon: Settings, path: "/dashboard/settings" },
-  { label: "Get Help", icon: LifeBuoy, path: "/dashboard/help" },
+  { label: "Settings", icon: Settings, path: "/ops/dashboard/settings" },
+  { label: "Get Help", icon: LifeBuoy, path: "/ops/dashboard/help" },
   { label: "Search", icon: Search, path: "#" },
 ];
 
@@ -56,7 +56,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === "/dashboard") return location.pathname === "/dashboard";
+    if (path === "/ops/dashboard") return location.pathname === "/ops/dashboard";
     if (path === "#") return false;
     return location.pathname.startsWith(path);
   };
@@ -69,7 +69,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/ops/dashboard")}
               className="cursor-pointer"
             >
               <div className="flex items-center justify-center size-8 shrink-0">
@@ -209,11 +209,11 @@ export function AppSidebar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate("/ops/dashboard/settings")} className="cursor-pointer">
                   <Settings className="size-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/dashboard/help")} className="cursor-pointer">
+                <DropdownMenuItem onClick={() => navigate("/ops/dashboard/help")} className="cursor-pointer">
                   <LifeBuoy className="size-4 mr-2" />
                   Get Help
                 </DropdownMenuItem>

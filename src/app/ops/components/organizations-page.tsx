@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { Building2, Search, Plus, ArrowUpDown } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Card, CardContent } from "../../shared/components/ui/card";
+import { Badge } from "../../shared/components/ui/badge";
+import { Button } from "../../shared/components/ui/button";
 import { AddOrganizationWizard } from "./add-organization-wizard";
 
 /* ------------------------------------------------------------------ */

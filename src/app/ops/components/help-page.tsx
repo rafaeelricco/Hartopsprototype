@@ -5,10 +5,10 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "./ui/card";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
-import { Badge } from "./ui/badge";
+} from "../../shared/components/ui/card";
+import { Button } from "../../shared/components/ui/button";
+import { Separator } from "../../shared/components/ui/separator";
+import { Badge } from "../../shared/components/ui/badge";
 import {
   BookOpen,
   MessageCircle,

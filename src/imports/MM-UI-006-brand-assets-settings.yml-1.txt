@@ -1,0 +1,82 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Brand Assets & Settings
+# =============================================================================
+
+id: "MM-UI-006"
+title: "Brand Assets & Settings"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "TBD — to be filled manually"
+
+context: |
+  As an Operating Staff member, I need to manage product libraries with
+  AI-assisted data entry and maintain help resources for field teams, so I
+  can keep SKU data accurate with minimal manual effort and ensure educators
+  have access to up-to-date FAQs and guidelines.
+
+scope:
+  in_scope:
+    - "Product Library and SKU management"
+    - "Auto Upload feature with AI-prefilled processing"
+    - "Help Resources — client-managed FAQs for field teams"
+  out_of_scope:
+    - "Brand identity management (logos, colors, fonts)"
+    - "User account settings and profile management"
+    - "Organization-level configuration and permissions"
+    - "Notification preferences"
+
+key_concepts:
+  - term: "Product Library"
+    definition: "A managed collection of SKUs (Stock Keeping Units) representing the brand's products available for field events."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.6 — Product Library"
+  - term: "Auto Upload"
+    definition: "An AI-powered feature that pre-fills product data fields during SKU upload, reducing manual data entry."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.6 — Product Library"
+  - term: "Help Resources"
+    definition: "Client-managed FAQ content that is pushed to field educator teams for reference during events."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.6 — Help Resources"
+
+core_content:
+  - section_title: "Product Library & SKU Management"
+    points:
+      - "Elements: Product Library listing all SKUs associated with the brand."
+      - "Functionality: CRUD operations on SKU entries — add, edit, remove products."
+      - "Functionality: 'Auto Upload' feature uses AI to pre-fill product data fields from uploaded content."
+      - "Design principle: Minimize manual data entry through intelligent automation."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.6 — Product Library"
+
+  - section_title: "Help Resources Management"
+    points:
+      - "Elements: FAQ management interface for creating and editing help content."
+      - "Functionality: Client-managed FAQs are pushed to field educator teams."
+      - "Design principle: Operating Staff controls the information flow to educators without requiring platform admin involvement."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.6 — Help Resources"
+
+assumptions:
+  - "Auto Upload accepts common file formats (CSV, Excel) for bulk SKU import."
+  - "AI pre-filling requires human review and confirmation before saving."
+  - "Product Library supports search and filtering by product name, SKU code, or category."
+  - "Help Resources are versioned or timestamped so educators see the latest content."
+  - "FAQs pushed to field teams appear in the Educator mobile app."
+  - "SKU data includes at minimum: product name, SKU code, description, and category."
+
+implications:
+  - "Frontend: Auto Upload needs a file upload component with progress indication and AI-fill preview."
+  - "Frontend: Help Resources editor needs a rich text or structured content editor for FAQs."
+  - "Backend: AI pre-fill service requires integration with an ML model or external AI API for product data extraction."
+  - "Backend: Help Resources need a push mechanism to sync content to the Educator mobile app."
+  - "Architecture: Auto Upload AI processing should be async with status polling — large files may take time."

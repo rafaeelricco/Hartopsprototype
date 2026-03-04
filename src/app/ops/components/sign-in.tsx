@@ -41,7 +41,7 @@ export function SignIn() {
 
     // Mock: check for demo credentials
     if (email === "admin@hartops.com" && password === "Password1!") {
-      navigate("/dashboard");
+      navigate("/ops/dashboard");
     } else if (email === "locked@hartops.com") {
       setErrors({ general: "Account locked. Please contact your administrator." });
     } else {
@@ -98,7 +98,7 @@ export function SignIn() {
               Password
             </label>
             <Link
-              to="/forgot-password"
+              to="/ops/forgot-password"
               className="text-primary hover:opacity-80 transition-opacity"
               style={{ fontSize: '0.8125rem' }}
             >

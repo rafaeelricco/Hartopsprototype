@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "./ui/sidebar";
-import { Separator } from "./ui/separator";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "../../shared/components/ui/sidebar";
+import { Separator } from "../../shared/components/ui/separator";
 import { AppSidebar } from "./app-sidebar";
 
 export function AppShell() {

@@ -19,11 +19,11 @@ import {
   Minus,
   Briefcase,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import { Progress } from "./ui/progress";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../shared/components/ui/card";
+import { Badge } from "../../shared/components/ui/badge";
+import { Button } from "../../shared/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../shared/components/ui/tabs";
+import { Progress } from "../../shared/components/ui/progress";
 
 /* ------------------------------------------------------------------ */
 /* Mock data — Organizations                                           */
@@ -429,7 +429,7 @@ export function OrganizationDetailPage() {
   if (!org) {
     return (
       <div className="p-6 w-full">
-        <Button variant="ghost" onClick={() => navigate("/dashboard/organizations")} className="cursor-pointer mb-4">
+        <Button variant="ghost" onClick={() => navigate("/ops/dashboard/organizations")} className="cursor-pointer mb-4">
           <ArrowLeft className="size-4 mr-2" /> Back to Organizations
         </Button>
         <div className="flex items-center justify-center py-20">
@@ -450,7 +450,7 @@ export function OrganizationDetailPage() {
       <div>
         <Button
           variant="ghost"
-          onClick={() => navigate("/dashboard/organizations")}
+          onClick={() => navigate("/ops/dashboard/organizations")}
           className="-ml-3 mb-3 text-muted-foreground hover:text-foreground cursor-pointer"
           style={{ fontSize: "0.8125rem" }}
         >

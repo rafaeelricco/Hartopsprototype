@@ -22,18 +22,18 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import { Progress } from "./ui/progress";
+} from "../../shared/components/ui/card";
+import { Badge } from "../../shared/components/ui/badge";
+import { Button } from "../../shared/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../shared/components/ui/tabs";
+import { Progress } from "../../shared/components/ui/progress";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../../shared/components/ui/select";
 import {
   LineChart,
   Line,

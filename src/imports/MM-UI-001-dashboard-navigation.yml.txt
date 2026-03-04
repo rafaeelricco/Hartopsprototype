@@ -1,0 +1,90 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Dashboard & Navigation
+# =============================================================================
+
+id: "MM-UI-001"
+title: "Dashboard & Navigation"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "MM-UI-002"
+    - "MM-UI-003"
+    - "MM-UI-004"
+    - "MM-UI-005"
+    - "MM-UI-006"
+
+context: |
+  As an Operating Staff member, I need a centralized dashboard that immediately
+  answers "Are my campaigns producing results?" so I can make data-driven
+  decisions without navigating through multiple screens.
+
+scope:
+  in_scope:
+    - "Side navigation structure and menu items"
+    - "Dashboard as default landing page after Sign In"
+    - "4 Stat Cards displaying key performance metrics"
+    - "Performance Trend Chart visualization"
+    - "Timeframe filter interaction (Last 30 days, 3/6/12 months)"
+    - "Real-time update behavior when filter changes"
+  out_of_scope:
+    - "Authentication and Sign In flow"
+    - "Detailed campaign or event drill-down views"
+    - "Report generation and export functionality (covered in MM-UI-005)"
+    - "Settings and configuration screens (covered in MM-UI-006)"
+
+key_concepts:
+  - term: "Stat Cards"
+    definition: "Four summary cards on the dashboard displaying key aggregate metrics at a glance."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.1 — Dashboard"
+  - term: "Performance Trend Chart"
+    definition: "A time-series chart visualizing campaign performance trends over the selected timeframe."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.1 — Dashboard"
+
+core_content:
+  - section_title: "Side Navigation Structure"
+    points:
+      - "Elements: Side Nav contains — Dashboard, Campaigns, Events, Reports, Brand Assets, Settings."
+      - "Functionality: Side Nav is persistent across all Operating Staff screens."
+      - "Design principle: Navigation items map 1:1 to the primary workflows of the Operating Staff persona."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.1 — Side Nav"
+
+  - section_title: "Dashboard Landing Experience"
+    points:
+      - "Entry Point: Dashboard is the default landing page after Sign In."
+      - "Elements: 4 Stat Cards displayed prominently at the top of the page."
+      - "Elements: Performance Trend Chart displayed below the Stat Cards."
+      - "Design principle: Dashboard answers the primary question — 'Are my campaigns producing results?'"
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.1 — Dashboard, Trigger and Flow"
+
+  - section_title: "Timeframe Filter Interaction"
+    points:
+      - "Elements: Timeframe filter with options — Last 30 days, 3 months, 6 months, 12 months."
+      - "Functionality: Changing the filter updates all dashboard components (Stat Cards + Chart) in real-time."
+      - "Design principle: Single filter controls all data on the page for consistency."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.1 — Interaction"
+
+assumptions:
+  - "Stat Cards display metrics like Samples, Consumer Reach, Total Sales, and Events — exact KPIs not specified in source."
+  - "Performance Trend Chart is a line or area chart — chart type not explicitly defined."
+  - "Real-time means immediate UI update on filter change, not WebSocket-based live data streaming."
+  - "Default timeframe filter value is 'Last 30 days'."
+  - "Dashboard data is pre-aggregated for fast rendering."
+
+implications:
+  - "Frontend: Timeframe filter must trigger re-fetch or re-filter of all dashboard components simultaneously."
+  - "Frontend: Stat Cards and Chart should share a common data context or state to ensure consistency."
+  - "Backend: API must support timeframe-parameterized queries for dashboard aggregates."
+  - "Backend: Consider caching or pre-computing dashboard metrics to support real-time filter responsiveness."

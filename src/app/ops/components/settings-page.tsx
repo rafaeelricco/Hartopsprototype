@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../shared/components/ui/card";
+import { Badge } from "../../shared/components/ui/badge";
+import { Button } from "../../shared/components/ui/button";
+import { Separator } from "../../shared/components/ui/separator";
+import { Avatar, AvatarFallback } from "../../shared/components/ui/avatar";
 import { Plus, Mail, Shield, Trash2 } from "lucide-react";
 
 const teamMembers = [

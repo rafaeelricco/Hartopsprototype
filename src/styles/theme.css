@@ -14,15 +14,15 @@
   --secondary-foreground: #0F172A;
   --muted: #F1F5F9;
   --muted-foreground: #64748B;
-  --accent: #F1F5F9;
-  --accent-foreground: #0F172A;
-  --destructive: #d4183d;
-  --destructive-foreground: #ffffff;
+  --accent: #0F766E;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
   --border: #E2E8F0;
   --input: #E2E8F0;
-  --input-background: #FFFFFF;
-  --switch-background: #cbced4;
-  --font-weight-medium: 600;
+  --input-background: #F8FAFC;
+  --switch-background: #CBD5E1;
+  --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #7D152D;
   --chart-1: oklch(0.646 0.222 41.116);
@@ -141,52 +141,41 @@
     font-size: var(--text-2xl);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
   }
 
   h2 {
     font-size: var(--text-xl);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
   }
 
   h3 {
     font-size: var(--text-lg);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
   }
 
   h4 {
     font-size: var(--text-base);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
   }
 
   label {
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
   }
 
   button {
     font-size: var(--text-base);
     font-weight: var(--font-weight-medium);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
   }
 
   input {
-    font-size: 0.875rem;
+    font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
-    font-family: 'Inter', sans-serif;
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
   }
 }

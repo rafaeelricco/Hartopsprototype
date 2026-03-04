@@ -1,0 +1,111 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Event Creation Workflow
+# =============================================================================
+
+id: "MM-UI-003"
+title: "Event Creation Workflow"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "MM-UI-004"
+
+context: |
+  As an Operating Staff member, I need to create events using a guided wizard
+  that shows me the end result (report preview) before the educator starts work,
+  so I can validate that the event will capture the right data and meet
+  campaign objectives. This is the core UX of the platform, built on a
+  "report-first" approach.
+
+scope:
+  in_scope:
+    - "4-step event creation wizard"
+    - "Step 1: Event Basics form fields"
+    - "Step 2: Objectives selection"
+    - "Step 3: Intelligent Report Preview and Educator Experience preview"
+    - "Step 4: Advanced Customization modules"
+    - "Objective-to-Data-Module mapping logic"
+  out_of_scope:
+    - "Event monitoring and lifecycle after creation (covered in MM-UI-004)"
+    - "Educator mobile app experience"
+    - "Report generation post-event (covered in MM-UI-005)"
+    - "Campaign selection prior to event creation (covered in MM-UI-002)"
+
+key_concepts:
+  - term: "Report-First Approach"
+    definition: "A design philosophy where operators see a mock-up of the final report before the event happens, ensuring the right data will be collected."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Context"
+  - term: "Intelligent Report Preview"
+    definition: "An auto-generated mock-up report that maps selected Objectives to Data Modules and renders a preview of the expected output."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 3"
+  - term: "Venue Type"
+    definition: "Classification of event location — Off-Premises, On-Premises, or Special."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 1"
+  - term: "Data Modules"
+    definition: "Configurable report sections that are automatically selected based on the objectives chosen in Step 2."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 3"
+
+core_content:
+  - section_title: "Step 1 — Event Basics"
+    points:
+      - "Elements: Name, Location, Date, Duration, Venue Type fields."
+      - "Elements: Venue Type options — Off-Premises, On-Premises, Special."
+      - "Functionality: All fields serve as foundational event metadata."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 1: Event Basics"
+
+  - section_title: "Step 2 — Objectives"
+    points:
+      - "Elements: Checkbox list of objectives — Brand Awareness, Drive Sales, Competitive Intel, etc."
+      - "Functionality: Multiple objectives can be selected simultaneously."
+      - "Design principle: Objectives drive the entire downstream report structure."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 2: Objectives"
+
+  - section_title: "Step 3 — Intelligent Report Preview"
+    points:
+      - "Entry Point: Automatically triggered after Step 2 completion."
+      - "Functionality: System maps selected Objectives to corresponding Data Modules."
+      - "Functionality: Renders a mock-up report showing what the final output will look like."
+      - "Elements: 'View Educator Experience' toggle to preview the mobile app view."
+      - "Design principle: Report-first approach — operators validate the end result before the educator starts work."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 3: Intelligent Report Preview"
+
+  - section_title: "Step 4 — Advanced Customization"
+    points:
+      - "Elements: Optional checkbox modules — Shelf Analysis, Menu Analysis, etc."
+      - "Functionality: Operators can add specialized data collection modules beyond the auto-mapped ones."
+      - "Design principle: Keeps the default flow simple while allowing power users to customize."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.3 — Step 4: Advanced Customization"
+
+assumptions:
+  - "The wizard enforces sequential step completion — users cannot skip to Step 3 without completing Steps 1 and 2."
+  - "The Objective-to-Data-Module mapping is maintained server-side and is configurable per organization."
+  - "The 'View Educator Experience' toggle shows a mobile device frame preview within the wizard."
+  - "Step 4 modules are additive — they do not override the auto-mapped modules from Step 3."
+  - "Draft saving is available between steps — source does not confirm this."
+  - "At least one Objective must be selected in Step 2 to proceed."
+
+implications:
+  - "Frontend: Implement a multi-step wizard with progress indicator and step validation."
+  - "Frontend: Step 3 requires a report mock-up renderer capable of dynamically composing Data Modules."
+  - "Frontend: 'View Educator Experience' toggle needs a mobile preview component (device frame)."
+  - "Backend: API must provide Objective-to-Data-Module mapping configuration."
+  - "Backend: Report preview generation must be fast enough for real-time rendering after Step 2."
+  - "Architecture: The mapping engine is a core piece of business logic — consider extracting it as a shared service."

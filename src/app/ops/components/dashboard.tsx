@@ -14,14 +14,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Badge } from "./ui/badge";
+} from "../../shared/components/ui/card";
+import { Badge } from "../../shared/components/ui/badge";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "./ui/chart";
+} from "../../shared/components/ui/chart";
 import {
   AreaChart,
   Area,
