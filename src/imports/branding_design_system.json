@@ -1,0 +1,81 @@
+{
+  "name": "Hart Ops Design System",
+  "version": "1.0.0",
+  "principles": {
+    "aesthetic": "Flat, border-based design",
+    "shadows": "Elevation 0 (No shadows)",
+    "alignment": "Left-aligned (start) by default"
+  },
+  "colors": {
+    "primary": {
+      "value": "#7D152D",
+      "description": "Primary burgundy for actions, active indicators, highlights"
+    },
+    "background": {
+      "app": {
+        "value": "#F8FAFC",
+        "description": "Slate 50 - Main application background"
+      },
+      "card": {
+        "value": "#FFFFFF",
+        "description": "Container backgrounds"
+      }
+    },
+    "foreground": {
+      "primary": {
+        "value": "#0F172A",
+        "description": "Slate 900 - Primary text and headings"
+      },
+      "muted": {
+        "value": "#64748B",
+        "description": "Slate 500 - Secondary text and placeholders"
+      }
+    },
+    "accent": {
+      "muted": {
+        "value": "#F1F5F9",
+        "description": "Slate 100 - Secondary buttons and hover states"
+      }
+    },
+    "border": {
+      "value": "#E2E8F0",
+      "description": "Slate 200 - Component borders"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Source Sans 3",
+      "body": "Inter"
+    },
+    "alignment": "Left-aligned"
+  },
+  "spacing": {
+    "padding": {
+      "card_internal": "24px",
+      "element": {
+        "horizontal": {
+          "min": "8px",
+          "max": "16px"
+        },
+        "vertical": {
+          "min": "8px",
+          "max": "12px"
+        }
+      }
+    },
+    "gaps": {
+      "major_sections": {
+        "min": "16px",
+        "max": "24px"
+      },
+      "groupings": "8px"
+    }
+  },
+  "borderRadius": {
+    "containers": "12px",
+    "elements": {
+      "min": "6px",
+      "max": "8px"
+    }
+  }
+}

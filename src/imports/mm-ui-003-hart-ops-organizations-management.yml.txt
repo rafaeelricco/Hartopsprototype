@@ -1,0 +1,114 @@
+id: "MM-UI-003"
+title: "Hart Ops Organizations Management"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "TBD — to be filled manually"
+
+context: |
+  Organizations are the core tenant unit of the platform. Hart Ops creates and manages
+  these entities through a searchable list and a 3-step onboarding wizard designed for
+  trial clients. The Organization Detail page provides read-only drill-down for monitoring
+  tenant health. As a Hart Ops administrator, I need to onboard new trial client
+  organizations efficiently and monitor their activity without modifying their data.
+
+scope:
+  in_scope:
+    - "Organizations list view with search"
+    - "Add Organization wizard (3-step: Details, Users, Review)"
+    - "Organization detail page with sub-tabs"
+    - "Validations and edge cases for the wizard"
+  out_of_scope:
+    - "Organization editing or deletion (not specified in source)"
+    - "Trial client staff actions within their own organization (see MM-UI for Trial Client Staff)"
+    - "Cross-org event monitoring (see MM-UI-004)"
+    - "Campaign creation or management from Hart Ops side"
+
+key_concepts:
+  - term: "Organization"
+    definition: "A tenant on the platform representing a trial client company. Each organization is an isolated entity with its own campaigns, events, users, and data. Created exclusively by Hart Ops."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Context"
+  - term: "Add Organization Wizard"
+    definition: "A 3-step guided flow (Details → Users → Review) for onboarding new trial client organizations onto the platform."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Add Organization Wizard"
+  - term: "Domain Blacklisting"
+    definition: "Validation rule that prevents invitation emails from disposable or blacklisted email domains during the Users step of the wizard."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Step 2 (Users)"
+
+core_content:
+  - section_title: "Organizations List View"
+    points:
+      - "Elements: Searchable list displaying organization cards."
+      - "Functionality: Search filters organizations by name or other identifying attributes."
+      - "Entry Point: 'Organizations' item in the sidebar navigation."
+      - "Functionality: Clicking an organization card navigates to its detail page."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Shared Layout"
+
+  - section_title: "Add Organization Wizard — Step 1 (Details)"
+    points:
+      - "Entry Point: 'Add Organization' button in the Organizations list view."
+      - "Elements: Stepper indicator showing current step (1 of 3)."
+      - "Elements: Fields — Company Name, Logo upload, Industry, Primary Contact."
+      - "Functionality: Logo format restricted to PNG/SVG."
+      - "Functionality: Company Name must be unique across the platform."
+      - "Functionality: Incomplete step prevents navigation to next step."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Step 1 (Details)"
+
+  - section_title: "Add Organization Wizard — Step 2 (Users)"
+    points:
+      - "Elements: Email input field to invite the initial Trial Client Staff user."
+      - "Functionality: Email format validation enforced."
+      - "Functionality: Domain blacklisting rejects disposable email providers."
+      - "Design principle: Only one initial user is invited during onboarding — the trial client manages their own team afterward."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Step 2 (Users)"
+
+  - section_title: "Add Organization Wizard — Step 3 (Review)"
+    points:
+      - "Elements: Summary view of all configuration entered in Steps 1 and 2."
+      - "Functionality: User reviews details and finalizes — triggers organization creation and invitation email."
+      - "Functionality: Back navigation allows editing previous steps without data loss."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Step 3 (Review)"
+
+  - section_title: "Organization Detail Page"
+    points:
+      - "Entry Point: Clicking an organization card in the list view."
+      - "Elements: Organization header with company details and status."
+      - "Elements: Sub-tabs — Overview, Campaigns, Events, Team."
+      - "Functionality: Read-only drill-down view — Hart Ops monitors tenant health but does not modify tenant data."
+      - "Design principle: The detail page answers 'How is this specific tenant doing?' without requiring Hart Ops to switch context to the tenant's own interface."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§3 Organizations Management — Detail Page"
+
+assumptions:
+  - "The wizard enforces linear progression — users cannot skip steps, but can navigate backward."
+  - "Logo upload supports drag-and-drop or file picker — specific interaction not detailed in source."
+  - "Company Name uniqueness check happens on blur or submit, not real-time keystroke validation."
+  - "The domain blacklist is maintained server-side and updated independently of the application code."
+  - "Organization detail sub-tabs load data lazily (on tab selection) rather than all at once."
+  - "There is no bulk organization import — onboarding is one-at-a-time through the wizard."
+
+implications:
+  - "Frontend: Wizard component needs stepper state management with step validation gating."
+  - "Frontend: Logo upload requires a file upload component with format validation and preview."
+  - "Frontend: Organization detail page uses a tabbed layout with lazy-loaded content panels."
+  - "Backend: Company Name uniqueness must be enforced at the database level (unique constraint) in addition to UI validation."
+  - "Backend: Domain blacklist endpoint or configuration required for email validation in Step 2."
+  - "Backend: Organization creation and invitation email sending should be atomic — if the email fails, the organization should not be left in a partial state."
