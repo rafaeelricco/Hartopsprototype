@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { PasswordInput } from "./password-input";
+import { Input } from "@/app/shared/components/ui/input";
 
 export function SignIn() {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export function SignIn() {
           <label htmlFor="email" className="block text-foreground">
             Email
           </label>
-          <input
+          <Input
             id="email"
             name="email"
             type="email"
@@ -88,9 +89,7 @@ export function SignIn() {
                 setErrors((prev) => ({ ...prev, email: undefined }));
             }}
             placeholder="you@example.com"
-            className={`w-full rounded-lg border ${
-              errors.email ? "border-destructive" : "border-border"
-            } bg-card px-3 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors`}
+            aria-invalid={!!errors.email}
           />
           {errors.email && (
             <p className="text-destructive" style={{ fontSize: "0.8125rem" }}>
