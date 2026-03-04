@@ -3,7 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  error?: string;
+  error?: string | undefined;
 }
 
 export function AuthInput({

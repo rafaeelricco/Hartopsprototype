@@ -115,7 +115,7 @@ export function CampaignDetail() {
     );
   }
 
-  const campStatus = STATUS_LABELS[campaign.status] ?? STATUS_LABELS.draft;
+  const campStatus = STATUS_LABELS[campaign.status] ?? STATUS_LABELS["draft"];
 
   // Event stats (from all events, not filtered)
   const draftEvents = allEvents.filter((e) => e.status === "draft").length;
@@ -157,11 +157,11 @@ export function CampaignDetail() {
                 className="px-2.5 py-0.5 rounded-md"
                 style={{
                   fontSize: "0.6875rem",
-                  background: campStatus.bg,
-                  color: campStatus.text,
+                  background: campStatus!.bg,
+                  color: campStatus!.text,
                 }}
               >
-                {campStatus.label}
+                {campStatus!.label}
               </span>
             </div>
             <p
@@ -380,7 +380,7 @@ export function CampaignDetail() {
 // ---------------------------------------------------------------------------
 
 function EventCard({ event }: { event: EventItem }) {
-  const status = STATUS_LABELS[event.status] ?? STATUS_LABELS.draft;
+  const status = STATUS_LABELS[event.status] ?? STATUS_LABELS["draft"];
   const objectiveLabels = OBJECTIVES.filter((o) =>
     event.objectives.includes(o.id),
   ).map((o) => o.label);
@@ -408,15 +408,15 @@ function EventCard({ event }: { event: EventItem }) {
             className="flex items-center gap-1 flex-shrink-0 px-2 py-0.5 rounded-md"
             style={{
               fontSize: "0.6875rem",
-              background: status.bg,
-              color: status.text,
+              background: status!.bg,
+              color: status!.text,
             }}
           >
             <span
               className="w-1.5 h-1.5 rounded-full inline-block"
-              style={{ background: status.dot }}
+              style={{ background: status!.dot }}
             />
-            {status.label}
+            {status!.label}
           </span>
         </div>
 

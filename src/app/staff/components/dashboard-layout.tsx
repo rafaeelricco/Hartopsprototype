@@ -47,7 +47,9 @@ export function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [timeframe, setTimeframe] = useState<Timeframe>(TIMEFRAMES[0]);
+  const [timeframe, setTimeframe] = useState<Timeframe>(
+    TIMEFRAMES[0] ?? "Last 30 days",
+  );
 
   const pageTitle =
     PAGE_TITLES[location.pathname] ??

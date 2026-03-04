@@ -67,7 +67,7 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function shortGeo(location: string): string {
   const parts = location.split(",");
   if (parts.length >= 2) {
-    return parts[parts.length - 1].trim();
+    return parts[parts.length - 1]?.trim() ?? location;
   }
   return location.length > 16 ? location.slice(0, 14) + "…" : location;
 }
@@ -381,8 +381,8 @@ function EventTableView({
           </thead>
           <tbody>
             {events.map((event) => {
-              const st = STATUS_META[event.status] ?? STATUS_META.draft;
-              const ph = PHASE_META[event.status] ?? PHASE_META.draft;
+              const st = STATUS_META[event.status] ?? STATUS_META["draft"];
+              const ph = PHASE_META[event.status] ?? PHASE_META["draft"];
               const campaign = getCampaign(event.campaignId);
               return (
                 <tr
@@ -450,15 +450,15 @@ function EventTableView({
                       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md whitespace-nowrap"
                       style={{
                         fontSize: "0.6875rem",
-                        background: st.bg,
-                        color: st.text,
+                        background: st!.bg,
+                        color: st!.text,
                       }}
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0"
-                        style={{ background: st.dot }}
+                        style={{ background: st!.dot }}
                       />
-                      {st.label}
+                      {st!.label}
                     </span>
                   </td>
                   {/* Phase */}
@@ -467,11 +467,11 @@ function EventTableView({
                       className="inline-block px-2 py-0.5 rounded-md whitespace-nowrap"
                       style={{
                         fontSize: "0.6875rem",
-                        background: ph.bg,
-                        color: ph.color,
+                        background: ph!.bg,
+                        color: ph!.color,
                       }}
                     >
-                      {ph.label}
+                      {ph!.label}
                     </span>
                   </td>
                   {/* Modules */}
@@ -664,7 +664,7 @@ function EventCalendarView({
               {/* Event pills with geographic hint */}
               <div className="flex flex-col gap-0.5 flex-1">
                 {dayEvents.slice(0, 3).map((ev) => {
-                  const st = STATUS_META[ev.status] ?? STATUS_META.draft;
+                  const st = STATUS_META[ev.status] ?? STATUS_META["draft"];
                   const geo = shortGeo(ev.location);
                   return (
                     <Link
@@ -673,13 +673,13 @@ function EventCalendarView({
                       className="block truncate px-1.5 py-0.5 rounded no-underline hover:opacity-80 transition-opacity"
                       style={{
                         fontSize: "0.5625rem",
-                        background: st.bg,
-                        color: st.text,
+                        background: st!.bg,
+                        color: st!.text,
                       }}
                       title={`${ev.name} — ${ev.location}`}
                     >
                       <span className="truncate">{ev.name}</span>
-                      <span style={{ color: st.text, opacity: 0.6 }}>
+                      <span style={{ color: st!.text, opacity: 0.6 }}>
                         {" "}
                         · {geo}
                       </span>

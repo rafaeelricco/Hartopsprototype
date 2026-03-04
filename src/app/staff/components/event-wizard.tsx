@@ -83,7 +83,9 @@ export function EventWizard({
   const { createEvent } = useCampaignContext();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<WizardData>(INITIAL_DATA);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof WizardData | "objectives", string>>
+  >({});
   const [showEducator, setShowEducator] = useState(false);
   const [generating, setGenerating] = useState(false);
 
@@ -124,7 +126,7 @@ export function EventWizard({
   // ── Validation ────────────────────────────────────────────────────────────
 
   function validateStep1(): boolean {
-    const errs: Record<string, string> = {};
+    const errs: Partial<Record<keyof WizardData | "objectives", string>> = {};
     if (!data.name.trim()) errs.name = "Event name is required.";
     if (!data.location.trim()) errs.location = "Location is required.";
     if (!data.date) errs.date = "Date is required.";
@@ -183,7 +185,12 @@ export function EventWizard({
 
   const updateField = useCallback((field: keyof WizardData, value: string) => {
     setData((d) => ({ ...d, [field]: value }));
-    setErrors((e) => (e[field] ? { ...e, [field]: "" } : e));
+    setErrors((e) => {
+      if (!e[field]) return e;
+      const next = { ...e };
+      delete next[field];
+      return next;
+    });
   }, []);
 
   function toggleObjective(id: string) {
@@ -193,7 +200,12 @@ export function EventWizard({
         ? d.objectives.filter((o) => o !== id)
         : [...d.objectives, id],
     }));
-    if (errors.objectives) setErrors((e) => ({ ...e, objectives: "" }));
+    if (errors.objectives)
+      setErrors((e) => {
+        const next = { ...e };
+        delete next.objectives;
+        return next;
+      });
   }
 
   function toggleAdvanced(id: string) {
@@ -390,7 +402,7 @@ function Step1Basics({
   updateField,
 }: {
   data: WizardData;
-  errors: Record<string, string>;
+  errors: Partial<Record<keyof WizardData | "objectives", string>>;
   updateField: (field: keyof WizardData, value: string) => void;
 }) {
   return (
@@ -546,7 +558,7 @@ function Step2Objectives({
 }: {
   selected: string[];
   toggle: (id: string) => void;
-  error?: string;
+  error?: string | undefined;
 }) {
   return (
     <div>
@@ -1021,22 +1033,22 @@ function Step3ReportPreview({
             </div>
 
             {/* Educator form preview for first active module */}
-            {modules.length > 1 && (
+            {modules.length > 1 && modules[1] && (
               <div className="px-4 py-2.5 border-t border-[#E2E8F0] bg-[#FAFBFC]">
                 <div className="flex items-center gap-2 mb-1.5">
                   <div className="w-4 h-4 rounded-sm bg-[#0F766E]/10 flex items-center justify-center">
-                    {modules[1].sampleType === "score" ? (
+                    {modules[1]!.sampleType === "score" ? (
                       <Star size={9} style={{ color: "#0F766E" }} />
-                    ) : modules[1].sampleType === "percent" ? (
+                    ) : modules[1]!.sampleType === "percent" ? (
                       <TrendingUp size={9} style={{ color: "#0F766E" }} />
-                    ) : modules[1].sampleType === "number" ? (
+                    ) : modules[1]!.sampleType === "number" ? (
                       <BarChart3 size={9} style={{ color: "#0F766E" }} />
                     ) : (
                       <FileText size={9} style={{ color: "#0F766E" }} />
                     )}
                   </div>
                   <span style={{ fontSize: "0.6875rem", color: "#0F172A" }}>
-                    {modules[1].label}
+                    {modules[1]!.label}
                   </span>
                 </div>
                 <div className="flex gap-1.5">
@@ -1323,9 +1335,9 @@ function FieldWrapper({
   children,
 }: {
   label: string;
-  required?: boolean;
-  error?: string;
-  icon?: React.ReactNode;
+  required?: boolean | undefined;
+  error?: string | undefined;
+  icon?: React.ReactNode | undefined;
   children: React.ReactNode;
 }) {
   return (

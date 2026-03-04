@@ -460,8 +460,8 @@ function ProductLibrary({
                 unitSize: "",
                 abv: "",
                 status: "draft",
-                createdAt: new Date().toISOString().split("T")[0],
-                updatedAt: new Date().toISOString().split("T")[0],
+                createdAt: new Date().toISOString().split("T")[0] ?? "",
+                updatedAt: new Date().toISOString().split("T")[0] ?? "",
               });
             }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
@@ -647,7 +647,7 @@ function SKUGridCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const st = STATUS_STYLE[sku.status] ?? STATUS_STYLE.draft;
+  const st = STATUS_STYLE[sku.status] ?? STATUS_STYLE["draft"];
   return (
     <div
       className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden group hover:shadow-md transition-shadow cursor-pointer"
@@ -662,9 +662,9 @@ function SKUGridCard({
         />
         <span
           className="absolute top-2 left-2 px-2 py-0.5 rounded-md"
-          style={{ fontSize: "0.625rem", background: st.bg, color: st.text }}
+          style={{ fontSize: "0.625rem", background: st!.bg, color: st!.text }}
         >
-          {st.label}
+          {st!.label}
         </span>
         <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
@@ -770,7 +770,7 @@ function SKUListView({
           </thead>
           <tbody>
             {skus.map((sku) => {
-              const st = STATUS_STYLE[sku.status] ?? STATUS_STYLE.draft;
+              const st = STATUS_STYLE[sku.status] ?? STATUS_STYLE["draft"];
               return (
                 <tr
                   key={sku.id}
@@ -830,11 +830,11 @@ function SKUListView({
                       className="px-2 py-0.5 rounded-md"
                       style={{
                         fontSize: "0.6875rem",
-                        background: st.bg,
-                        color: st.text,
+                        background: st!.bg,
+                        color: st!.text,
                       }}
                     >
-                      {st.label}
+                      {st!.label}
                     </span>
                   </td>
                   <td
@@ -888,7 +888,7 @@ function SKUDetailOverlay({
   onDelete: () => void;
   onClose: () => void;
 }) {
-  const st = STATUS_STYLE[sku.status] ?? STATUS_STYLE.draft;
+  const st = STATUS_STYLE[sku.status] ?? STATUS_STYLE["draft"];
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -931,11 +931,11 @@ function SKUDetailOverlay({
                   className="px-2 py-0.5 rounded-md"
                   style={{
                     fontSize: "0.6875rem",
-                    background: st.bg,
-                    color: st.text,
+                    background: st!.bg,
+                    color: st!.text,
                   }}
                 >
-                  {st.label}
+                  {st!.label}
                 </span>
               </div>
               <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
@@ -1045,7 +1045,7 @@ function SKUEditModal({
     setForm((prev) => ({
       ...prev,
       [key]: val,
-      updatedAt: new Date().toISOString().split("T")[0],
+      updatedAt: new Date().toISOString().split("T")[0] ?? "",
     }));
   }
 
@@ -1329,7 +1329,7 @@ function AutoUploadDrawer({
   }
 
   function handleConfirm() {
-    const now = new Date().toISOString().split("T")[0];
+    const now = new Date().toISOString().split("T")[0] ?? "";
     const newSkus: SKU[] = aiResults
       .filter((_, i) => selected.has(i))
       .map((r, i) => ({
@@ -1820,7 +1820,7 @@ function InlineEditSelect({
   options,
   onChange,
   warn,
-  label,
+  label: _label,
 }: {
   value: string;
   options: string[];

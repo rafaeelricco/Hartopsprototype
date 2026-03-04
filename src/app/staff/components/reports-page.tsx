@@ -62,7 +62,6 @@ import {
   getGalleryEvents,
   DEFAULT_COMPARISON_IDS,
   REPORT_SCOPES,
-  type CampaignMetrics,
   type ProofPhoto,
   type ReportScope,
 } from "./reports-data";
@@ -667,7 +666,8 @@ export function ReportsPage() {
                 </thead>
                 <tbody>
                   {comparisonData.map((row) => {
-                    const dotColor = STATUS_DOT[row.status] ?? STATUS_DOT.draft;
+                    const dotColor =
+                      STATUS_DOT[row.status] ?? STATUS_DOT["draft"];
                     return (
                       <tr
                         key={row.campaignId}

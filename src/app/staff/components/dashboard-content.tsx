@@ -28,7 +28,6 @@ import {
   getDashboardData,
   type Timeframe,
   type StatCard,
-  type ChartPoint,
 } from "./dashboard-data";
 
 const STAT_ICONS = [TrendingUp, Users, ShoppingCart, Calendar];
@@ -102,7 +101,10 @@ export function DashboardContent() {
       {/* -------------------------------------------------------------- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
         {data.stats.map((card: StatCard, idx: number) => {
-          const Icon = STAT_ICONS[idx];
+          const Icon = STAT_ICONS[idx] as React.ComponentType<{
+            size: number;
+            style: React.CSSProperties;
+          }>;
           return (
             <div
               key={card.label}

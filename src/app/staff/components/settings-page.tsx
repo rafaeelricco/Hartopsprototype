@@ -76,17 +76,6 @@ function fmtRelative(iso: string) {
   return `${days}d ago`;
 }
 
-function fmtDateTime(iso: string) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
 // =============================================================================
 // Main
 // =============================================================================
@@ -702,7 +691,7 @@ function TeamTab() {
     const initials = email.substring(0, 2).toUpperCase();
     const newMember: TeamMember = {
       id: "tm-new-" + Date.now(),
-      name: email.split("@")[0],
+      name: email.split("@")[0] ?? email,
       email,
       role,
       status: "invited",
@@ -860,7 +849,7 @@ function TeamTab() {
             </thead>
             <tbody>
               {filtered.map((m) => {
-                const st = STATUS_STYLE[m.status] ?? STATUS_STYLE.active;
+                const st = STATUS_STYLE[m.status] ?? STATUS_STYLE["active"];
                 return (
                   <tr
                     key={m.id}
@@ -912,11 +901,11 @@ function TeamTab() {
                         className="px-2 py-0.5 rounded-md"
                         style={{
                           fontSize: "0.6875rem",
-                          background: st.bg,
-                          color: st.text,
+                          background: st!.bg,
+                          color: st!.text,
                         }}
                       >
-                        {st.label}
+                        {st!.label}
                       </span>
                     </td>
                     <td

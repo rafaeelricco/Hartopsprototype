@@ -50,7 +50,7 @@ function generateChartPoints(
     prev += Math.round((Math.random() - 0.45) * variance * 0.7);
     cur = Math.max(cur, baseCurrent * 0.4);
     prev = Math.max(prev, basePrevious * 0.3);
-    points.push({ date: labels[i], current: cur, previous: prev });
+    points.push({ date: labels[i] ?? "", current: cur, previous: prev });
   }
   return points;
 }

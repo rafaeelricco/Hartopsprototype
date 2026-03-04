@@ -12,14 +12,18 @@ export function SignUp() {
     password: "",
     confirm: "",
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<"name" | "email" | "password" | "confirm", string>>
+  >({});
   const [loading, setLoading] = useState(false);
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }));
 
   const validate = () => {
-    const e: Record<string, string> = {};
+    const e: Partial<
+      Record<"name" | "email" | "password" | "confirm", string>
+    > = {};
     if (!form.name.trim()) e.name = "Full name is required";
     if (!form.email.trim()) e.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(form.email))

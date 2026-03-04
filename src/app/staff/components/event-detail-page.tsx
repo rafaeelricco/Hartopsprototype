@@ -7,7 +7,7 @@
 // Phase transitions require explicit confirmation (irreversible).
 // =============================================================================
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router";
 import {
   ArrowLeft,
@@ -294,8 +294,7 @@ function ConfirmDialog({
 
 export function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
-  const { getEvent, getCampaign, updateEventStatus, updateEventFields } =
-    useCampaignContext();
+  const { getEvent, getCampaign, updateEventStatus } = useCampaignContext();
 
   const event = getEvent(eventId ?? "");
   const campaign = event ? getCampaign(event.campaignId) : undefined;
@@ -365,7 +364,7 @@ export function EventDetailPage() {
 
   const phase = getPhase(event.status);
   const phaseMeta = PHASE_META[phase];
-  const status = STATUS_LABELS[event.status] ?? STATUS_LABELS.draft;
+  const status = STATUS_LABELS[event.status] ?? STATUS_LABELS["draft"];
 
   const mappedModules = getDataModulesForObjectives(event.objectives);
   const advModules = ADVANCED_MODULES.filter((m) =>
@@ -416,15 +415,15 @@ export function EventDetailPage() {
                 className="flex items-center gap-1 px-2.5 py-0.5 rounded-md"
                 style={{
                   fontSize: "0.6875rem",
-                  background: status.bg,
-                  color: status.text,
+                  background: status!.bg,
+                  color: status!.text,
                 }}
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full inline-block"
-                  style={{ background: status.dot }}
+                  style={{ background: status!.dot }}
                 />
-                {status.label}
+                {status!.label}
               </span>
             </div>
 
@@ -977,7 +976,7 @@ function EditableField({
 // =============================================================================
 
 function Phase2LiveFeed({
-  event,
+  event: _event,
   objectives,
   modules,
 }: {
@@ -1013,10 +1012,12 @@ function Phase2LiveFeed({
       const idx = nextIdx.current;
       if (idx < FEED_POOL.length) {
         const item = FEED_POOL[idx];
-        setFeedItems((prev) => [
-          { ...item, time: makeTime(idx), id: idx },
-          ...prev,
-        ]);
+        if (item) {
+          setFeedItems((prev) => [
+            { ...item, time: makeTime(idx), id: idx },
+            ...prev,
+          ]);
+        }
         nextIdx.current = idx + 1;
       }
     }, 3500);
