@@ -8,7 +8,6 @@ import {
   DialogFooter,
 } from "../../shared/components/ui/dialog";
 import { Button } from "../../shared/components/ui/button";
-import { Badge } from "../../shared/components/ui/badge";
 import {
   Check,
   ChevronLeft,
@@ -95,7 +94,9 @@ export function AddOrganizationWizard({
 }: AddOrganizationWizardProps) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<WizardData>({ ...INITIAL_DATA });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof WizardData | "logo", string>>
+  >({});
   const [submitted, setSubmitted] = useState(false);
 
   /* ---- helpers --------------------------------------------------- */
@@ -130,7 +131,7 @@ export function AddOrganizationWizard({
   /* ---- validation ------------------------------------------------ */
 
   const validateStep1 = (): boolean => {
-    const errs: Record<string, string> = {};
+    const errs: Partial<Record<keyof WizardData | "logo", string>> = {};
     if (!data.companyName.trim())
       errs.companyName = "Company Name is required.";
     else if (
@@ -147,7 +148,7 @@ export function AddOrganizationWizard({
   };
 
   const validateStep2 = (): boolean => {
-    const errs: Record<string, string> = {};
+    const errs: Partial<Record<keyof WizardData | "logo", string>> = {};
     const email = data.inviteEmail.trim();
     if (!email) {
       errs.inviteEmail = "Invitation email is required.";
@@ -155,7 +156,7 @@ export function AddOrganizationWizard({
       errs.inviteEmail = "Please enter a valid email address.";
     } else {
       const domain = email.split("@")[1]?.toLowerCase();
-      if (BLACKLISTED_DOMAINS.includes(domain)) {
+      if (domain && BLACKLISTED_DOMAINS.includes(domain)) {
         errs.inviteEmail = "Disposable email domains are not allowed.";
       }
     }
@@ -219,8 +220,10 @@ export function AddOrganizationWizard({
     reader.readAsDataURL(file);
   };
 
-  const removeLogo = () =>
-    updateField("logoFile", null) || updateField("logoPreview", null);
+  const removeLogo = () => {
+    updateField("logoFile", null);
+    updateField("logoPreview", null);
+  };
 
   /* ---- drop handler ---------------------------------------------- */
 
@@ -253,7 +256,7 @@ export function AddOrganizationWizard({
 
   /* ---- render helpers -------------------------------------------- */
 
-  const FieldError = ({ field }: { field: string }) =>
+  const FieldError = ({ field }: { field: keyof WizardData | "logo" }) =>
     errors[field] ? (
       <p
         className="flex items-center gap-1 text-destructive mt-1"

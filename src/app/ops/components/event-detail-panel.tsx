@@ -3,14 +3,10 @@ import {
   CalendarDays,
   Clock,
   MapPin,
-  Users,
   Building2,
-  Globe,
   Tag,
-  Ticket,
   User,
   Megaphone,
-  Radio,
 } from "lucide-react";
 import {
   Sheet,

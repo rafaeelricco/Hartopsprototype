@@ -1,4 +1,3 @@
-import React from "react";
 import { LegalPageLayout } from "../../shared/components/layouts/legal-page-layout";
 
 export function PrivacyPolicyPage() {

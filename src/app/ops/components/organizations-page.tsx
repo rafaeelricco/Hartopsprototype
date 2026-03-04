@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { Building2, Search, Plus, ArrowUpDown } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
@@ -125,7 +125,7 @@ export function OrganizationsPage() {
     const q = search.toLowerCase().trim();
     if (!q) return organizations;
     return organizations.filter(
-      (o) =>
+      (o: Organization) =>
         o.name.toLowerCase().includes(q) ||
         o.industry.toLowerCase().includes(q) ||
         o.plan.toLowerCase().includes(q),
@@ -157,7 +157,8 @@ export function OrganizationsPage() {
       ];
       const joinedStr = `${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
 
-      const nextId = Math.max(...organizations.map((o) => o.id), 0) + 1;
+      const nextId =
+        Math.max(...organizations.map((o: Organization) => o.id), 0) + 1;
       const newOrg: Organization = {
         id: nextId,
         name: data.companyName.trim(),
@@ -169,7 +170,7 @@ export function OrganizationsPage() {
         joined: joinedStr,
       };
 
-      setOrganizations((prev) => [newOrg, ...prev]);
+      setOrganizations((prev: Organization[]) => [newOrg, ...prev]);
     },
     [organizations],
   );
@@ -250,7 +251,7 @@ export function OrganizationsPage() {
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((org) => (
+                  filtered.map((org: Organization) => (
                     <tr
                       key={org.id}
                       onClick={() =>
@@ -330,7 +331,7 @@ export function OrganizationsPage() {
         open={wizardOpen}
         onOpenChange={setWizardOpen}
         onSubmit={handleWizardSubmit}
-        existingNames={organizations.map((o) => o.name)}
+        existingNames={organizations.map((o: Organization) => o.name)}
       />
     </div>
   );

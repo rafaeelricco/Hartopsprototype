@@ -8,9 +8,9 @@ export function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{
-    email?: string;
-    password?: string;
-    general?: string;
+    email?: string | undefined;
+    password?: string | undefined;
+    general?: string | undefined;
   }>({});
   const [loading, setLoading] = useState(false);
 

@@ -21,9 +21,10 @@ export function ActivateAccount() {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>(
-    {},
-  );
+  const [errors, setErrors] = useState<{
+    password?: string | undefined;
+    confirm?: string | undefined;
+  }>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 

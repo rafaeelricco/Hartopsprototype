@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -10,7 +10,6 @@ import { Button } from "../../shared/components/ui/button";
 import { Separator } from "../../shared/components/ui/separator";
 import { Badge } from "../../shared/components/ui/badge";
 import {
-  BookOpen,
   MessageCircle,
   Mail,
   Phone,

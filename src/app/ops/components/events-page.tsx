@@ -2,19 +2,13 @@ import React, { useState, useMemo } from "react";
 import {
   CalendarDays,
   Search,
-  Filter,
-  MapPin,
   Clock,
-  Users,
   Building2,
   Radio,
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
   X,
-  Globe,
-  Tag,
-  Ticket,
   Eye,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
@@ -457,7 +451,7 @@ export function EventsPage() {
   const eventsThisWeek = MOCK_EVENTS.filter((e) => {
     // Simple: count events from Mar 1–7
     const d = e.date;
-    return d.startsWith("Mar") && parseInt(d.split(" ")[1]) <= 7;
+    return d.startsWith("Mar") && parseInt(d.split(" ")[1] || "0") <= 7;
   }).length;
   const liveNow = MOCK_EVENTS.filter((e) => e.status === "Live").length;
 
