@@ -19,6 +19,7 @@ import {
   ClipboardCheck,
   AlertCircle,
 } from "lucide-react";
+import { Input } from "@/app/shared/components/ui/input";
 
 /* ------------------------------------------------------------------ */
 /* Types                                                               */
@@ -383,13 +384,13 @@ export function AddOrganizationWizard({
                 >
                   Company Name <span className="text-destructive">*</span>
                 </label>
-                <input
+                <Input
                   type="text"
                   value={data.companyName}
                   onChange={(e) => updateField("companyName", e.target.value)}
                   onBlur={handleCompanyNameBlur}
                   placeholder="e.g. Acme Corp"
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors"
+                  aria-invalid={!!errors.companyName}
                 />
                 <FieldError field="companyName" />
               </div>
@@ -490,14 +491,13 @@ export function AddOrganizationWizard({
                 >
                   Primary Contact <span className="text-destructive">*</span>
                 </label>
-                <input
+                <Input
                   type="text"
                   value={data.primaryContact}
                   onChange={(e) =>
                     updateField("primaryContact", e.target.value)
                   }
                   placeholder="Full name of main contact"
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors"
                 />
                 <FieldError field="primaryContact" />
               </div>
@@ -529,12 +529,12 @@ export function AddOrganizationWizard({
                 >
                   Email Address <span className="text-destructive">*</span>
                 </label>
-                <input
+                <Input
                   type="email"
                   value={data.inviteEmail}
                   onChange={(e) => updateField("inviteEmail", e.target.value)}
                   placeholder="user@company.com"
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors"
+                  aria-invalid={!!errors.inviteEmail}
                 />
                 <FieldError field="inviteEmail" />
               </div>

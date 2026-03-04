@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Input } from "@/app/shared/components/ui/input";
 
 export function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ export function ForgotPassword() {
           <label htmlFor="email" className="block text-foreground">
             Email
           </label>
-          <input
+          <Input
             id="email"
             name="email"
             type="email"
@@ -83,9 +84,7 @@ export function ForgotPassword() {
               if (error) setError("");
             }}
             placeholder="you@example.com"
-            className={`w-full rounded-lg border ${
-              error ? "border-destructive" : "border-border"
-            } bg-card px-3 py-2.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors`}
+            aria-invalid={!!error}
           />
           {error && (
             <p className="text-destructive" style={{ fontSize: "0.8125rem" }}>

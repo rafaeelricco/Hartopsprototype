@@ -10,6 +10,7 @@ import { Badge } from "../../shared/components/ui/badge";
 import { Button } from "../../shared/components/ui/button";
 import { Avatar, AvatarFallback } from "../../shared/components/ui/avatar";
 import { Mail, Shield, Trash2 } from "lucide-react";
+import { Input } from "@/app/shared/components/ui/input";
 
 const teamMembers = [
   {
@@ -80,11 +81,10 @@ export function SettingsPage() {
             >
               Full Name
             </label>
-            <input
+            <Input
               type="text"
               value={profileName}
               onChange={(e) => setProfileName(e.target.value)}
-              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors"
             />
           </div>
           <div className="space-y-1.5">
@@ -94,11 +94,11 @@ export function SettingsPage() {
             >
               Email
             </label>
-            <input
+            <Input
               type="email"
               value={profileEmail}
               readOnly
-              className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-muted-foreground cursor-not-allowed"
+              className="bg-muted text-muted-foreground cursor-not-allowed"
             />
           </div>
           <div className="flex justify-end">
