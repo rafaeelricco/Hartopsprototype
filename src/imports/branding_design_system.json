@@ -1,81 +1,118 @@
 {
-  "name": "Hart Ops Design System",
-  "version": "1.0.0",
-  "principles": {
-    "aesthetic": "Flat, border-based design",
-    "shadows": "Elevation 0 (No shadows)",
-    "alignment": "Left-aligned (start) by default"
-  },
+  "colorScheme": "light",
+  "fonts": [
+    {
+      "family": "Inter",
+      "role": "body"
+    },
+    {
+      "family": "Inter",
+      "role": "heading"
+    }
+  ],
   "colors": {
-    "primary": {
-      "value": "#7D152D",
-      "description": "Primary burgundy for actions, active indicators, highlights"
+    "primary": "#7D152D",
+    "accent": "#0F766E",
+    "background": "#F8FAFC",
+    "textPrimary": "#0F172A",
+    "link": "#0F766E"
+  },
+  "shadcn": {
+    "theme": "light",
+    "colors": {
+      "background": "#F8FAFC",
+      "foreground": "#0F172A",
+      "card": "#FFFFFF",
+      "cardForeground": "#0F172A",
+      "popover": "#FFFFFF",
+      "popoverForeground": "#0F172A",
+      "primary": "#7D152D",
+      "primaryForeground": "#FFFFFF",
+      "secondary": "#F1F5F9",
+      "secondaryForeground": "#0F172A",
+      "muted": "#F1F5F9",
+      "mutedForeground": "#64748B",
+      "accent": "#0F766E",
+      "accentForeground": "#0F172A",
+      "destructive": "#EF4444",
+      "destructiveForeground": "#FFFFFF",
+      "border": "#E2E8F0",
+      "input": "#E2E8F0",
+      "ring": "#7D152D"
     },
-    "background": {
-      "app": {
-        "value": "#F8FAFC",
-        "description": "Slate 50 - Main application background"
-      },
-      "card": {
-        "value": "#FFFFFF",
-        "description": "Container backgrounds"
-      }
-    },
-    "foreground": {
-      "primary": {
-        "value": "#0F172A",
-        "description": "Slate 900 - Primary text and headings"
-      },
-      "muted": {
-        "value": "#64748B",
-        "description": "Slate 500 - Secondary text and placeholders"
-      }
-    },
-    "accent": {
-      "muted": {
-        "value": "#F1F5F9",
-        "description": "Slate 100 - Secondary buttons and hover states"
-      }
-    },
-    "border": {
-      "value": "#E2E8F0",
-      "description": "Slate 200 - Component borders"
+    "radius": {
+      "base": "0.75rem",
+      "sm": "0.5rem",
+      "md": "0.625rem",
+      "lg": "0.75rem"
     }
   },
   "typography": {
-    "fonts": {
-      "heading": "Source Sans 3",
-      "body": "Inter"
+    "fontFamilies": {
+      "primary": "Inter",
+      "heading": "Inter"
     },
-    "alignment": "Left-aligned"
-  },
-  "spacing": {
-    "padding": {
-      "card_internal": "24px",
-      "element": {
-        "horizontal": {
-          "min": "8px",
-          "max": "16px"
-        },
-        "vertical": {
-          "min": "8px",
-          "max": "12px"
-        }
-      }
+    "fontStacks": {
+      "heading": ["Inter"],
+      "body": ["Inter"],
+      "paragraph": ["Inter"]
     },
-    "gaps": {
-      "major_sections": {
-        "min": "16px",
-        "max": "24px"
-      },
-      "groupings": "8px"
+    "fontSizes": {
+      "h1": "16px",
+      "h2": "35px",
+      "body": "16px"
     }
   },
-  "borderRadius": {
-    "containers": "12px",
-    "elements": {
-      "min": "6px",
-      "max": "8px"
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "12px"
+  },
+  "components": {
+    "card": {
+      "padding": "16px"
+    }
+  },
+  "images": {
+    "logo": "https://lirp.cdn-website.com/516d69f6/dms3rep/multi/opt/hart-2Bagency-2Blogo-217w.png",
+    "favicon": "https://irp-cdn.multiscreensite.com/516d69f6/site_favicon_16_1569436772334.ico",
+    "ogImage": null,
+    "logoHref": "/",
+    "logoAlt": "Hart Agency Logo"
+  },
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Selected #0 because it is visible, large, and matches the brand name 'Hart Agency' in the alt text. It links to the homepage, indicating it is the primary logo.",
+    "confidence": 0.9,
+    "source": "llm"
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "businesses seeking promotional marketing services"
+  },
+  "designSystem": {
+    "framework": "custom",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0,
+    "colors": 0.95,
+    "overall": 0.475
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 0,
+        "selectedLogoReasoning": "Selected #0 because it is visible, large, and matches the brand name 'Hart Agency' in the alt text. It links to the homepage, indicating it is the primary logo.",
+        "confidence": 0.9
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": false,
+      "llmSucceeded": false
     }
   }
 }
