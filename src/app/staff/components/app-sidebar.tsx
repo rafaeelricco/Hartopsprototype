@@ -3,16 +3,15 @@
 import * as React from "react";
 import {
   LayoutDashboard,
-  Building2,
+  Megaphone,
   CalendarDays,
-  FileBarChart,
+  FileBarChart2,
+  Palette,
   Settings,
-  LifeBuoy,
-  GalleryVerticalEnd,
+  AudioWaveform,
 } from "lucide-react";
 
 import { NavMain } from "@/app/shared/components/nav-main";
-import { NavProjects } from "@/app/shared/components/nav-projects";
 import { NavUser } from "@/app/shared/components/nav-user";
 import { TeamSwitcher } from "@/app/shared/components/team-switcher";
 import {
@@ -25,49 +24,47 @@ import {
 
 const data = {
   user: {
-    name: "Admin Hart",
-    email: "admin@hartops.com",
-    avatar: "/avatars/admin-hart.jpg",
+    name: "Jane Smith",
+    email: "jane@hartagency.com",
+    avatar: "/avatars/jane-smith.jpg",
   },
   teams: [
     {
-      name: "Hart Ops",
-      logo: GalleryVerticalEnd,
-      plan: "Super Admin",
+      name: "Hart Agency",
+      logo: AudioWaveform,
+      plan: "Operating Staff",
     },
   ],
   navMain: [
     {
       title: "Dashboard",
-      url: "/ops/dashboard",
+      url: "/staff/dashboard",
       icon: LayoutDashboard,
     },
     {
-      title: "Organizations",
-      url: "/ops/dashboard/organizations",
-      icon: Building2,
+      title: "Campaigns",
+      url: "/staff/campaigns",
+      icon: Megaphone,
     },
     {
       title: "Events",
-      url: "/ops/dashboard/events",
+      url: "/staff/events",
       icon: CalendarDays,
     },
     {
+      title: "Reports",
+      url: "/staff/reports",
+      icon: FileBarChart2,
+    },
+    {
+      title: "Brand Assets",
+      url: "/staff/brand-assets",
+      icon: Palette,
+    },
+    {
       title: "Settings",
-      url: "/ops/dashboard/settings",
+      url: "/staff/settings",
       icon: Settings,
-    },
-  ],
-  projects: [
-    {
-      name: "Reports",
-      url: "/ops/dashboard/reports",
-      icon: FileBarChart,
-    },
-    {
-      name: "Get Help",
-      url: "/ops/dashboard/help",
-      icon: LifeBuoy,
     },
   ],
 };
@@ -80,7 +77,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

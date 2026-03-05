@@ -152,7 +152,7 @@ export function Campaigns() {
             className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
               statusFilter === "all"
                 ? "text-white hover:bg-[#7D152D] hover:text-white"
-                : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
+                : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] hover:text-[#0F172A]"
             }`}
             style={
               statusFilter === "all"
@@ -173,7 +173,7 @@ export function Campaigns() {
                 className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
                   isActive
                     ? "text-white hover:bg-[#7D152D] hover:text-white"
-                    : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
+                    : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] hover:text-[#0F172A]"
                 }`}
                 style={
                   isActive

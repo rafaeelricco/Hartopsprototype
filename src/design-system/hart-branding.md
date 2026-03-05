@@ -38,7 +38,7 @@ To seamlessly use shadcn/ui components, define the following variables in your g
 - `--secondary-foreground`: `#0F172A`
 - `--muted`: `#F1F5F9` (Muted Accent)
 - `--muted-foreground`: `#64748B` (Muted Foreground)
-- `--accent`: `#0F766E`
+- `--accent`: `#691226`
 - `--accent-foreground`: `#0F172A`
 - `--destructive`: `#EF4444`
 - `--destructive-foreground`: `#FFFFFF`
