@@ -9,7 +9,10 @@ import {
   Palette,
   Settings,
   AudioWaveform,
+  BadgeCheck,
+  Bell,
 } from "lucide-react";
+import { useNavigate } from "react-router";
 
 import { NavMain } from "@/app/shared/components/nav-main";
 import { NavUser } from "@/app/shared/components/nav-user";
@@ -69,7 +72,18 @@ const data = {
   ],
 };
 
+const staffMenuGroups = [
+  {
+    items: [
+      { label: "Account", icon: BadgeCheck },
+      { label: "Notifications", icon: Bell },
+    ],
+  },
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const navigate = useNavigate();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -79,7 +93,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={data.user}
+          menuGroups={staffMenuGroups}
+          onLogout={() => navigate("/staff")}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

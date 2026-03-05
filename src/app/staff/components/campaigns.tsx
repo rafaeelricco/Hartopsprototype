@@ -106,6 +106,7 @@ export function Campaigns() {
       {/* Header                                                           */}
       {/* ---------------------------------------------------------------- */}
       <PageHeader
+        title="Campaigns"
         subtitle={
           <>
             {campaigns.length} campaigns &middot; {activeCount} active &middot;{" "}
@@ -300,7 +301,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
 
   return (
     <Link
-      to={`/campaigns/${campaign.id}`}
+      to={`/staff/campaigns/${campaign.id}`}
       className="bg-white rounded-xl border border-[#E2E8F0] p-5 flex flex-col transition-all hover:shadow-md hover:border-[#CBD5E1] group no-underline"
       style={{ minHeight: 180 }}
     >

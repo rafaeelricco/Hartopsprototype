@@ -244,7 +244,7 @@ export function HelpPage() {
                 <Button
                   variant="ghost"
                   onClick={() => toggleFaq(faq.id)}
-                  className="w-full flex items-center justify-between gap-4 py-3.5 text-left cursor-pointer bg-transparent border-none hover:bg-accent/50"
+                  className="w-full flex items-center justify-between gap-4 py-3.5 text-left cursor-pointer bg-transparent border-none hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span
@@ -302,7 +302,7 @@ export function HelpPage() {
               <Button
                 key={resource.title}
                 variant="ghost"
-                className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors text-left cursor-pointer bg-transparent h-auto"
+                className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors text-left cursor-pointer bg-transparent h-auto"
                 asChild
               >
                 <a href="#">

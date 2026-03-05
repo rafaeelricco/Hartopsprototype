@@ -64,7 +64,7 @@ export function ForgotPassword() {
             Resend email
           </Button>
           <Link
-            to="/"
+            to="/staff"
             className="flex items-center gap-1.5 hover:underline"
             style={{ fontSize: "0.875rem", color: "#0F766E" }}
           >
@@ -104,7 +104,7 @@ export function ForgotPassword() {
 
       <p className="mt-8 text-center">
         <Link
-          to="/"
+          to="/staff"
           className="flex items-center justify-center gap-1.5 hover:underline"
           style={{ fontSize: "0.875rem", color: "#0F766E" }}
         >

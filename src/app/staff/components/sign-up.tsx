@@ -134,7 +134,11 @@ export function SignUp() {
         style={{ fontSize: "0.875rem", color: "#64748B" }}
       >
         Already have an account?{" "}
-        <Link to="/" className="hover:underline" style={{ color: "#0F766E" }}>
+        <Link
+          to="/staff"
+          className="hover:underline"
+          style={{ color: "#0F766E" }}
+        >
           Sign in
         </Link>
       </p>

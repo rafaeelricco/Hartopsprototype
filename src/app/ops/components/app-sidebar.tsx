@@ -9,7 +9,11 @@ import {
   Settings,
   LifeBuoy,
   GalleryVerticalEnd,
+  BadgeCheck,
+  CreditCard,
+  Bell,
 } from "lucide-react";
+import { useNavigate } from "react-router";
 
 import { NavMain } from "@/app/shared/components/nav-main";
 import { NavProjects } from "@/app/shared/components/nav-projects";
@@ -72,7 +76,19 @@ const data = {
   ],
 };
 
+const opsMenuGroups = [
+  {
+    items: [
+      { label: "Account", icon: BadgeCheck },
+      { label: "Billing", icon: CreditCard },
+      { label: "Notifications", icon: Bell },
+    ],
+  },
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const navigate = useNavigate();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -83,7 +99,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={data.user}
+          menuGroups={opsMenuGroups}
+          onLogout={() => navigate("/ops")}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

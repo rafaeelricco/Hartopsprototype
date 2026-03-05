@@ -51,7 +51,7 @@ export function ResetPassword() {
     setSuccess(true);
     setLoading(false);
 
-    setTimeout(() => navigate("/"), 2000);
+    setTimeout(() => navigate("/ops"), 2000);
   };
 
   if (success) {

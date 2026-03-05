@@ -682,7 +682,7 @@ export function ReportsPage() {
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2">
                             <Link
-                              to={`/campaigns/${row.campaignId}`}
+                              to={`/staff/campaigns/${row.campaignId}`}
                               className="no-underline hover:text-[#7D152D] truncate max-w-[180px] transition-colors"
                               style={{
                                 fontSize: "0.8125rem",
@@ -1242,7 +1242,7 @@ function PhotoLightbox({
           </p>
           <div className="flex items-center gap-4 flex-wrap mb-3">
             <Link
-              to={`/events/${photo.eventId}`}
+              to={`/staff/events/${photo.eventId}`}
               onClick={onClose}
               className="flex items-center gap-1 no-underline hover:underline"
               style={{ fontSize: "0.8125rem", color: "#7D152D" }}

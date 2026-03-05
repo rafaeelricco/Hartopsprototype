@@ -16,7 +16,14 @@ import {
 } from "@/app/shared/components/ui/breadcrumb";
 import { AppSidebar } from "./app-sidebar";
 import { Button } from "@/app/shared/components/ui/button";
-import { Bell, ChevronDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/app/shared/components/ui/select";
+import { Bell } from "lucide-react";
 import { TIMEFRAMES, type Timeframe } from "./dashboard-data";
 import * as React from "react";
 
@@ -75,37 +82,31 @@ export function AppShell() {
 
           <div className="flex items-center gap-3">
             {isDashboard && (
-              <div className="relative">
-                <select
-                  value={timeframe}
-                  onChange={(e) => setTimeframe(e.target.value as Timeframe)}
-                  className="appearance-none pl-4 pr-9 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 transition-colors"
-                  style={{ fontSize: "0.875rem", color: "#0F172A" }}
-                >
+              <Select
+                value={timeframe}
+                onValueChange={(v) => setTimeframe(v as Timeframe)}
+              >
+                <SelectTrigger className="w-auto">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
                   {TIMEFRAMES.map((t) => (
-                    <option key={t} value={t}>
+                    <SelectItem key={t} value={t}>
                       {t}
-                    </option>
+                    </SelectItem>
                   ))}
-                </select>
-                <ChevronDown
-                  size={15}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#64748B]"
-                />
-              </div>
+                </SelectContent>
+              </Select>
             )}
 
             <Button
               variant="ghost"
               size="icon"
-              className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors cursor-pointer"
+              className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
               aria-label="Notifications"
             >
               <Bell size={18} />
-              <span
-                className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-                style={{ background: "#EF4444" }}
-              />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
             </Button>
           </div>
         </header>

@@ -256,7 +256,7 @@ export function OrganizationsPage() {
                     <tr
                       key={org.id}
                       onClick={() =>
-                        navigate(`/dashboard/organizations/${org.id}`)
+                        navigate(`/ops/dashboard/organizations/${org.id}`)
                       }
                       className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     >

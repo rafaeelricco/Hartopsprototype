@@ -53,7 +53,7 @@ export function ForgotPassword() {
             </p>
           </div>
           <Link
-            to="/"
+            to="/ops"
             className="inline-flex items-center gap-1.5 text-primary hover:opacity-80 transition-opacity mt-2"
             style={{ fontSize: "0.875rem" }}
           >
@@ -104,7 +104,7 @@ export function ForgotPassword() {
 
         <div className="text-center">
           <Link
-            to="/"
+            to="/ops"
             className="inline-flex items-center gap-1.5 text-primary hover:opacity-80 transition-opacity"
             style={{ fontSize: "0.875rem" }}
           >

@@ -399,7 +399,7 @@ function EventTableView({
                   {/* Name */}
                   <td className="px-4 py-3.5">
                     <Link
-                      to={`/events/${event.id}`}
+                      to={`/staff/events/${event.id}`}
                       className="no-underline group-hover:text-[#7D152D] transition-colors truncate block max-w-[220px]"
                       style={{ fontSize: "0.8125rem", color: "#0F172A" }}
                       title={event.name}
@@ -489,7 +489,10 @@ function EventTableView({
                   </td>
                   {/* Arrow */}
                   <td className="px-3 py-3.5">
-                    <Link to={`/events/${event.id}`} className="no-underline">
+                    <Link
+                      to={`/staff/events/${event.id}`}
+                      className="no-underline"
+                    >
                       <ChevronRight size={15} style={{ color: "#CBD5E1" }} />
                     </Link>
                   </td>
@@ -681,7 +684,7 @@ function EventCalendarView({
                   return (
                     <Link
                       key={ev.id}
-                      to={`/events/${ev.id}`}
+                      to={`/staff/events/${ev.id}`}
                       className="block truncate px-1.5 py-0.5 rounded no-underline hover:opacity-80 transition-opacity"
                       style={{
                         fontSize: "0.5625rem",
