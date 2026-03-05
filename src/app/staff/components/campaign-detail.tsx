@@ -302,7 +302,7 @@ export function CampaignDetail() {
                 return (
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm"
                     onClick={() => setStatusFilter(f)}
                     className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
                       isActive
