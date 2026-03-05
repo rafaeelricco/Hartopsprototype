@@ -14,7 +14,6 @@ import {
   CalendarDays,
   MapPin,
   Clock,
-  Building2,
   Target,
   Megaphone,
   FileText,
@@ -30,9 +29,22 @@ import {
   Check,
   X,
   AlertTriangle,
+  Info,
+  Download,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
+import { Badge } from "@/app/shared/components/ui/badge";
+import { Separator } from "@/app/shared/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/app/shared/components/ui/dialog";
 import { useCampaignContext } from "./campaign-context";
 import {
   OBJECTIVES,
@@ -112,6 +124,8 @@ const PHASE_META: Record<
     bg: "#FEF2F2",
   },
 };
+
+const LIFECYCLE_PHASES: LifecyclePhase[] = [1, 2, 3];
 
 // ── Live feed mock data pool ─────────────────────────────────────────────────
 
@@ -209,89 +223,6 @@ function makeTime(index: number): string {
 }
 
 // =============================================================================
-// Confirmation Dialog
-// =============================================================================
-
-function ConfirmDialog({
-  open,
-  title,
-  description,
-  warning,
-  confirmLabel,
-  confirmColor,
-  onConfirm,
-  onCancel,
-}: {
-  open: boolean;
-  title: string;
-  description: string;
-  warning: string;
-  confirmLabel: string;
-  confirmColor: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  if (!open) return null;
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(15,23,42,0.4)" }}
-    >
-      <div
-        className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ background: "#FEF3C7" }}
-            >
-              <AlertTriangle size={18} style={{ color: "#D97706" }} />
-            </div>
-            <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>{title}</h3>
-          </div>
-          <p
-            style={{ fontSize: "0.875rem", color: "#64748B", lineHeight: 1.6 }}
-            className="mb-3"
-          >
-            {description}
-          </p>
-          <div
-            className="px-3.5 py-2.5 rounded-lg"
-            style={{
-              background: "#FEF3C7",
-              fontSize: "0.8125rem",
-              color: "#92400E",
-              lineHeight: 1.5,
-            }}
-          >
-            {warning}
-          </div>
-        </div>
-        <div className="px-6 pb-5 flex items-center justify-end gap-3">
-          <Button
-            variant="ghost"
-            onClick={onCancel}
-            className="px-4 py-2 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors h-auto"
-            style={{ fontSize: "0.875rem" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={onConfirm}
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto"
-            style={{ fontSize: "0.875rem", background: confirmColor }}
-          >
-            {confirmLabel}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// =============================================================================
 // Main Component
 // =============================================================================
 
@@ -366,6 +297,19 @@ export function EventDetailPage() {
   }
 
   const phase = getPhase(event.status);
+  const [viewingPhase, setViewingPhase] = useState<LifecyclePhase>(phase);
+  const [downloading, setDownloading] = useState(false);
+
+  function handleDownloadReport() {
+    setDownloading(true);
+    setTimeout(() => setDownloading(false), 2000);
+  }
+
+  // Reset viewingPhase when the actual phase changes (transition)
+  useEffect(() => {
+    setViewingPhase(phase);
+  }, [phase]);
+
   const phaseMeta = PHASE_META[phase];
   const status = STATUS_LABELS[event.status] ?? STATUS_LABELS["draft"];
 
@@ -382,19 +326,114 @@ export function EventDetailPage() {
     return { objectiveId: objId, label: obj?.label ?? objId, modules: mods };
   });
 
+  // Phase transition button config
+  const transitionButton =
+    phase === 1 && event.status === "draft"
+      ? {
+          label: "Schedule Event",
+          icon: CalendarDays,
+          color: "#1D4ED8",
+          onClick: () =>
+            requestTransition(
+              "scheduled",
+              "Schedule this event?",
+              "This will mark the event as scheduled. It will still be editable until the event starts.",
+              "Once the event goes live, you will no longer be able to edit its configuration.",
+              "Schedule Event",
+              "#1D4ED8",
+            ),
+        }
+      : phase === 1 && event.status === "scheduled"
+        ? {
+            label: "Start Event",
+            icon: Radio,
+            color: "#0F766E",
+            onClick: () =>
+              requestTransition(
+                "active",
+                "Start this event?",
+                "Starting the event transitions it to the Live Data Feed phase. Field educators will begin submitting data.",
+                "This action is irreversible. The event configuration will become read-only and cannot be modified.",
+                "Start Event",
+                "#0F766E",
+              ),
+          }
+        : phase === 2
+          ? {
+              label: "Lock Report",
+              icon: Lock,
+              color: "#B91C1C",
+              onClick: () =>
+                requestTransition(
+                  "completed",
+                  "Lock this report?",
+                  "Locking the report finalizes all collected data and generates the final event report.",
+                  "This action is permanent. Once locked, the report cannot be edited or unlocked. All data becomes read-only.",
+                  "Lock Report",
+                  "#B91C1C",
+                ),
+            }
+          : null;
+
   return (
     <div className="p-6 font-[Inter]">
-      {/* Confirmation dialog */}
-      <ConfirmDialog
+      {/* Confirmation dialog (shadcn) */}
+      <Dialog
         open={!!confirmAction}
-        title={confirmAction?.title ?? ""}
-        description={confirmAction?.description ?? ""}
-        warning={confirmAction?.warning ?? ""}
-        confirmLabel={confirmAction?.confirmLabel ?? ""}
-        confirmColor={confirmAction?.confirmColor ?? "#7D152D"}
-        onConfirm={executeTransition}
-        onCancel={() => setConfirmAction(null)}
-      />
+        onOpenChange={(open) => {
+          if (!open) setConfirmAction(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "#FEF3C7" }}
+              >
+                <AlertTriangle size={18} style={{ color: "#D97706" }} />
+              </div>
+              <DialogTitle className="text-base font-medium">
+                {confirmAction?.title}
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-sm text-[#64748B] leading-relaxed">
+              {confirmAction?.description}
+            </DialogDescription>
+          </DialogHeader>
+          <div
+            className="px-3.5 py-2.5 rounded-lg"
+            style={{
+              background: "#FEF3C7",
+              fontSize: "0.8125rem",
+              color: "#92400E",
+              lineHeight: 1.5,
+            }}
+          >
+            {confirmAction?.warning}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setConfirmAction(null)}
+              className="px-4 py-2 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors h-auto"
+              style={{ fontSize: "0.875rem" }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={executeTransition}
+              className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto"
+              style={{
+                fontSize: "0.875rem",
+                background: confirmAction?.confirmColor ?? "#7D152D",
+              }}
+            >
+              {confirmAction?.confirmLabel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Back link */}
       <Link
@@ -406,250 +445,215 @@ export function EventDetailPage() {
         Back to Events
       </Link>
 
-      {/* ── Header card ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2 flex-wrap">
-              <h2 style={{ fontSize: "1.25rem", color: "#0F172A" }}>
-                {event.name}
-              </h2>
-              <span
-                className="flex items-center gap-1 px-2.5 py-0.5 rounded-md"
-                style={{
-                  fontSize: "0.6875rem",
-                  background: status!.bg,
-                  color: status!.text,
-                }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full inline-block"
-                  style={{ background: status!.dot }}
-                />
-                {status!.label}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-4 flex-wrap mb-3">
-              {campaign && (
-                <Link
-                  to={`/campaigns/${event.campaignId}`}
-                  className="flex items-center gap-1 no-underline hover:underline"
-                  style={{ fontSize: "0.875rem", color: "#7D152D" }}
-                >
-                  <Megaphone size={14} />
-                  {campaign.name}
-                </Link>
+      {/* ── Consolidated Header ──────────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 mb-6">
+        {/* Row 1: Status badge + event name + transition button */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <Badge
+            className="rounded-md border-0 gap-1.5"
+            style={{
+              fontSize: "0.6875rem",
+              background: status!.bg,
+              color: status!.text,
+            }}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full inline-block"
+              style={{ background: status!.dot }}
+            />
+            {status!.label}
+          </Badge>
+          <h2
+            className="flex-1 min-w-0"
+            style={{ fontSize: "1.25rem", color: "#0F172A" }}
+          >
+            {event.name}
+          </h2>
+          {transitionButton && (
+            <Button
+              onClick={transitionButton.onClick}
+              className="inline-flex items-center gap-2 px-4 h-9 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
+              style={{
+                background: transitionButton.color,
+                fontSize: "0.8125rem",
+              }}
+            >
+              <transitionButton.icon size={14} />
+              {transitionButton.label}
+            </Button>
+          )}
+          {phase === 3 && viewingPhase === 3 && (
+            <Button
+              onClick={handleDownloadReport}
+              disabled={downloading}
+              className="inline-flex items-center gap-2 px-4 h-9 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
+              style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+            >
+              {downloading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Downloading…
+                </>
+              ) : (
+                <>
+                  <Download size={14} />
+                  Download Report
+                </>
               )}
-              <span
-                className="flex items-center gap-1"
-                style={{ fontSize: "0.875rem", color: "#64748B" }}
-              >
-                <MapPin size={14} />
-                {event.location}
-              </span>
-            </div>
-            <div className="flex items-center gap-4 flex-wrap">
-              <span
-                className="flex items-center gap-1.5"
-                style={{ fontSize: "0.875rem", color: "#64748B" }}
-              >
-                <CalendarDays size={14} />
-                {new Date(event.date + "T12:00:00").toLocaleDateString(
-                  "en-US",
-                  {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  },
-                )}
-              </span>
-              <span
-                className="flex items-center gap-1.5"
-                style={{ fontSize: "0.875rem", color: "#64748B" }}
-              >
-                <Clock size={14} />
-                {event.duration}
-              </span>
-              <span
-                className="flex items-center gap-1.5"
-                style={{ fontSize: "0.875rem", color: "#64748B" }}
-              >
-                <Building2 size={14} />
-                {VENUE_LABELS[event.venueType] || event.venueType}
-              </span>
-            </div>
-          </div>
-
-          {/* Phase transition buttons */}
-          {phase === 1 && event.status === "draft" && (
-            <Button
-              onClick={() =>
-                requestTransition(
-                  "scheduled",
-                  "Schedule this event?",
-                  "This will mark the event as scheduled. It will still be editable until the event starts.",
-                  "Once the event goes live, you will no longer be able to edit its configuration.",
-                  "Schedule Event",
-                  "#1D4ED8",
-                )
-              }
-              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
-              style={{ background: "#1D4ED8", fontSize: "0.875rem" }}
-            >
-              <CalendarDays size={15} />
-              Schedule Event
-            </Button>
-          )}
-          {phase === 1 && event.status === "scheduled" && (
-            <Button
-              onClick={() =>
-                requestTransition(
-                  "active",
-                  "Start this event?",
-                  "Starting the event transitions it to the Live Data Feed phase. Field educators will begin submitting data.",
-                  "This action is irreversible. The event configuration will become read-only and cannot be modified.",
-                  "Start Event",
-                  "#0F766E",
-                )
-              }
-              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
-              style={{ background: "#0F766E", fontSize: "0.875rem" }}
-            >
-              <Radio size={15} />
-              Start Event
-            </Button>
-          )}
-          {phase === 2 && (
-            <Button
-              onClick={() =>
-                requestTransition(
-                  "completed",
-                  "Lock this report?",
-                  "Locking the report finalizes all collected data and generates the final event report.",
-                  "This action is permanent. Once locked, the report cannot be edited or unlocked. All data becomes read-only.",
-                  "Lock Report",
-                  "#B91C1C",
-                )
-              }
-              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
-              style={{ background: "#B91C1C", fontSize: "0.875rem" }}
-            >
-              <Lock size={15} />
-              Lock Report
             </Button>
           )}
         </div>
-      </div>
 
-      {/* ── Lifecycle phase indicator ────────────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 mb-6">
-        <p
-          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-          className="uppercase tracking-wider mb-4"
-        >
-          Event Lifecycle
-        </p>
-        <div className="flex items-center gap-0">
-          {([1, 2, 3] as LifecyclePhase[]).map((p, i) => {
-            const pm = PHASE_META[p];
-            const PhaseIcon = pm.icon;
-            const isCurrent = p === phase;
-            const isDone = p < phase;
-            const isFuture = p > phase;
+        {/* Row 2: Campaign link + separator + location */}
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          {campaign && (
+            <Link
+              to={`/campaigns/${event.campaignId}`}
+              className="flex items-center gap-1 no-underline hover:underline"
+              style={{ fontSize: "0.8125rem", color: "#7D152D" }}
+            >
+              <Megaphone size={13} />
+              {campaign.name}
+            </Link>
+          )}
+          {campaign && (
+            <Separator orientation="vertical" className="h-3.5 bg-[#E2E8F0]" />
+          )}
+          <span
+            className="flex items-center gap-1"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
+            <MapPin size={13} />
+            {event.location}
+          </span>
+        </div>
 
-            return (
-              <div key={p} className="flex items-center flex-1">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Row 3: Inline lifecycle dots + current phase label */}
+        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-[#F1F5F9]">
+          <div className="flex items-center gap-0">
+            {LIFECYCLE_PHASES.map((p, i) => {
+              const pm = PHASE_META[p];
+              const isCurrent = p === phase;
+              const isDone = p < phase;
+              const isViewing = p === viewingPhase && viewingPhase !== phase;
+              return (
+                <div key={p} className="flex items-center">
                   <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
                     style={{
                       background: isCurrent
                         ? pm.color
                         : isDone
                           ? "#0F766E"
-                          : "#F1F5F9",
-                      color: isCurrent || isDone ? "#FFF" : "#94A3B8",
+                          : "#CBD5E1",
+                      boxShadow: isViewing
+                        ? `0 0 0 2px white, 0 0 0 4px ${pm.color}`
+                        : "none",
                     }}
-                  >
-                    {isDone ? (
-                      <CheckCircle2 size={18} />
-                    ) : (
-                      <PhaseIcon size={16} />
-                    )}
-                  </div>
-                  <div className="min-w-0 hidden sm:block">
-                    <p
-                      style={{
-                        fontSize: "0.8125rem",
-                        color: isCurrent
-                          ? pm.color
-                          : isDone
-                            ? "#0F766E"
-                            : "#94A3B8",
-                      }}
-                    >
-                      Phase {p}
-                    </p>
-                    <p
-                      className="truncate"
-                      style={{
-                        fontSize: "0.75rem",
-                        color: isFuture ? "#CBD5E1" : "#64748B",
-                      }}
-                    >
-                      {pm.label}
-                    </p>
-                  </div>
-                </div>
-                {i < 2 && (
-                  <div
-                    className="w-8 sm:w-12 h-px flex-shrink-0 mx-1"
-                    style={{ background: isDone ? "#0F766E" : "#E2E8F0" }}
                   />
-                )}
-              </div>
-            );
-          })}
+                  {i < 2 && (
+                    <div
+                      className="w-5 h-px"
+                      style={{
+                        background: isDone ? "#0F766E" : "#E2E8F0",
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <span
+            style={{ fontSize: "0.75rem", color: phaseMeta.color }}
+            className="flex items-center gap-1.5"
+          >
+            <phaseMeta.icon size={12} />
+            {phaseMeta.label}
+          </span>
         </div>
 
+        {/* Phase history tabs (only when phase > 1) */}
+        {phase > 1 && (
+          <div className="flex items-center gap-1 mt-3 pt-3 border-t border-[#F1F5F9] overflow-x-auto">
+            {LIFECYCLE_PHASES.filter((p) => p <= phase).map((p) => {
+              const pm = PHASE_META[p];
+              const Icon = pm.icon;
+              const isActive = p === viewingPhase;
+              const isCurrent = p === phase;
+              return (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setViewingPhase(p)}
+                  className="flex items-center gap-1.5 px-3 py-2 transition-colors whitespace-nowrap flex-shrink-0"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: isActive ? "#7D152D" : "#64748B",
+                    borderBottom: isActive
+                      ? "2px solid #7D152D"
+                      : "2px solid transparent",
+                    background: "transparent",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Icon size={12} />
+                  {pm.label}
+                  {isCurrent && " (Current)"}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Viewing history info banner ─────────────────────────────── */}
+      {viewingPhase < phase && (
         <div
-          className="mt-4 px-4 py-3 rounded-lg flex items-start gap-3"
-          style={{ background: phaseMeta.bg }}
+          className="flex items-start gap-3 px-5 py-3.5 rounded-xl mb-6"
+          style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}
         >
-          <phaseMeta.icon
+          <Info
             size={16}
-            style={{ color: phaseMeta.color, marginTop: 2 }}
+            className="flex-shrink-0 mt-0.5"
+            style={{ color: "#1D4ED8" }}
           />
           <div>
-            <p style={{ fontSize: "0.8125rem", color: phaseMeta.color }}>
-              {phaseMeta.label}
+            <p style={{ fontSize: "0.8125rem", color: "#1D4ED8" }}>
+              Viewing Phase {viewingPhase} — {PHASE_META[viewingPhase].label}
             </p>
             <p style={{ fontSize: "0.75rem", color: "#64748B" }}>
-              {phaseMeta.description}
+              This is a read-only snapshot. The event is currently in Phase{" "}
+              {phase}.
             </p>
           </div>
         </div>
-      </div>
+      )}
 
       {/* ── Phase-specific content ───────────────────────────────────── */}
-      {phase === 1 && (
+      {viewingPhase === 1 && (
         <Phase1Editable
           event={event}
           objectives={objectiveDetails}
           modules={mappedModules}
           advModules={advModules}
+          modulesByObjective={modulesByObjective}
+          readOnly={viewingPhase < phase ? true : false}
         />
       )}
-      {phase === 2 && (
-        <Phase2LiveFeed
-          event={event}
-          objectives={objectiveDetails}
-          modules={mappedModules}
-        />
-      )}
-      {phase === 3 && (
+      {viewingPhase === 2 &&
+        (viewingPhase === phase ? (
+          <Phase2LiveFeed
+            event={event}
+            objectives={objectiveDetails}
+            modules={mappedModules}
+          />
+        ) : (
+          <Phase2ReadOnly
+            modules={mappedModules}
+            objectives={objectiveDetails}
+          />
+        ))}
+      {viewingPhase === 3 && (
         <Phase3Locked
           event={event}
           modulesByObjective={modulesByObjective}
@@ -661,26 +665,37 @@ export function EventDetailPage() {
 }
 
 // =============================================================================
-// Phase 1 — Editable Configuration (with inline editing)
+// Phase 1 — Editable Configuration (with inline editing) — Sidebar Layout
 // =============================================================================
 
 function Phase1Editable({
   event,
   objectives,
-  modules,
+  modules: _modules,
   advModules,
+  modulesByObjective,
+  readOnly,
 }: {
   event: EventItem;
   objectives: { id: string; label: string; description: string }[];
   modules: DataModule[];
   advModules: { id: string; label: string; description: string }[];
+  modulesByObjective: {
+    objectiveId: string;
+    label: string;
+    modules: DataModule[];
+  }[];
+  readOnly?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Event configuration — now editable */}
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+      {/* Left — Event Configuration card */}
       <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
         <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center gap-2">
-          <Edit3 size={15} style={{ color: "#1D4ED8" }} />
+          <Edit3
+            size={15}
+            style={{ color: readOnly ? "#94A3B8" : "#1D4ED8" }}
+          />
           <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
             Event Configuration
           </span>
@@ -688,21 +703,31 @@ function Phase1Editable({
             className="ml-auto px-2 py-0.5 rounded-md inline-flex items-center gap-1"
             style={{
               fontSize: "0.6875rem",
-              background: "#EFF6FF",
-              color: "#1D4ED8",
+              background: readOnly ? "#F1F5F9" : "#EFF6FF",
+              color: readOnly ? "#64748B" : "#1D4ED8",
             }}
           >
-            <Pencil size={9} />
-            Editable
+            {readOnly ? (
+              <>
+                <Lock size={9} />
+                Read-only
+              </>
+            ) : (
+              <>
+                <Pencil size={9} />
+                Editable
+              </>
+            )}
           </span>
         </div>
-        <div className="px-5 py-4 space-y-1">
+        <div className="px-5 py-5 space-y-4">
           <EditableField
             eventId={event.id}
             field="name"
             label="Event Name"
             value={event.name}
             type="text"
+            readOnly={readOnly === true}
           />
           <EditableField
             eventId={event.id}
@@ -710,22 +735,27 @@ function Phase1Editable({
             label="Location"
             value={event.location}
             type="text"
+            readOnly={readOnly === true}
           />
-          <EditableField
-            eventId={event.id}
-            field="date"
-            label="Date"
-            value={event.date}
-            type="date"
-          />
-          <EditableField
-            eventId={event.id}
-            field="duration"
-            label="Duration"
-            value={event.duration}
-            type="select"
-            options={DURATION_OPTIONS}
-          />
+          <div className="grid grid-cols-2 gap-4">
+            <EditableField
+              eventId={event.id}
+              field="date"
+              label="Date"
+              value={event.date}
+              type="date"
+              readOnly={readOnly === true}
+            />
+            <EditableField
+              eventId={event.id}
+              field="duration"
+              label="Duration"
+              value={event.duration}
+              type="select"
+              options={DURATION_OPTIONS}
+              readOnly={readOnly === true}
+            />
+          </div>
           <EditableField
             eventId={event.id}
             field="venueType"
@@ -738,27 +768,29 @@ function Phase1Editable({
               { value: "special", label: "Special" },
             ]}
             displayValue={VENUE_LABELS[event.venueType] || event.venueType}
+            readOnly={readOnly === true}
           />
         </div>
       </div>
 
-      {/* Objectives & Modules */}
-      <div className="space-y-6">
+      {/* Right sidebar — Objectives + Data Modules */}
+      <div className="space-y-4">
+        {/* Objectives card */}
         <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center gap-2">
-            <Target size={15} style={{ color: "#7D152D" }} />
-            <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
+          <div className="px-4 py-3.5 border-b border-[#E2E8F0] flex items-center gap-2">
+            <Target size={14} style={{ color: "#7D152D" }} />
+            <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
               Objectives ({objectives.length})
             </span>
           </div>
-          <div className="px-5 py-4">
-            <div className="flex flex-wrap gap-2">
+          <div className="px-4 py-3.5">
+            <div className="flex flex-wrap gap-1.5">
               {objectives.map((o) => (
                 <span
                   key={o.id}
-                  className="px-3 py-1.5 rounded-lg"
+                  className="px-2.5 py-1 rounded-lg"
                   style={{
-                    fontSize: "0.8125rem",
+                    fontSize: "0.75rem",
                     background: "#7D152D0F",
                     color: "#7D152D",
                   }}
@@ -770,61 +802,94 @@ function Phase1Editable({
           </div>
         </div>
 
+        {/* Data Modules card — grouped by objective */}
         <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center gap-2">
-            <FileText size={15} style={{ color: "#0F766E" }} />
-            <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
-              Data Modules ({modules.length + advModules.length})
+          <div className="px-4 py-3.5 border-b border-[#E2E8F0] flex items-center gap-2">
+            <FileText size={14} style={{ color: "#0F766E" }} />
+            <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+              Data Modules
             </span>
           </div>
-          <div className="px-5 py-4 space-y-2">
-            {modules.map((m) => (
-              <div
-                key={m.id}
-                className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#F8FAFC]"
-              >
-                <div
-                  className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                  style={{ background: "#0F766E" }}
-                />
-                <div>
-                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                    {m.label}
-                  </p>
-                  <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-                    {m.description}
-                  </p>
+          <div className="px-4 py-3 space-y-3">
+            {modulesByObjective.map((group) => (
+              <div key={group.objectiveId}>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <div
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                    style={{ background: "#7D152D" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "0.6875rem",
+                      color: "#64748B",
+                    }}
+                    className="uppercase tracking-wider"
+                  >
+                    {group.label}
+                  </span>
+                </div>
+                <div className="space-y-1 ml-3">
+                  {group.modules.map((m) => (
+                    <div
+                      key={m.id}
+                      className="flex items-start gap-2 py-1 px-2 rounded-md bg-[#F8FAFC]"
+                    >
+                      <div
+                        className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                        style={{ background: "#0F766E" }}
+                      />
+                      <div className="min-w-0">
+                        <p
+                          className="truncate"
+                          style={{ fontSize: "0.75rem", color: "#0F172A" }}
+                        >
+                          {m.label}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
             {advModules.length > 0 && (
-              <>
-                <p
-                  className="pt-2"
-                  style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-                >
-                  ADVANCED MODULES
-                </p>
-                {advModules.map((m) => (
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
                   <div
-                    key={m.id}
-                    className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[#F8FAFC]"
+                    className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                    style={{ background: "#D97706" }}
+                  />
+                  <span
+                    style={{
+                      fontSize: "0.6875rem",
+                      color: "#64748B",
+                    }}
+                    className="uppercase tracking-wider"
                   >
+                    Advanced
+                  </span>
+                </div>
+                <div className="space-y-1 ml-3">
+                  {advModules.map((m) => (
                     <div
-                      className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
-                      style={{ background: "#D97706" }}
-                    />
-                    <div>
-                      <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                        {m.label}
-                      </p>
-                      <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-                        {m.description}
-                      </p>
+                      key={m.id}
+                      className="flex items-start gap-2 py-1 px-2 rounded-md bg-[#F8FAFC]"
+                    >
+                      <div
+                        className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                        style={{ background: "#D97706" }}
+                      />
+                      <div className="min-w-0">
+                        <p
+                          className="truncate"
+                          style={{ fontSize: "0.75rem", color: "#0F172A" }}
+                        >
+                          {m.label}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -833,7 +898,7 @@ function Phase1Editable({
   );
 }
 
-// ── Inline-editable field component ─────────────────────────────────────────
+// ── Inline-editable field component (vertical block layout) ──────────────────
 
 function EditableField({
   eventId,
@@ -843,6 +908,7 @@ function EditableField({
   type,
   options,
   displayValue,
+  readOnly,
 }: {
   eventId: string;
   field: "name" | "location" | "date" | "duration" | "venueType";
@@ -851,6 +917,7 @@ function EditableField({
   type: "text" | "date" | "select";
   options?: (string | { value: string; label: string })[];
   displayValue?: string;
+  readOnly?: boolean;
 }) {
   const { updateEventFields } = useCampaignContext();
   const [editing, setEditing] = useState(false);
@@ -896,31 +963,59 @@ function EditableField({
         })
       : value);
 
+  if (readOnly) {
+    return (
+      <div>
+        <span
+          className="block mb-1"
+          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        >
+          {label}
+        </span>
+        <div className="px-3 py-2">
+          <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+            {shown}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   if (!editing) {
     return (
-      <Button
-        variant="ghost"
+      <button
         onClick={startEdit}
-        className="flex items-center justify-between w-full py-2.5 px-2 -mx-2 rounded-lg hover:bg-[#F8FAFC] transition-colors group text-left h-auto"
+        className="block w-full text-left group"
+        type="button"
       >
-        <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>{label}</span>
-        <span className="flex items-center gap-2">
-          <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+        <span
+          className="block mb-1"
+          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+        >
+          {label}
+        </span>
+        <div className="flex items-center justify-between rounded-lg border border-transparent group-hover:border-[#E2E8F0] group-hover:bg-[#F8FAFC] px-3 py-2 transition-colors">
+          <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
             {shown}
           </span>
           <Pencil
-            size={11}
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            size={12}
+            className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
             style={{ color: "#94A3B8" }}
           />
-        </span>
-      </Button>
+        </div>
+      </button>
     );
   }
 
   return (
-    <div className="flex items-center justify-between py-2 px-2 -mx-2 rounded-lg bg-[#EFF6FF]/50">
-      <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>{label}</span>
+    <div>
+      <span
+        className="block mb-1"
+        style={{ fontSize: "0.6875rem", color: "#1D4ED8" }}
+      >
+        {label}
+      </span>
       <div className="flex items-center gap-1.5">
         {type === "select" ? (
           <select
@@ -928,8 +1023,8 @@ function EditableField({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="px-2 py-1 rounded-md border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30"
-            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+            className="flex-1 px-3 py-2 rounded-lg border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30"
+            style={{ fontSize: "0.875rem", color: "#0F172A" }}
           >
             {options?.map((o) => {
               const val = typeof o === "string" ? o : o.value;
@@ -948,31 +1043,27 @@ function EditableField({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="px-2 py-1 rounded-md border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30 h-auto w-auto shadow-none"
-            style={{
-              fontSize: "0.8125rem",
-              color: "#0F172A",
-              maxWidth: type === "date" ? 160 : 200,
-            }}
+            className="flex-1 px-3 py-2 rounded-lg border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30 h-auto shadow-none"
+            style={{ fontSize: "0.875rem", color: "#0F172A" }}
           />
         )}
         <Button
           variant="ghost"
           size="icon-xs"
           onClick={save}
-          className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#ECFDF5] transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#ECFDF5] transition-colors cursor-pointer"
           title="Save"
         >
-          <Check size={13} style={{ color: "#0F766E" }} />
+          <Check size={14} style={{ color: "#0F766E" }} />
         </Button>
         <Button
           variant="ghost"
           size="icon-xs"
           onClick={cancel}
-          className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#FEF2F2] transition-colors cursor-pointer"
           title="Cancel"
         >
-          <X size={13} style={{ color: "#B91C1C" }} />
+          <X size={14} style={{ color: "#B91C1C" }} />
         </Button>
       </div>
     </div>
@@ -1283,6 +1374,202 @@ function Phase2LiveFeed({
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+    </div>
+  );
+}
+
+// =============================================================================
+// Phase 2 — Read-Only Snapshot (viewed from Phase 3)
+// =============================================================================
+
+function Phase2ReadOnly({
+  modules,
+  objectives,
+}: {
+  modules: DataModule[];
+  objectives: { id: string; label: string }[];
+}) {
+  const allItems = FEED_POOL.map((item, i) => ({
+    ...item,
+    time: makeTime(i),
+    id: i,
+  }));
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Feed column */}
+      <div className="lg:col-span-2 bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#E2E8F0] flex items-center gap-2">
+          <CheckCircle2 size={15} style={{ color: "#0F766E" }} />
+          <span style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
+            Data Feed (Complete)
+          </span>
+          <span
+            className="ml-auto px-2.5 py-0.5 rounded-md"
+            style={{
+              fontSize: "0.6875rem",
+              background: "#F1F5F9",
+              color: "#64748B",
+            }}
+          >
+            Completed
+          </span>
+        </div>
+
+        <div className="divide-y divide-[#F8FAFC] max-h-[440px] overflow-y-auto">
+          {allItems.map((item) => (
+            <div key={item.id} className="px-5 py-3.5 flex items-start gap-3">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{
+                  background: item.type === "photo" ? "#7D152D0F" : "#0F766E0F",
+                }}
+              >
+                {item.type === "photo" ? (
+                  <Camera size={14} style={{ color: "#7D152D" }} />
+                ) : (
+                  <Activity size={14} style={{ color: "#0F766E" }} />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                  {item.module}
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                  {item.value}
+                </p>
+              </div>
+              <span
+                style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                className="flex-shrink-0"
+              >
+                {item.time}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="px-5 py-3 border-t border-[#E2E8F0] bg-[#FAFBFC] flex items-center gap-2">
+          <CheckCircle2 size={12} style={{ color: "#0F766E" }} />
+          <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            Data collection completed · {FEED_POOL.length} entries received
+          </p>
+        </div>
+      </div>
+
+      {/* Right sidebar: progress + modules */}
+      <div className="space-y-4">
+        {/* Collection progress — 100% */}
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
+          <p
+            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+            className="uppercase tracking-wider mb-3"
+          >
+            Collection Progress
+          </p>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="relative w-14 h-14">
+              <svg width="56" height="56" viewBox="0 0 56 56">
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  fill="none"
+                  stroke="#E2E8F0"
+                  strokeWidth="4"
+                />
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  fill="none"
+                  stroke="#0F766E"
+                  strokeWidth="4"
+                  strokeDasharray="150.8 150.8"
+                  strokeLinecap="round"
+                  transform="rotate(-90 28 28)"
+                />
+              </svg>
+              <span
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              >
+                100%
+              </span>
+            </div>
+            <div>
+              <p style={{ fontSize: "0.9375rem", color: "#0F172A" }}>
+                {modules.length} / {modules.length}
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                modules with data
+              </p>
+            </div>
+          </div>
+          <div className="h-1.5 rounded-full bg-[#E2E8F0] overflow-hidden">
+            <div
+              className="h-full rounded-full"
+              style={{ width: "100%", background: "#0F766E" }}
+            />
+          </div>
+        </div>
+
+        {/* Module status — all complete */}
+        <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-[#E2E8F0]">
+            <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+              Module Status
+            </span>
+          </div>
+          <div className="px-5 py-3 space-y-2">
+            {modules.map((m) => (
+              <div key={m.id} className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: "#0F766E" }}
+                >
+                  <CheckCircle2 size={10} style={{ color: "#FFF" }} />
+                </div>
+                <span
+                  className="truncate"
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#64748B",
+                    textDecoration: "line-through",
+                  }}
+                >
+                  {m.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Objectives */}
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
+          <p
+            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+            className="uppercase tracking-wider mb-2"
+          >
+            Objectives
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {objectives.map((o) => (
+              <span
+                key={o.id}
+                className="px-2.5 py-1 rounded-lg"
+                style={{
+                  fontSize: "0.75rem",
+                  background: "#7D152D0F",
+                  color: "#7D152D",
+                }}
+              >
+                {o.label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

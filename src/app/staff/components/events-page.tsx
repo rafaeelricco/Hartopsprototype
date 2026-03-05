@@ -5,7 +5,7 @@
 // =============================================================================
 
 import { useState, useMemo } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   List,
@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ArrowUpDown,
   Filter,
+  Plus,
 } from "lucide-react";
 import { useCampaignContext } from "./campaign-context";
 import { type EventItem } from "./event-data";
@@ -77,6 +78,7 @@ function shortGeo(location: string): string {
 // ── Main component ───────────────────────────────────────────────────────────
 
 export function EventsPage() {
+  const navigate = useNavigate();
   const { events, campaigns, getCampaign } = useCampaignContext();
 
   const [view, setView] = useState<ViewMode>("list");
@@ -148,34 +150,44 @@ export function EventsPage() {
         title="Events"
         subtitle="Monitor and manage events across all campaigns."
         actions={
-          <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
+          <>
             <Button
-              variant="ghost"
-              onClick={() => setView("list")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
-                view === "list"
-                  ? "bg-white text-[#0F172A] shadow-sm hover:bg-white"
-                  : "text-[#64748B] hover:text-[#0F172A]"
-              }`}
-              style={{ fontSize: "0.8125rem" }}
+              onClick={() => navigate("/staff/events/create")}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
+              style={{ background: "#7D152D", fontSize: "0.8125rem" }}
             >
-              <List size={15} />
-              List
+              <Plus size={15} />
+              Create Event
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => setView("calendar")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
-                view === "calendar"
-                  ? "bg-white text-[#0F172A] shadow-sm hover:bg-white"
-                  : "text-[#64748B] hover:text-[#0F172A]"
-              }`}
-              style={{ fontSize: "0.8125rem" }}
-            >
-              <CalendarDays size={15} />
-              Calendar
-            </Button>
-          </div>
+            <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
+              <Button
+                variant="ghost"
+                onClick={() => setView("list")}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
+                  view === "list"
+                    ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
+                    : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
+                }`}
+                style={{ fontSize: "0.8125rem" }}
+              >
+                <List size={15} />
+                List
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setView("calendar")}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
+                  view === "calendar"
+                    ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
+                    : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
+                }`}
+                style={{ fontSize: "0.8125rem" }}
+              >
+                <CalendarDays size={15} />
+                Calendar
+              </Button>
+            </div>
+          </>
         }
       />
 
@@ -212,7 +224,7 @@ export function EventsPage() {
               className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm cursor-pointer h-auto flex flex-col items-start ${
                 statusFilter === s.key
                   ? "border-[#7D152D] ring-1 ring-[#7D152D]/20 hover:bg-white"
-                  : "border-[#E2E8F0] hover:bg-accent/50"
+                  : "border-[#E2E8F0] hover:bg-[#F8FAFC]"
               }`}
             >
               <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>

@@ -29,6 +29,7 @@ import { EventDetailPage as StaffEventDetailPage } from "./staff/components/even
 import { ReportsPage as StaffReportsPage } from "./staff/components/reports-page";
 import { BrandAssetsPage } from "./staff/components/brand-assets-page";
 import { SettingsPage as StaffSettingsPage } from "./staff/components/settings-page";
+import { CreateEventPage } from "./staff/components/create-event-page";
 
 export const router = createBrowserRouter([
   // ---- OPS PLATFORM (/ops) ----
@@ -66,6 +67,7 @@ export const router = createBrowserRouter([
       { path: "campaigns", Component: Campaigns },
       { path: "campaigns/:id", Component: CampaignDetail },
       { path: "events", Component: StaffEventsPage },
+      { path: "events/create", Component: CreateEventPage },
       { path: "events/:eventId", Component: StaffEventDetailPage },
       { path: "reports", Component: StaffReportsPage },
       { path: "brand-assets", Component: BrandAssetsPage },
