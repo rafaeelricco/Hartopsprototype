@@ -241,9 +241,10 @@ export function HelpPage() {
             {faqs.map((faq, index) => (
               <div key={faq.id}>
                 {index > 0 && <Separator />}
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => toggleFaq(faq.id)}
-                  className="w-full flex items-center justify-between gap-4 py-3.5 text-left cursor-pointer bg-transparent border-none"
+                  className="w-full flex items-center justify-between gap-4 py-3.5 text-left cursor-pointer bg-transparent border-none hover:bg-accent/50"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span
@@ -263,7 +264,7 @@ export function HelpPage() {
                       <ChevronDown className="size-4 text-muted-foreground" />
                     )}
                   </div>
-                </button>
+                </Button>
                 {expandedFaq === faq.id && (
                   <div className="pb-3.5 pl-0 pr-8">
                     <p
@@ -298,38 +299,42 @@ export function HelpPage() {
         <CardContent className="px-5 pb-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {resources.map((resource) => (
-              <button
+              <Button
                 key={resource.title}
-                className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors text-left cursor-pointer bg-transparent"
+                variant="ghost"
+                className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors text-left cursor-pointer bg-transparent h-auto"
+                asChild
               >
-                <div className="flex items-center justify-center size-9 rounded-md bg-muted shrink-0 mt-0.5">
-                  <resource.icon className="size-4 text-muted-foreground" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-foreground truncate"
-                      style={{ fontSize: "0.8125rem", fontWeight: 500 }}
-                    >
-                      {resource.title}
-                    </span>
-                    <ExternalLink className="size-3 text-muted-foreground shrink-0" />
+                <a href="#">
+                  <div className="flex items-center justify-center size-9 rounded-md bg-muted shrink-0 mt-0.5">
+                    <resource.icon className="size-4 text-muted-foreground" />
                   </div>
-                  <p
-                    className="text-muted-foreground mt-0.5"
-                    style={{ fontSize: "0.75rem" }}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-foreground truncate"
+                        style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                      >
+                        {resource.title}
+                      </span>
+                      <ExternalLink className="size-3 text-muted-foreground shrink-0" />
+                    </div>
+                    <p
+                      className="text-muted-foreground mt-0.5"
+                      style={{ fontSize: "0.75rem" }}
+                    >
+                      {resource.description}
+                    </p>
+                  </div>
+                  <Badge
+                    variant="secondary"
+                    className="shrink-0 mt-0.5"
+                    style={{ fontSize: "0.625rem" }}
                   >
-                    {resource.description}
-                  </p>
-                </div>
-                <Badge
-                  variant="secondary"
-                  className="shrink-0 mt-0.5"
-                  style={{ fontSize: "0.625rem" }}
-                >
-                  {resource.type}
-                </Badge>
-              </button>
+                    {resource.type}
+                  </Badge>
+                </a>
+              </Button>
             ))}
           </div>
         </CardContent>

@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Bell,
 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
 import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
 import { TIMEFRAMES, type Timeframe } from "./dashboard-data";
 
@@ -82,13 +83,15 @@ export function DashboardLayout() {
               className="h-9 w-auto"
             />
           </Link>
-          <button
-            className="lg:hidden text-[#64748B] hover:text-[#0F172A] transition-colors"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden text-[#64748B] hover:text-[#0F172A] transition-colors cursor-pointer"
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         {/* Navigation */}
@@ -158,14 +161,15 @@ export function DashboardLayout() {
               </p>
             </div>
           </div>
-          <button
+          <Button
+            variant="ghost"
             onClick={() => navigate("/")}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg w-full text-[#64748B] hover:bg-[#FEF2F2] hover:text-[#EF4444] transition-colors"
+            className="flex items-center justify-start gap-3 px-3 py-2.5 rounded-lg w-full text-[#64748B] hover:bg-[#FEF2F2] hover:text-[#EF4444] transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.9375rem" }}
           >
             <LogOut size={18} />
             Sign out
-          </button>
+          </Button>
         </div>
       </aside>
 
@@ -184,13 +188,15 @@ export function DashboardLayout() {
         {/* Top bar */}
         <header className="sticky top-0 z-20 flex items-center justify-between px-6 py-3.5 bg-white/90 backdrop-blur-md border-b border-[#E2E8F0]">
           <div className="flex items-center gap-3">
-            <button
-              className="lg:hidden text-[#64748B] hover:text-[#0F172A] transition-colors"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden text-[#64748B] hover:text-[#0F172A] transition-colors cursor-pointer"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar"
             >
               <Menu size={22} />
-            </button>
+            </Button>
             <h1 style={{ fontSize: "1.25rem", color: "#0F172A" }}>
               {pageTitle}
             </h1>
@@ -220,8 +226,10 @@ export function DashboardLayout() {
             )}
 
             {/* Notification bell */}
-            <button
-              className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors"
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative w-9 h-9 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors cursor-pointer"
               aria-label="Notifications"
             >
               <Bell size={18} />
@@ -229,7 +237,7 @@ export function DashboardLayout() {
                 className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
                 style={{ background: "#EF4444" }}
               />
-            </button>
+            </Button>
           </div>
         </header>
 

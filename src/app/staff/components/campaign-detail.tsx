@@ -19,6 +19,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
 import { useCampaignContext } from "./campaign-context";
 import { EventWizard } from "./event-wizard";
 import { OBJECTIVES, type EventItem } from "./event-data";
@@ -194,14 +195,14 @@ export function CampaignDetail() {
           </div>
 
           {/* Create Event CTA */}
-          <button
+          <Button
             onClick={() => setWizardOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
+            className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0 cursor-pointer"
             style={{ background: "#7D152D", fontSize: "0.875rem" }}
           >
             <Plus size={16} strokeWidth={2.5} />
             Create Event
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -236,15 +237,16 @@ export function CampaignDetail() {
               key: "completed" as const,
             },
           ].map((s) => (
-            <button
+            <Button
               key={s.label}
+              variant="ghost"
               onClick={() =>
                 setStatusFilter(statusFilter === s.key ? "all" : s.key)
               }
-              className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm ${
+              className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm cursor-pointer h-auto flex flex-col items-start ${
                 statusFilter === s.key
-                  ? "border-[#7D152D] ring-1 ring-[#7D152D]/20"
-                  : "border-[#E2E8F0]"
+                  ? "border-[#7D152D] ring-1 ring-[#7D152D]/20 hover:bg-white"
+                  : "border-[#E2E8F0] hover:bg-accent/50"
               }`}
             >
               <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>
@@ -254,7 +256,7 @@ export function CampaignDetail() {
               >
                 {s.count}
               </p>
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -279,14 +281,14 @@ export function CampaignDetail() {
           >
             Create your first event using the guided wizard.
           </p>
-          <button
+          <Button
             onClick={() => setWizardOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto"
             style={{ background: "#7D152D", fontSize: "0.875rem" }}
           >
             <Plus size={16} strokeWidth={2.5} />
             Create Event
-          </button>
+          </Button>
         </div>
       ) : (
         <>
@@ -298,12 +300,13 @@ export function CampaignDetail() {
                 const label =
                   f === "all" ? "All" : (STATUS_LABELS[f]?.label ?? f);
                 return (
-                  <button
-                    key={f}
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setStatusFilter(f)}
-                    className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
                       isActive
-                        ? "text-white"
+                        ? "text-white hover:bg-[#7D152D] hover:text-white"
                         : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
                     }`}
                     style={
@@ -313,14 +316,15 @@ export function CampaignDetail() {
                     }
                   >
                     {label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
 
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors cursor-pointer h-auto"
               style={{ fontSize: "0.8125rem" }}
             >
               {sortDir === "desc" ? (
@@ -329,7 +333,7 @@ export function CampaignDetail() {
                 <ArrowUp size={13} />
               )}
               Date {sortDir === "desc" ? "newest" : "oldest"}
-            </button>
+            </Button>
           </div>
 
           {/* Event cards */}

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { PasswordInput } from "./password-input";
 import { CheckCircle2, AlertCircle } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
 
 const PASSWORD_RULES = [
   { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
@@ -104,14 +105,10 @@ export function ActivateAccount() {
   }
 
   return (
-    <AuthLayout>
-      <div className="space-y-1 mb-6">
-        <h2 className="text-foreground">Activate Account</h2>
-        <p className="text-muted-foreground" style={{ fontSize: "0.875rem" }}>
-          Set your password to activate your Hart Ops account.
-        </p>
-      </div>
-
+    <AuthLayout
+      title="Activate Account"
+      subtitle="Set your password to activate your Hart Ops account."
+    >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* New Password */}
         <div className="space-y-1.5">
@@ -192,13 +189,13 @@ export function ActivateAccount() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-primary text-primary-foreground py-2.5 px-4 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-11 cursor-pointer"
         >
           {loading ? "Activating..." : "Activate Account"}
-        </button>
+        </Button>
       </form>
     </AuthLayout>
   );

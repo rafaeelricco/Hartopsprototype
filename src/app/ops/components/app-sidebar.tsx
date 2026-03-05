@@ -34,6 +34,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../../shared/components/ui/dropdown-menu";
+import { Button } from "../../shared/components/ui/button";
 
 const mainNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/ops/dashboard" },
@@ -171,7 +172,10 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent cursor-pointer h-12">
+                <Button
+                  variant="ghost"
+                  className="flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent cursor-pointer h-12"
+                >
                   <Avatar className="size-8 rounded-lg">
                     <AvatarFallback
                       className="rounded-lg text-xs"
@@ -198,7 +202,7 @@ export function AppSidebar() {
                     </span>
                   </div>
                   <MoreHorizontal className="ml-auto size-4 text-muted-foreground" />
-                </button>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-56 rounded-lg"

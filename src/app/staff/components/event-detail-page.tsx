@@ -31,6 +31,8 @@ import {
   X,
   AlertTriangle,
 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
 import { useCampaignContext } from "./campaign-context";
 import {
   OBJECTIVES,
@@ -268,20 +270,21 @@ function ConfirmDialog({
           </div>
         </div>
         <div className="px-6 pb-5 flex items-center justify-end gap-3">
-          <button
+          <Button
+            variant="ghost"
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors"
+            className="px-4 py-2 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors h-auto"
             style={{ fontSize: "0.875rem" }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto"
             style={{ fontSize: "0.875rem", background: confirmColor }}
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -481,7 +484,7 @@ export function EventDetailPage() {
 
           {/* Phase transition buttons */}
           {phase === 1 && event.status === "draft" && (
-            <button
+            <Button
               onClick={() =>
                 requestTransition(
                   "scheduled",
@@ -492,15 +495,15 @@ export function EventDetailPage() {
                   "#1D4ED8",
                 )
               }
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
+              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
               style={{ background: "#1D4ED8", fontSize: "0.875rem" }}
             >
               <CalendarDays size={15} />
               Schedule Event
-            </button>
+            </Button>
           )}
           {phase === 1 && event.status === "scheduled" && (
-            <button
+            <Button
               onClick={() =>
                 requestTransition(
                   "active",
@@ -511,15 +514,15 @@ export function EventDetailPage() {
                   "#0F766E",
                 )
               }
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
+              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
               style={{ background: "#0F766E", fontSize: "0.875rem" }}
             >
               <Radio size={15} />
               Start Event
-            </button>
+            </Button>
           )}
           {phase === 2 && (
-            <button
+            <Button
               onClick={() =>
                 requestTransition(
                   "completed",
@@ -530,12 +533,12 @@ export function EventDetailPage() {
                   "#B91C1C",
                 )
               }
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
+              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0"
               style={{ background: "#B91C1C", fontSize: "0.875rem" }}
             >
               <Lock size={15} />
               Lock Report
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -895,9 +898,10 @@ function EditableField({
 
   if (!editing) {
     return (
-      <button
+      <Button
+        variant="ghost"
         onClick={startEdit}
-        className="flex items-center justify-between w-full py-2.5 px-2 -mx-2 rounded-lg hover:bg-[#F8FAFC] transition-colors group text-left"
+        className="flex items-center justify-between w-full py-2.5 px-2 -mx-2 rounded-lg hover:bg-[#F8FAFC] transition-colors group text-left h-auto"
       >
         <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>{label}</span>
         <span className="flex items-center gap-2">
@@ -910,7 +914,7 @@ function EditableField({
             style={{ color: "#94A3B8" }}
           />
         </span>
-      </button>
+      </Button>
     );
   }
 
@@ -938,13 +942,13 @@ function EditableField({
             })}
           </select>
         ) : (
-          <input
+          <Input
             ref={inputRef as React.RefObject<HTMLInputElement>}
             type={type}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="px-2 py-1 rounded-md border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30"
+            className="px-2 py-1 rounded-md border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30 h-auto w-auto shadow-none"
             style={{
               fontSize: "0.8125rem",
               color: "#0F172A",
@@ -952,20 +956,24 @@ function EditableField({
             }}
           />
         )}
-        <button
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={save}
-          className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#ECFDF5] transition-colors"
+          className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#ECFDF5] transition-colors cursor-pointer"
           title="Save"
         >
           <Check size={13} style={{ color: "#0F766E" }} />
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={cancel}
-          className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#FEF2F2] transition-colors"
+          className="w-6 h-6 rounded flex items-center justify-center hover:bg-[#FEF2F2] transition-colors cursor-pointer"
           title="Cancel"
         >
           <X size={13} style={{ color: "#B91C1C" }} />
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Input } from "@/app/shared/components/ui/input";
+import { Button } from "@/app/shared/components/ui/button";
 
 export function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -93,13 +94,13 @@ export function ForgotPassword() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-primary text-primary-foreground py-2.5 px-4 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-11 cursor-pointer"
         >
           {loading ? "Sending..." : "Send Reset Link"}
-        </button>
+        </Button>
 
         <div className="text-center">
           <Link

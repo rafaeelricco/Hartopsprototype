@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useCampaignContext } from "./campaign-context";
 import { type EventItem } from "./event-data";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -147,30 +149,32 @@ export function EventsPage() {
         subtitle="Monitor and manage events across all campaigns."
         actions={
           <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setView("list")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
                 view === "list"
-                  ? "bg-white text-[#0F172A] shadow-sm"
+                  ? "bg-white text-[#0F172A] shadow-sm hover:bg-white"
                   : "text-[#64748B] hover:text-[#0F172A]"
               }`}
               style={{ fontSize: "0.8125rem" }}
             >
               <List size={15} />
               List
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => setView("calendar")}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
                 view === "calendar"
-                  ? "bg-white text-[#0F172A] shadow-sm"
+                  ? "bg-white text-[#0F172A] shadow-sm hover:bg-white"
                   : "text-[#64748B] hover:text-[#0F172A]"
               }`}
               style={{ fontSize: "0.8125rem" }}
             >
               <CalendarDays size={15} />
               Calendar
-            </button>
+            </Button>
           </div>
         }
       />
@@ -199,15 +203,16 @@ export function EventsPage() {
         ).map((s) => {
           const count = events.filter((e) => e.status === s.key).length;
           return (
-            <button
+            <Button
               key={s.key}
+              variant="ghost"
               onClick={() =>
                 setStatusFilter(statusFilter === s.key ? "all" : s.key)
               }
-              className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm ${
+              className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm cursor-pointer h-auto flex flex-col items-start ${
                 statusFilter === s.key
-                  ? "border-[#7D152D] ring-1 ring-[#7D152D]/20"
-                  : "border-[#E2E8F0]"
+                  ? "border-[#7D152D] ring-1 ring-[#7D152D]/20 hover:bg-white"
+                  : "border-[#E2E8F0] hover:bg-accent/50"
               }`}
             >
               <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>
@@ -217,7 +222,7 @@ export function EventsPage() {
               >
                 {count}
               </p>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -230,7 +235,7 @@ export function EventsPage() {
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] pointer-events-none"
           />
-          <input
+          <Input
             type="text"
             placeholder="Search by name or location..."
             value={search}
@@ -246,12 +251,13 @@ export function EventsPage() {
             const isActive = statusFilter === f;
             const label = f === "all" ? "All" : (STATUS_META[f]?.label ?? f);
             return (
-              <button
+              <Button
                 key={f}
+                variant="ghost"
                 onClick={() => setStatusFilter(f)}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
                   isActive
-                    ? "text-white"
+                    ? "text-white hover:bg-[#7D152D] hover:text-white"
                     : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
                 }`}
                 style={
@@ -261,7 +267,7 @@ export function EventsPage() {
                 }
               >
                 {label}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -289,14 +295,15 @@ export function EventsPage() {
 
         {/* Sort (list view only) */}
         {view === "list" && (
-          <button
+          <Button
+            variant="ghost"
             onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors flex-shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors flex-shrink-0 cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem" }}
           >
             <ArrowUpDown size={13} />
             Date {sortDir === "desc" ? "newest" : "oldest"}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -563,30 +570,35 @@ function EventCalendarView({
       {/* Month header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => goMonth(-1)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
           >
             <ChevronLeft size={18} />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => goMonth(1)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
           >
             <ChevronRight size={18} />
-          </button>
+          </Button>
           <span style={{ fontSize: "1rem", color: "#0F172A" }} className="ml-1">
             {monthLabel}
           </span>
         </div>
         {!isCurrentMonth && (
-          <button
+          <Button
+            variant="ghost"
             onClick={goToday}
-            className="px-3 py-1.5 rounded-lg text-[#7D152D] bg-[#7D152D0A] hover:bg-[#7D152D14] transition-colors"
+            className="px-3 py-1.5 rounded-lg text-[#7D152D] bg-[#7D152D0A] hover:bg-[#7D152D14] transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.75rem" }}
           >
             Today
-          </button>
+          </Button>
         )}
       </div>
 

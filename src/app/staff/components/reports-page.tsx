@@ -40,6 +40,7 @@ import {
   ArrowDownUp,
   ListFilter,
 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
 import {
   BarChart,
   Bar,
@@ -273,27 +274,27 @@ export function ReportsPage() {
             {/* Scope selector (change #1) */}
             <div className="inline-flex rounded-lg border border-[#E2E8F0] overflow-hidden">
               {REPORT_SCOPES.map((s) => (
-                <button
+                <Button
                   key={s.value}
+                  variant="ghost"
                   onClick={() => setScope(s.value)}
-                  className="px-3 py-2 transition-colors"
+                  className="px-3 py-2 transition-colors h-auto rounded-none border-r border-[#E2E8F0] last:border-r-0 cursor-pointer"
                   style={{
                     fontSize: "0.75rem",
                     background: scope === s.value ? "#7D152D" : "#fff",
                     color: scope === s.value ? "#fff" : "#64748B",
-                    borderRight: "1px solid #E2E8F0",
                   }}
                 >
                   {s.label}
-                </button>
+                </Button>
               ))}
             </div>
 
             {/* Export button */}
             <div className="relative">
-              <button
+              <Button
                 onClick={() => setExportOpen(!exportOpen)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
                 style={{ background: "#7D152D", fontSize: "0.8125rem" }}
               >
                 <Download size={14} />
@@ -302,7 +303,7 @@ export function ReportsPage() {
                   size={12}
                   className={`transition-transform ${exportOpen ? "rotate-180" : ""}`}
                 />
-              </button>
+              </Button>
 
               {exportOpen && (
                 <>
@@ -316,10 +317,11 @@ export function ReportsPage() {
                         SELECT FORMAT
                       </p>
                     </div>
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={() => handleExport("pdf")}
                       disabled={!!exporting}
-                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[#F8FAFC] transition-colors text-left disabled:opacity-60"
+                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[#F8FAFC] transition-colors text-left disabled:opacity-60 h-auto cursor-pointer justify-start"
                     >
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -336,11 +338,12 @@ export function ReportsPage() {
                         </p>
                       </div>
                       {exporting === "pdf" && <Spinner />}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="ghost"
                       onClick={() => handleExport("csv")}
                       disabled={!!exporting}
-                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[#F8FAFC] transition-colors text-left disabled:opacity-60"
+                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-[#F8FAFC] transition-colors text-left disabled:opacity-60 h-auto cursor-pointer justify-start"
                     >
                       <div
                         className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -357,7 +360,7 @@ export function ReportsPage() {
                         </p>
                       </div>
                       {exporting === "csv" && <Spinner />}
-                    </button>
+                    </Button>
                   </div>
                 </>
               )}
@@ -546,21 +549,23 @@ export function ReportsPage() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <Button
+                variant="ghost"
                 onClick={selectAllCampaigns}
-                className="px-2.5 py-1 rounded-md transition-colors hover:bg-[#F1F5F9]"
+                className="px-2.5 py-1 rounded-md transition-colors hover:bg-[#F1F5F9] h-auto cursor-pointer"
                 style={{ fontSize: "0.6875rem", color: "#7D152D" }}
               >
                 Select All
-              </button>
+              </Button>
               <span style={{ color: "#E2E8F0" }}>|</span>
-              <button
+              <Button
+                variant="ghost"
                 onClick={clearCampaigns}
-                className="px-2.5 py-1 rounded-md transition-colors hover:bg-[#F1F5F9]"
+                className="px-2.5 py-1 rounded-md transition-colors hover:bg-[#F1F5F9] h-auto cursor-pointer"
                 style={{ fontSize: "0.6875rem", color: "#64748B" }}
               >
                 Clear
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -569,12 +574,13 @@ export function ReportsPage() {
             {CAMPAIGN_METRICS.map((c) => {
               const selected = selectedCampaigns.has(c.campaignId);
               return (
-                <button
+                <Button
                   key={c.campaignId}
+                  variant="ghost"
                   onClick={() => toggleCampaign(c.campaignId)}
-                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1 h-auto cursor-pointer ${
                     selected
-                      ? "text-white"
+                      ? "text-white hover:bg-[#7D152D] hover:text-white"
                       : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
                   }`}
                   style={
@@ -588,7 +594,7 @@ export function ReportsPage() {
                   {c.campaignName.length > 20
                     ? c.campaignName.slice(0, 18) + "..."
                     : c.campaignName}
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -886,18 +892,19 @@ export function ReportsPage() {
             </div>
             <div className="flex items-center gap-2">
               {/* Date sort toggle */}
-              <button
+              <Button
+                variant="ghost"
                 onClick={() =>
                   setGallerySortDir((d) =>
                     d === "newest" ? "oldest" : "newest",
                   )
                 }
-                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F1F5F9] hover:bg-[#E2E8F0] transition-colors h-auto cursor-pointer"
                 style={{ fontSize: "0.6875rem", color: "#64748B" }}
               >
                 <ArrowDownUp size={11} />
                 {gallerySortDir === "newest" ? "Newest first" : "Oldest first"}
-              </button>
+              </Button>
 
               {/* Event filter dropdown */}
               {galleryEventOptions.length > 1 && (
@@ -927,9 +934,10 @@ export function ReportsPage() {
 
           {/* Campaign filter pills */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setGalleryCampaignFilter("all")}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
+              className={`px-3 py-1.5 rounded-lg transition-colors h-auto cursor-pointer ${
                 galleryCampaignFilter === "all"
                   ? "text-white"
                   : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
@@ -941,12 +949,13 @@ export function ReportsPage() {
               }
             >
               All
-            </button>
+            </Button>
             {galleryCampaigns.map(([id, name]) => (
-              <button
+              <Button
                 key={id}
+                variant="ghost"
                 onClick={() => setGalleryCampaignFilter(id)}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors h-auto cursor-pointer ${
                   galleryCampaignFilter === id
                     ? "text-white"
                     : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
@@ -958,7 +967,7 @@ export function ReportsPage() {
                 }
               >
                 {name.length > 20 ? name.slice(0, 18) + "..." : name}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -973,10 +982,11 @@ export function ReportsPage() {
         ) : (
           <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {galleryPhotos.map((photo, idx) => (
-              <button
+              <Button
                 key={photo.id}
+                variant="ghost"
                 onClick={() => openLightbox(idx)}
-                className="group relative rounded-xl overflow-hidden bg-[#F1F5F9] aspect-[4/3] cursor-pointer"
+                className="group relative rounded-xl overflow-hidden bg-[#F1F5F9] aspect-[4/3] cursor-pointer block p-0 w-full h-full border-0 shadow-none"
               >
                 <ImageWithFallback
                   src={photo.url}
@@ -1011,7 +1021,7 @@ export function ReportsPage() {
                 <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <Eye size={13} style={{ color: "#0F172A" }} />
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -1163,28 +1173,32 @@ function PhotoLightbox({
     >
       {/* Prev button */}
       {hasPrev && (
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={(e) => {
             e.stopPropagation();
             onPrev();
           }}
-          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10"
+          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10 h-auto cursor-pointer"
         >
           <ChevronLeft size={20} style={{ color: "#0F172A" }} />
-        </button>
+        </Button>
       )}
 
       {/* Next button */}
       {hasNext && (
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={(e) => {
             e.stopPropagation();
             onNext();
           }}
-          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10"
+          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10 h-auto cursor-pointer"
         >
           <ChevronRight size={20} style={{ color: "#0F172A" }} />
-        </button>
+        </Button>
       )}
 
       <div
@@ -1198,12 +1212,14 @@ function PhotoLightbox({
             className="w-full aspect-[16/10] object-cover"
           />
           {/* Close */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors h-auto cursor-pointer p-0"
           >
             <X size={16} className="text-white" />
-          </button>
+          </Button>
           {/* Counter */}
           <div
             className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg"

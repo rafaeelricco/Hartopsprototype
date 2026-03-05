@@ -28,6 +28,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
 import {
   VENUE_TYPES,
   DURATION_OPTIONS,
@@ -234,13 +236,15 @@ export function EventWizard({
           <h2 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
             Create Event
           </h2>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors h-auto cursor-pointer"
             aria-label="Close wizard"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* ── Progress stepper ─────────────────────────────────────────── */}
@@ -328,48 +332,50 @@ export function EventWizard({
         {/* ── Footer actions ───────────────────────────────────────────── */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-[#E2E8F0] bg-white">
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="outline"
               onClick={step === 1 ? onClose : handleBack}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.875rem" }}
             >
               <ChevronLeft size={15} />
               {step === 1 ? "Cancel" : "Back"}
-            </button>
+            </Button>
 
             {/* Save Draft (Gap #4 from assumptions) */}
             {step > 1 && (
-              <button
+              <Button
+                variant="ghost"
                 onClick={onClose}
-                className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors h-auto cursor-pointer"
                 style={{ fontSize: "0.8125rem" }}
                 title="Save as draft and close"
               >
                 <Save size={14} />
                 Save Draft
-              </button>
+              </Button>
             )}
           </div>
 
           {step < 4 ? (
-            <button
+            <Button
               onClick={handleNext}
               disabled={generating}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 h-auto cursor-pointer"
               style={{ background: "#7D152D", fontSize: "0.875rem" }}
             >
               Continue
               <ChevronRight size={15} />
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={handleSubmit}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
               style={{ background: "#0F766E", fontSize: "0.875rem" }}
             >
               <Check size={15} />
               Create Event
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -421,7 +427,7 @@ function Step1Basics({
         error={errors.name}
         icon={<FileText size={15} style={{ color: "#94A3B8" }} />}
       >
-        <input
+        <Input
           type="text"
           value={data.name}
           onChange={(e) => updateField("name", e.target.value)}
@@ -439,7 +445,7 @@ function Step1Basics({
         error={errors.location}
         icon={<MapPin size={15} style={{ color: "#94A3B8" }} />}
       >
-        <input
+        <Input
           type="text"
           value={data.location}
           onChange={(e) => updateField("location", e.target.value)}
@@ -458,7 +464,7 @@ function Step1Basics({
           error={errors.date}
           icon={<Calendar size={15} style={{ color: "#94A3B8" }} />}
         >
-          <input
+          <Input
             type="date"
             value={data.date}
             onChange={(e) => updateField("date", e.target.value)}
@@ -502,13 +508,14 @@ function Step1Basics({
           {VENUE_TYPES.map((v) => {
             const selected = data.venueType === v.value;
             return (
-              <button
+              <Button
                 key={v.value}
+                variant="ghost"
                 type="button"
                 onClick={() => updateField("venueType", v.value)}
-                className={`p-3.5 rounded-xl border-2 text-left transition-all ${
+                className={`p-3.5 rounded-xl border-2 text-left transition-all h-auto cursor-pointer block w-full whitespace-normal hover:bg-[#F8FAFC] ${
                   selected
-                    ? "border-[#7D152D] bg-[#7D152D]/5"
+                    ? "border-[#7D152D] bg-[#7D152D]/5 hover:bg-[#7D152D]/5"
                     : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1]"
                 }`}
               >
@@ -530,7 +537,7 @@ function Step1Basics({
                 >
                   {v.description}
                 </p>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -601,58 +608,61 @@ function Step2Objectives({
           const isSelected = selected.includes(obj.id);
           const moduleCount = (OBJECTIVE_MODULE_MAP[obj.id] ?? []).length;
           return (
-            <button
+            <Button
               key={obj.id}
+              variant="ghost"
               type="button"
               onClick={() => toggle(obj.id)}
-              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all ${
+              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all h-auto cursor-pointer block w-full whitespace-normal hover:bg-[#F8FAFC] ${
                 isSelected
-                  ? "border-[#7D152D] bg-[#7D152D]/5"
+                  ? "border-[#7D152D] bg-[#7D152D]/5 hover:bg-[#7D152D]/5"
                   : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1]"
               }`}
             >
-              {/* Checkbox indicator */}
-              <div
-                className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors"
-                style={{
-                  background: isSelected ? "#7D152D" : "transparent",
-                  border: isSelected ? "none" : "2px solid #CBD5E1",
-                }}
-              >
-                {isSelected && <Check size={13} style={{ color: "#FFF" }} />}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
+              <div className="flex items-start gap-3.5">
+                {/* Checkbox indicator */}
+                <div
+                  className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors"
+                  style={{
+                    background: isSelected ? "#7D152D" : "transparent",
+                    border: isSelected ? "none" : "2px solid #CBD5E1",
+                  }}
+                >
+                  {isSelected && <Check size={13} style={{ color: "#FFF" }} />}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p
+                      style={{
+                        fontSize: "0.9375rem",
+                        color: isSelected ? "#7D152D" : "#0F172A",
+                      }}
+                    >
+                      {obj.label}
+                    </p>
+                    <span
+                      style={{
+                        fontSize: "0.6875rem",
+                        color: isSelected ? "#7D152D" : "#94A3B8",
+                        opacity: 0.7,
+                      }}
+                    >
+                      {moduleCount} modules
+                    </span>
+                  </div>
                   <p
                     style={{
-                      fontSize: "0.9375rem",
-                      color: isSelected ? "#7D152D" : "#0F172A",
+                      fontSize: "0.8125rem",
+                      color: "#94A3B8",
+                      lineHeight: 1.5,
                     }}
+                    className="mt-0.5"
                   >
-                    {obj.label}
+                    {obj.description}
                   </p>
-                  <span
-                    style={{
-                      fontSize: "0.6875rem",
-                      color: isSelected ? "#7D152D" : "#94A3B8",
-                      opacity: 0.7,
-                    }}
-                  >
-                    {moduleCount} modules
-                  </span>
                 </div>
-                <p
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "#94A3B8",
-                    lineHeight: 1.5,
-                  }}
-                  className="mt-0.5"
-                >
-                  {obj.description}
-                </p>
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -735,10 +745,11 @@ function Step3ReportPreview({
           Intelligent Report Preview
         </h3>
         {/* Educator Experience toggle */}
-        <button
+        <Button
+          variant="ghost"
           type="button"
           onClick={onToggleEducator}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors ${
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors h-auto cursor-pointer ${
             showEducator
               ? "text-white"
               : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
@@ -751,7 +762,7 @@ function Step3ReportPreview({
         >
           <Smartphone size={13} />
           Educator View
-        </button>
+        </Button>
       </div>
       <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-5">
         {showEducator
@@ -1191,10 +1202,11 @@ function Step4Advanced({
 
       {/* Gap #5: Auto-mapped modules context */}
       <div className="mb-5 border border-[#E2E8F0] rounded-xl overflow-hidden">
-        <button
+        <Button
+          variant="ghost"
           type="button"
           onClick={() => setShowAutoMapped((p) => !p)}
-          className="w-full flex items-center justify-between px-4 py-3 bg-[#FAFBFC] hover:bg-[#F1F5F9] transition-colors text-left"
+          className="w-full flex items-center justify-between px-4 py-3 bg-[#FAFBFC] hover:bg-[#F1F5F9] transition-colors text-left h-auto cursor-pointer rounded-none border-0"
         >
           <div className="flex items-center gap-2">
             <div
@@ -1222,7 +1234,7 @@ function Step4Advanced({
           ) : (
             <ChevronDown size={15} style={{ color: "#94A3B8" }} />
           )}
-        </button>
+        </Button>
         {showAutoMapped && (
           <div className="px-4 py-3 border-t border-[#F1F5F9]">
             <div className="flex flex-wrap gap-1.5">
@@ -1260,46 +1272,49 @@ function Step4Advanced({
         {ADVANCED_MODULES.map((mod) => {
           const isSelected = selected.includes(mod.id);
           return (
-            <button
+            <Button
               key={mod.id}
+              variant="ghost"
               type="button"
               onClick={() => toggle(mod.id)}
-              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all ${
+              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all h-auto cursor-pointer block w-full whitespace-normal hover:bg-[#F8FAFC] ${
                 isSelected
-                  ? "border-[#0F766E] bg-[#0F766E]/5"
+                  ? "border-[#0F766E] bg-[#0F766E]/5 hover:bg-[#0F766E]/5"
                   : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1]"
               }`}
             >
-              <div
-                className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors"
-                style={{
-                  background: isSelected ? "#0F766E" : "transparent",
-                  border: isSelected ? "none" : "2px solid #CBD5E1",
-                }}
-              >
-                {isSelected && <Check size={13} style={{ color: "#FFF" }} />}
-              </div>
-              <div className="flex-1">
-                <p
+              <div className="flex items-start gap-3.5">
+                <div
+                  className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors"
                   style={{
-                    fontSize: "0.9375rem",
-                    color: isSelected ? "#0F766E" : "#0F172A",
+                    background: isSelected ? "#0F766E" : "transparent",
+                    border: isSelected ? "none" : "2px solid #CBD5E1",
                   }}
                 >
-                  {mod.label}
-                </p>
-                <p
-                  style={{
-                    fontSize: "0.8125rem",
-                    color: "#94A3B8",
-                    lineHeight: 1.5,
-                  }}
-                  className="mt-0.5"
-                >
-                  {mod.description}
-                </p>
+                  {isSelected && <Check size={13} style={{ color: "#FFF" }} />}
+                </div>
+                <div className="flex-1">
+                  <p
+                    style={{
+                      fontSize: "0.9375rem",
+                      color: isSelected ? "#0F766E" : "#0F172A",
+                    }}
+                  >
+                    {mod.label}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.8125rem",
+                      color: "#94A3B8",
+                      lineHeight: 1.5,
+                    }}
+                    className="mt-0.5"
+                  >
+                    {mod.description}
+                  </p>
+                </div>
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>

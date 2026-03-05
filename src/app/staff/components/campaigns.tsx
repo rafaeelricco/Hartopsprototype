@@ -18,6 +18,8 @@ import {
 import { type Campaign } from "./campaign-data";
 import { useCampaignContext } from "./campaign-context";
 import { CreateCampaignModal } from "./create-campaign-modal";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
 
 const PAGE_SIZE = 6;
 
@@ -111,14 +113,14 @@ export function Campaigns() {
           </>
         }
         actions={
-          <button
+          <Button
             onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer"
             style={{ background: "#7D152D", fontSize: "0.875rem" }}
           >
             <Plus size={16} strokeWidth={2.5} />
             Create Campaign
-          </button>
+          </Button>
         }
       />
 
@@ -132,23 +134,24 @@ export function Campaigns() {
             size={16}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
           />
-          <input
+          <Input
             type="text"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search campaigns…"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#E2E8F0] bg-white focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 transition-colors"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#E2E8F0] bg-white focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 transition-colors h-auto w-auto shadow-none"
             style={{ fontSize: "0.875rem" }}
           />
         </div>
 
         {/* Status filter pills */}
         <div className="flex items-center gap-1.5">
-          <button
+          <Button
+            variant="ghost"
             onClick={() => handleStatusFilter("all")}
-            className={`px-3 py-1.5 rounded-lg transition-colors ${
+            className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
               statusFilter === "all"
-                ? "text-white"
+                ? "text-white hover:bg-[#7D152D] hover:text-white"
                 : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
             }`}
             style={
@@ -158,17 +161,18 @@ export function Campaigns() {
             }
           >
             All
-          </button>
+          </Button>
           {STATUS_FILTERS.map((s) => {
             const meta = STATUS_STYLES[s];
             const isActive = statusFilter === s;
             return (
-              <button
+              <Button
                 key={s}
+                variant="ghost"
                 onClick={() => handleStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer h-auto ${
                   isActive
-                    ? "text-white"
+                    ? "text-white hover:bg-[#7D152D] hover:text-white"
                     : "text-[#64748B] bg-[#F1F5F9] hover:bg-[#E2E8F0]"
                 }`}
                 style={
@@ -178,7 +182,7 @@ export function Campaigns() {
                 }
               >
                 {meta.label}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -222,23 +226,26 @@ export function Campaigns() {
               </p>
 
               <div className="flex items-center gap-1">
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={safePage <= 1}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                   aria-label="Previous page"
                 >
                   <ChevronLeft size={16} />
-                </button>
+                </Button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => (
-                    <button
+                    <Button
                       key={page}
+                      variant="ghost"
                       onClick={() => setCurrentPage(page)}
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
                         page === safePage
-                          ? "text-white"
+                          ? "text-white hover:bg-[#7D152D] hover:text-white"
                           : "text-[#64748B] hover:bg-[#F1F5F9]"
                       }`}
                       style={
@@ -251,20 +258,22 @@ export function Campaigns() {
                       }
                     >
                       {page}
-                    </button>
+                    </Button>
                   ),
                 )}
 
-                <button
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() =>
                     setCurrentPage((p) => Math.min(totalPages, p + 1))
                   }
                   disabled={safePage >= totalPages}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                   aria-label="Next page"
                 >
                   <ChevronRight size={16} />
-                </button>
+                </Button>
               </div>
             </div>
           )}

@@ -5,7 +5,10 @@
 // =============================================================================
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
+import { Textarea } from "@/app/shared/components/ui/textarea";
 
 interface CreateCampaignModalProps {
   open: boolean;
@@ -114,13 +117,15 @@ export function CreateCampaignModal({
           <h2 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
             Create Campaign
           </h2>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         {/* Form */}
@@ -134,7 +139,7 @@ export function CreateCampaignModal({
             >
               Name <span style={{ color: "#EF4444" }}>*</span>
             </label>
-            <input
+            <Input
               ref={nameRef}
               id="campaign-name"
               type="text"
@@ -171,7 +176,7 @@ export function CreateCampaignModal({
             >
               Description
             </label>
-            <textarea
+            <Textarea
               id="campaign-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -185,22 +190,26 @@ export function CreateCampaignModal({
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors"
+              className="px-4 py-2.5 rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.875rem" }}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2.5 rounded-lg text-white transition-opacity disabled:opacity-60"
+              className="px-5 py-2.5 rounded-lg text-white transition-opacity disabled:opacity-60 h-auto cursor-pointer"
               style={{ background: "#7D152D", fontSize: "0.875rem" }}
             >
+              {submitting && (
+                <Loader2 size={14} className="mr-2 animate-spin" />
+              )}
               {submitting ? "Creating…" : "Create Campaign"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

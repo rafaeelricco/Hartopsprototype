@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { AuthInput } from "./auth-input";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
+import { Checkbox } from "@/app/shared/components/ui/checkbox";
 
 export function SignUp() {
   const navigate = useNavigate();
@@ -90,12 +92,13 @@ export function SignUp() {
 
         <div className="mb-6">
           <label
+            htmlFor="terms"
             className="flex items-start gap-2 cursor-pointer"
             style={{ fontSize: "0.8125rem" }}
           >
-            <input
-              type="checkbox"
-              className="w-4 h-4 mt-0.5 rounded border-[#E2E8F0] accent-[#7D152D]"
+            <Checkbox
+              id="terms"
+              className="mt-0.5 border-[#E2E8F0] data-[state=checked]:bg-[#7D152D] data-[state=checked]:border-[#7D152D]"
             />
             <span style={{ color: "#64748B" }}>
               I agree to Hart Agency's{" "}
@@ -116,15 +119,14 @@ export function SignUp() {
           </label>
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg text-white transition-all hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
-          style={{ background: "#7D152D", fontSize: "0.9375rem" }}
+          className="w-full h-11 cursor-pointer"
         >
           {loading && <Loader2 size={18} className="animate-spin" />}
           {loading ? "Creating account..." : "Create account"}
-        </button>
+        </Button>
       </form>
 
       <p

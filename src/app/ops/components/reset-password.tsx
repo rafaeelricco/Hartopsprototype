@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { PasswordInput } from "./password-input";
 import { CheckCircle2 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
 
 const PASSWORD_RULES = [
   { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
@@ -160,13 +161,13 @@ export function ResetPassword() {
           )}
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-primary text-primary-foreground py-2.5 px-4 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-11 cursor-pointer"
         >
           {loading ? "Updating..." : "Reset Password"}
-        </button>
+        </Button>
       </form>
     </AuthLayout>
   );

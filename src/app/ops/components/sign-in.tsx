@@ -3,11 +3,12 @@ import { useNavigate, Link } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { PasswordInput } from "./password-input";
 import { Input } from "@/app/shared/components/ui/input";
+import { Button } from "@/app/shared/components/ui/button";
 
 export function SignIn() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("staff@gmail.com");
+  const [password, setPassword] = useState("12345678");
   const [errors, setErrors] = useState<{
     email?: string | undefined;
     password?: string | undefined;
@@ -44,13 +45,11 @@ export function SignIn() {
     // Simulate auth call
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
-    // Mock: check for demo credentials
-    if (email === "admin@hartops.com" && password === "Password1!") {
+    // Consolidated Auth Logic
+    if (email === "staff@gmail.com" && password === "12345678") {
+      navigate("/staff/dashboard");
+    } else if (email === "ops@gmail.com" && password === "12345678") {
       navigate("/ops/dashboard");
-    } else if (email === "locked@hartops.com") {
-      setErrors({
-        general: "Account locked. Please contact your administrator.",
-      });
     } else {
       setErrors({ general: "Invalid email or password. Please try again." });
     }
@@ -131,13 +130,13 @@ export function SignIn() {
         </div>
 
         {/* Submit */}
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-primary text-primary-foreground py-2.5 px-4 hover:opacity-90 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full h-11 cursor-pointer"
         >
           {loading ? "Signing in..." : "Sign In"}
-        </button>
+        </Button>
       </form>
     </AuthLayout>
   );

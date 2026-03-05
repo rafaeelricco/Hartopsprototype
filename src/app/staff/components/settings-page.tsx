@@ -38,6 +38,8 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
 import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
 import {
   CURRENT_USER,
@@ -106,10 +108,11 @@ export function SettingsPage() {
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 border-b border-[#E2E8F0] overflow-x-auto">
         {TABS.map((t) => (
-          <button
+          <Button
             key={t.key}
+            variant="ghost"
             onClick={() => setTab(t.key)}
-            className="flex items-center gap-2 px-4 py-3 transition-colors relative whitespace-nowrap"
+            className="flex items-center gap-2 px-4 py-3 transition-colors relative whitespace-nowrap h-auto rounded-none hover:bg-transparent cursor-pointer"
             style={{
               fontSize: "0.8125rem",
               color: tab === t.key ? "#7D152D" : "#64748B",
@@ -123,7 +126,7 @@ export function SettingsPage() {
                 style={{ background: "#7D152D" }}
               />
             )}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -174,8 +177,9 @@ function ProfileTab() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <button
-              className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+            <Button
+              variant="ghost"
+              className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl opacity-0 hover:opacity-100 transition-opacity p-0 h-full w-full cursor-pointer"
               onClick={() =>
                 toast.info(
                   "Avatar upload is simulated — no file will be stored.",
@@ -183,7 +187,7 @@ function ProfileTab() {
               }
             >
               <Camera size={18} style={{ color: "#fff" }} />
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 min-w-0">
@@ -215,13 +219,14 @@ function ProfileTab() {
           </div>
 
           {!editing && (
-            <button
+            <Button
+              variant="outline"
               onClick={() => setEditing(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors flex-shrink-0 cursor-pointer h-auto"
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             >
               <Pencil size={13} /> Edit
-            </button>
+            </Button>
           )}
         </div>
       </SectionCard>
@@ -234,27 +239,35 @@ function ProfileTab() {
               <FieldGroup label="First name">
                 <Input
                   value={profile.firstName}
-                  onChange={(v) => setProfile((p) => ({ ...p, firstName: v }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, firstName: e.target.value }))
+                  }
                 />
               </FieldGroup>
               <FieldGroup label="Last name">
                 <Input
                   value={profile.lastName}
-                  onChange={(v) => setProfile((p) => ({ ...p, lastName: v }))}
+                  onChange={(e) =>
+                    setProfile((p) => ({ ...p, lastName: e.target.value }))
+                  }
                 />
               </FieldGroup>
             </div>
             <FieldGroup label="Email">
               <Input
                 value={profile.email}
-                onChange={(v) => setProfile((p) => ({ ...p, email: v }))}
+                onChange={(e) =>
+                  setProfile((p) => ({ ...p, email: e.target.value }))
+                }
                 type="email"
               />
             </FieldGroup>
             <FieldGroup label="Phone">
               <Input
                 value={profile.phone}
-                onChange={(v) => setProfile((p) => ({ ...p, phone: v }))}
+                onChange={(e) =>
+                  setProfile((p) => ({ ...p, phone: e.target.value }))
+                }
                 type="tel"
               />
             </FieldGroup>
@@ -275,10 +288,10 @@ function ProfileTab() {
               </select>
             </FieldGroup>
             <div className="flex items-center gap-2 pt-2">
-              <button
+              <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
                 style={{ background: "#7D152D", fontSize: "0.8125rem" }}
               >
                 {saving ? (
@@ -287,14 +300,15 @@ function ProfileTab() {
                   <Check size={14} />
                 )}
                 {saving ? "Saving..." : "Save Changes"}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outline"
                 onClick={handleCancel}
-                className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+                className="px-4 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
                 style={{ fontSize: "0.8125rem", color: "#64748B" }}
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </div>
         </SectionCard>
@@ -319,13 +333,14 @@ function ProfileTab() {
               </p>
             </div>
           </div>
-          <button
+          <Button
+            variant="outline"
             onClick={() => setShowPasswordModal(true)}
-            className="px-3 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            className="px-3 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem", color: "#0F172A" }}
           >
             Change password
-          </button>
+          </Button>
         </div>
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F1F5F9]">
           <div className="flex items-center gap-3">
@@ -363,15 +378,16 @@ function ProfileTab() {
               action cannot be undone.
             </p>
           </div>
-          <button
+          <Button
+            variant="outline"
             onClick={() =>
               toast.error("Account deletion is disabled in this demo.")
             }
-            className="px-3 py-2 rounded-lg border border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors flex-shrink-0"
+            className="px-3 py-2 rounded-lg border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors flex-shrink-0 cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem", color: "#B91C1C" }}
           >
             Delete account
-          </button>
+          </Button>
         </div>
       </SectionCard>
 
@@ -419,39 +435,43 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
     <Overlay onClose={onClose}>
       <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
         <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Change Password</h3>
-        <button
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={onClose}
-          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
         >
           <X size={16} style={{ color: "#64748B" }} />
-        </button>
+        </Button>
       </div>
       <form onSubmit={handleSubmit} className="p-5 space-y-4">
         <FieldGroup label="Current password">
           <div className="relative">
-            <input
+            <Input
               type={showCurrent ? "text" : "password"}
               value={current}
               onChange={(e) => setCurrent(e.target.value)}
               className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
               style={{ fontSize: "0.8125rem" }}
             />
-            <button
+            <Button
+              variant="ghost"
+              size="icon-xs"
               type="button"
               onClick={() => setShowCurrent(!showCurrent)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer h-auto w-auto p-0 hover:bg-transparent"
             >
               {showCurrent ? (
                 <EyeOff size={14} style={{ color: "#94A3B8" }} />
               ) : (
                 <Eye size={14} style={{ color: "#94A3B8" }} />
               )}
-            </button>
+            </Button>
           </div>
         </FieldGroup>
         <FieldGroup label="New password">
           <div className="relative">
-            <input
+            <Input
               type={showNext ? "text" : "password"}
               value={next}
               onChange={(e) => setNext(e.target.value)}
@@ -459,22 +479,24 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
               style={{ fontSize: "0.8125rem" }}
               placeholder="Min. 8 characters"
             />
-            <button
+            <Button
+              variant="ghost"
+              size="icon-xs"
               type="button"
               onClick={() => setShowNext(!showNext)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer h-auto w-auto p-0 hover:bg-transparent"
             >
               {showNext ? (
                 <EyeOff size={14} style={{ color: "#94A3B8" }} />
               ) : (
                 <Eye size={14} style={{ color: "#94A3B8" }} />
               )}
-            </button>
+            </Button>
           </div>
           {next.length > 0 && <PasswordStrength password={next} />}
         </FieldGroup>
         <FieldGroup label="Confirm new password">
-          <input
+          <Input
             type="password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
@@ -483,23 +505,24 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
           />
         </FieldGroup>
         <div className="flex items-center justify-end gap-2 pt-2">
-          <button
+          <Button
+            variant="outline"
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            className="px-4 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem", color: "#64748B" }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
             style={{ background: "#7D152D", fontSize: "0.8125rem" }}
           >
             {saving && <Loader2 size={14} className="animate-spin" />}
             {saving ? "Updating..." : "Update Password"}
-          </button>
+          </Button>
         </div>
       </form>
     </Overlay>
@@ -636,10 +659,10 @@ function NotificationsTab() {
       ))}
 
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
           style={{ background: "#7D152D", fontSize: "0.8125rem" }}
         >
           {saving ? (
@@ -648,7 +671,7 @@ function NotificationsTab() {
             <Check size={14} />
           )}
           {saving ? "Saving..." : "Save Preferences"}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -787,7 +810,7 @@ function TeamTab() {
               className="absolute left-3 top-1/2 -translate-y-1/2"
               style={{ color: "#94A3B8" }}
             />
-            <input
+            <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or email..."
@@ -809,13 +832,13 @@ function TeamTab() {
             ))}
           </select>
         </div>
-        <button
+        <Button
           onClick={() => setShowInvite(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-11 cursor-pointer"
           style={{ background: "#7D152D", fontSize: "0.8125rem" }}
         >
           <Plus size={14} /> Invite Member
-        </button>
+        </Button>
       </div>
 
       {/* Member count */}
@@ -916,12 +939,14 @@ function TeamTab() {
                     </td>
                     <td className="px-4 py-3">
                       {m.email !== CURRENT_USER.email && (
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon-xs"
                           onClick={() => setRemovingId(m.id)}
-                          className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors"
+                          className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors h-auto w-auto cursor-pointer"
                         >
                           <Trash2 size={13} style={{ color: "#B91C1C" }} />
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
@@ -979,18 +1004,20 @@ function InviteModal({
         <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
           Invite Team Member
         </h3>
-        <button
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={onClose}
-          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
         >
           <X size={16} style={{ color: "#64748B" }} />
-        </button>
+        </Button>
       </div>
       <form onSubmit={handleSubmit} className="p-5 space-y-4">
         <FieldGroup label="Email address">
           <Input
             value={email}
-            onChange={setEmail}
+            onChange={(e) => setEmail(e.target.value)}
             type="email"
             placeholder="colleague@company.com"
           />
@@ -1014,21 +1041,22 @@ function InviteModal({
           accepting.
         </p>
         <div className="flex items-center justify-end gap-2 pt-2">
-          <button
+          <Button
+            variant="outline"
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            className="px-4 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem", color: "#64748B" }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
             style={{ background: "#7D152D", fontSize: "0.8125rem" }}
           >
             Send Invitation
-          </button>
+          </Button>
         </div>
       </form>
     </Overlay>
@@ -1145,9 +1173,10 @@ function PreferencesTab() {
               </div>
             </div>
             <div className="inline-flex rounded-lg border border-[#E2E8F0] overflow-hidden">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => setProductView("grid")}
-                className="px-3 py-1.5 transition-colors"
+                className="px-3 py-1.5 transition-colors h-auto rounded-none cursor-pointer"
                 style={{
                   fontSize: "0.75rem",
                   background: productView === "grid" ? "#7D152D" : "#fff",
@@ -1155,10 +1184,11 @@ function PreferencesTab() {
                 }}
               >
                 Grid
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={() => setProductView("list")}
-                className="px-3 py-1.5 transition-colors"
+                className="px-3 py-1.5 transition-colors h-auto rounded-none cursor-pointer"
                 style={{
                   fontSize: "0.75rem",
                   background: productView === "list" ? "#7D152D" : "#fff",
@@ -1166,7 +1196,7 @@ function PreferencesTab() {
                 }}
               >
                 List
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -1216,10 +1246,10 @@ function PreferencesTab() {
       </SectionCard>
 
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
           style={{ background: "#7D152D", fontSize: "0.8125rem" }}
         >
           {saving ? (
@@ -1228,7 +1258,7 @@ function PreferencesTab() {
             <Check size={14} />
           )}
           {saving ? "Saving..." : "Save Preferences"}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -1340,10 +1370,12 @@ function IntegrationsTab() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
                     onClick={() => handleSync(int.id)}
                     disabled={!!syncing}
-                    className="p-2 rounded-lg hover:bg-[#F1F5F9] transition-colors disabled:opacity-50"
+                    className="p-2 rounded-lg hover:bg-[#F1F5F9] transition-colors disabled:opacity-50 h-auto w-auto cursor-pointer"
                     title="Sync now"
                   >
                     {syncing === int.id ? (
@@ -1355,14 +1387,15 @@ function IntegrationsTab() {
                     ) : (
                       <RefreshCw size={14} style={{ color: "#64748B" }} />
                     )}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="outline"
                     onClick={() => toggleConnect(int.id)}
-                    className="px-3 py-1.5 rounded-lg border border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors"
+                    className="px-3 py-1.5 rounded-lg border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors cursor-pointer h-auto"
                     style={{ fontSize: "0.75rem", color: "#B91C1C" }}
                   >
                     Disconnect
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -1400,10 +1433,11 @@ function IntegrationsTab() {
                     {int.description}
                   </p>
                 </div>
-                <button
+                <Button
+                  variant="outline"
                   onClick={() => toggleConnect(int.id)}
                   disabled={!!syncing}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#0F766E] hover:bg-[#ECFDF5] transition-colors disabled:opacity-50 flex-shrink-0"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-[#0F766E] hover:bg-[#ECFDF5] transition-colors disabled:opacity-50 flex-shrink-0 cursor-pointer h-auto"
                   style={{ fontSize: "0.75rem", color: "#0F766E" }}
                 >
                   {syncing === int.id ? (
@@ -1412,7 +1446,7 @@ function IntegrationsTab() {
                     <Plus size={12} />
                   )}
                   Connect
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -1445,7 +1479,7 @@ function APIKeyField() {
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 relative">
-        <input
+        <Input
           readOnly
           value={
             visible ? key : key.replace(/./g, "•").substring(0, 32) + "..."
@@ -1453,24 +1487,27 @@ function APIKeyField() {
           className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] font-mono outline-none"
           style={{ fontSize: "0.75rem", color: "#64748B" }}
         />
-        <button
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={() => setVisible(!visible)}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer h-auto w-auto p-0 hover:bg-transparent"
         >
           {visible ? (
             <EyeOff size={13} style={{ color: "#94A3B8" }} />
           ) : (
             <Eye size={13} style={{ color: "#94A3B8" }} />
           )}
-        </button>
+        </Button>
       </div>
-      <button
+      <Button
+        variant="outline"
         onClick={handleCopy}
-        className="p-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors"
+        className="p-2 rounded-lg border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors h-auto w-auto cursor-pointer"
         title="Copy key"
       >
         <Copy size={14} style={{ color: "#64748B" }} />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -1522,29 +1559,6 @@ function FieldGroup({
   );
 }
 
-function Input({
-  value,
-  onChange,
-  type = "text",
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  placeholder?: string;
-}) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
-      style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-    />
-  );
-}
-
 function ToggleSwitch({
   checked,
   onChange,
@@ -1561,9 +1575,10 @@ function ToggleSwitch({
   const dot = small ? 14 : 18;
   const pad = 2;
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => onChange(!checked)}
-      className="rounded-full transition-colors flex-shrink-0 relative"
+      className="rounded-full transition-colors flex-shrink-0 relative p-0 hover:bg-transparent cursor-pointer"
       style={{
         width: w,
         height: h,
@@ -1581,7 +1596,7 @@ function ToggleSwitch({
           left: checked ? w - dot - pad : pad,
         }}
       />
-    </button>
+    </Button>
   );
 }
 
@@ -1646,20 +1661,21 @@ function ConfirmDialog({
           </div>
         </div>
         <div className="flex items-center justify-end gap-2">
-          <button
+          <Button
+            variant="outline"
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem", color: "#64748B" }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto"
             style={{ background: "#B91C1C", fontSize: "0.8125rem" }}
           >
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

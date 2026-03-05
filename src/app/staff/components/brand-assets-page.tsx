@@ -38,6 +38,9 @@ import {
   CircleAlert,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
+import { Textarea } from "@/app/shared/components/ui/textarea";
 import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
 import {
   INITIAL_SKUS,
@@ -179,9 +182,10 @@ function TabButton({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onClick}
-      className="flex items-center gap-2 px-4 py-3 transition-colors relative"
+      className={`flex items-center gap-2 px-4 py-3 transition-colors relative rounded-none hover:bg-transparent h-auto cursor-pointer ${active ? "" : "hover:text-[#0F172A]"}`}
       style={{ fontSize: "0.8125rem", color: active ? "#7D152D" : "#64748B" }}
     >
       {icon}
@@ -210,7 +214,7 @@ function TabButton({
           style={{ background: "#7D152D" }}
         />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -368,7 +372,7 @@ function ProductLibrary({
               className="absolute left-3 top-1/2 -translate-y-1/2"
               style={{ color: "#94A3B8" }}
             />
-            <input
+            <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, SKU, or description..."
@@ -376,12 +380,14 @@ function ProductLibrary({
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             />
             {search && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-auto w-auto p-0 hover:bg-transparent cursor-pointer"
               >
                 <X size={12} style={{ color: "#94A3B8" }} />
-              </button>
+              </Button>
             )}
           </div>
 
@@ -415,39 +421,42 @@ function ProductLibrary({
 
           {/* View toggle */}
           <div className="inline-flex rounded-lg border border-[#E2E8F0] overflow-hidden">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setViewMode("grid")}
-              className="p-2 transition-colors"
+              className="p-2 transition-colors h-auto rounded-none cursor-pointer"
               style={{
                 background: viewMode === "grid" ? "#7D152D" : "#fff",
                 color: viewMode === "grid" ? "#fff" : "#94A3B8",
               }}
             >
               <LayoutGrid size={14} />
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => setViewMode("list")}
-              className="p-2 transition-colors"
+              className="p-2 transition-colors h-auto rounded-none cursor-pointer"
               style={{
                 background: viewMode === "list" ? "#7D152D" : "#fff",
                 color: viewMode === "list" ? "#fff" : "#94A3B8",
               }}
             >
               <List size={14} />
-            </button>
+            </Button>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            variant="outline"
             onClick={() => setShowAutoUpload(true)}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
             style={{ fontSize: "0.8125rem", color: "#0F172A" }}
           >
             <Sparkles size={14} style={{ color: "#0F766E" }} />
             Auto Upload
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setIsCreating(true);
               setEditingSku({
@@ -464,12 +473,12 @@ function ProductLibrary({
                 updatedAt: new Date().toISOString().split("T")[0] ?? "",
               });
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
             style={{ background: "#7D152D", fontSize: "0.8125rem" }}
           >
             <Plus size={14} />
             Add Product
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -499,14 +508,16 @@ function ProductLibrary({
                 onRemove={() => setStatusFilter("all")}
               />
             )}
-            <button
+            <Button
+              variant="ghost"
+              size="icon-xs"
               onClick={clearFilters}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-[#FEF2F2] transition-colors"
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-[#FEF2F2] transition-colors h-auto w-auto cursor-pointer"
               style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
             >
               <XCircle size={10} />
               Clear all
-            </button>
+            </Button>
           </>
         )}
       </div>
@@ -523,13 +534,14 @@ function ProductLibrary({
             No products match your filters.
           </p>
           {hasFilters && (
-            <button
+            <Button
+              variant="ghost"
               onClick={clearFilters}
-              className="mt-2 inline-flex items-center gap-1"
+              className="mt-2 inline-flex items-center gap-1 h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#7D152D" }}
             >
               <RotateCcw size={12} /> Clear filters
-            </button>
+            </Button>
           )}
         </div>
       ) : viewMode === "grid" ? (
@@ -624,12 +636,14 @@ function FilterChip({
       style={{ fontSize: "0.6875rem", color: "#64748B" }}
     >
       {label}
-      <button
+      <Button
+        variant="ghost"
+        size="icon-xs"
         onClick={onRemove}
-        className="hover:text-[#0F172A] transition-colors"
+        className="hover:text-[#0F172A] transition-colors h-auto w-auto p-0"
       >
         <X size={10} />
-      </button>
+      </Button>
     </span>
   );
 }
@@ -667,24 +681,28 @@ function SKUGridCard({
           {st!.label}
         </span>
         <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={(e) => {
               e.stopPropagation();
               onEdit();
             }}
-            className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition-colors"
+            className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition-colors cursor-pointer"
           >
             <Pencil size={12} style={{ color: "#0F172A" }} />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={(e) => {
               e.stopPropagation();
               onDelete();
             }}
-            className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition-colors"
+            className="w-7 h-7 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow transition-colors cursor-pointer"
           >
             <Trash2 size={12} style={{ color: "#B91C1C" }} />
-          </button>
+          </Button>
         </div>
       </div>
       <div className="p-3.5">
@@ -845,24 +863,28 @@ function SKUListView({
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEdit(sku);
                         }}
-                        className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors"
+                        className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors h-auto w-auto cursor-pointer"
                       >
                         <Pencil size={13} style={{ color: "#64748B" }} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
                         onClick={(e) => {
                           e.stopPropagation();
                           onDelete(sku);
                         }}
-                        className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors"
+                        className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors h-auto w-auto cursor-pointer"
                       >
                         <Trash2 size={13} style={{ color: "#B91C1C" }} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -907,12 +929,14 @@ function SKUDetailOverlay({
               alt={sku.productName}
               className="w-full h-full object-cover"
             />
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={onClose}
-              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center transition-colors"
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center transition-colors h-auto cursor-pointer"
             >
               <X size={16} style={{ color: "#fff" }} />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -943,12 +967,14 @@ function SKUDetailOverlay({
               </h3>
             </div>
             {!sku.imageUrl && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={onClose}
-                className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+                className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
               >
                 <X size={16} style={{ color: "#64748B" }} />
-              </button>
+              </Button>
             )}
           </div>
 
@@ -997,28 +1023,31 @@ function SKUDetailOverlay({
 
           {/* Actions */}
           <div className="flex items-center gap-2 pt-4 border-t border-[#E2E8F0]">
-            <button
+            <Button
+              variant="outline"
               onClick={onEdit}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             >
               <Pencil size={13} /> Edit
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={onDelete}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#B91C1C" }}
             >
               <Trash2 size={13} /> Remove
-            </button>
+            </Button>
             <div className="flex-1" />
-            <button
+            <Button
+              variant="ghost"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg hover:bg-[#F1F5F9] transition-colors"
+              className="px-4 py-2 rounded-lg hover:bg-[#F1F5F9] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#64748B" }}
             >
               Close
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -1072,17 +1101,19 @@ function SKUEditModal({
           <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
             {isNew ? "Add Product" : "Edit Product"}
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
           >
             <X size={16} style={{ color: "#64748B" }} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <FormField label="Product Name *">
-            <input
+            <Input
               value={form.productName}
               onChange={(e) => update("productName", e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
@@ -1093,7 +1124,7 @@ function SKUEditModal({
 
           <div className="grid grid-cols-2 gap-3">
             <FormField label="SKU Code *">
-              <input
+              <Input
                 value={form.skuCode}
                 onChange={(e) => update("skuCode", e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D] font-mono"
@@ -1119,7 +1150,7 @@ function SKUEditModal({
           </div>
 
           <FormField label="Description">
-            <textarea
+            <Textarea
               value={form.description}
               onChange={(e) => update("description", e.target.value)}
               rows={3}
@@ -1131,7 +1162,7 @@ function SKUEditModal({
 
           <div className="grid grid-cols-3 gap-3">
             <FormField label="Unit Size">
-              <input
+              <Input
                 value={form.unitSize}
                 onChange={(e) => update("unitSize", e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
@@ -1140,7 +1171,7 @@ function SKUEditModal({
               />
             </FormField>
             <FormField label="ABV">
-              <input
+              <Input
                 value={form.abv}
                 onChange={(e) => update("abv", e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
@@ -1163,7 +1194,7 @@ function SKUEditModal({
           </div>
 
           <FormField label="Image URL">
-            <input
+            <Input
               value={form.imageUrl}
               onChange={(e) => update("imageUrl", e.target.value)}
               className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
@@ -1173,21 +1204,22 @@ function SKUEditModal({
           </FormField>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <button
+            <Button
+              variant="outline"
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+              className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#64748B" }}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+              className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
               style={{ background: "#7D152D", fontSize: "0.8125rem" }}
             >
               {isNew ? "Add Product" : "Save Changes"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -1236,20 +1268,21 @@ function DeleteConfirmDialog({
           </div>
         </div>
         <div className="flex items-center justify-end gap-2">
-          <button
+          <Button
+            variant="outline"
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
             style={{ fontSize: "0.8125rem", color: "#64748B" }}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
             style={{ background: "#B91C1C", fontSize: "0.8125rem" }}
           >
             Remove
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -1387,12 +1420,14 @@ function AutoUploadDrawer({
             <Sparkles size={16} style={{ color: "#0F766E" }} />
             <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Auto Upload</h3>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-1.5 hover:bg-[#F1F5F9] rounded-md transition-colors"
+            className="p-1.5 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
           >
             <X size={16} style={{ color: "#64748B" }} />
-          </button>
+          </Button>
         </div>
 
         <div className="p-6">
@@ -1578,9 +1613,11 @@ function AutoUploadDrawer({
                       {/* Row 1: checkbox + name + confidence */}
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
                             onClick={() => toggleItem(idx)}
-                            className="flex-shrink-0 mt-0.5"
+                            className="flex-shrink-0 mt-0.5 h-auto w-auto p-0 hover:bg-transparent cursor-pointer"
                           >
                             {isSelected ? (
                               <CheckCircle2
@@ -1593,7 +1630,7 @@ function AutoUploadDrawer({
                                 style={{ color: "#CBD5E1" }}
                               />
                             )}
-                          </button>
+                          </Button>
                           <div className="flex-1 min-w-0">
                             <InlineEditInput
                               value={item.productName}
@@ -1670,26 +1707,27 @@ function AutoUploadDrawer({
               </div>
 
               <div className="flex items-center justify-between">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     setStage("upload");
                     setFileName(null);
                     setAiResults([]);
                   }}
-                  className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-[#F1F5F9] transition-colors"
+                  className="flex items-center gap-1 px-3 py-2 rounded-lg hover:bg-[#F1F5F9] transition-colors h-auto cursor-pointer"
                   style={{ fontSize: "0.8125rem", color: "#64748B" }}
                 >
                   <RotateCcw size={13} />
                   Upload different file
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleConfirm}
                   disabled={selected.size === 0}
-                  className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-50 h-auto cursor-pointer"
                   style={{ background: "#0F766E", fontSize: "0.8125rem" }}
                 >
                   Import {selected.size} product{selected.size !== 1 ? "s" : ""}
-                </button>
+                </Button>
               </div>
             </div>
           )}
@@ -1724,7 +1762,7 @@ function InlineEditInput({
   const [editing, setEditing] = useState(false);
   if (editing) {
     return (
-      <input
+      <Input
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -1732,7 +1770,7 @@ function InlineEditInput({
         onKeyDown={(e) => {
           if (e.key === "Enter") setEditing(false);
         }}
-        className="w-full px-1.5 py-0.5 rounded border outline-none"
+        className="w-full px-1.5 py-0.5 rounded border outline-none h-auto shadow-none"
         style={{
           ...style,
           borderColor: warn ? "#D97706" : "#0F766E",
@@ -1743,9 +1781,10 @@ function InlineEditInput({
     );
   }
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => setEditing(true)}
-      className="text-left w-full px-1.5 py-0.5 rounded transition-colors hover:bg-[#F1F5F9] group/ie"
+      className="text-left w-full px-1.5 py-0.5 rounded transition-colors hover:bg-[#F1F5F9] group/ie h-auto justify-start font-normal cursor-pointer"
       style={{
         ...style,
         borderLeft: warn ? "2px solid #D97706" : "2px solid transparent",
@@ -1760,7 +1799,7 @@ function InlineEditInput({
           style={{ color: "#D97706" }}
         />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -1776,13 +1815,13 @@ function InlineEditTextarea({
   const [editing, setEditing] = useState(false);
   if (editing) {
     return (
-      <textarea
+      <Textarea
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onBlur={() => setEditing(false)}
         rows={3}
-        className="w-full px-2 py-1 rounded border outline-none resize-none"
+        className="w-full px-2 py-1 rounded border outline-none resize-none shadow-none"
         style={{
           fontSize: "0.75rem",
           color: "#64748B",
@@ -1793,9 +1832,10 @@ function InlineEditTextarea({
     );
   }
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => setEditing(true)}
-      className="text-left w-full px-2 py-1 rounded transition-colors hover:bg-[#F1F5F9]"
+      className="text-left w-full px-2 py-1 rounded transition-colors hover:bg-[#F1F5F9] h-auto justify-start font-normal cursor-pointer"
       style={{
         fontSize: "0.75rem",
         color: "#94A3B8",
@@ -1811,7 +1851,7 @@ function InlineEditTextarea({
           style={{ color: "#D97706" }}
         />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -1855,9 +1895,10 @@ function InlineEditSelect({
     );
   }
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={() => setEditing(true)}
-      className="text-left w-full px-2 py-0.5 rounded-md bg-[#F1F5F9] transition-colors hover:bg-[#E2E8F0]"
+      className="text-left w-full px-2 py-0.5 rounded-md bg-[#F1F5F9] transition-colors hover:bg-[#E2E8F0] h-auto justify-start font-normal cursor-pointer"
       style={{
         fontSize: "0.6875rem",
         color: "#64748B",
@@ -1873,7 +1914,7 @@ function InlineEditSelect({
           style={{ color: "#D97706" }}
         />
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -1997,7 +2038,7 @@ function HelpResources({
               className="absolute left-3 top-1/2 -translate-y-1/2"
               style={{ color: "#94A3B8" }}
             />
-            <input
+            <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search FAQs..."
@@ -2005,12 +2046,14 @@ function HelpResources({
               style={{ fontSize: "0.8125rem", color: "#0F172A" }}
             />
             {search && (
-              <button
+              <Button
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-auto w-auto p-0 cursor-pointer"
               >
                 <X size={12} style={{ color: "#94A3B8" }} />
-              </button>
+              </Button>
             )}
           </div>
           <select
@@ -2029,9 +2072,10 @@ function HelpResources({
 
           {/* #8 — Expand / Collapse All */}
           {filtered.length > 0 && (
-            <button
+            <Button
+              variant="outline"
               onClick={toggleExpandAll}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#64748B" }}
             >
               {allExpanded ? (
@@ -2040,16 +2084,17 @@ function HelpResources({
                 <ChevronsUpDown size={14} />
               )}
               {allExpanded ? "Collapse All" : "Expand All"}
-            </button>
+            </Button>
           )}
         </div>
 
         <div className="flex items-center gap-2">
           {unpushedCount > 0 && (
-            <button
+            <Button
+              variant="outline"
               onClick={handlePushAll}
               disabled={pushingId === "all"}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[#0F766E] hover:bg-[#ECFDF5] transition-colors disabled:opacity-60"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-[#0F766E] hover:bg-[#ECFDF5] transition-colors disabled:opacity-60 h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#0F766E" }}
             >
               {pushingId === "all" ? (
@@ -2058,9 +2103,9 @@ function HelpResources({
                 <Send size={14} />
               )}
               Push All ({unpushedCount})
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             onClick={() => {
               setIsCreating(true);
               setEditingFaq({
@@ -2073,12 +2118,12 @@ function HelpResources({
                 version: 1,
               });
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
             style={{ background: "#7D152D", fontSize: "0.8125rem" }}
           >
             <Plus size={14} />
             Add FAQ
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -2118,9 +2163,10 @@ function HelpResources({
                 className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden transition-shadow hover:shadow-sm"
               >
                 {/* Question row */}
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => toggleExpanded(faq.id)}
-                  className="w-full flex items-center gap-3 px-5 py-4 text-left"
+                  className="w-full flex items-center gap-3 px-5 py-4 text-left h-auto justify-start font-normal cursor-pointer hover:bg-transparent"
                 >
                   <ChevronRight
                     size={14}
@@ -2165,7 +2211,7 @@ function HelpResources({
                       />
                     )}
                   </div>
-                </button>
+                </Button>
 
                 {/* Expanded content */}
                 {isExpanded && (
@@ -2193,13 +2239,14 @@ function HelpResources({
                       )}
                       <div className="flex items-center gap-1 ml-auto">
                         {needsPush && (
-                          <button
+                          <Button
+                            variant="ghost"
                             onClick={(e) => {
                               e.stopPropagation();
                               handlePush(faq.id);
                             }}
                             disabled={!!pushingId}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#ECFDF5] transition-colors disabled:opacity-60"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#ECFDF5] transition-colors disabled:opacity-60 h-auto cursor-pointer"
                             style={{ fontSize: "0.75rem", color: "#0F766E" }}
                           >
                             {pushingId === faq.id ? (
@@ -2208,29 +2255,31 @@ function HelpResources({
                               <Send size={12} />
                             )}
                             Push
-                          </button>
+                          </Button>
                         )}
-                        <button
+                        <Button
+                          variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsCreating(false);
                             setEditingFaq(faq);
                           }}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors h-auto cursor-pointer"
                           style={{ fontSize: "0.75rem", color: "#64748B" }}
                         >
                           <Pencil size={12} /> Edit
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="ghost"
                           onClick={(e) => {
                             e.stopPropagation();
                             setDeletingFaq(faq);
                           }}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#FEF2F2] transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-[#FEF2F2] transition-colors h-auto cursor-pointer"
                           style={{ fontSize: "0.75rem", color: "#B91C1C" }}
                         >
                           <Trash2 size={12} /> Remove
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -2344,12 +2393,14 @@ function FAQEditModal({
           <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
             {isNew ? "Add FAQ" : "Edit FAQ"}
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors"
+            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
           >
             <X size={16} style={{ color: "#64748B" }} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -2372,7 +2423,7 @@ function FAQEditModal({
           </FormField>
 
           <FormField label="Question *">
-            <input
+            <Input
               value={form.question}
               onChange={(e) =>
                 setForm((p) => ({ ...p, question: e.target.value }))
@@ -2415,10 +2466,11 @@ function FAQEditModal({
                   onClick={() => insertLinePrefix("1) ")}
                 />
                 <div className="flex-1" />
-                <button
+                <Button
+                  variant="ghost"
                   type="button"
                   onClick={() => setShowPreview(!showPreview)}
-                  className="flex items-center gap-1 px-2 py-1 rounded-md transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 rounded-md transition-colors h-auto w-auto cursor-pointer"
                   style={{
                     fontSize: "0.625rem",
                     color: showPreview ? "#0F766E" : "#94A3B8",
@@ -2427,7 +2479,7 @@ function FAQEditModal({
                 >
                   <Eye size={11} />
                   Preview
-                </button>
+                </Button>
               </div>
 
               {showPreview ? (
@@ -2449,14 +2501,14 @@ function FAQEditModal({
                   )}
                 </div>
               ) : (
-                <textarea
+                <Textarea
                   ref={answerRef}
                   value={form.answer}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, answer: e.target.value }))
                   }
                   rows={8}
-                  className="w-full px-3 py-2 outline-none resize-none"
+                  className="w-full px-3 py-2 outline-none resize-none shadow-none"
                   style={{ fontSize: "0.8125rem", lineHeight: 1.6 }}
                   placeholder="Provide a clear, detailed answer..."
                 />
@@ -2470,21 +2522,22 @@ function FAQEditModal({
           </p>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <button
+            <Button
+              variant="outline"
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+              className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem", color: "#64748B" }}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90"
+              className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
               style={{ background: "#7D152D", fontSize: "0.8125rem" }}
             >
               {isNew ? "Create FAQ" : "Save Changes"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -2504,15 +2557,17 @@ function ToolbarBtn({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       type="button"
       onClick={onClick}
       title={title}
-      className="p-1.5 rounded-md hover:bg-[#E2E8F0] transition-colors"
+      className="p-1.5 rounded-md hover:bg-[#E2E8F0] transition-colors h-auto w-auto cursor-pointer"
       style={{ color: "#64748B" }}
     >
       {icon}
-    </button>
+    </Button>
   );
 }
 

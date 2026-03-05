@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { AuthLayout } from "./auth-layout";
 import { AuthInput } from "./auth-input";
 import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Button } from "@/app/shared/components/ui/button";
 
 export function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -53,16 +54,15 @@ export function ForgotPassword() {
             Click the link in the email to reset your password. If you don't see
             it, check your spam folder.
           </p>
-          <button
+          <Button
             onClick={() => {
               setSent(false);
               setEmail("");
             }}
-            className="mb-4 px-6 py-2.5 rounded-lg text-white transition-all hover:opacity-90"
-            style={{ background: "#7D152D", fontSize: "0.9375rem" }}
+            className="mb-4 px-6 h-11 cursor-pointer"
           >
             Resend email
-          </button>
+          </Button>
           <Link
             to="/"
             className="flex items-center gap-1.5 hover:underline"
@@ -92,15 +92,14 @@ export function ForgotPassword() {
           autoComplete="email"
         />
 
-        <button
+        <Button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg text-white transition-all hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
-          style={{ background: "#7D152D", fontSize: "0.9375rem" }}
+          className="w-full h-11 cursor-pointer mt-2"
         >
           {loading && <Loader2 size={18} className="animate-spin" />}
           {loading ? "Sending..." : "Send reset link"}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-8 text-center">

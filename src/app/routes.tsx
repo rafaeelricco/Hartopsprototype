@@ -18,7 +18,6 @@ import { PrivacyPolicyPage } from "./ops/components/privacy-policy";
 import { NotFound } from "./ops/components/not-found";
 
 // ---- STAFF IMPORTS ----
-import { SignIn as StaffSignIn } from "./staff/components/sign-in";
 import { SignUp as StaffSignUp } from "./staff/components/sign-up";
 import { ForgotPassword as StaffForgotPassword } from "./staff/components/forgot-password";
 import { DashboardLayout as StaffDashboardLayout } from "./staff/components/dashboard-layout";
@@ -56,7 +55,7 @@ export const router = createBrowserRouter([
   },
 
   // ---- STAFF PLATFORM (/staff) ----
-  { path: "/staff", Component: StaffSignIn },
+  { path: "/staff", Component: OpsSignIn },
   { path: "/staff/sign-up", Component: StaffSignUp },
   { path: "/staff/forgot-password", Component: StaffForgotPassword },
   {
