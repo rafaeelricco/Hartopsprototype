@@ -1608,7 +1608,7 @@ export function OrganizationDetailPage() {
         <Button
           variant="ghost"
           onClick={() => navigate("/ops/dashboard/organizations")}
-          className="-ml-3 mb-3 text-muted-foreground hover:text-foreground cursor-pointer"
+          className="-ml-3 mb-3"
           style={{ fontSize: "0.8125rem" }}
         >
           <ArrowLeft className="size-4 mr-1" /> Organizations
@@ -1665,12 +1665,11 @@ export function OrganizationDetailPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="overview">
-        <TabsList className="border-b border-border bg-transparent rounded-none w-full justify-start gap-0 h-auto p-0">
+        <TabsList>
           {["Overview", "Campaigns", "Events", "Team"].map((tab) => (
             <TabsTrigger
               key={tab}
               value={tab.toLowerCase()}
-              className="rounded-none border-b-2 border-transparent bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-[#7D152D] data-[state=active]:text-[#7D152D] data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-[#7D152D] hover:text-foreground px-4 py-2.5 cursor-pointer"
               style={{ fontSize: "0.8125rem" }}
             >
               {tab}

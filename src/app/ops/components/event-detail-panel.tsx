@@ -261,13 +261,9 @@ export function EventDetailPanel({
 
         {/* Tabs */}
         <Tabs defaultValue="overview" className="flex-1 min-h-0 flex flex-col">
-          <TabsList className="shrink-0 border-b border-border bg-transparent rounded-none w-full justify-start gap-0 h-auto p-0 px-6">
+          <TabsList className="shrink-0 px-6">
             {["Overview", "Attendance", "Details"].map((tab) => (
-              <TabsTrigger
-                key={tab}
-                value={tab.toLowerCase()}
-                className="rounded-none border-b-2 border-transparent bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-[#7D152D] data-[state=active]:text-[#7D152D] data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-[#7D152D] hover:text-foreground px-4 py-2.5 cursor-pointer"
-              >
+              <TabsTrigger key={tab} value={tab.toLowerCase()}>
                 {tab}
               </TabsTrigger>
             ))}

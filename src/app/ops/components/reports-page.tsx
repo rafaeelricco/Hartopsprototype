@@ -617,12 +617,11 @@ export function ReportsPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-transparent border-b border-border rounded-none w-full justify-start h-auto p-0 gap-0">
+        <TabsList>
           {["Dashboard", "Data Quality"].map((tab) => (
             <TabsTrigger
               key={tab}
               value={tab.toLowerCase().replace(" ", "-")}
-              className="rounded-none border-b-2 border-transparent bg-transparent data-[state=active]:bg-transparent data-[state=active]:border-[#7D152D] data-[state=active]:text-[#7D152D] data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:border-[#7D152D] hover:text-foreground px-4 py-2.5 cursor-pointer"
               style={{ fontSize: "0.8125rem" }}
             >
               {tab}
