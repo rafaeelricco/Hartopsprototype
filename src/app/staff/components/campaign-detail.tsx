@@ -118,16 +118,6 @@ export function CampaignDetail() {
 
   const campStatus = STATUS_LABELS[campaign.status] ?? STATUS_LABELS["draft"];
 
-  // Event stats (from all events, not filtered)
-  const draftEvents = allEvents.filter((e) => e.status === "draft").length;
-  const scheduledEvents = allEvents.filter(
-    (e) => e.status === "scheduled",
-  ).length;
-  const activeEvents = allEvents.filter((e) => e.status === "active").length;
-  const completedEvents = allEvents.filter(
-    (e) => e.status === "completed",
-  ).length;
-
   // Gap #7: Use campaign.eventCount for total, actual array for detail
   const totalEventCount = Math.max(campaign.eventCount, allEvents.length);
   const showingSubset = allEvents.length < totalEventCount;
@@ -193,73 +183,8 @@ export function CampaignDetail() {
               </span>
             </div>
           </div>
-
-          {/* Create Event CTA */}
-          <Button
-            onClick={() => setWizardOpen(true)}
-            className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 flex-shrink-0 cursor-pointer"
-            style={{ background: "#7D152D", fontSize: "0.875rem" }}
-          >
-            <Plus size={16} strokeWidth={2.5} />
-            Create Event
-          </Button>
         </div>
       </div>
-
-      {/* ---------------------------------------------------------------- */}
-      {/* Event stats row                                                  */}
-      {/* ---------------------------------------------------------------- */}
-      {allEvents.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-          {[
-            {
-              label: "Draft",
-              count: draftEvents,
-              color: "#64748B",
-              key: "draft" as const,
-            },
-            {
-              label: "Scheduled",
-              count: scheduledEvents,
-              color: "#1D4ED8",
-              key: "scheduled" as const,
-            },
-            {
-              label: "Active",
-              count: activeEvents,
-              color: "#0F766E",
-              key: "active" as const,
-            },
-            {
-              label: "Completed",
-              count: completedEvents,
-              color: "#B91C1C",
-              key: "completed" as const,
-            },
-          ].map((s) => (
-            <Button
-              key={s.label}
-              variant="ghost"
-              onClick={() =>
-                setStatusFilter(statusFilter === s.key ? "all" : s.key)
-              }
-              className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm cursor-pointer h-auto flex flex-col items-start ${
-                statusFilter === s.key
-                  ? "border-[#7D152D] ring-1 ring-[#7D152D]/20 hover:bg-white"
-                  : "border-[#E2E8F0] hover:bg-accent/50"
-              }`}
-            >
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>
-              <p
-                style={{ fontSize: "1.25rem", color: s.color }}
-                className="mt-0.5"
-              >
-                {s.count}
-              </p>
-            </Button>
-          ))}
-        </div>
-      )}
 
       {/* ---------------------------------------------------------------- */}
       {/* Events list                                                      */}

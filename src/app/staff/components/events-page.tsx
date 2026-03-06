@@ -191,54 +191,6 @@ export function EventsPage() {
         }
       />
 
-      {/* Stat summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {(
-          [
-            {
-              key: "draft" as const,
-              label: "Draft / Editable",
-              color: "#64748B",
-            },
-            { key: "scheduled" as const, label: "Scheduled", color: "#1D4ED8" },
-            {
-              key: "active" as const,
-              label: "Active / Live",
-              color: "#0F766E",
-            },
-            {
-              key: "completed" as const,
-              label: "Completed / Locked",
-              color: "#B91C1C",
-            },
-          ] as const
-        ).map((s) => {
-          const count = events.filter((e) => e.status === s.key).length;
-          return (
-            <Button
-              key={s.key}
-              variant="ghost"
-              onClick={() =>
-                setStatusFilter(statusFilter === s.key ? "all" : s.key)
-              }
-              className={`bg-white rounded-xl border px-4 py-3 text-left transition-all hover:shadow-sm cursor-pointer h-auto flex flex-col items-start ${
-                statusFilter === s.key
-                  ? "border-[#7D152D] ring-1 ring-[#7D152D]/20 hover:bg-white"
-                  : "border-[#E2E8F0] hover:bg-[#F8FAFC]"
-              }`}
-            >
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{s.label}</p>
-              <p
-                style={{ fontSize: "1.25rem", color: s.color }}
-                className="mt-0.5"
-              >
-                {count}
-              </p>
-            </Button>
-          );
-        })}
-      </div>
-
       {/* Filters row */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
         {/* Search */}
