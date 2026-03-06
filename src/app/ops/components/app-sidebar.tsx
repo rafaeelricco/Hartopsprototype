@@ -7,11 +7,7 @@ import {
   CalendarDays,
   FileBarChart,
   Settings,
-  LifeBuoy,
   GalleryVerticalEnd,
-  BadgeCheck,
-  CreditCard,
-  Bell,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -68,23 +64,8 @@ const data = {
       url: "/ops/dashboard/reports",
       icon: FileBarChart,
     },
-    {
-      name: "Get Help",
-      url: "/ops/dashboard/help",
-      icon: LifeBuoy,
-    },
   ],
 };
-
-const opsMenuGroups = [
-  {
-    items: [
-      { label: "Account", icon: BadgeCheck },
-      { label: "Billing", icon: CreditCard },
-      { label: "Notifications", icon: Bell },
-    ],
-  },
-];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
@@ -99,11 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser
-          user={data.user}
-          menuGroups={opsMenuGroups}
-          onLogout={() => navigate("/ops")}
-        />
+        <NavUser user={data.user} onLogout={() => navigate("/ops")} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

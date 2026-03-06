@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router";
 import {
   CalendarDays,
   Search,
@@ -9,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Eye,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -21,7 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../shared/components/ui/select";
-import { EventDetailPanel } from "./event-detail-panel";
 import { Input } from "@/app/shared/components/ui/input";
 
 /* ------------------------------------------------------------------ */
@@ -49,7 +48,7 @@ export interface EventRecord {
   createdAt: string;
 }
 
-const MOCK_EVENTS: EventRecord[] = [
+export const MOCK_EVENTS: EventRecord[] = [
   {
     id: "EVT-3001",
     name: "Annual Charity Gala",
@@ -438,13 +437,12 @@ const PAGE_SIZE = 8;
 /* ------------------------------------------------------------------ */
 
 export function EventsPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [orgFilter, setOrgFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
-  const [selectedEvent, setSelectedEvent] = useState<EventRecord | null>(null);
-  const [panelOpen, setPanelOpen] = useState(false);
 
   /* ---- Computed stats ---- */
   const today = "Mar 4, 2026";
@@ -506,11 +504,6 @@ export function EventsPage() {
     setOrgFilter("all");
     setTypeFilter("all");
     setSearch("");
-  };
-
-  const openDetail = (event: EventRecord) => {
-    setSelectedEvent(event);
-    setPanelOpen(true);
   };
 
   return (
@@ -637,19 +630,16 @@ export function EventsPage() {
                     "Date & Time",
                     "Attendees",
                     "Status",
-                    "",
                   ].map((h) => (
                     <th
                       key={h}
                       className="text-left px-5 py-3 text-muted-foreground"
                       style={{ fontSize: "0.75rem", fontWeight: 500 }}
                     >
-                      {h && (
-                        <span className="inline-flex items-center gap-1">
-                          {h}
-                          {h !== "" && <ArrowUpDown className="size-3" />}
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1">
+                        {h}
+                        <ArrowUpDown className="size-3" />
+                      </span>
                     </th>
                   ))}
                 </tr>
@@ -657,7 +647,7 @@ export function EventsPage() {
               <tbody>
                 {paged.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-12 text-center">
+                    <td colSpan={6} className="px-5 py-12 text-center">
                       <p
                         className="text-muted-foreground"
                         style={{ fontSize: "0.875rem" }}
@@ -670,7 +660,9 @@ export function EventsPage() {
                   paged.map((event) => (
                     <tr
                       key={event.id}
-                      onClick={() => openDetail(event)}
+                      onClick={() =>
+                        navigate(`/ops/dashboard/events/${event.id}`)
+                      }
                       className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     >
                       <td className="px-5 py-3">
@@ -752,19 +744,6 @@ export function EventsPage() {
                           {event.status}
                         </Badge>
                       </td>
-                      <td className="px-5 py-3">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-muted-foreground hover:text-foreground cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openDetail(event);
-                          }}
-                        >
-                          <Eye className="size-4" />
-                        </Button>
-                      </td>
                     </tr>
                   ))
                 )}
@@ -825,13 +804,6 @@ export function EventsPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Event Detail Side Panel */}
-      <EventDetailPanel
-        event={selectedEvent}
-        open={panelOpen}
-        onOpenChange={setPanelOpen}
-      />
     </div>
   );
 }

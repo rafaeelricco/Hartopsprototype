@@ -40,7 +40,7 @@ import { Progress } from "../../shared/components/ui/progress";
 /* Mock data — Organizations                                           */
 /* ------------------------------------------------------------------ */
 
-interface Organization {
+export interface Organization {
   id: number;
   name: string;
   industry: string;
@@ -59,7 +59,7 @@ interface Organization {
   description: string;
 }
 
-const ORGANIZATIONS: Record<number, Organization> = {
+export const ORGANIZATIONS: Record<number, Organization> = {
   1: {
     id: 1,
     name: "Acme Corp",
@@ -234,7 +234,7 @@ const ORG_QUALITY: Record<number, OrgQuality> = {
 /* Mock data — Per-org campaigns (change #5)                           */
 /* ------------------------------------------------------------------ */
 
-interface Campaign {
+export interface Campaign {
   id: number;
   name: string;
   status: string;
@@ -244,7 +244,7 @@ interface Campaign {
   progress: number;
 }
 
-const ORG_CAMPAIGNS: Record<number, Campaign[]> = {
+export const ORG_CAMPAIGNS: Record<number, Campaign[]> = {
   1: [
     {
       id: 1,
@@ -564,7 +564,7 @@ const ORG_CAMPAIGNS: Record<number, Campaign[]> = {
 /* Mock data — Per-org events (change #5)                              */
 /* ------------------------------------------------------------------ */
 
-interface OrgEvent {
+export interface OrgEvent {
   id: number;
   name: string;
   type: string;
@@ -573,7 +573,7 @@ interface OrgEvent {
   status: string;
 }
 
-const ORG_EVENTS: Record<number, OrgEvent[]> = {
+export const ORG_EVENTS: Record<number, OrgEvent[]> = {
   1: [
     {
       id: 1,
@@ -1814,7 +1814,12 @@ export function OrganizationDetailPage() {
                       {campaigns.map((c) => (
                         <tr
                           key={c.id}
-                          className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                          onClick={() =>
+                            navigate(
+                              `/ops/dashboard/organizations/${org.id}/campaigns/${c.id}`,
+                            )
+                          }
+                          className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                         >
                           <td className="px-5 py-3">
                             <span
@@ -2153,7 +2158,7 @@ function InfoRow({
   );
 }
 
-function CampaignStatusBadge({ status }: { status: string }) {
+export function CampaignStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     Active: "bg-green-50 text-green-700 border-green-200",
     Completed: "bg-muted text-muted-foreground border-border",

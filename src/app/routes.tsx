@@ -9,7 +9,9 @@ import { AppShell as OpsAppShell } from "./ops/components/app-shell";
 import { Dashboard as OpsDashboard } from "./ops/components/dashboard";
 import { OrganizationsPage } from "./ops/components/organizations-page";
 import { OrganizationDetailPage } from "./ops/components/organization-detail-page";
+import { CampaignDetailPage } from "./ops/components/campaign-detail-page";
 import { EventsPage as OpsEventsPage } from "./ops/components/events-page";
+import { EventDetailPage as OpsEventDetailPage } from "./ops/components/event-detail-page";
 import { ReportsPage as OpsReportsPage } from "./ops/components/reports-page";
 import { SettingsPage as OpsSettingsPage } from "./ops/components/settings-page";
 import { HelpPage } from "./ops/components/help-page";
@@ -47,7 +49,12 @@ export const router = createBrowserRouter([
       { index: true, Component: OpsDashboard },
       { path: "organizations", Component: OrganizationsPage },
       { path: "organizations/:id", Component: OrganizationDetailPage },
+      {
+        path: "organizations/:id/campaigns/:campaignId",
+        Component: CampaignDetailPage,
+      },
       { path: "events", Component: OpsEventsPage },
+      { path: "events/:eventId", Component: OpsEventDetailPage },
       { path: "reports", Component: OpsReportsPage },
       { path: "settings", Component: OpsSettingsPage },
       { path: "help", Component: HelpPage },
