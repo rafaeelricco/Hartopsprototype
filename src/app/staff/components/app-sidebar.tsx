@@ -72,17 +72,25 @@ const data = {
   ],
 };
 
-const staffMenuGroups = [
-  {
-    items: [
-      { label: "Account", icon: BadgeCheck },
-      { label: "Notifications", icon: Bell },
-    ],
-  },
-];
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate();
+
+  const staffMenuGroups = [
+    {
+      items: [
+        {
+          label: "Account",
+          icon: BadgeCheck,
+          onClick: () => navigate("/staff/settings"),
+        },
+        {
+          label: "Notifications",
+          icon: Bell,
+          onClick: () => navigate("/staff/settings"),
+        },
+      ],
+    },
+  ];
 
   return (
     <Sidebar collapsible="icon" {...props}>
