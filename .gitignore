@@ -51,3 +51,6 @@ coverage/
 *.pem
 /tmp
 .cache/
+
+# Claude code
+.claude
