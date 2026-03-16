@@ -8,7 +8,7 @@
 
 - Clarify and refine task types:
   - Current Sales Tracking should change to function as a counter for products — this then calculates the profit.
-  Source: `CONTEXT.md 00:21:55 – "for that sales tracker, I would just want to be able to click off how many I think I I sold during the event."` + `00:11:14 – "So then that that creates a counter for each one."`
+    Source: `CONTEXT.md 00:21:55 – "for that sales tracker, I would just want to be able to click off how many I think I I sold during the event."` + `00:11:14 – "So then that that creates a counter for each one."`
 
 - Fold the current Sales Tracking AI shelf-recognition into "venue intelligence" / survey flows (photo now, process and fill in later).
   Source: `CONTEXT.md 00:16:11 – "I think we need to have rename it to survey as opposed to sales tracking."` + `00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later because if they have the picture, they can see what's there."`
@@ -19,11 +19,11 @@
 - Include brand info and "evaluation" content (PDF-equivalent) in-app:
   - Serving instructions, brand scripts, setup info.
   - Consider educator certification / pre-qualification per brand and use that in assignment/priority.
-  Source: `CONTEXT.md 00:27:25 – "What drinks are served? Information about the brand... having educators pre-qualified like knowing who's been been qualified for this so that they get priority um would be helpful... that is a sheet of paper that has all the brand information, the setup information."` + `00:46:25 – "when you go back to the mobile app, you can then communicate visually to the educator what the bottle looks like, not making any assumptions of that and we're utilizing the brand assets."`
+    Source: `CONTEXT.md 00:27:25 – "What drinks are served? Information about the brand... having educators pre-qualified like knowing who's been been qualified for this so that they get priority um would be helpful... that is a sheet of paper that has all the brand information, the setup information."` + `00:46:25 – "when you go back to the mobile app, you can then communicate visually to the educator what the bottle looks like, not making any assumptions of that and we're utilizing the brand assets."`
 
 - Consider how to handle educator scoring (reliability, cancellations, certifications) and make sure event flows capture the data needed.
   - Actual scoring could be phase 2.
-  Source: `CONTEXT.md 00:54:10 – "we're tagging that this this educator canceled... it needs to be part of a scoring process with the educators."` + `01:09:02 – "educator profiles there is a lot of detail in the educators we currently capture... there was an educator rating which we're not really utilizing yet. All that's definitely important important with that."`
+    Source: `CONTEXT.md 00:54:10 – "we're tagging that this this educator canceled... it needs to be part of a scoring process with the educators."` + `01:09:02 – "educator profiles there is a lot of detail in the educators we currently capture... there was an educator rating which we're not really utilizing yet. All that's definitely important important with that."`
 
 ---
 
