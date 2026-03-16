@@ -32,7 +32,7 @@
 Campaign creation is too shallow (only name + description in `create-campaign-modal.tsx`) and events don't inherit from campaigns. Chris's biggest feedback area.
 
 (OK) 1. **Expand campaign creation** — Add fields: supplier, distributors, target markets/geography, anticipated event count, linked products (from item master), objectives. Campaign interface in `campaign-data.ts` currently only has `id, name, description, eventCount, status, createdAt`.
-   Source: `CONTEXT.md 00:34:50 – "So like with the campaigns, linking that over to more more more things like um which which suppliers, which distributors, what what markets... Like all that information is important because that that will all trickle into the events."`
+Source: `CONTEXT.md 00:34:50 – "So like with the campaigns, linking that over to more more more things like um which which suppliers, which distributors, what what markets... Like all that information is important because that that will all trickle into the events."`
 
 2. **Event creation inherits from campaign** — Pre-populate objectives, products, venue type from parent campaign. Currently the wizard (`event-wizard.tsx`) asks everything from scratch. Chris: "just assign the account and the date and time."
    Source: `CONTEXT.md 00:51:06 – "That's why I was saying having as much detail in the campaign easier for for creating the events because then that's just pull from the campaign and regurgitate it. Just assign sign the account and the date and time."`
