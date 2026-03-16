@@ -22,6 +22,12 @@ interface CampaignContextValue {
   createCampaign: (data: {
     name: string;
     description: string;
+    supplier?: string | undefined;
+    distributors?: string[] | undefined;
+    targetMarkets?: string[] | undefined;
+    anticipatedEventCount?: number | undefined;
+    linkedProductIds?: string[] | undefined;
+    objectives?: string[] | undefined;
   }) => string | null;
   createEvent: (
     event: Omit<EventItem, "id" | "createdAt" | "status">,
@@ -87,6 +93,12 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
   function createCampaign(data: {
     name: string;
     description: string;
+    supplier?: string | undefined;
+    distributors?: string[] | undefined;
+    targetMarkets?: string[] | undefined;
+    anticipatedEventCount?: number | undefined;
+    linkedProductIds?: string[] | undefined;
+    objectives?: string[] | undefined;
   }): string | null {
     if (existingCampaignNames.includes(data.name.toLowerCase())) {
       return "Name already in use.";
@@ -98,6 +110,18 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       eventCount: 0,
       status: "draft",
       createdAt: new Date().toISOString().slice(0, 10),
+      ...(data.supplier ? { supplier: data.supplier } : {}),
+      ...(data.distributors?.length ? { distributors: data.distributors } : {}),
+      ...(data.targetMarkets?.length
+        ? { targetMarkets: data.targetMarkets }
+        : {}),
+      ...(data.anticipatedEventCount != null
+        ? { anticipatedEventCount: data.anticipatedEventCount }
+        : {}),
+      ...(data.linkedProductIds?.length
+        ? { linkedProductIds: data.linkedProductIds }
+        : {}),
+      ...(data.objectives?.length ? { objectives: data.objectives } : {}),
     };
     setCampaigns((prev) => [newCampaign, ...prev]);
     return null;

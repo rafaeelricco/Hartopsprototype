@@ -18,11 +18,16 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
+  Truck,
+  Package,
+  Globe,
+  BarChart2,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { useCampaignContext } from "./campaign-context";
 import { EventWizard } from "./event-wizard";
 import { OBJECTIVES, type EventItem } from "./event-data";
+import { MOCK_PRODUCTS } from "./campaign-data";
 
 const STATUS_LABELS: Record<
   string,
@@ -187,7 +192,185 @@ export function CampaignDetail() {
       </div>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Events list                                                      */}
+      {/* Campaign Context panel  (only when fields are present)          */}
+      {/* ---------------------------------------------------------------- */}
+      {(campaign.supplier ||
+        (campaign.distributors?.length ?? 0) > 0 ||
+        (campaign.targetMarkets?.length ?? 0) > 0 ||
+        campaign.anticipatedEventCount != null ||
+        (campaign.objectives?.length ?? 0) > 0 ||
+        (campaign.linkedProductIds?.length ?? 0) > 0) && (
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 mb-6">
+          <h3
+            className="mb-4"
+            style={{
+              fontSize: "0.8125rem",
+              color: "#94A3B8",
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+            }}
+          >
+            Campaign Context
+          </h3>
+          <div className="flex flex-col gap-3">
+            {/* Supplier */}
+            {campaign.supplier && (
+              <div className="flex items-start gap-3">
+                <Truck
+                  size={14}
+                  className="mt-0.5 flex-shrink-0"
+                  style={{ color: "#94A3B8" }}
+                />
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    Supplier
+                  </span>
+                  <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+                    {campaign.supplier}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Distributors */}
+            {(campaign.distributors?.length ?? 0) > 0 && (
+              <div className="flex items-start gap-3">
+                <Package
+                  size={14}
+                  className="mt-0.5 flex-shrink-0"
+                  style={{ color: "#94A3B8" }}
+                />
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    Distributors
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {campaign.distributors!.map((d) => (
+                      <span
+                        key={d}
+                        className="px-2.5 py-0.5 rounded-full"
+                        style={{
+                          fontSize: "0.75rem",
+                          background: "#F1F5F9",
+                          color: "#475569",
+                        }}
+                      >
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Target Markets */}
+            {(campaign.targetMarkets?.length ?? 0) > 0 && (
+              <div className="flex items-start gap-3">
+                <Globe
+                  size={14}
+                  className="mt-0.5 flex-shrink-0"
+                  style={{ color: "#94A3B8" }}
+                />
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    Target Markets
+                  </span>
+                  <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+                    {campaign.targetMarkets!.join(" · ")}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Anticipated Event Count */}
+            {campaign.anticipatedEventCount != null && (
+              <div className="flex items-start gap-3">
+                <BarChart2
+                  size={14}
+                  className="mt-0.5 flex-shrink-0"
+                  style={{ color: "#94A3B8" }}
+                />
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    Anticipated Events
+                  </span>
+                  <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+                    {campaign.anticipatedEventCount} planned ·{" "}
+                    {allEvents.length} created so far
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Objectives */}
+            {(campaign.objectives?.length ?? 0) > 0 && (
+              <div className="flex items-start gap-3">
+                <Target
+                  size={14}
+                  className="mt-0.5 flex-shrink-0"
+                  style={{ color: "#94A3B8" }}
+                />
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    Objectives
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {OBJECTIVES.filter((o) =>
+                      campaign.objectives!.includes(o.id),
+                    ).map((o) => (
+                      <span
+                        key={o.id}
+                        className="px-2.5 py-0.5 rounded-md"
+                        style={{
+                          fontSize: "0.75rem",
+                          background: "#7D152D0A",
+                          color: "#7D152D",
+                        }}
+                      >
+                        {o.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Linked Products */}
+            {(campaign.linkedProductIds?.length ?? 0) > 0 && (
+              <div className="flex items-start gap-3">
+                <Package
+                  size={14}
+                  className="mt-0.5 flex-shrink-0"
+                  style={{ color: "#94A3B8" }}
+                />
+                <div>
+                  <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                    Linked Products
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {MOCK_PRODUCTS.filter((p) =>
+                      campaign.linkedProductIds!.includes(p.id),
+                    ).map((p) => (
+                      <span
+                        key={p.id}
+                        className="px-2.5 py-0.5 rounded-md"
+                        style={{
+                          fontSize: "0.75rem",
+                          background: "#F1F5F9",
+                          color: "#475569",
+                        }}
+                      >
+                        {p.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ---------------------------------------------------------------- */}
       {allEvents.length === 0 ? (
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-8 flex flex-col items-center justify-center text-center min-h-[280px]">

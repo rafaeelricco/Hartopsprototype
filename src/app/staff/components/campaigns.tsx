@@ -17,7 +17,10 @@ import {
 } from "lucide-react";
 import { type Campaign } from "./campaign-data";
 import { useCampaignContext } from "./campaign-context";
-import { CreateCampaignModal } from "./create-campaign-modal";
+import {
+  CreateCampaignModal,
+  type CreateCampaignFormData,
+} from "./create-campaign-modal";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
 
@@ -84,11 +87,7 @@ export function Campaigns() {
     setCurrentPage(1);
   };
 
-  // Create campaign handler
-  function handleCreate(data: {
-    name: string;
-    description: string;
-  }): string | null {
+  function handleCreate(data: CreateCampaignFormData): string | null {
     const error = createCampaign(data);
     if (error) return error;
     setModalOpen(false);
