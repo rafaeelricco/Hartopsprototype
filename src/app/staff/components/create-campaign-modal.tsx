@@ -603,15 +603,13 @@ export function CreateCampaignModal({
                       })
                     )}
                   </div>
-                  {selectedProducts.length > 0 && (
-                    <p
-                      className="mt-1.5"
-                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
-                    >
-                      {selectedProducts.length} product
-                      {selectedProducts.length !== 1 ? "s" : ""} selected
-                    </p>
-                  )}
+                  <p
+                    className="mt-1.5"
+                    style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                  >
+                    {selectedProducts.length} product
+                    {selectedProducts.length !== 1 ? "s" : ""} selected
+                  </p>
                 </div>
               </div>
             </div>
