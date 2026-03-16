@@ -229,9 +229,9 @@ export function EventDetailPage() {
       </Button>
 
       {/* Live Banner */}
-      {isLive && (
+      {/* {isLive && (
         <Card className="border-green-200 bg-green-50">
-          <CardContent className="px-4 py-3 flex items-center gap-2">
+          <CardContent className="px-4 py-3 [&:last-child]:pb-3 flex items-center gap-2">
             <span className="relative flex size-2">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex size-2 rounded-full bg-green-500" />
@@ -242,7 +242,7 @@ export function EventDetailPage() {
             </span>
           </CardContent>
         </Card>
-      )}
+      )} */}
 
       {/* Header */}
       <div>
@@ -255,6 +255,12 @@ export function EventDetailPage() {
               <span className="inline-block size-1.5 rounded-full bg-green-500 mr-1 animate-pulse" />
             )}
             {event.status}
+            {isLive && (
+              <>
+                {' '}
+                {event.startTime} – {event.endTime}
+              </>
+            )}
           </Badge>
           <Badge
             variant="secondary"

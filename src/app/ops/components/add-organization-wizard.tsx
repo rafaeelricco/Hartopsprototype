@@ -470,7 +470,7 @@ export function AddOrganizationWizard({
                 <select
                   value={data.industry}
                   onChange={(e) => updateField("industry", e.target.value)}
-                  className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors appearance-none cursor-pointer"
+                  className="w-full bg-transparent rounded-lg border border-border px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 focus:border-[#7D152D] transition-colors appearance-none cursor-pointer"
                   style={{ fontSize: "0.875rem" }}
                 >
                   <option value="">Select an industry</option>
