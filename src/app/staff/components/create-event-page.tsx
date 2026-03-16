@@ -78,13 +78,17 @@ const STEPS = [
 
 export function CreateEventPage() {
   const navigate = useNavigate();
-  const { campaigns, createEvent, getCampaign, getEventsForCampaign } =
+  const { campaigns, createEvent, getCampaign, getEventsForCampaign, getActivity } =
     useCampaignContext();
 
   const [searchParams] = useSearchParams();
   const campaignIdParam = searchParams.get("campaign");
+  const activityIdParam = searchParams.get("activity");
   const preselectedCampaign = campaignIdParam
     ? getCampaign(campaignIdParam)
+    : undefined;
+  const preselectedActivity = activityIdParam
+    ? getActivity(activityIdParam)
     : undefined;
 
   const backUrl = campaignIdParam
@@ -92,13 +96,16 @@ export function CreateEventPage() {
     : "/staff/events";
   const backLabel = campaignIdParam ? "Back to Campaign" : "Back to Events";
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(preselectedActivity ? 2 : 1);
   const [data, setData] = useState<WizardData>(() => {
     if (preselectedCampaign) {
       return {
         ...INITIAL_DATA,
         campaignId: preselectedCampaign.id,
         objectives: [...(preselectedCampaign.objectives ?? [])],
+        ...(preselectedActivity?.venueType
+          ? { venueType: preselectedActivity.venueType }
+          : {}),
       };
     }
     return INITIAL_DATA;
@@ -181,8 +188,16 @@ export function CreateEventPage() {
 
   function handleSubmit() {
     const selectedCampaign = getCampaign(data.campaignId);
+    // Determine product IDs: prefer activity subset, fallback to campaign
+    let productIds: string[] | undefined;
+    if (preselectedActivity?.linkedProductIds?.length) {
+      productIds = preselectedActivity.linkedProductIds;
+    } else if (selectedCampaign?.linkedProductIds?.length) {
+      productIds = selectedCampaign.linkedProductIds;
+    }
     const event = createEvent({
       campaignId: data.campaignId,
+      ...(preselectedActivity ? { activityId: preselectedActivity.id } : {}),
       name: data.name.trim(),
       location: data.location.trim(),
       date: data.date,
@@ -191,9 +206,7 @@ export function CreateEventPage() {
       objectives: data.objectives,
       dataModules: mappedModules.map((m) => m.id),
       advancedModules: data.advancedModules,
-      ...(selectedCampaign?.linkedProductIds?.length
-        ? { linkedProductIds: selectedCampaign.linkedProductIds }
-        : {}),
+      ...(productIds ? { linkedProductIds: productIds } : {}),
     });
     navigate(
       campaignIdParam
@@ -257,6 +270,21 @@ export function CreateEventPage() {
           Walk through each step to set up your event.
         </p>
       </div>
+
+      {/* Activity context banner */}
+      {preselectedActivity && (
+        <div
+          className="mx-6 mb-3 px-4 py-2.5 rounded-lg flex items-center gap-2"
+          style={{
+            background: "#EFF6FF",
+            fontSize: "0.8125rem",
+            color: "#1D4ED8",
+          }}
+        >
+          <Target size={14} />
+          Creating event under activity: <strong>{preselectedActivity.name}</strong>
+        </div>
+      )}
 
       {/* ── Step indicator bar ────────────────────────────────────────────── */}
       <div className="px-6 pb-5">
@@ -339,35 +367,29 @@ export function CreateEventPage() {
           <StepBasics data={data} errors={errors} updateField={updateField} />
         )}
         {step === 3 && (
-          <div className="flex gap-6">
-            <div className="flex-1 min-w-0">
-              <StepObjectives
-                selected={data.objectives}
-                toggle={toggleObjective}
-                error={errors.objectives}
-                inheritedCount={inheritedObjectiveCount}
-              />
-            </div>
-            <div
-              className="flex-shrink-0 transition-all duration-300"
-              style={{
-                width: data.objectives.length > 0 ? 380 : 0,
-                opacity: data.objectives.length > 0 ? 1 : 0,
-                overflow: "hidden",
-              }}
-            >
-              {data.objectives.length > 0 && (
-                <div className="sticky top-0">
-                  <ProjectedImpactSidebar
-                    data={data}
-                    modules={mappedModules}
-                    modulesByObjective={modulesByObjective}
-                    showEducator={showEducator}
-                    onToggleEducator={() => setShowEducator((p) => !p)}
-                  />
-                </div>
-              )}
-            </div>
+          <div className="flex flex-col">
+            <StepObjectives
+              selected={data.objectives}
+              toggle={toggleObjective}
+              error={errors.objectives}
+              inheritedCount={inheritedObjectiveCount}
+            />
+
+            {data.objectives.length > 0 && (
+              <>
+                <div
+                  className="my-5"
+                  style={{ borderTop: "1px solid #E2E8F0" }}
+                />
+                <ProjectedImpactSection
+                  data={data}
+                  modules={mappedModules}
+                  modulesByObjective={modulesByObjective}
+                  showEducator={showEducator}
+                  onToggleEducator={() => setShowEducator((p) => !p)}
+                />
+              </>
+            )}
           </div>
         )}
         {step === 4 && (
@@ -774,8 +796,8 @@ function StepObjectives({
   inheritedCount?: number;
 }) {
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
+    <div className="sticky top-0 z-10 pb-1" style={{ boxShadow: selected.length > 0 ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}>
+      <div className="flex items-center justify-between mb-2">
         <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
           Select Objectives
         </h3>
@@ -790,14 +812,10 @@ function StepObjectives({
           {selected.length} of {OBJECTIVES.length} selected
         </span>
       </div>
-      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-3">
-        Objectives drive the entire downstream report structure. Select all that
-        apply.
-      </p>
 
       {inheritedCount > 0 && (
         <div
-          className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg"
+          className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg"
           style={{
             background: "#F0FDF4",
             fontSize: "0.8125rem",
@@ -812,7 +830,7 @@ function StepObjectives({
 
       {error && (
         <div
-          className="mb-4 px-3 py-2 rounded-lg"
+          className="mb-3 px-3 py-2 rounded-lg"
           style={{
             background: "#FEF2F2",
             fontSize: "0.8125rem",
@@ -823,7 +841,7 @@ function StepObjectives({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="flex flex-wrap gap-2">
         {OBJECTIVES.map((obj) => {
           const isSelected = selected.includes(obj.id);
           const moduleCount = (OBJECTIVE_MODULE_MAP[obj.id] ?? []).length;
@@ -833,55 +851,43 @@ function StepObjectives({
               variant="ghost"
               type="button"
               onClick={() => toggle(obj.id)}
-              className={`flex items-start gap-3.5 p-4 rounded-xl border-2 text-left transition-all h-auto cursor-pointer block w-full whitespace-normal hover:bg-[#F8FAFC] ${
+              title={obj.description}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 transition-all h-auto cursor-pointer whitespace-nowrap hover:bg-[#F8FAFC] ${
                 isSelected
                   ? "border-[#7D152D] bg-[#7D152D]/5 hover:bg-[#7D152D]/5"
                   : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1]"
               }`}
             >
-              <div className="flex items-start gap-3.5">
-                {/* Checkbox indicator */}
-                <div
-                  className="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center mt-0.5 transition-colors"
-                  style={{
-                    background: isSelected ? "#7D152D" : "transparent",
-                    border: isSelected ? "none" : "2px solid #CBD5E1",
-                  }}
-                >
-                  {isSelected && <Check size={13} style={{ color: "#FFF" }} />}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <p
-                      style={{
-                        fontSize: "0.9375rem",
-                        color: isSelected ? "#7D152D" : "#0F172A",
-                      }}
-                    >
-                      {obj.label}
-                    </p>
-                    <span
-                      style={{
-                        fontSize: "0.6875rem",
-                        color: isSelected ? "#7D152D" : "#94A3B8",
-                        opacity: 0.7,
-                      }}
-                    >
-                      {moduleCount} modules
-                    </span>
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "0.8125rem",
-                      color: "#94A3B8",
-                      lineHeight: 1.5,
-                    }}
-                    className="mt-0.5"
-                  >
-                    {obj.description}
-                  </p>
-                </div>
+              <div
+                className="w-4.5 h-4.5 rounded-md flex-shrink-0 flex items-center justify-center transition-colors"
+                style={{
+                  width: 18,
+                  height: 18,
+                  background: isSelected ? "#7D152D" : "transparent",
+                  border: isSelected ? "none" : "2px solid #CBD5E1",
+                }}
+              >
+                {isSelected && <Check size={12} style={{ color: "#FFF" }} />}
               </div>
+              <span
+                style={{
+                  fontSize: "0.875rem",
+                  color: isSelected ? "#7D152D" : "#0F172A",
+                  fontWeight: isSelected ? 500 : 400,
+                }}
+              >
+                {obj.label}
+              </span>
+              <span
+                className="px-1.5 py-0.5 rounded-md"
+                style={{
+                  fontSize: "0.625rem",
+                  background: isSelected ? "#7D152D1A" : "#F1F5F9",
+                  color: isSelected ? "#7D152D" : "#94A3B8",
+                }}
+              >
+                {moduleCount}
+              </span>
             </Button>
           );
         })}
@@ -891,7 +897,7 @@ function StepObjectives({
 }
 
 // =============================================================================
-// Projected Impact Sidebar (live report preview alongside Objectives)
+// Projected Impact Section (full-width report preview below Objectives)
 // =============================================================================
 
 const SECTION_COLORS = [
@@ -903,7 +909,7 @@ const SECTION_COLORS = [
   "#059669",
 ];
 
-function ProjectedImpactSidebar({
+function ProjectedImpactSection({
   data,
   modules,
   modulesByObjective,
@@ -927,7 +933,7 @@ function ProjectedImpactSidebar({
   return (
     <div style={{ animation: "fadeInUp 0.3s ease-out" }}>
       <div className="flex items-center justify-between mb-1">
-        <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Projected Impact</h3>
+        <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>Projected Impact</h3>
         <Button
           variant="ghost"
           type="button"
@@ -947,18 +953,18 @@ function ProjectedImpactSidebar({
           Educator View
         </Button>
       </div>
-      <p style={{ fontSize: "0.75rem", color: "#94A3B8" }} className="mb-4">
+      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-4">
         {showEducator
           ? "Preview of what the educator will see on their mobile device."
           : "Live preview of your report based on selected objectives."}
       </p>
 
       {!showEducator ? (
-        /* Report mock-up */
+        /* Report mock-up — full-width layout */
         <div className="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white">
           {/* Report title bar */}
           <div
-            className="px-4 py-3 border-b border-[#E2E8F0]"
+            className="px-5 py-4 border-b border-[#E2E8F0]"
             style={{
               background: "linear-gradient(135deg, #7D152D 0%, #5C0F21 100%)",
             }}
@@ -969,30 +975,30 @@ function ProjectedImpactSidebar({
             >
               Event Report
             </p>
-            <p style={{ fontSize: "0.875rem", color: "#FFF" }}>
+            <p style={{ fontSize: "1rem", color: "#FFF", fontWeight: 500 }}>
               {data.name || "Untitled Event"}
             </p>
-            <div className="flex flex-col gap-1 mt-1.5">
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
               {data.location && (
                 <span
                   className="flex items-center gap-1"
                   style={{
-                    fontSize: "0.75rem",
+                    fontSize: "0.8125rem",
                     color: "rgba(255,255,255,0.7)",
                   }}
                 >
-                  <MapPin size={12} /> {data.location}
+                  <MapPin size={13} /> {data.location}
                 </span>
               )}
               {data.date && (
                 <span
                   className="flex items-center gap-1"
                   style={{
-                    fontSize: "0.75rem",
+                    fontSize: "0.8125rem",
                     color: "rgba(255,255,255,0.7)",
                   }}
                 >
-                  <Calendar size={12} />{" "}
+                  <Calendar size={13} />{" "}
                   {new Date(data.date + "T12:00:00").toLocaleDateString(
                     "en-US",
                     { month: "short", day: "numeric", year: "numeric" },
@@ -1003,18 +1009,18 @@ function ProjectedImpactSidebar({
                 <span
                   className="flex items-center gap-1"
                   style={{
-                    fontSize: "0.75rem",
+                    fontSize: "0.8125rem",
                     color: "rgba(255,255,255,0.7)",
                   }}
                 >
-                  <Clock size={12} /> {data.duration}
+                  <Clock size={13} /> {data.duration}
                 </span>
               )}
             </div>
           </div>
 
           {/* Objectives summary strip */}
-          <div className="px-4 py-2.5 border-b border-[#F1F5F9] bg-[#FAFBFC]">
+          <div className="px-5 py-3 border-b border-[#F1F5F9] bg-[#FAFBFC]">
             <div className="flex items-center gap-2 flex-wrap">
               <span
                 style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
@@ -1044,41 +1050,39 @@ function ProjectedImpactSidebar({
             </div>
           </div>
 
-          {/* Per-objective report sections */}
-          {modulesByObjective.map((group, gi) => (
-            <div
-              key={group.objectiveId}
-              className={
-                gi < modulesByObjective.length - 1
-                  ? "border-b border-[#F1F5F9]"
-                  : ""
-              }
-            >
-              <div className="px-4 pt-3 pb-2 flex items-center gap-2">
-                <div
-                  className="w-1.5 h-5 rounded-full"
-                  style={{
-                    background: SECTION_COLORS[gi % SECTION_COLORS.length],
-                  }}
-                />
-                <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                  {group.label}
-                </span>
-                <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-                  ({group.modules.length} modules)
-                </span>
-              </div>
+          {/* Per-objective report sections — 2-column grid */}
+          <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {modulesByObjective.map((group, gi) => (
+              <div
+                key={group.objectiveId}
+                className="border border-[#F1F5F9] rounded-xl overflow-hidden bg-white"
+              >
+                <div className="px-4 py-2.5 flex items-center gap-2 bg-[#FAFBFC] border-b border-[#F1F5F9]">
+                  <div
+                    className="w-1.5 h-5 rounded-full"
+                    style={{
+                      background: SECTION_COLORS[gi % SECTION_COLORS.length],
+                    }}
+                  />
+                  <span style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 500 }}>
+                    {group.label}
+                  </span>
+                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                    ({group.modules.length} modules)
+                  </span>
+                </div>
 
-              <div className="px-4 pb-3 grid grid-cols-1 gap-2">
-                {group.modules.map((mod) => (
-                  <SampleModuleCard key={mod.id} mod={mod} />
-                ))}
+                <div className="p-3 grid grid-cols-1 gap-2">
+                  {group.modules.map((mod) => (
+                    <SampleModuleCard key={mod.id} mod={mod} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
 
           {/* Report footer */}
-          <div className="px-4 py-2.5 border-t border-[#E2E8F0] bg-[#FAFBFC] flex items-center justify-between">
+          <div className="px-5 py-3 border-t border-[#E2E8F0] bg-[#FAFBFC] flex items-center justify-between">
             <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
               Sample data shown &middot; Actual values collected during event
             </span>
@@ -1088,11 +1092,11 @@ function ProjectedImpactSidebar({
           </div>
         </div>
       ) : (
-        /* Educator mobile preview */
-        <div className="flex justify-center">
+        /* Educator mobile preview — centered in full width */
+        <div className="flex justify-center py-4">
           <div
-            className="w-[260px] rounded-[2rem] border-[6px] border-[#1E293B] bg-white overflow-hidden shadow-xl flex flex-col"
-            style={{ minHeight: 440 }}
+            className="w-[280px] rounded-[2rem] border-[6px] border-[#1E293B] bg-white overflow-hidden shadow-xl flex flex-col"
+            style={{ minHeight: 480 }}
           >
             {/* Phone status bar */}
             <div

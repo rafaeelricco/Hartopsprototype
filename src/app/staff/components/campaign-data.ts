@@ -2,6 +2,43 @@
 // Mock campaign data and types for MM-UI-002 Campaign Management.
 // =============================================================================
 
+// ---------------------------------------------------------------------------
+// Channel types — 4 core groupings per Hart's hierarchy
+// ---------------------------------------------------------------------------
+
+export interface ChannelOption {
+  value: string;
+  label: string;
+  description: string;
+}
+
+export const CHANNEL_OPTIONS: ChannelOption[] = [
+  {
+    value: "on-premise-chain",
+    label: "On-Premise Chain",
+    description: "Chain bars, restaurants & venues (e.g. TGI Fridays)",
+  },
+  {
+    value: "on-premise-independent",
+    label: "On-Premise Independent",
+    description: "Independent bars, lounges & restaurants",
+  },
+  {
+    value: "off-premise-chain",
+    label: "Off-Premise Chain",
+    description: "Chain retail & liquor stores (e.g. Total Wine, Tesco)",
+  },
+  {
+    value: "off-premise-independent",
+    label: "Off-Premise Independent",
+    description: "Independent liquor stores & specialty shops",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Campaign
+// ---------------------------------------------------------------------------
+
 export interface Campaign {
   id: string;
   name: string;
@@ -13,6 +50,7 @@ export interface Campaign {
   supplier?: string | undefined;
   distributors?: string[] | undefined;
   targetMarkets?: string[] | undefined;
+  channels?: string[] | undefined;
   anticipatedEventCount?: number | undefined;
   linkedProductIds?: string[] | undefined;
   objectives?: string[] | undefined;
@@ -30,17 +68,19 @@ export function generateId(): string {
 export interface ProductRef {
   id: string;
   name: string;
+  brand?: string | undefined;
+  line?: string | undefined;
 }
 
 export const MOCK_PRODUCTS: ProductRef[] = [
-  { id: "sku-001", name: "Absolut Vodka 750ml" },
-  { id: "sku-002", name: "Absolut Lime 750ml" },
-  { id: "sku-003", name: "Kahlúa 700ml" },
-  { id: "sku-004", name: "Malibu Coconut Rum 750ml" },
-  { id: "sku-005", name: "Beefeater Gin 750ml" },
-  { id: "sku-006", name: "Jameson Irish Whiskey 750ml" },
-  { id: "sku-007", name: "Maker's Mark Bourbon 750ml" },
-  { id: "sku-008", name: "Hendrick's Gin 700ml" },
+  { id: "sku-001", name: "Absolut Vodka 750ml", brand: "Absolut", line: "Absolut Classic" },
+  { id: "sku-002", name: "Absolut Lime 750ml", brand: "Absolut", line: "Absolut Flavors" },
+  { id: "sku-003", name: "Kahlúa 700ml", brand: "Kahlúa", line: "Kahlúa Classic" },
+  { id: "sku-004", name: "Malibu Coconut Rum 750ml", brand: "Malibu", line: "Malibu Classic" },
+  { id: "sku-005", name: "Beefeater Gin 750ml", brand: "Beefeater", line: "Beefeater Classic" },
+  { id: "sku-006", name: "Jameson Irish Whiskey 750ml", brand: "Jameson", line: "Jameson Original" },
+  { id: "sku-007", name: "Maker's Mark Bourbon 750ml", brand: "Maker's Mark", line: "Maker's Mark Classic" },
+  { id: "sku-008", name: "Hendrick's Gin 700ml", brand: "Hendrick's", line: "Hendrick's Classic" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -59,6 +99,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     supplier: "Beam Suntory",
     distributors: ["Southern Glazer's", "Republic National"],
     targetMarkets: ["New York", "Los Angeles", "Chicago", "Miami"],
+    channels: ["off-premise-chain", "on-premise-independent"],
     anticipatedEventCount: 20,
     linkedProductIds: ["sku-001", "sku-002"],
     objectives: ["brand-awareness", "drive-sales"],
@@ -74,6 +115,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     supplier: "Pernod Ricard",
     distributors: ["Breakthru Beverage"],
     targetMarkets: ["San Francisco", "Denver", "Portland"],
+    channels: ["off-premise-chain", "off-premise-independent"],
     anticipatedEventCount: 24,
     linkedProductIds: ["sku-003", "sku-004", "sku-005"],
     objectives: ["drive-sales", "product-education"],
@@ -89,6 +131,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     supplier: "Beam Suntory",
     distributors: ["Southern Glazer's"],
     targetMarkets: ["Los Angeles", "Chicago", "Austin"],
+    channels: ["on-premise-chain", "on-premise-independent"],
     anticipatedEventCount: 6,
     linkedProductIds: ["sku-001", "sku-006"],
     objectives: ["brand-awareness", "consumer-engagement", "market-research"],
@@ -113,6 +156,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     supplier: "Diageo",
     distributors: ["Republic National", "Wirtz Beverage"],
     targetMarkets: ["Los Angeles", "Austin", "Atlanta"],
+    channels: ["on-premise-independent", "off-premise-chain"],
     anticipatedEventCount: 15,
     linkedProductIds: ["sku-007", "sku-008"],
     objectives: ["brand-awareness", "product-education", "market-research"],
@@ -146,6 +190,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     supplier: "Brown-Forman",
     distributors: ["Southern Glazer's", "Charmer Industries"],
     targetMarkets: ["New York", "Los Angeles", "Nashville"],
+    channels: ["on-premise-chain", "on-premise-independent"],
     anticipatedEventCount: 10,
     linkedProductIds: ["sku-006", "sku-007", "sku-008"],
     objectives: ["brand-awareness", "drive-sales", "consumer-engagement"],

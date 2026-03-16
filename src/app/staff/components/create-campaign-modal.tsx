@@ -11,7 +11,7 @@ import { X, Loader2, Plus } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
 import { Textarea } from "@/app/shared/components/ui/textarea";
-import { MOCK_PRODUCTS } from "./campaign-data";
+import { MOCK_PRODUCTS, CHANNEL_OPTIONS } from "./campaign-data";
 import { OBJECTIVES } from "./event-data";
 
 // ---------------------------------------------------------------------------
@@ -24,6 +24,7 @@ export interface CreateCampaignFormData {
   supplier?: string | undefined;
   distributors?: string[] | undefined;
   targetMarkets?: string[] | undefined;
+  channels?: string[] | undefined;
   anticipatedEventCount?: number | undefined;
   linkedProductIds?: string[] | undefined;
   objectives?: string[] | undefined;
@@ -147,6 +148,7 @@ export function CreateCampaignModal({
     string | ""
   >("");
   const [selectedObjectives, setSelectedObjectives] = useState<string[]>([]);
+  const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [productSearch, setProductSearch] = useState("");
 
@@ -166,6 +168,7 @@ export function CreateCampaignModal({
       setTargetMarkets([]);
       setAnticipatedEventCount("");
       setSelectedObjectives([]);
+      setSelectedChannels([]);
       setSelectedProducts([]);
       setProductSearch("");
       setTimeout(() => nameRef.current?.focus(), 100);
@@ -208,6 +211,12 @@ export function CreateCampaignModal({
     );
   }
 
+  function toggleChannel(value: string) {
+    setSelectedChannels((prev) =>
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
+    );
+  }
+
   function toggleProduct(id: string) {
     setSelectedProducts((prev) =>
       prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
@@ -230,6 +239,7 @@ export function CreateCampaignModal({
         supplier: supplier.trim() || undefined,
         distributors: distributors.length ? distributors : undefined,
         targetMarkets: targetMarkets.length ? targetMarkets : undefined,
+        channels: selectedChannels.length ? selectedChannels : undefined,
         anticipatedEventCount: anticipatedEventCount
           ? parseInt(anticipatedEventCount, 10)
           : undefined,
@@ -414,6 +424,64 @@ export function CreateCampaignModal({
                     }
                     placeholder="Type a city or region and press Enter"
                   />
+                </div>
+
+                {/* Channels */}
+                <div>
+                  <p
+                    style={{ fontSize: "0.875rem", color: "#0F172A" }}
+                    className="mb-2"
+                  >
+                    Channels
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {CHANNEL_OPTIONS.map((ch) => {
+                      const active = selectedChannels.includes(ch.value);
+                      return (
+                        <button
+                          key={ch.value}
+                          type="button"
+                          onClick={() => toggleChannel(ch.value)}
+                          className="px-3 py-2.5 rounded-lg border text-left transition-colors cursor-pointer"
+                          style={
+                            active
+                              ? {
+                                  background: "#7D152D",
+                                  borderColor: "#7D152D",
+                                  color: "#fff",
+                                  fontSize: "0.8125rem",
+                                }
+                              : {
+                                  background: "#F8FAFC",
+                                  borderColor: "#E2E8F0",
+                                  color: "#64748B",
+                                  fontSize: "0.8125rem",
+                                }
+                          }
+                        >
+                          <span style={{ fontWeight: 500 }}>{ch.label}</span>
+                          <br />
+                          <span
+                            style={{
+                              fontSize: "0.75rem",
+                              opacity: active ? 0.8 : 0.7,
+                            }}
+                          >
+                            {ch.description}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedChannels.length > 0 && (
+                    <p
+                      className="mt-1.5"
+                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                    >
+                      {selectedChannels.length} channel
+                      {selectedChannels.length !== 1 ? "s" : ""} selected
+                    </p>
+                  )}
                 </div>
 
                 {/* Anticipated Event Count */}

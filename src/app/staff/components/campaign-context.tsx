@@ -1,5 +1,5 @@
 // =============================================================================
-// Shared React context for campaigns + events state.
+// Shared React context for campaigns + activities + events state.
 // Wraps the layout so both CampaignLibrary and CampaignDetail can read/write.
 // =============================================================================
 
@@ -12,23 +12,36 @@ import {
 } from "react";
 import { INITIAL_CAMPAIGNS, generateId, type Campaign } from "./campaign-data";
 import { INITIAL_EVENTS, generateEventId, type EventItem } from "./event-data";
+import {
+  INITIAL_ACTIVITIES,
+  generateActivityId,
+  type Activity,
+} from "./activity-data";
 
 interface CampaignContextValue {
   campaigns: Campaign[];
   events: EventItem[];
+  activities: Activity[];
   getCampaign: (id: string) => Campaign | undefined;
   getEvent: (id: string) => EventItem | undefined;
   getEventsForCampaign: (campaignId: string) => EventItem[];
+  getActivity: (id: string) => Activity | undefined;
+  getActivitiesForCampaign: (campaignId: string) => Activity[];
+  getEventsForActivity: (activityId: string) => EventItem[];
   createCampaign: (data: {
     name: string;
     description: string;
     supplier?: string | undefined;
     distributors?: string[] | undefined;
     targetMarkets?: string[] | undefined;
+    channels?: string[] | undefined;
     anticipatedEventCount?: number | undefined;
     linkedProductIds?: string[] | undefined;
     objectives?: string[] | undefined;
   }) => string | null;
+  createActivity: (
+    data: Omit<Activity, "id" | "createdAt">,
+  ) => Activity;
   createEvent: (
     event: Omit<EventItem, "id" | "createdAt" | "status">,
   ) => EventItem;
@@ -46,11 +59,23 @@ interface CampaignContextValue {
 const DEFAULT_VALUE: CampaignContextValue = {
   campaigns: INITIAL_CAMPAIGNS,
   events: INITIAL_EVENTS,
+  activities: INITIAL_ACTIVITIES,
   getCampaign: (id) => INITIAL_CAMPAIGNS.find((c) => c.id === id),
   getEvent: (id) => INITIAL_EVENTS.find((e) => e.id === id),
   getEventsForCampaign: (cid) =>
     INITIAL_EVENTS.filter((e) => e.campaignId === cid),
+  getActivity: (id) => INITIAL_ACTIVITIES.find((a) => a.id === id),
+  getActivitiesForCampaign: (cid) =>
+    INITIAL_ACTIVITIES.filter((a) => a.campaignId === cid),
+  getEventsForActivity: (aid) =>
+    INITIAL_EVENTS.filter((e) => e.activityId === aid),
   createCampaign: () => null,
+  createActivity: (p) =>
+    ({
+      ...p,
+      id: "tmp",
+      createdAt: new Date().toISOString().slice(0, 10),
+    }) as Activity,
   createEvent: (p) =>
     ({
       ...p,
@@ -72,6 +97,8 @@ export function useCampaignContext() {
 export function CampaignProvider({ children }: { children: ReactNode }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
   const [events, setEvents] = useState<EventItem[]>(INITIAL_EVENTS);
+  const [activities, setActivities] =
+    useState<Activity[]>(INITIAL_ACTIVITIES);
 
   const existingCampaignNames = useMemo(
     () => campaigns.map((c) => c.name.toLowerCase()),
@@ -90,12 +117,25 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     return events.filter((e) => e.campaignId === campaignId);
   }
 
+  function getActivity(id: string) {
+    return activities.find((a) => a.id === id);
+  }
+
+  function getActivitiesForCampaign(campaignId: string) {
+    return activities.filter((a) => a.campaignId === campaignId);
+  }
+
+  function getEventsForActivity(activityId: string) {
+    return events.filter((e) => e.activityId === activityId);
+  }
+
   function createCampaign(data: {
     name: string;
     description: string;
     supplier?: string | undefined;
     distributors?: string[] | undefined;
     targetMarkets?: string[] | undefined;
+    channels?: string[] | undefined;
     anticipatedEventCount?: number | undefined;
     linkedProductIds?: string[] | undefined;
     objectives?: string[] | undefined;
@@ -115,6 +155,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       ...(data.targetMarkets?.length
         ? { targetMarkets: data.targetMarkets }
         : {}),
+      ...(data.channels?.length ? { channels: data.channels } : {}),
       ...(data.anticipatedEventCount != null
         ? { anticipatedEventCount: data.anticipatedEventCount }
         : {}),
@@ -125,6 +166,18 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     };
     setCampaigns((prev) => [newCampaign, ...prev]);
     return null;
+  }
+
+  function createActivity(
+    data: Omit<Activity, "id" | "createdAt">,
+  ): Activity {
+    const newActivity: Activity = {
+      ...data,
+      id: generateActivityId(),
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    setActivities((prev) => [newActivity, ...prev]);
+    return newActivity;
   }
 
   function createEvent(
@@ -168,10 +221,15 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
   const value: CampaignContextValue = {
     campaigns,
     events,
+    activities,
     getCampaign,
     getEvent,
     getEventsForCampaign,
+    getActivity,
+    getActivitiesForCampaign,
+    getEventsForActivity,
     createCampaign,
+    createActivity,
     createEvent,
     updateEventStatus,
     updateEventFields,
