@@ -35,6 +35,7 @@ import {
   TabsContent,
 } from "../../shared/components/ui/tabs";
 import { Progress } from "../../shared/components/ui/progress";
+import { MOCK_EVENTS } from "./events-page";
 
 /* ------------------------------------------------------------------ */
 /* Mock data — Organizations                                           */
@@ -1598,7 +1599,7 @@ export function OrganizationDetailPage() {
 
   const quality = ORG_QUALITY[org.id];
   const campaigns = ORG_CAMPAIGNS[org.id] ?? [];
-  const events = ORG_EVENTS[org.id] ?? [];
+  const orgEvents = MOCK_EVENTS.filter((e) => e.orgId === org.id);
   const team = ORG_TEAM[org.id] ?? [];
 
   return (
@@ -1868,7 +1869,7 @@ export function OrganizationDetailPage() {
           </Card>
         </TabsContent>
 
-        {/* ---- EVENTS — change #5: per-org data ---- */}
+        {/* ---- EVENTS — change #5: per-org data, clickable rows ---- */}
         <TabsContent value="events" className="mt-5 space-y-4">
           <Card className="gap-0">
             <CardHeader className="px-5 pt-5 pb-4">
@@ -1876,12 +1877,12 @@ export function OrganizationDetailPage() {
                 Events
               </CardTitle>
               <CardDescription style={{ fontSize: "0.8125rem" }}>
-                {events.length} recent event{events.length !== 1 ? "s" : ""} for{" "}
+                {orgEvents.length} recent event{orgEvents.length !== 1 ? "s" : ""} for{" "}
                 {org.name}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              {events.length === 0 ? (
+              {orgEvents.length === 0 ? (
                 <div className="px-5 py-12 text-center">
                   <p
                     className="text-muted-foreground"
@@ -1909,10 +1910,15 @@ export function OrganizationDetailPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {events.map((ev) => (
+                      {orgEvents.map((ev) => (
                         <tr
                           key={ev.id}
-                          className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                          onClick={() =>
+                            navigate(
+                              `/ops/dashboard/organizations/${org.id}/events/${ev.id}`,
+                            )
+                          }
+                          className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                         >
                           <td className="px-5 py-3">
                             <span
@@ -1940,7 +1946,7 @@ export function OrganizationDetailPage() {
                             className="px-5 py-3 text-muted-foreground tabular-nums"
                             style={{ fontSize: "0.8125rem" }}
                           >
-                            {ev.attendees}
+                            {ev.attendeesRegistered}
                           </td>
                           <td className="px-5 py-3">
                             <Badge
