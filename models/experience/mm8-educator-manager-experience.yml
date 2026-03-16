@@ -1,0 +1,109 @@
+id: "mm8"
+title: "Educator Manager Experience"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm7"
+  feeds_into:
+    - "mm9"
+
+context: |
+  Educator Managers are the coordination layer between Trial Client Staff and field
+  educators. They do not create events or campaigns — they receive assigned events,
+  ensure educators are staffed, monitor live execution, and finalize completed events.
+  Scheduling negotiation (accepting, declining, rescheduling) still happens outside the
+  platform via phone and text, but educators now maintain availability in-app via the
+  Availability tab, reducing the "phone tag" cycle for initial availability checks.
+
+scope:
+  in_scope:
+    - "Authentication and invitation-only onboarding"
+    - "Action-oriented dashboard with event stats"
+    - "Event management (viewing, educator assignment, live monitoring, finalization)"
+    - "Educator roster management and performance stats"
+    - "Notification preferences and settings"
+  out_of_scope:
+    - "Trial client operator experience (see Trial Client Staff Experience)"
+    - "Hart Ops platform administration (see Hart Ops Experience)"
+    - "Educator mobile app experience (see Educator Mobile Experience)"
+    - "Phase 1 feature boundaries (see Phase 1 Scope)"
+    - "Out-of-platform scheduling coordination (phone/text between managers and educators)"
+
+key_concepts:
+  - term: "Event Finalization"
+    definition: "The act of a manager clicking 'Approve & Finalize' on a completed event. Locks the event for all actors and terminates the educator's 24-hour editing window."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5"
+      - doc: "Educator Mobile §3.4"
+        details: "Post-event editing window"
+  - term: "Educator Assignment"
+    definition: "The in-platform act of selecting or reassigning an educator to an event. Educators now maintain availability in-app; managers can reference this before confirming assignments."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:09:06"
+  - term: "Digital Availability"
+    definition: "Educators maintain day-level and time-slot-level availability via the mobile app's Availability tab. This is now implemented, reducing reliance on phone/text for initial availability checks. Full scheduling negotiation (accept/decline/reschedule) remains external."
+    sources:
+      - doc: "Chris, Intro Meeting"
+        details: "~00:33:48"
+
+core_content:
+  - section_title: "Authentication and Navigation"
+    points:
+      - "Invitation-only via email link from Trial Client Staff."
+      - "Side navigation: Dashboard (default), Events, Educators, Settings."
+      - "Navigation designed to be future-proof (Analytics, Training sections anticipated)."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §1.1, §2"
+  - section_title: "Dashboard (Homepage)"
+    points:
+      - "Three stat cards: Total Events This Week, Active Events Now, Events Requiring Attention."
+      - "Every card and list item is clickable — direct link to the task at hand."
+      - "Action-oriented: surfaces things the manager needs to do, not just see."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §3"
+  - section_title: "Events List and Detail Flow"
+    points:
+      - "Events List: filterable by Live, Upcoming, Completed. Monthly Calendar view toggle."
+      - "Pre-Event: read-only view of products, instructions, goals. Focus on Educator Assignment."
+      - "During Event: real-time dashboard — geolocated check-in, live data, photo uploads."
+      - "Post-Event: final stats and photos. Approve & Finalize CTA to close event record."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §4, §5"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:09:06"
+  - section_title: "Educator Management"
+    points:
+      - "Educator Roster: list of assigned educators with contact, status, and performance sorting."
+      - "Educator Detail: contact links (mailto/tel), Quick Stats (avg rating, sales per event, punctuality)."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5.1, §5.2"
+  - section_title: "Settings and Notifications"
+    points:
+      - "Most granular notification set: new events, unstaffed (7 days), starting in 1 hour, failed check-in, ready for review."
+      - "Help & Support: consumes FAQs managed by Trial Client Staff."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §6.1, §6.2"
+
+assumptions:
+  - "Educator Managers cannot self-register — must be invited by Trial Client Staff."
+  - "Scheduling negotiation (accept/decline/reschedule) stays outside the platform in Phase 1, but educators now enter availability in-app."
+  - "Managers require a 'Speed-to-Finalize' workflow (events cluster on weekends)."
+  - "Finalization is irreversible — no undo mechanism in Phase 1."
+  - "Managers see only their scoped slice (their educators and events, not entire tenant data)."
+
+implications:
+  - "Finalization is the bottleneck of the data pipeline — reporting depends on managers closing events."
+  - "Scoped data views require distinct Information Architecture with strict tenant-and-manager-level scoping."
+  - "The platform-vs-phone boundary is a Phase 1 design choice — architecture must support later in-app messaging."
+  - "Managers are coordinators, not administrators (limited Edit Educator capability)."
+  - "Notification reliability is the primary driver of platform engagement."

@@ -1,0 +1,117 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Educator Mobile AI & Offline Mode
+# =============================================================================
+
+id: "mm-ui-003"
+title: "Educator Mobile AI & Offline Mode"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "mm9"
+    - "mm-ui-002"
+  feeds_into:
+    - "mm-ui-002"
+
+context: |
+  Educators work in retail environments with unreliable connectivity — big-box stores,
+  warehouse venues, and rural locations where cellular signal is weak or nonexistent.
+  The app must function fully offline, storing all data locally and syncing transparently
+  when connectivity returns. AI features (voice-to-data, image recognition) augment
+  data capture speed but must degrade gracefully when offline. As an educator, I need
+  the app to work regardless of connectivity so I never lose event data or get blocked
+  from completing my tasks.
+
+scope:
+  in_scope:
+    - "Voice-to-data interaction for hands-free data entry"
+    - "Automatic offline detection and mode switching"
+    - "Local data storage during offline periods"
+    - "Automatic data sync on connectivity restoration"
+    - "Conflict resolution for synced data"
+    - "Offline limitations and degraded feature indicators"
+  out_of_scope:
+    - "Smart notifications (push notification logic and triggers)"
+    - "AI image recognition model architecture (on-device vs. cloud)"
+    - "Data quality scoring and validation algorithms"
+    - "Backend sync queue processing infrastructure"
+
+key_concepts:
+  - term: "Voice-to-Data"
+    definition: "An AI-powered interaction where the educator holds a button to record a voice observation, and the system transcribes and maps it into structured data fields automatically. Eliminates typing entirely for qualitative data capture."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 4 AI-Powered Assistance"
+  - term: "Offline-First Architecture"
+    definition: "A design pattern where the app assumes connectivity is unreliable by default. All data entry is saved to local SQLite storage first, then synced to the server when connectivity is available. The app never blocks on network availability."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 5 Offline Mode"
+  - term: "Last-Write-Wins Conflict Resolution"
+    definition: "A sync strategy where conflicting data changes are resolved by comparing timestamps — the most recent write overwrites earlier ones. Used when the same data point is modified both locally (offline) and remotely before sync completes."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 5 Offline Mode — Sync"
+
+core_content:
+  - section_title: "Voice-to-Data Interaction"
+    points:
+      - "Entry Point: Educator holds the microphone button (hold-to-record trigger) within the Venue Survey review phase — voice-to-data is scoped to venue observations, not all data collection cards."
+      - "Functionality: Audio is captured while the button is held and released to stop recording."
+      - "Functionality: AI transcribes the voice recording into text, then maps the transcription into structured data fields."
+      - "Functionality: The educator reviews the auto-populated fields and confirms or corrects before saving."
+      - "Design principle: Voice input eliminates typing entirely — critical for educators whose hands may be occupied during events."
+      - "Implementation note: Voice-to-data is currently integrated within the venue survey review phase only (venue-intelligence-card.tsx). The transcription result populates VenueAccountProfile.voiceNoteTranscript."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 4 AI-Powered Assistance — Voice-to-Data"
+
+  - section_title: "Offline Detection & Mode Switch"
+    points:
+      - "Functionality: The app continuously monitors network connectivity in the background."
+      - "Functionality: When connectivity is lost, the app automatically switches to offline mode with no user action required."
+      - "Elements: A persistent 'Working Offline' banner appears at the top of the screen to indicate offline status."
+      - "Functionality: All data entry continues normally — saved to local SQLite storage instead of the remote server."
+      - "Design principle: The mode switch is seamless and automatic — the educator should barely notice the transition."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 5 Offline Mode"
+
+  - section_title: "Data Sync & Restoration"
+    points:
+      - "Functionality: When connectivity is restored, the app automatically begins syncing locally stored data to the server."
+      - "Functionality: Sync processes a queue of pending changes in chronological order."
+      - "Functionality: Conflict resolution uses a last-timestamp-wins strategy — the most recent write takes precedence."
+      - "Functionality: Failed sync attempts are retried automatically without user intervention."
+      - "Elements: The 'Working Offline' banner disappears once sync is complete and connectivity is stable."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 5 Offline Mode — Sync"
+
+  - section_title: "Offline Limitations"
+    points:
+      - "Functionality: Photo uploads are queued locally but not transmitted until connectivity is restored."
+      - "Functionality: AI voice transcription may require connectivity depending on model deployment (on-device vs. cloud)."
+      - "Elements: Features that are degraded or unavailable offline display a visual indicator (e.g., greyed out icon or tooltip)."
+      - "Design principle: Core data collection (taps, counters, selections) works fully offline — only network-dependent features degrade."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 5 Offline Mode — Limitations"
+
+assumptions:
+  - "SQLite is the local storage engine for offline data — chosen for reliability and native mobile support."
+  - "The 'Working Offline' banner is the only offline indicator — there is no separate offline mode UI or reduced feature set."
+  - "Last-timestamp-wins is sufficient because educator data is typically append-only during events — concurrent edits to the same record are rare."
+  - "Voice-to-data transcription accuracy is sufficient for structured field mapping without extensive post-processing."
+  - "Photo uploads queued offline retain their original timestamps and metadata when eventually synced."
+  - "The sync queue has a maximum retry count before surfacing an error to the educator — exact threshold not specified in source."
+
+implications:
+  - "Frontend: Every data write operation must target local SQLite first, with a background sync layer handling server communication."
+  - "Frontend: The connectivity monitor must distinguish between 'no connection' and 'weak connection' to avoid oscillating between modes."
+  - "Frontend: Voice recording UI needs clear visual feedback (waveform, recording indicator) since there is no typing to confirm input."
+  - "Frontend: AI image detection UI (ImageRecognitionOverlay component) is implemented within the venue survey camera phase — renders bounding boxes with confidence scores and product labels over captured photos. Currently simulated; types (DetectedProduct) and overlay patterns are production-ready for a real AI backend."
+  - "Frontend: Offline-queued photos must be tracked with their associated event and data card context to ensure correct server-side association on sync."
+  - "Backend: Server must handle out-of-order data arrival gracefully — events synced after connectivity restoration may arrive hours after they occurred."
+  - "Backend: Timestamp-based conflict resolution requires synchronized clocks — device time drift could cause incorrect conflict winners."
+  - "Backend: The sync API should support batch operations to minimize round trips when processing a large offline queue."

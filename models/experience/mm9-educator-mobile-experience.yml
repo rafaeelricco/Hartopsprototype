@@ -1,0 +1,197 @@
+id: "mm9"
+title: "Educator Mobile Experience"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm8"
+    - "mm5"
+  feeds_into: []
+
+context: |
+  The educator mobile app is the data collection engine for the entire platform. Every
+  downstream revenue stream — client reports, billing, the future data institute — depends
+  on educators capturing accurate, structured data in real time during live consumer
+  interactions. If the new app doesn't make data entry effortless during the event itself,
+  the data quality problem persists and the platform's value proposition collapses.
+
+scope:
+  in_scope:
+    - "Authentication and minimal onboarding"
+    - "Navigation (Events + Availability + Settings, three tabs)"
+    - "Events list (Upcoming/Past)"
+    - "Pre-event details (read-only preparation)"
+    - "Live event dashboard with data collection cards"
+    - "Consumer profiling flow (Passive/Active, depth levels)"
+    - "Sales tracking (manual product counter), venue survey (structured multi-phase), brand education content"
+    - "AI-powered assistance (voice-to-data, smart notifications, image recognition)"
+    - "Check-in/check-out with geolocation"
+    - "Post-event review and 24-hour editing window"
+    - "Offline mode"
+  out_of_scope:
+    - "Trial client staff event configuration (see Trial Client Staff Experience)"
+    - "Educator Manager coordination and finalization (see Educator Manager Experience)"
+    - "Hart Ops platform administration (see Hart Ops Experience)"
+    - "Business model and transformation strategy (see Business Model)"
+    - "Phase 1 delivery scope (see Phase 1 Scope)"
+
+key_concepts:
+  - term: "Data Collection Card"
+    definition: "A single-tap entry point on the live event screen that opens a full-screen, focused workflow for one type of data capture. Cards appear dynamically based on client configuration."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.16"
+      - doc: "Briefing Document"
+        details: "Live event execution section"
+  - term: "Smart Notifications"
+    definition: "Contextual push notifications nudging educators based on event progress (e.g., time without a sample, sales target reminders)."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.17-18"
+  - term: "Educator"
+    definition: "Part-time contracted field worker. Gig workers who may do two events per day within ~100-mile radius. Not a teacher — industry-specific term."
+    sources:
+      - doc: "Briefing Document"
+        details: "Role definition"
+      - doc: "Chris, Demo Meeting"
+        details: "~05:22, ~01:10:03"
+
+core_content:
+  - section_title: "Authentication and Onboarding"
+    points:
+      - "Invitation-only — educators cannot self-register."
+      - "Deep-links to app (redirects to app store if not installed)."
+      - "After activation: biometric login (optional), geolocation, notification, and camera permissions (all three mandatory — app blocks if denied)."
+      - "Deliberately minimal — app must be usable within minutes of activation."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.15, §1.1-1.3"
+  - section_title: "Navigation"
+    points:
+      - "Bottom navigation: Availability (first tab, default), Events (center), Settings (right). Availability-first order ensures it is the default landing context."
+      - "Three primary tabs — Availability was elevated from a deferred item to the first tab to eliminate back-channel scheduling via phone/text. Future tabs (Performance, Earnings, Training) anticipated."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.15, §2"
+      - doc: "TASKS.md"
+        details: "§1.1 Availability & Calendar"
+  - section_title: "Availability & Calendar"
+    points:
+      - "Primary tab with calendar-based availability management."
+      - "Educators toggle day-level and time-slot-level (Morning/Afternoon/Evening) availability."
+      - "Visual indicators: teal dots for available days, burgundy dots for days with assigned events."
+      - "Contextual reminder notifications nudge educators to keep availability up to date."
+      - "Weekly summary in header shows at-a-glance availability status."
+    sources:
+      - doc: "TASKS.md"
+        details: "§1.1"
+      - doc: "CONTEXT.md"
+        details: "Chris: 'The big thing that needs to be front and center is availability'"
+  - section_title: "Events List (Homepage)"
+    points:
+      - "Two tabs: Upcoming Events (default), Past Events."
+      - "Event cards: name, location, date/time, dynamic status (Not Started, Check-in Available, In Progress, Completed)."
+      - "Live indicator on events within 1 hour of go-live."
+      - "Educators see only events assigned to them."
+    sources:
+      - doc: "Functionality PDF"
+        details: "pp.15-16, §3.1"
+  - section_title: "Pre-Event Details"
+    points:
+      - "Pinned top: event name, location (Get Directions), date/time (Add to Calendar)."
+      - "Collapsible sections: products, instructions, materials, goals, compensation, contacts."
+      - "Entirely read-only. One tap to maps, calendar, or phone."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.16, §3.2"
+  - section_title: "Live Event Dashboard"
+    points:
+      - "Core screen after check-in. Always visible: event name, countdown timer, progress indicator."
+      - "Three implemented data collection cards: Consumer Profiling, Sales Tracking (manual product counter), Venue Survey (structured multi-phase). Additional cards (Passive Counting, Product Feedback, QR Code) are architected but not yet implemented."
+      - "Brand Guide quick-access button on dashboard — non-task element providing per-brand education content."
+      - "Each card opens a full-screen focused workflow."
+      - "Design principle: cards, not forms. Every data point is a tap, swipe, or photo."
+    sources:
+      - doc: "Functionality PDF"
+        details: "pp.16-17, §3.3"
+      - doc: "Chris, Demo Meeting"
+        details: "~10:42, ~27:19, ~46:03"
+  - section_title: "Consumer Profiling Flow"
+    points:
+      - "Passive Counting: simple -/+ counter buttons."
+      - "Active Profiling: gender (3 buttons) → age range (4 buttons) → emoji rating (5 emojis) → purchase intent (3 buttons)."
+      - "Depth levels (configured by client): Quick (10 sec), Standard (30 sec), Deep (45 sec)."
+      - "Big tap-friendly buttons, zero typing."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.16"
+      - doc: "Chris, Demo Meeting"
+        details: "~27:19, ~10:42"
+  - section_title: "Sales Tracking, Venue Survey, and Brand Education"
+    points:
+      - "Sales Tracking: manual product-level counter with campaign-preloaded products (CampaignProduct[]). Tap-to-count per product with venue-specific labels (on-premise = 'drinks served', off-premise = 'bottles sold'). No AI/AR/camera — purely manual. Campaign origin banner shows product source."
+      - "Venue Survey (renamed from Venue Intelligence): structured multi-phase flow replacing simple photo capture. Camera phase with 8 photo categories (shelf, backbar, cooler, menu, cold-box, window, display, other). AI-assisted product detection overlay with bounding boxes. Account profile tracking (displays, cold boxes, coolers, windows, confirmed products with facings/prices). Voice-note integration. Quick capture with deferred review."
+      - "Brand Education: per-brand collapsible content sections (serving instructions, brand scripts, setup info, product info). Multi-brand tab navigation. Accessible from both pre-event details and live event dashboard."
+      - "Product Feedback: not yet implemented (flavor sliders, A/B comparison planned for future)."
+    sources:
+      - doc: "Implementation"
+        details: "sales-tracking-card.tsx, venue-intelligence-card.tsx, brand-info-card.tsx"
+      - doc: "Chris, Demo Meeting"
+        details: "~13:24, ~21:14"
+  - section_title: "AI-Powered Assistance"
+    points:
+      - "Voice-to-Data: scoped to the Venue Survey review phase — educator holds to record venue observations, AI transcribes into VenueAccountProfile.voiceNoteTranscript."
+      - "Image Recognition: within venue survey camera phase — AI product detection renders bounding boxes on shelf/display photos (ImageRecognitionOverlay component). Currently simulated UI; types and overlay patterns ready for real AI backend."
+      - "Smart Notifications: implemented via useSmartNotifications hook — contextual toasts on the live event dashboard based on event progress (time without activity, task reminders)."
+      - "Voice recording of consumer conversations is legally problematic — for educator observations only."
+    sources:
+      - doc: "Functionality PDF"
+        details: "pp.17-18"
+      - doc: "Implementation"
+        details: "venue-intelligence-card.tsx, image-recognition-overlay.tsx, useSmartNotifications hook"
+  - section_title: "Brand Education"
+    points:
+      - "Per-brand collapsible content sections: serving instructions, brand scripts, setup information, product info (BrandEducationContent type with BrandEducationItem[] items)."
+      - "Multi-brand tab navigation when the event includes multiple brands."
+      - "Dual entry points: accessible from both pre-event details screen (preparation context) and live event dashboard (Brand Guide quick-access button)."
+      - "Content is read-only — determined by the campaign's brandEducation configuration on EventInfo."
+    sources:
+      - doc: "Implementation"
+        details: "brand-info-card.tsx; event.ts — BrandEducationContent, BrandEducationItem types"
+  - section_title: "Check-out and Post-Event"
+    points:
+      - "Check-out disabled until all required tasks complete. Visible checklist of remaining items."
+      - "Geolocation verified at both check-in AND check-out."
+      - "Post-event: read-only after 24 hours OR manager finalization, whichever comes first."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.18, §3.4"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:09:06"
+  - section_title: "Offline Mode"
+    points:
+      - "Full offline functionality: cached events, local timestamps, data entry saved locally."
+      - "Auto-sync when online; retry on failure."
+      - "Banner: 'Working Offline — Will sync when online.' Photo upload inactive until online."
+      - "Hard requirement — educators use personal phones in retail connectivity dead zones."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.18, §5"
+      - doc: "Chris, Demo Meeting"
+        details: "~43:06, ~43:36"
+
+assumptions:
+  - "App must be usable with zero training — educators are part-time gig workers, not full-time employees."
+  - "Educators use personal devices with limited data plans (BYOD)."
+  - "Three core data collection cards (Consumer Profiling, Sales Tracking, Venue Survey) always appear on the live event dashboard. Client configuration determines which products are loaded into sales tracking and which brand education content is available."
+  - "Educators will resist data collection that feels like additional unpaid work."
+  - "Verifiable physical presence at the venue is primary proof the event happened."
+  - "QR code feature assumes consumers have smartphones and willingness to scan."
+  - "Event coordination (accepting, declining, rescheduling) happens outside the app for Phase 1, but availability entry is now in-platform via the Availability tab."
+
+implications:
+  - "The mobile experience cannot be a static, one-size-fits-all form — must dynamically adapt."
+  - "Every data collection interaction must be designed for 5-10 seconds maximum."
+  - "The app must function seamlessly with partial or zero connectivity."
+  - "Data collection must be rigidly enforced at point of interaction to prevent post-event fabrication."
+  - "Change management is a product design problem, not an operations problem."

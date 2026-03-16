@@ -1,0 +1,90 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Event Monitoring
+# =============================================================================
+
+id: "mm-ui-004"
+title: "Event Monitoring"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "mm-ui-005"
+
+context: |
+  As an Operating Staff member, I need to monitor events across list and
+  calendar views and track their lifecycle from editable configuration through
+  live data feed to locked final report, so I can manage field operations
+  efficiently and ensure data integrity post-event.
+
+scope:
+  in_scope:
+    - "Event List View as default"
+    - "Event Calendar View (monthly grid)"
+    - "Toggle between List and Calendar views"
+    - "Event Detail Lifecycle — three phases"
+    - "Weekend clustering visibility in Calendar View"
+  out_of_scope:
+    - "Event creation wizard (covered in mm-ui-003)"
+    - "Report generation and export (covered in mm-ui-005)"
+    - "Educator assignment and scheduling"
+    - "Event cancellation or rescheduling workflows"
+
+key_concepts:
+  - term: "Event Lifecycle"
+    definition: "The three-phase progression of an event: Editable Configuration → Live Data Feed → Locked Final Report."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.4 — Detail Lifecycle"
+  - term: "Weekend Clustering"
+    definition: "The pattern of events concentrating on weekends, making calendar view essential for identifying scheduling density."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.4 — List & Calendar Views, Rationale"
+
+core_content:
+  - section_title: "List & Calendar View Toggle"
+    points:
+      - "Entry Point: Navigating to the Events section from Side Nav."
+      - "Elements: Default view is List View showing events in tabular format."
+      - "Elements: Toggle control to switch between List View and Calendar View."
+      - "Elements: Calendar View displays a monthly grid mapping events to dates."
+      - "Design principle: Operators need both chronological (list) and spatial/temporal (calendar) views to manage events."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.4 — List & Calendar Views"
+
+  - section_title: "Calendar View — Geographic & Temporal Grouping"
+    points:
+      - "Functionality: Monthly grid highlights weekend clustering patterns."
+      - "Design principle: Operators must group events geographically and chronologically for efficient management."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.4 — Rationale"
+
+  - section_title: "Event Detail Lifecycle"
+    points:
+      - "Phase 1 — Editable Configuration: Event details can be modified before the event starts."
+      - "Phase 2 — Live Data Feed: During the event, real-time data flows in from field educators."
+      - "Phase 3 — Locked Final Report: After event completion, the report is locked and becomes read-only."
+      - "Functionality: Lifecycle phases are sequential and irreversible — once locked, a report cannot be edited."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.4 — Detail Lifecycle"
+
+assumptions:
+  - "List View supports sorting and filtering by date, status, campaign, and location."
+  - "Calendar View supports navigation between months (previous/next)."
+  - "The transition from Editable to Live happens automatically when the event's scheduled date/time arrives."
+  - "The transition from Live to Locked happens automatically after a defined post-event window."
+  - "Locked Final Report is viewable but not editable — no unlock mechanism is described."
+  - "Live Data Feed phase shows partial/incoming data in near real-time."
+
+implications:
+  - "Frontend: Implement dual-view toggle with shared event data source to avoid redundant API calls."
+  - "Frontend: Calendar component must handle dense weekend clustering without visual clutter."
+  - "Frontend: Event detail view needs clear phase indicators showing current lifecycle state."
+  - "Backend: Event lifecycle state machine must enforce phase transitions and prevent edits on locked events."
+  - "Backend: Live Data Feed requires real-time or near-real-time data ingestion pipeline from mobile app."
+  - "Architecture: Consider WebSocket or SSE for Live Data Feed phase to push updates to the monitoring view."

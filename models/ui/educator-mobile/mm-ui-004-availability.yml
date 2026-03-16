@@ -1,0 +1,108 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Educator Mobile Availability & Calendar
+# =============================================================================
+
+id: "mm-ui-004"
+title: "Educator Mobile Availability & Calendar"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "mm9"
+    - "mm-ui-001"
+  feeds_into: []
+
+context: |
+  Availability management is a critical process gap in the current Hart workflow. Managers
+  currently rely on phone calls, text messages, and emails to coordinate educator schedules —
+  a back-channel that is inefficient and error-prone. By making availability a primary tab
+  in the educator mobile app, educators are nudged to maintain their calendar proactively.
+  Managers can then view real-time availability when assigning educators to events (§2.2),
+  eliminating manual scheduling overhead. As an educator, I need a simple, always-visible
+  way to manage my availability so managers can assign me to events without phone calls.
+
+scope:
+  in_scope:
+    - "Primary tab navigation placement for availability"
+    - "Calendar-based availability visualization and editing"
+    - "Day-level and time-slot-level availability toggling"
+    - "Visual indicators for available days, unavailable days, and days with events"
+    - "Ping/reminder notifications to update stale availability"
+    - "Weekly availability summary in header"
+  out_of_scope:
+    - "Manager-facing availability read view (staff dashboard, §2.2)"
+    - "Automated event assignment based on availability"
+    - "Recurring availability patterns (e.g., every Monday available)"
+    - "Integration with external calendar services (Google Calendar, iCal)"
+    - "Backend persistence and sync of availability data"
+
+key_concepts:
+  - term: "Primary Tab Placement"
+    definition: "Availability is positioned as the first tab (leftmost) in the bottom navigation bar — before Events and Settings — to ensure it is the default landing context and 'front and center.' This placement serves as a constant visual reminder."
+    sources:
+      - doc: "TASKS.md"
+        details: "Section 1.1 Availability & Calendar — primary tab requirement"
+      - doc: "CONTEXT.md"
+        details: "Chris feedback: 'The big thing that needs to be front and center is availability and having a calendar functionality built into here.'"
+  - term: "Availability Slot"
+    definition: "A time-of-day segment (Morning 6a–12p, Afternoon 12p–6p, Evening 6p–10p) within a given day that an educator can independently mark as available or unavailable. Provides granularity beyond full-day toggling."
+    sources:
+      - doc: "TASKS.md"
+        details: "Section 1.1 — real-time availability for manager assignment"
+  - term: "Availability Reminder"
+    definition: "An in-app notification that nudges educators to update their availability when it becomes stale (no updates in N days) or when upcoming weeks have no availability set. Designed to establish a habit of proactive schedule maintenance."
+    sources:
+      - doc: "TASKS.md"
+        details: "Section 1.1 — ping/reminder notifications"
+      - doc: "CONTEXT.md"
+        details: "Chris: 'maybe even having something that pings them once in a while to hey don't forget to update your availability'"
+
+core_content:
+  - section_title: "Calendar View"
+    points:
+      - "Entry Point: Educator taps the Availability tab in the bottom navigation bar."
+      - "Elements: Monthly calendar grid showing the current month with navigation arrows for previous/next months."
+      - "Elements: Available days are marked with a teal dot indicator below the date number."
+      - "Elements: Days with assigned events show a burgundy dot indicator (non-toggleable by the educator)."
+      - "Elements: The currently selected day has a highlighted ring/background."
+      - "Design principle: The calendar is the primary interaction surface — educators scan and tap to manage their schedule."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), general availability requirements"
+
+  - section_title: "Day Detail & Time Slots"
+    points:
+      - "Entry Point: Educator taps on a specific day in the calendar grid."
+      - "Elements: A detail card slides into view below the calendar showing the selected date."
+      - "Functionality: Three time-slot toggles — Morning (6a–12p), Afternoon (12p–6p), Evening (6p–10p) — each independently toggleable."
+      - "Functionality: Quick action buttons — 'Mark Available All Day' sets all three slots ON, 'Mark Unavailable' sets all three OFF."
+      - "Edge Case: If the selected day has an assigned event, the event details are shown read-only alongside the availability slots."
+      - "Design principle: Slot-level granularity lets educators express partial availability without complex time-range inputs."
+
+  - section_title: "Reminder Notifications"
+    points:
+      - "Functionality: An amber banner appears at the top of the availability screen when availability data is stale (no updates in 5+ days)."
+      - "Functionality: A secondary reminder appears when the upcoming week has no availability set at all."
+      - "Functionality: Banners are dismissible but re-appear on the next app session if the underlying condition persists."
+      - "Design principle: Gentle nudges create a habit loop — educators learn to maintain their availability proactively, reducing manager workload."
+
+  - section_title: "Header Summary"
+    points:
+      - "Elements: The branded header displays a contextual summary — e.g., '3 days available this week' — giving an at-a-glance status."
+      - "Functionality: The summary pill updates dynamically as the educator toggles availability."
+      - "Design principle: The summary reinforces the impact of maintaining availability — educators see their 'contribution' quantified."
+
+assumptions:
+  - "Three time slots (Morning, Afternoon, Evening) provide sufficient granularity for event scheduling purposes."
+  - "Availability data is local-only in the prototype; production would sync to the backend for managers to query."
+  - "Event indicators on the calendar are derived from the existing event list data in the app."
+  - "Reminder thresholds (5 days for stale data, 1 week forward look) are initial defaults; production may make these configurable."
+  - "Educators manage availability for future dates only — past dates are not editable."
+
+implications:
+  - "Frontend: Bottom navigation expanded to 3 tabs (Availability, Events, Settings) — implemented with equal spacing in bottom-nav.tsx."
+  - "Frontend: The react-day-picker Calendar component needs custom day rendering to display availability/event dot indicators."
+  - "Frontend: Availability state must be tracked per-day with slot-level granularity — a Map or keyed object structure is appropriate."
+  - "Backend: Production implementation will require an availability API (CRUD per educator per date/slot) and real-time sync."
+  - "Backend: Manager-facing availability query endpoint (filtered by geography, date range, and skill set) feeds into §2.2 assignment suggestions."
+  - "Process: The availability reminder flow should be complemented by manager-side visibility — if an educator hasn't updated in N days, surface that on the manager dashboard too."

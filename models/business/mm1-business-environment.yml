@@ -1,0 +1,156 @@
+id: "mm1"
+title: "Business Environment"
+status: "approved"
+
+dependencies:
+  depends_on: []
+  feeds_into:
+    - "mm2"
+
+context: |
+  External factors beyond Hart's control that shape how it operates — the US beverage
+  alcohol supply chain, regulatory landscape, competitive dynamics, labor market realities,
+  technology environment, and seasonal/macroeconomic trends.
+
+scope:
+  in_scope:
+    - "US beverage alcohol supply chain (three-tier system)"
+    - "State-level regulatory variation for alcohol marketing"
+    - "Competitive landscape (field agencies, Circana/Nielsen)"
+    - "Educator workforce dynamics (gig economy, BYOD)"
+    - "Consumer behavior shifts and industry macro trends"
+    - "Technology constraints (offline connectivity, AI readiness)"
+    - "Seasonality and climate impact on events"
+    - "Consumer privacy and legal compliance"
+  out_of_scope:
+    - "Hart's internal operations and workflows (see Current Campaign Operations)"
+    - "Hart's revenue model and business canvas (see Business Model)"
+    - "Platform features and UX per role (see role-specific experience models)"
+    - "Hart's transformation strategy and phasing (see Vision and Transformation Strategy)"
+
+key_concepts:
+  - term: "Three-tier system"
+    definition: "Legally mandated US alcohol distribution: Supplier → Distributor → Retailer. Hart operates adjacent, not within."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~03:18"
+      - doc: "hart_context_v1.yaml"
+        details: "industry_structure.three_tier"
+  - term: "Educator"
+    definition: "Part-time contracted field worker who executes sampling events at retail locations. Industry-specific term in beverage alcohol marketing — not a teacher."
+    sources:
+      - doc: "Briefing Document"
+        details: "Background"
+      - doc: "Chris, Demo Meeting"
+        details: "~05:22"
+  - term: "TD Links"
+    definition: "Trade Development links — industry-standard identifiers connecting brands, distributors, and retail accounts."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~16:21"
+      - doc: "hart_context_v1.yaml"
+        details: "domain_functional"
+  - term: "Circana/Nielsen"
+    definition: "Market research firms selling syndicated data on consumer purchasing and retail trends. Both potential competitors and potential buyers of Hart's unique in-store data."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~03:46, ~25:07"
+
+core_content:
+  - section_title: "Political: Three-tier distribution and regulatory variation"
+    points:
+      - "US alcohol follows mandated supply chain: Supplier → Distributor → Retailer → Consumer. In place since 1933."
+      - "No tier may legally bypass another in most states. Direct-to-consumer wine has contracted, pushing industry back toward traditional flows."
+      - "Hart is not a tier — it operates in the marketing space between supplier budgets and retail execution."
+      - "Alcohol regulation is state-controlled, not federal — laws differ on sampling rules, signage, marketing claims, and licensing."
+      - "Expansion introduces new constraints each time — regulatory patchwork spans control to open franchised states."
+      - "Cannabis legalization creates a parallel vertical opportunity and potential labor market competitor."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~02:50–03:18, ~06:50"
+      - doc: "hart_context_v1.yaml"
+        details: "regulatory.alcohol_marketing"
+  - section_title: "Economic: Industry scale and Hart's position"
+    points:
+      - "US wine & spirits wholesaling is $146.7B (2026). Highly fragmented: top 3 distributors control ~26%."
+      - "Marketing budgets flow opposite to product: supplier allocates brand budget → portion to distributor → distributor or supplier hires Hart."
+      - "Hart sits between marketing budgets and retail execution. Scale: 1,000+ educators, ~50 clients."
+      - "Hart charges clients by the hour. Clients include suppliers and distributors — roughly 50/50 split."
+      - "Premiumization trend: fewer Americans drinking, but per capita expenditure rising."
+      - "Product mix shifting: Tequila breakout, RTDs tripled 2018–2023. Whiskey growth cooling."
+      - "Moderation: nearly half of Americans planned to drink less in 2025."
+    sources:
+      - doc: "IBISWorld 42482"
+        details: "Industry report"
+      - doc: "Chris, Demo Meeting"
+        details: "~21:01, ~06:50–07:46"
+      - doc: "Diageo Annual Report 2025"
+        details: "Macro trends"
+  - section_title: "Social: Workforce and consumer dynamics"
+    points:
+      - "Educators are part-time, gig-economy workers — comparable to Uber drivers with low loyalty and unpredictable availability."
+      - "Personable and presentable but not tech-inclined. Use personal devices (BYOD)."
+      - "Consumers are receptive during sampling but do not want to feel surveilled."
+      - "Data collection must be invisible or frictionless."
+      - "Retailers welcome Hart's events because they drive sales ('free money')."
+      - "Retailers resist pure data-collection visits but welcome Hart."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~05:22, ~10:42, ~04:43"
+      - doc: "Chris, Intro Meeting"
+        details: "Retailer relationship"
+  - section_title: "Technological: Connectivity, devices, and AI"
+    points:
+      - "Offline capability is a hard requirement for retail 'dead zones.'"
+      - "BYOD means no control over device specs or OS versions."
+      - "Image recognition AI is still considered the 'holy grail' — remains somewhat unreliable for shelf tags/bottles."
+      - "TD Links are industry-standard retail identifiers required for platform integration."
+      - "Major clients moving toward API-based reporting and electronic invoicing."
+      - "Wholesalers increasingly tech-enabled (e.g., Southern Glazer's 'Proof' platform)."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~42:36, ~12:54–14:52, ~59:31"
+      - doc: "hart_context_v1.yaml"
+        details: "Technology section"
+  - section_title: "Environmental: Seasonality and climate"
+    points:
+      - "Pronounced seasonality: summer peaks and holiday spikes (St. Patrick's Day, Christmas)."
+      - "Weather directly impacts performance — cold/snow reduces foot traffic."
+    sources:
+      - doc: "hart_context_v1.yaml"
+        details: "Seasonality"
+      - doc: "Chris, Demo Meeting"
+        details: "~50:47"
+  - section_title: "Legal: Privacy and compliance"
+    points:
+      - "CCPA and state-level privacy patchwork trending stricter."
+      - "No audio recording without explicit consent (two-party consent laws)."
+      - "Age verification is mandatory for sampling."
+      - "Geolocation serves as proof of presence for billing/audit."
+      - "Educators are 'technically employees,' affecting labor law compliance."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~26:01–26:51, ~01:10:33"
+      - doc: "hart_context_v1.yaml"
+        details: "regulatory section"
+
+assumptions:
+  - "The three-tier distribution system will remain legally mandated for the foreseeable future."
+  - "Hart's current markets represent the range of regulatory complexity the platform must handle."
+  - "Educators remain classified as employees through Phases 1–2."
+  - "Circana and Nielsen's collection methods remain researchers in vests."
+  - "Consumer privacy regulation continues to trend stricter at the state level."
+  - "Marketing spend continues shifting toward measurable, experiential channels."
+  - "Hart can legally resell aggregated event data to third parties (Data Institute)."
+  - "Tariff and trade policy changes will not significantly reduce supplier marketing budgets."
+
+implications:
+  - "The platform's compliance layer must be state-scoped, not global."
+  - "Hart's position outside the three-tier chain is a strategic advantage the platform must preserve."
+  - "Offline-first is a non-negotiable architectural constraint."
+  - "Consumer data collection must anticipate stricter privacy regulation from Phase 1."
+  - "Hart's competitive moat is operational access, not just technology."
+  - "Seasonal demand cycles must be a first-class concept in the data model."
+  - "Educator workforce realities (non-technical, personal devices) constrain mobile UX more than any technical factor."
+  - "The moderation trend is a tailwind for Hart's data value."
+  - "Distributor consolidation and digital capability are potential competitive threats."

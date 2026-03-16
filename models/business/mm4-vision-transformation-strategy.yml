@@ -1,0 +1,127 @@
+id: "mm4"
+title: "Vision and Transformation Strategy"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm3"
+  feeds_into:
+    - "mm5"
+
+context: |
+  Hart's three long-term ambitions (SaaS platform, data institute, vertical expansion),
+  why the four-phase transformation is structured the way it is, what Phase 1 specifically
+  delivers and proves, and the design constraints that flow from the vision into everything
+  Ambar builds.
+
+scope:
+  in_scope:
+    - "Three long-term ambitions: SaaS platform, Data Institute, Vertical Expansion"
+    - "The four-phase transformation structure and de-risking logic"
+    - "Why trial clients first (not Hart)"
+    - "The flywheel effect (events → data → clients → events)"
+    - "Design constraints that flow from the vision"
+    - "Ambar's role as implementation partner"
+  out_of_scope:
+    - "Hart's current revenue model and operational cycle (see Business Model)"
+    - "Detailed platform UX per role (see role-specific experience models)"
+    - "Phase 1 feature scope and delivery plan (see Phase 1 Scope)"
+    - "Industry supply chain mechanics and competitive landscape (see Business Environment)"
+
+key_concepts:
+  - term: "Trial Client"
+    definition: "An external marketing agency (not Hart itself) that pilots the new platform in Phase 1. Chosen because they approach the product without legacy HEMS expectations."
+    sources:
+      - doc: "Briefing Document"
+        details: "Phase 1 section"
+  - term: "Data Institute"
+    definition: "Hart's term for the business unit that will package, expose, and sell aggregated event data to the wider industry."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~29:40"
+      - doc: "Briefing Document"
+        details: "The Vision, item 2"
+  - term: "Affiliate"
+    definition: "An external marketing agency that uses Hart's platform to run their own events and educator networks, contributing data to Hart's aggregated pool."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~35:00, ~01:00:51"
+
+core_content:
+  - section_title: "Ambition 1: SaaS Platform for the Industry"
+    points:
+      - "Transforming the operational model into a B2B product for other marketing agencies."
+      - "Target: small agencies in regional markets where Hart doesn't operate."
+      - "Replaces email-based communication with client self-service portals."
+    sources:
+      - doc: "Briefing Document"
+        details: "The Vision, item 1"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:42:04"
+  - section_title: "Ambition 2: Data Institute"
+    points:
+      - "Transitioning to a 'data collector company that does events.'"
+      - "Monetize aggregated intelligence: consumer preferences, shelf audits, competitive pricing."
+      - "AI investments: image recognition for shelf analysis and geofenced consumer profiling."
+    sources:
+      - doc: "Briefing Document"
+        details: "The Vision, item 2"
+      - doc: "Chris, Demo Meeting"
+        details: "~29:14, ~04:16"
+  - section_title: "Ambition 3: Vertical Expansion"
+    points:
+      - "Moving beyond beverage alcohol into food, cannabis, coffee, and other retail consumables."
+      - "'This isn't just for beverage alcohol. This is market information on retailers.'"
+      - "Requires flexible data model accommodating generic product types and venue categories."
+    sources:
+      - doc: "Briefing Document"
+        details: "The Vision, item 3"
+      - doc: "Chris, Demo Meeting"
+        details: "~16:41, ~01:31:44"
+  - section_title: "The Flywheel Effect"
+    points:
+      - "Events generate data → Data attracts clients → Clients generate events → More data."
+      - "Competitive advantage: Hart provides sales value to retailers while collecting data."
+    sources:
+      - doc: "Briefing Document"
+        details: "Strategic framing"
+  - section_title: "The Four-Phase Structure: De-risking by Validation"
+    points:
+      - "Phase 1 (Validation): Build SaaS for external trial clients. Proves product-market fit."
+      - "Phase 2 (Migration): Move Hart's 60k events/year to the platform. Proves operational reliability."
+      - "Phase 3 (Scale): Multi-tenant growth and ERP integrations. Proves scalability."
+      - "Phase 4 (Monetization): Expose and sell aggregated data. Proves data product viability."
+    sources:
+      - doc: "Briefing Document"
+        details: "The 4 Phases"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:01:19–01:37:16"
+  - section_title: "Design Constraints from the Vision"
+    points:
+      - "Multi-tenant from day one: Phase 1 serves external clients; cannot retrofit later."
+      - "Dynamic configuration: no hard-coding per-client setups."
+      - "Data schema designed for aggregation: capturing normalized data now for Phase 4."
+      - "Platform, not tool: must be extensible for Phase 3/4 integrations."
+      - "Mobile-first data quality: foundation for the entire business model."
+    sources:
+      - doc: "Briefing Document"
+        details: "Vision constraints"
+      - doc: "Chris, Demo Meeting"
+        details: "Design discussions"
+
+assumptions:
+  - "Hart's leadership has committed budget and organizational support for all four phases, not just Phase 1."
+  - "External trial clients exist and are willing to pilot an unproven platform."
+  - "Hart's competitive advantage (educators are already inside stores) is durable and not easily replicated."
+  - "Data collected during events will be legally sellable to third parties in a data institute model."
+  - "Phases 2-4 will be built by Ambar (long-term partnership implied)."
+  - "The four-phase framing is a de-risking strategy, not a fixed roadmap."
+
+implications:
+  - "Phase 1 is a core business hypothesis test."
+  - "The foundation of how data is standardized is the cornerstone of the strategy."
+  - "The ability to flexibly tailor configurations without manual intervention is critical to scaling."
+  - "The mobile app must be treated as a first-class strategic product."
+  - "The business must plan for massive scale and new revenue streams from the outset."
+  - "The two trial clients will disproportionately shape the platform's initial direction."
+  - "Preserving domain knowledge and strategic intent is critical to continuity."

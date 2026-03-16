@@ -1,0 +1,142 @@
+id: "mm2"
+title: "Business Model"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm1"
+  feeds_into:
+    - "mm3"
+
+context: |
+  How Hart generates revenue today, the end-to-end operational cycle that produces
+  that revenue, and how that model evolves across the four-phase transformation into
+  a SaaS platform, data institute, and multi-vertical business.
+
+scope:
+  in_scope:
+    - "Hart's current revenue model (hourly billing, event-fee-based)"
+    - "Client types: suppliers vs distributors (50/50 split)"
+    - "The operational cycle from client request to payment"
+    - "Data collected during events"
+    - "Current software tools (HEMS, Cross Box, mobile app)"
+    - "Key problems with the current model"
+    - "Transformation goals: SaaS, Data Institute, Vertical Expansion"
+    - "The four-phase transformation roadmap"
+  out_of_scope:
+    - "Industry supply chain mechanics and competitive landscape (see Business Environment)"
+    - "Detailed platform UX per role (see role-specific experience models)"
+    - "Phase 1 feature scope and delivery plan (see Phase 1 Scope)"
+    - "Strategic rationale for the four phases (see Vision and Transformation Strategy)"
+
+key_concepts:
+  - term: "HEMS"
+    definition: "Hart's existing internal event management software (web + mobile). Currently hard-coded for Hart's own operations, not multi-tenant."
+    sources:
+      - doc: "Chris, Intro Meeting"
+        details: "~00:08:31"
+  - term: "Campaign"
+    definition: "A container grouping multiple events under a shared budget, client, and brand objectives — typically spanning 6-12 months."
+    sources:
+      - doc: "Briefing Document"
+        details: "Campaign definition"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:15:39"
+  - term: "Educator Manager"
+    definition: "Regional coordinator who assigns educators to events and ensures execution quality. Sits between client operations staff and educators."
+    sources:
+      - doc: "Briefing Document"
+        details: "Role definitions"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:33:48"
+  - term: "Cross Box"
+    definition: "A separate reporting database that mirrors event data from the main application. Sync is primarily one-way from HEMS → Cross Box."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~08:45"
+
+core_content:
+  - section_title: "What Hart Is Today"
+    points:
+      - "Beverage alcohol marketing agency based in New York, operating across the US."
+      - "Executes 60,000+ promotional events per year with 1,000+ educators in the field."
+      - "Serves ~50 clients, split roughly 50/50 between suppliers and distributors."
+      - "Has been in business for over 20 years."
+    sources:
+      - doc: "Briefing Document"
+        details: "para. 1"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:04:36, ~00:29:49"
+  - section_title: "Revenue Model"
+    points:
+      - "Hart charges clients by the hour for event execution."
+      - "Revenue is event-fee-based: clients pay per event, Hart pays educators from that fee."
+      - "Billing is per-event, currently generated as individual Excel invoices emailed to clients."
+      - "Profitability is tracked per client: how much Hart charges vs. event cost."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~21:01, ~32:16"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:08:31, ~00:28:35"
+  - section_title: "The Operational Cycle"
+    points:
+      - "1. Client sends campaign request via email (brands, timeframes, target accounts, budget)."
+      - "2. Hart ops person manually enters each event into HEMS."
+      - "3. Events scheduled; Educator Managers coordinate with educators via phone/text."
+      - "4. Educators execute at retail locations: check in (geolocated), sample, collect data, check out."
+      - "5. Data flows through mobile app → HEMS → Cross Box."
+      - "6. Reports compiled and emailed to clients (PowerPoints, Excel files)."
+      - "7. Per-event invoices (Excel) emailed to clients."
+    sources:
+      - doc: "Briefing Document"
+        details: "para. 1-4"
+      - doc: "Chris, Demo Meeting"
+        details: "~07:20–09:15, ~01:12:00"
+  - section_title: "Data Collected During Events"
+    points:
+      - "Consumer profiling: gender, age range, ethnicity, taste preference, purchase intent."
+      - "Sales data: starting/ending inventory, bottles sold, receipt photos."
+      - "Venue intelligence: shelf placement, displays, competitor presence, menus, pricing."
+      - "Event proof: geolocated check-in/out, photos, social media posts."
+      - "Client-specific questionnaires: vary by brand, currently hard-coded per client."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~10:42–13:24"
+      - doc: "Briefing Document"
+        details: "Educators section"
+  - section_title: "Key Problems with the Current Model"
+    points:
+      - "Hard-coded configuration: questionnaires and workflows coded per client, changes risk live operations."
+      - "Communication overhead: thousands of individual emails for invoicing, reporting, requests."
+      - "Data quality: educators fabricate or copy-paste due to clunky app interface."
+      - "No client self-service: clients cannot access data or reports without Hart emailing them."
+      - "Architecture blocks scale: HEMS built for internal use, not multi-tenant."
+    sources:
+      - doc: "Briefing Document"
+        details: "para. 2"
+      - doc: "Chris, Demo Meeting"
+        details: "~46:03, ~09:43, ~32:16"
+  - section_title: "Transformation: SaaS Platform, Data Institute, Vertical Expansion"
+    points:
+      - "Goal 1 — SaaS: Turn operational model into a product other agencies can use."
+      - "Goal 2 — Data Institute: Aggregate event data into a sellable intelligence asset."
+      - "Goal 3 — Vertical Expansion: Extend beyond beverage alcohol to food, cannabis, coffee, etc."
+      - "Phase 1: SaaS for two trial clients. Phase 2: Hart migration. Phase 3: Scale. Phase 4: Data monetization."
+    sources:
+      - doc: "Briefing Document"
+        details: "The Vision, The 4 Phases"
+      - doc: "Chris, Demo Meeting"
+        details: "~29:14, ~01:01:19–01:37:16"
+
+assumptions:
+  - "Hart's current pricing model (hourly rate) will remain the standard for initial external clients."
+  - "Educators will remain part-time, gig-economy workers requiring intuitive, zero-training interfaces."
+  - "The current 50/50 client split (suppliers/distributors) is representative of the addressable market."
+  - "Event data holds sufficient standalone value to be aggregated and monetized as the Data Institute."
+  - "Trial clients will adopt a platform focused purely on event configuration, execution, and reporting."
+
+implications:
+  - "Manual billing and invoicing will become a severe bottleneck at SaaS scale; automation is critical."
+  - "Moving from agency to product requires standardizing event types, objectives, and reporting into templates."
+  - "Data Institute viability depends entirely on accuracy of data captured by temporary educators."
+  - "The platform must handle 60,000-event-per-year complexity without increasing operations headcount."

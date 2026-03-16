@@ -1,0 +1,182 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Educator Mobile Event Execution
+# =============================================================================
+
+id: "mm-ui-002"
+title: "Educator Mobile Event Execution"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "mm9"
+    - "mm-ui-001"
+  feeds_into:
+    - "mm-ui-003"
+    - "mm-ui-004"
+
+context: |
+  Event execution is the core purpose of the educator mobile app. Once checked in at the
+  venue, the educator enters a live dashboard where all data collection happens through
+  purpose-built cards — consumer profiling, sales tracking, and venue survey. Every
+  interaction is designed for taps, counters, and photos, not typing. The flow is bookended by
+  geofenced check-in and check-out to verify physical presence. As an educator, I need
+  a fast, tap-driven interface to capture event data in real time so I can complete my
+  tasks accurately without slowing down consumer interactions.
+
+scope:
+  in_scope:
+    - "Geolocation-verified check-in flow"
+    - "Live event dashboard with persistent elements"
+    - "Consumer profiling data collection card"
+    - "Sales tracking data collection card"
+    - "Venue survey data collection card (renamed from venue intelligence)"
+    - "Geolocation-verified check-out with task gating"
+  out_of_scope:
+    - "Event creation or configuration (client staff responsibility)"
+    - "Pre-event details screen (read-only preparation view)"
+    - "Post-event editing window (24-hour review period)"
+    - "Passive counting card (not yet implemented)"
+    - "Product feedback card (not yet implemented)"
+    - "QR code card (not yet implemented)"
+    - "Smart notifications (covered in mm-ui-003)"
+    - "Brand education content (accessible from dashboard but content management is a separate concern)"
+
+key_concepts:
+  - term: "Geofenced Check-in/Check-out"
+    definition: "A location verification mechanism that confirms the educator is within 500 feet of the event venue before allowing check-in or check-out. Uses device GPS to validate physical presence — the primary proof that the event is happening."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.3 Live Event — Check-in"
+  - term: "Data Collection Card"
+    definition: "A single-tap entry point on the live event dashboard that opens a full-screen, focused workflow for one type of data capture. Each card is purpose-built for its data type — taps, swipes, and photos instead of text input."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.3 Live Event Dashboard"
+  - term: "Campaign Product"
+    definition: "A product pre-loaded from the client's campaign configuration (CampaignProduct type). Products appear in the sales tracking card with their names and optional unit prices — educators count sales per product, they do not manually add products."
+    sources:
+      - doc: "Implementation"
+        details: "event.ts — CampaignProduct interface; sales-tracking-card.tsx — product list rendering"
+  - term: "Venue Type"
+    definition: "A classification set at the event level (on-premise or off-premise) that drives venue-specific UI behavior. On-premise events use 'drinks served' labels; off-premise events use 'bottles sold.' Venue type also influences which photo categories are most relevant in the venue survey."
+    sources:
+      - doc: "Implementation"
+        details: "event.ts — EventInfo.venueType; sales-tracking-card.tsx — venue-specific labels"
+  - term: "Quick Capture / Deferred Review"
+    definition: "A venue survey interaction pattern where educators can snap photos quickly during an event ('take a picture and walk away') and complete the detailed review phase later — e.g., from the car after the event. Addresses the constraint that educators are busy during live events and cannot stop to fill out detailed forms."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~21:14 — 'take a picture and walk away, come back and fill it out later'"
+      - doc: "Implementation"
+        details: "venue-intelligence-card.tsx — quick vs full capture modes, VenueSurveyData.captureMode"
+  - term: "Task Completion Gating"
+    definition: "A UX enforcement pattern where the check-out button remains disabled until all required data collection tasks are completed. A visible checklist shows remaining items, preventing incomplete event submissions."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.4 Check-out"
+
+core_content:
+  - section_title: "Check-in Flow"
+    points:
+      - "Entry Point: Educator taps 'Check In' on an event card when within proximity of the venue."
+      - "Functionality: App verifies educator's GPS location is within 500 feet of the event venue coordinates."
+      - "Functionality: On successful geolocation verification, the event timer starts and the task checklist becomes active."
+      - "Edge Case: If the educator is outside the 500ft radius, a 'Too far from venue' error is displayed."
+      - "Functionality: The 'Too far' error includes an option to request a manual override from the educator manager."
+      - "Design principle: Geofenced check-in is the primary proof that the event is physically happening — it prevents remote data fabrication."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.3 Live Event — Check-in"
+
+  - section_title: "Live Event Interface"
+    points:
+      - "Entry Point: Successful check-in transitions the educator to the live event dashboard."
+      - "Elements: Persistent header showing event name, always visible during the event."
+      - "Elements: Countdown timer displaying remaining event time."
+      - "Elements: Progress indicator showing completed vs. total tasks."
+      - "Elements: Task checklist with three data collection cards as actionable items: Consumer Profiling, Sales Tracking, Venue Survey."
+      - "Elements: Brand Guide quick-access button — opens per-brand education content (serving instructions, scripts, setup info). Non-task element, always accessible."
+      - "Elements: Smart notification toasts appear contextually based on event progress (powered by useSmartNotifications hook)."
+      - "Elements: Venue Survey card shows 'Pending review' badge when photos have been captured but deep review has not been completed."
+      - "Design principle: Persistent elements keep the educator oriented — they always know what event they're in, how much time remains, and what's left to do."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.3 Live Event Dashboard"
+
+  - section_title: "Consumer Profiling Card"
+    points:
+      - "Entry Point: Educator taps the Consumer Profiling card on the live event dashboard."
+      - "Elements: Full-screen modal presenting a sequential single-question flow."
+      - "Functionality: Step 1 — Gender selection (3 large tap buttons)."
+      - "Functionality: Step 2 — Age Range selection (4 large tap buttons)."
+      - "Functionality: Step 3 — Rating via emoji selection (5 emoji buttons)."
+      - "Functionality: Step 4 — Purchase Intent selection (3 large tap buttons)."
+      - "Functionality: After the final step, the consumer counter auto-increments and the card resets for the next consumer."
+      - "Design principle: Zero typing required. Target completion time is under 30 seconds per consumer."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.3 Consumer Profiling"
+
+  - section_title: "Sales Tracking Card"
+    points:
+      - "Entry Point: Educator taps the Sales Tracking card on the live event dashboard."
+      - "Elements: Product list pre-loaded from campaign configuration (CampaignProduct[]) — each product shown as a row with name, unit price, and -/+ counter buttons."
+      - "Functionality: Tap-to-count per product — each tap increments the quantity for that specific product (TrackedProduct[])."
+      - "Functionality: Venue-specific labels driven by EventInfo.venueType — on-premise events display 'drinks served', off-premise events display 'bottles sold.'"
+      - "Elements: Campaign origin info banner at top showing which campaign the products belong to and the campaign source."
+      - "Functionality: Save persists tracked products with quantities to the event's completedData.salesItems array."
+      - "Design principle: No camera, no AI — purely manual product-level counting. Designed for speed and reliability over automation."
+    sources:
+      - doc: "Implementation"
+        details: "sales-tracking-card.tsx; event.ts — CampaignProduct, TrackedProduct types"
+
+  - section_title: "Venue Survey Card (renamed from Venue Intelligence)"
+    points:
+      - "Entry Point: Educator taps the Venue Survey card on the live event dashboard."
+      - "Elements: Multi-phase flow — Camera phase → Quick Confirm → Deep Review."
+      - "Functionality: Camera phase — educator captures photos in 8 categories (shelf, backbar, cooler, menu, cold-box, window, display, other). SurveyPhotoCategory type defines the categories."
+      - "Functionality: AI-assisted product detection — ImageRecognitionOverlay renders bounding boxes with confidence scores and product labels over captured photos (DetectedProduct[]). Currently UI-simulated, ready for real AI backend."
+      - "Functionality: Quick Confirm — after photos, educator can save immediately (quick capture mode) or proceed to deep review (full capture mode). VenueSurveyData.captureMode tracks which mode was used."
+      - "Functionality: Deep Review — full account profile form: display count, cold box count, cooler count, window count, confirmed products with facings and prices (VenueAccountProfile type)."
+      - "Functionality: Voice-note recording within review phase — hold-to-record, AI transcription to text, educator review before saving. Transcription stored in VenueAccountProfile.voiceNoteTranscript."
+      - "Functionality: Deferred review — educator can snap photos during the event and complete the review phase later (e.g., from the car). Dashboard shows 'Pending review' state for incomplete surveys."
+      - "Design principle: Quick capture addresses the live-event time constraint — 'take a picture and walk away, come back and fill it out later.' Deep review captures the structured data that makes venue intelligence actionable."
+    sources:
+      - doc: "Implementation"
+        details: "venue-intelligence-card.tsx, image-recognition-overlay.tsx; event.ts — VenueSurveyData, VenueAccountProfile, SurveyPhoto, DetectedProduct, ConfirmedProduct types"
+      - doc: "Chris, Demo Meeting"
+        details: "~21:14 — deferred review pattern"
+
+  - section_title: "Check-out Flow"
+    points:
+      - "Entry Point: Educator taps 'Check Out' on the live event dashboard."
+      - "Functionality: Check-out button is disabled until all mandatory tasks in the checklist are completed."
+      - "Elements: Visible checklist of remaining incomplete tasks when check-out is attempted prematurely."
+      - "Functionality: Three-phase check-out process — (1) Summary: EventDataSummary component displays all collected data including per-product sales counts (TrackedProduct[]) and venue survey data (VenueSurveyData). (2) Verifying: geolocation confirmation that the educator is still within 500 feet of the venue. (3) Success: confirmation screen with event completion status."
+      - "Elements: Teal-branded checkout header with event metadata pills (duration, total consumers, total sales)."
+      - "Design principle: Task completion gating ensures data quality — educators cannot leave without fulfilling all required data collection. The summary phase gives educators confidence that their work was captured correctly."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 3.4 Check-out"
+      - doc: "Implementation"
+        details: "checkout-screen.tsx — three-phase flow; EventDataSummary component"
+
+assumptions:
+  - "The 500-foot geofence radius is configurable per event or globally — source specifies 500ft as the default."
+  - "Manual override requests for geofence failures are routed to the educator manager, not the client."
+  - "Products in the sales tracking card are pre-loaded from the campaign configuration — educators cannot add products manually."
+  - "Venue type (on-premise / off-premise) is set at the event level and drives UI label variations in sales tracking and photo category suggestions in venue survey."
+  - "The consumer profiling card steps and options are configured per client campaign — the 4-step flow described is the standard template."
+  - "Auto-increment after profiling means each completed flow counts as one consumer interaction — no separate save action."
+  - "The venue survey AI product detection overlay is simulated in the current implementation — UI patterns and types (DetectedProduct, ConfirmedProduct) are in place for future AI backend integration."
+  - "The task checklist contents are determined by the client's event configuration, not the educator."
+
+implications:
+  - "Frontend: Geolocation must be continuously available during event execution — not just at check-in/check-out moments."
+  - "Frontend: Consumer profiling card must support rapid sequential entry — transitions between steps should be instantaneous with no loading states."
+  - "Frontend: Sales tracking card must pre-load campaign products at event start — the product list drives the entire UI. Venue type drives label variations."
+  - "Frontend: Venue survey is the most complex component (~48KB) — multi-phase flow requires careful state management across camera, confirm, and review phases."
+  - "Frontend: Check-out button state must reactively update as tasks are completed — requires real-time checklist tracking. EventDataSummary must render per-product sales data and venue survey results."
+  - "Backend: Geofence validation should happen server-side as well as client-side to prevent GPS spoofing."
+  - "Backend: Campaign product data must be available at event assignment time so the sales tracking card can pre-populate."
+  - "Backend: Event data submissions must be idempotent to handle retry scenarios from offline sync."

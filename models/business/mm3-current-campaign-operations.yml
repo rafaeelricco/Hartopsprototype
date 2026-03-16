@@ -1,0 +1,146 @@
+id: "mm3"
+title: "Current Campaign Operations"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm2"
+  feeds_into:
+    - "mm4"
+
+context: |
+  How Hart runs campaigns and events today — the end-to-end operational cycle from client
+  request to payment, the communication stack, current software (HEMS, Cross Box, iPad app),
+  data collection and reporting methods, and where the process breaks down.
+
+scope:
+  in_scope:
+    - "Campaign intake and planning workflow"
+    - "Educator coordination and scheduling"
+    - "Event execution and data collection"
+    - "Reporting and client delivery"
+    - "Billing and payment processes"
+    - "Current software ecosystem (HEMS, Cross Box, mobile app)"
+    - "Operational breakdowns and pain points"
+  out_of_scope:
+    - "Target-state platform features and Phase 1 deliverables (see Phase 1 Scope)"
+    - "Business model, revenue structure, and pricing (see Business Model)"
+    - "External market forces and industry dynamics (see Business Environment)"
+    - "Rebuild-vs-refactor rationale and transformation roadmap (see Vision and Transformation Strategy)"
+    - "Detailed experience flows for individual user roles (see role-specific experience models)"
+
+key_concepts:
+  - term: "HEMS / My HEMS"
+    definition: "Current Hart Event Management System — the existing web + mobile application managing events, educators, and billing. Built for internal use only; not multi-tenant."
+    sources:
+      - doc: "Chris, Phone Call"
+        details: "~05:37"
+      - doc: "Chris, Demo Meeting"
+        details: "~36:41"
+  - term: "Cross Box / Crossbox"
+    definition: "A separate reporting database that mirrors data from the main HEMS application database. Sync is primarily one-way from HEMS app database → Cross Box."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~08:38, ~34:32"
+  - term: "Educator"
+    definition: "Field worker who executes events — sampling products, collecting consumer data, taking photos, and recording sales figures. Part-time gig workers using personal devices."
+    sources:
+      - doc: "Briefing Document"
+        details: "Role definitions"
+      - doc: "Chris, Demo Meeting"
+        details: "~05:22"
+  - term: "Educator Manager"
+    definition: "Coordinator who sits between Hart ops staff and field educators — recruits, schedules, and supervises educators via phone, text, and the HEMS app."
+    sources:
+      - doc: "Briefing Document"
+        details: "Role definitions"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:10:33"
+
+core_content:
+  - section_title: "Campaign Intake & Planning"
+    points:
+      - "Clients send campaign requests to Hart via email; some use phone calls. No self-service portal."
+      - "A Hart operations person manually enters each event into HEMS."
+      - "Questionnaires and product configurations are hard-coded per brand at the start of the year."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~06:50, ~01:12:00, ~01:19:44"
+  - section_title: "Educator Coordination & Scheduling"
+    points:
+      - "Events loaded into HEMS are pushed to educator managers who have calendar visibility."
+      - "Assignment and availability confirmation happen outside the app — phone, text, WhatsApp."
+      - "Educators geographically constrained (~100-mile radius, personal vehicles)."
+      - "Digital availability tracking was not built into the legacy app (HEMS). The new educator mobile app now includes an Availability tab for in-app availability entry."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~07:46, ~01:10:33"
+      - doc: "Joe, Intro Meeting"
+        details: "~33:00"
+  - section_title: "Event Execution & Data Collection"
+    points:
+      - "Educators check into venues via mobile app (starts timer, displays questionnaire)."
+      - "Data collected: product inventory, prices, sales, consumer demographics, photos, social posts."
+      - "Form-based interface — educators commonly write on paper and transcribe later, or fabricate."
+      - "Geolocation at check-in and check-out as proof of presence."
+      - "Offline connectivity is a real constraint in older urban areas."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~08:16, ~12:00, ~42:48, ~46:29, ~50:18"
+  - section_title: "Reporting & Client Delivery"
+    points:
+      - "Event data pushed from HEMS into Cross Box (separate reporting DB, one-way mirror)."
+      - "Reports delivered as PowerPoint presentations via email."
+      - "Photos serve primarily as proof-of-presence, rarely analyzed."
+      - "Account surveys outsourced to third parties and not integrated into HEMS."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~08:38, ~08:45, ~12:10, ~01:27:47"
+  - section_title: "Billing & Payment"
+    points:
+      - "HEMS generates invoices, but distributor clients require individual Excel invoices per event."
+      - "Creating massive email volume. Billing process is fully manual."
+      - "Larger clients moving toward API-based invoicing, not currently implemented."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~32:00, ~58:35, ~59:00"
+  - section_title: "Current Software Ecosystem"
+    points:
+      - "HEMS web backend: manages events, educators, billing. Well-organized DB but hard-coded workflows."
+      - "HEMS mobile app (iOS only): iPad/iPhone app for educators. Apple-only assumption."
+      - "Cross Box: separate reporting database mirroring HEMS data."
+      - "Communication: email (client↔Hart), phone/text (manager↔educator), email (Hart→client reports)."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~31:29, ~34:32, ~42:07"
+      - doc: "Briefing Document"
+        details: "Software section"
+  - section_title: "Operational Breakdowns"
+    points:
+      - "Data fabrication: cumbersome form interfaces incentivize educators to fill entries after the fact."
+      - "No cancellation workflow: cancelled events remain 'un-executed' without reason tracking."
+      - "Wasted photo data: gigabytes captured but serve only as audit trail."
+      - "Email overload: individualized Excel invoices for thousands of events creates unsustainable burden."
+    sources:
+      - doc: "Chris, Demo Meeting"
+        details: "~12:10, ~32:00, ~45:50"
+      - doc: "Intro Meeting"
+        details: "~31:00"
+
+assumptions:
+  - "Educator recruitment tribal knowledge lives in phone calls, not captured in HEMS."
+  - "Dual-entry is preferable to modifying HEMS. Hart would rather run a parallel system."
+  - "HEMS functionality is stable but inflexible ('90-95% utilization' — problem is quality and agility)."
+  - "Account surveys are a valuable future revenue stream."
+  - "Configuration is static: questionnaire hard-coding happens annually, no mid-campaign adjustments."
+  - "BYOD is the standard. Educators use personal iOS devices."
+
+implications:
+  - "The new platform's first priority is replacing email-based client communication."
+  - "Data quality must be enforced by UX design — move from 'glorified forms' to card-based, real-time capture."
+  - "Offline-first is a hard architectural requirement."
+  - "The hard-coded questionnaire model is the primary flexibility bottleneck."
+  - "Photo data is an untapped asset — leverage AI analysis rather than proof-of-presence only."
+  - "Billing modernization is downstream of event finalization."
+  - "Dual-entry will be a reality during Phase 1."
+  - "Digital availability is a high-value recruitment feature — now addressed via the educator mobile Availability tab."

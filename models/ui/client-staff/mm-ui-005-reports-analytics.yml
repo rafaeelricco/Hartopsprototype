@@ -1,0 +1,102 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Reports & Analytics
+# =============================================================================
+
+id: "mm-ui-005"
+title: "Reports & Analytics"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "TBD — to be filled manually"
+
+context: |
+  As an Operating Staff member, I need centralized performance tracking across
+  events and campaigns with exportable reports, so I can analyze ROI, provide
+  proof-of-performance to clients, and support both executive presentations
+  and raw data analysis workflows.
+
+scope:
+  in_scope:
+    - "Quick Stats real-time roll-up"
+    - "Campaign Comparison side-by-side table"
+    - "Photo Proof Gallery for venue intelligence"
+    - "Export functionality — PDF and CSV formats"
+  out_of_scope:
+    - "Dashboard-level stat cards (covered in mm-ui-001)"
+    - "Individual event report detail view (covered in mm-ui-004)"
+    - "Report configuration during event creation (covered in mm-ui-003)"
+    - "Custom report builder or ad-hoc query tools"
+
+key_concepts:
+  - term: "Quick Stats"
+    definition: "A real-time aggregate roll-up of key metrics — Samples, Consumer Reach, and Total Sales — across all events."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Quick Stats"
+  - term: "Campaign Comparison"
+    definition: "A side-by-side performance table allowing ROI analysis across multiple campaigns."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Campaign Comparison"
+  - term: "Photo Proof Gallery"
+    definition: "A visual grid of event photos used for venue intelligence and proof-of-performance documentation."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Photo Proof Gallery"
+
+core_content:
+  - section_title: "Quick Stats Overview"
+    points:
+      - "Elements: Real-time roll-up displaying Samples, Consumer Reach, and Total Sales."
+      - "Functionality: Metrics aggregate across all events and campaigns in the selected scope."
+      - "Design principle: Provides at-a-glance performance health without drilling into details."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Quick Stats"
+
+  - section_title: "Campaign Comparison"
+    points:
+      - "Elements: Side-by-side performance table comparing multiple campaigns."
+      - "Functionality: Enables ROI analysis by placing campaign metrics adjacent for comparison."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Campaign Comparison"
+
+  - section_title: "Photo Proof Gallery"
+    points:
+      - "Elements: Visual grid layout displaying event photos."
+      - "Functionality: Serves as venue intelligence — visual proof of event execution."
+      - "Design principle: Photos provide qualitative evidence complementing quantitative metrics."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Photo Proof Gallery"
+
+  - section_title: "Export Functionality"
+    points:
+      - "Entry Point: 'Export' button in the Reports view."
+      - "Step 1: User selects export format — PDF or CSV."
+      - "Step 2: System generates the file."
+      - "Step 3: File is downloaded to the user's device."
+      - "Design principle: PDF for brand presentations; CSV for analysts' raw data processing."
+    sources:
+      - doc: "operating_staff_spec.md"
+        details: "Section II.5 — Exports"
+
+assumptions:
+  - "Quick Stats update in real-time as new event data flows in."
+  - "Campaign Comparison allows selecting which campaigns to compare — not all-at-once."
+  - "Photo Proof Gallery supports filtering by event, campaign, or date range."
+  - "PDF export is styled and branded for client-facing presentations."
+  - "CSV export includes all raw data fields for analyst consumption."
+  - "Export generation happens asynchronously for large datasets."
+
+implications:
+  - "Frontend: Quick Stats component needs a real-time data subscription or polling mechanism."
+  - "Frontend: Campaign Comparison table must be responsive and handle varying numbers of campaign columns."
+  - "Frontend: Photo Gallery needs lazy loading and thumbnail optimization for performance."
+  - "Backend: Export service must support async generation with download notification for large reports."
+  - "Backend: PDF generation requires a templating engine with brand-aware styling."
+  - "Backend: CSV export must flatten nested event data into tabular format."

@@ -1,0 +1,126 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Educator Mobile Authentication & Setup
+# =============================================================================
+
+id: "mm-ui-001"
+title: "Educator Mobile Authentication & Setup"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "mm9"
+  feeds_into:
+    - "mm-ui-002"
+
+context: |
+  Educators are part-time gig workers activating a mobile app for the first time via an
+  invitation deep link. The onboarding must be near-instantaneous — password creation,
+  biometric enrollment, and mandatory permission grants all happen in a single sequential
+  flow. Returning users authenticate biometric-first to minimize friction before every event.
+  As an educator, I need to activate and sign into the app quickly so I can start capturing
+  event data without delay.
+
+scope:
+  in_scope:
+    - "Deep link activation and App Store redirect"
+    - "Account activation screen with password creation"
+    - "Sequential mandatory permission prompts"
+    - "Biometric-first sign-in for returning users"
+    - "Biometric failure fallback to email/password"
+    - "Denied mandatory permission blocking and optional permission fallback handling"
+  out_of_scope:
+    - "Self-registration (educators are invitation-only)"
+    - "Forgot password flow (not described in source for mobile)"
+    - "MFA/2FA beyond biometrics"
+    - "Session management and token refresh mechanics"
+    - "Role-based permissions within the educator app"
+
+key_concepts:
+  - term: "Deep Link Activation"
+    definition: "A one-time URL sent via invitation that either opens the app directly or redirects to the App Store for installation. After install, the link routes the educator to the activation screen to set their password."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.1 First-Time Activation"
+  - term: "Biometric-First Authentication"
+    definition: "The default sign-in pattern for returning educators. The app presents biometric authentication (FaceID or Fingerprint) immediately on launch, bypassing the email/password screen entirely unless biometric fails or is cancelled."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.3 Sign In (Returning User)"
+  - term: "Mandatory Permission Gate"
+    definition: "A sequential series of OS-level permission prompts (Biometrics, Geolocation, Notifications, Photo Access) presented during first activation. Geolocation, Notifications, and Photo Access are hard-gated — denying any of these blocks the onboarding flow entirely and the app does not proceed. Biometrics is optional; denying it triggers a fallback to email/password authentication."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.1 First-Time Activation"
+
+core_content:
+  - section_title: "Activation Flow"
+    points:
+      - "Entry Point: Educator receives invitation with a deep link URL."
+      - "Functionality: Deep link opens the app if installed, or redirects to the App Store if not."
+      - "Functionality: After install/open, the deep link routes to the activation screen."
+      - "Elements: Activation screen displays email (pre-filled, read-only) and password creation field."
+      - "Validation: Password must meet strength requirements (minimum 8 characters, 1 uppercase, 1 number, 1 special character)."
+      - "Functionality: On successful password creation, the app proceeds to sequential permission prompts."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.1 First-Time Activation"
+
+  - section_title: "Permission Handling"
+    points:
+      - "Functionality: After password creation, four permission prompts appear sequentially: Biometrics, Geolocation, Notifications, Photo Access."
+      - "Design principle: Prompts are presented one at a time in a fixed order to avoid overwhelming the user."
+      - "Functionality: Geolocation, Notifications, and Photo Access are mandatory — denying any of these displays a blocking overlay with no 'Continue Anyway' option. Each mandatory permission shows a 'Required' badge and replaces 'Not Now' with a 'Why is this required?' secondary action explaining the business rationale. The user must grant the permission to proceed."
+      - "Functionality: Biometrics is optional — denying it shows a soft warning and the user can continue with email/password authentication as fallback."
+      - "Design principle: Mandatory permissions are requested at activation because they are essential to core event workflows (check-in, task execution, compensation)."
+      - "Rationale: Educators are compensated for event work — if they don't enable required permissions, the app cannot function and they cannot get paid."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.1 First-Time Activation — Permissions"
+
+  - section_title: "Sign In (Returning User)"
+    points:
+      - "Entry Point: Educator opens the app after initial activation."
+      - "Functionality: App displays a loading screen, then immediately presents biometric authentication (FaceID or Fingerprint)."
+      - "Functionality: On successful biometric authentication, the educator is routed directly to the Events List."
+      - "Design principle: Biometric-first eliminates the email/password screen entirely for returning users — optimized for speed before events."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.3 Sign In (Returning User)"
+
+  - section_title: "Biometric Failure Fallback"
+    points:
+      - "Entry Point: Biometric authentication fails or is cancelled by the educator."
+      - "Functionality: App falls back to a traditional email and password sign-in screen."
+      - "Functionality: Email and password are validated against the authentication service."
+      - "Edge Case: Multiple biometric failures should not lock the account — the fallback screen is always accessible."
+    sources:
+      - doc: "SaaS Platform Functional Specification.md"
+        details: "Section III Educators (Mobile App), Section 1.3 Sign In — Biometric Failure"
+
+  - section_title: "Settings Permission Management"
+    points:
+      - "Entry Point: Educator navigates to Settings and views the Permissions section."
+      - "Elements: Each permission row shows its current status (Enabled/Disabled) with a toggle."
+      - "Functionality: Mandatory permissions (Geolocation, Notifications, Camera) display a lock icon and 'Required' badge — their toggles are non-interactive."
+      - "Functionality: Attempting to tap a mandatory permission toggle opens a blocking explanation modal explaining why the permission cannot be disabled."
+      - "Functionality: Only biometrics can be toggled post-onboarding — toggling off falls back to email/password authentication."
+      - "Design principle: Mandatory permissions are enforced at both onboarding AND in settings — there is no way to disable them without uninstalling the app."
+    sources:
+      - doc: "Implementation"
+        details: "settings-screen.tsx — mandatory permission lock icon and explanation modal"
+
+assumptions:
+  - "Deep link technology handles both iOS Universal Links and Android App Links."
+  - "The App Store redirect preserves the activation context so the deep link resolves after installation."
+  - "Password strength requirements match the platform-wide policy (same as Hart Ops and Client Staff)."
+  - "Biometric enrollment uses the device's native biometric API (LocalAuthentication on iOS, BiometricPrompt on Android)."
+  - "Mandatory permissions (Location, Notifications, Camera) cannot be denied — the app blocks onboarding until granted. Only biometric denial is allowed, with email/password fallback."
+  - "Session tokens are issued upon successful authentication and cached securely on-device."
+
+implications:
+  - "Frontend: Deep link handling requires platform-specific configuration (Associated Domains on iOS, Intent Filters on Android)."
+  - "Frontend: The activation flow must detect whether the deep link is a first-time activation or an expired/used link and display appropriate messaging."
+  - "Frontend: Biometric authentication component must gracefully handle devices without biometric hardware by defaulting to email/password."
+  - "Frontend: Permission prompts must be triggered programmatically in sequence — not all at once — to match the designed UX."
+  - "Backend: Activation tokens must be single-use with server-side expiration tracking."
+  - "Backend: Authentication endpoint must support both biometric token exchange and email/password flows."

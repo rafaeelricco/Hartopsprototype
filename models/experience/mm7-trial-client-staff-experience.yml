@@ -1,0 +1,123 @@
+id: "mm7"
+title: "Trial Client Staff Experience"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm6"
+  feeds_into:
+    - "mm8"
+
+context: |
+  How trial client operators (ops staff at the first two trial clients) experience the web
+  platform — from onboarding through campaign creation, event configuration, live monitoring,
+  results review, and team management. Their experience is the fundamental test of whether
+  Hart's operational model works as a product.
+
+scope:
+  in_scope:
+    - "Onboarding and authentication"
+    - "Navigation structure"
+    - "Dashboard with performance metrics"
+    - "Campaign creation (lightweight)"
+    - "Event creation wizard (4-step flow)"
+    - "Event list, monitoring, and detail views"
+    - "Reports and campaign comparison"
+    - "Brand Assets (product library + questionnaire templates)"
+    - "Team management and help resources"
+  out_of_scope:
+    - "Hart Ops platform administration (see Hart Ops Experience)"
+    - "Educator Manager coordination (see Educator Manager Experience)"
+    - "Educator mobile app experience (see Educator Mobile Experience)"
+    - "Business model and industry context (see Business Model, Business Environment)"
+    - "Phase 1 delivery scope and constraints (see Phase 1 Scope)"
+
+key_concepts:
+  - term: "Tentative Event Report / Intelligent Report Preview"
+    definition: "A preview shown during event creation (Step 3) displaying what the completed event report will look like, based on venue type and objectives. Operator adjusts the report rather than configuring data collection modules directly."
+    sources:
+      - doc: "Amendments PDF"
+        details: "Step 3"
+  - term: "Direct Editing"
+    definition: "Optional Step 4 of event creation where operators can manually configure the data collection modules."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.8-10"
+      - doc: "Amendments PDF"
+        details: "Step 4"
+  - term: "Brand Assets"
+    definition: "A library containing the client's products and reusable questionnaire templates."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.11-12"
+  - term: "Event Modules"
+    definition: "Configurable data collection components that determine what the educator does during a live event."
+    sources:
+      - doc: "Amendments PDF"
+        details: "pp.5-7"
+
+core_content:
+  - section_title: "Onboarding and Authentication"
+    points:
+      - "Invitation-only via Hart Ops. After activation, redirects to sign-in page."
+      - "Sign-in includes: Organization selector, email, password, company logo."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§1"
+  - section_title: "Dashboard (Homepage)"
+    points:
+      - "Stat cards: Active Campaigns, Events, Consumers Reached, Total Sales Generated."
+      - "Performance Trend Chart, timeframe adjustable (30 days to 12 months)."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§3"
+  - section_title: "Event Creation — The 4-Step Wizard"
+    points:
+      - "Step 1 (Basics): Name, Location, Date/Time, Duration, Campaign, Products, Instructions, Venue Type."
+      - "Step 2 (Objectives): Checkbox selection — Brand Awareness, Drive Sales, Build Consumer Database, etc."
+      - "Step 3 (Intelligent Report Preview): Realistic mock-up based on Steps 1-2. Toggle sections, profiling level (Quick/Standard/Deep), QR Code."
+      - "Step 4 (Direct Editing, Optional): Granular module configuration for power users."
+    sources:
+      - doc: "2026-02-05 PDF"
+        details: "Wizard specification"
+      - doc: "2026-01-22 PDF"
+        details: "Feature specification"
+  - section_title: "Event Monitoring and Detail Views"
+    points:
+      - "Searchable list and calendar views. Filters for Campaign, Location, Status."
+      - "Detail view transforms based on lifecycle: Configuration → Live Feed → Final Report."
+      - "Final Report: aggregated consumer data, inventory performance, photo gallery."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§5, §6"
+  - section_title: "Brand Assets"
+    points:
+      - "Product Library: manage products manually or via AI-prefilled batch upload."
+      - "Questionnaire Templates: library of consumer and educator templates for reuse."
+    sources:
+      - doc: "Functionality PDF"
+        details: "p.11-12"
+  - section_title: "Team Management and Settings"
+    points:
+      - "Invite and manage team members by role (Staff, Educator, Manager)."
+      - "Client Staff manage FAQs and resource links for their field staff."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§8"
+
+assumptions:
+  - "The 'report-first' approach (Step 3) will be intuitive for operators used to email/phone configuration."
+  - "Trial client operators will self-serve the entire campaign-to-results lifecycle without Hart intervention."
+  - "The platform can reliably translate high-level business goals into concrete event execution steps."
+  - "Campaign creation is intentionally simple (name + description only) — value lies in event configuration."
+  - "Events might need to span multiple campaigns (flagged in Briefing Document)."
+  - "Educator availability entry is now in-platform (via the mobile Availability tab); scheduling negotiation remains external."
+
+implications:
+  - "The event creation wizard is the single most complex and differentiating workflow."
+  - "The intelligent report preview requires robust business rules to map objectives to tasks."
+  - "Reporting expectations will vary significantly between clients and events."
+  - "Event configuration must give operators absolute confidence in what the educator will experience."
+  - "Brand Assets must be populated before operators can create meaningful events."
+  - "Guided, outcome-based creation prioritized over exhaustive manual setup."
+  - "Client-managed help resources means user-generated content from day one."

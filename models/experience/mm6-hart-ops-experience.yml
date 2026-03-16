@@ -1,0 +1,111 @@
+id: "mm6"
+title: "Hart Ops Experience"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm5"
+  feeds_into:
+    - "mm7"
+
+context: |
+  Hart Ops is the superadmin layer — Hart's window into whether the SaaS model works.
+  It is a small surface (one web role, roughly 8 screens) but carries high strategic
+  importance: this is where Hart monitors platform health, onboards tenant organizations,
+  and sees cross-org data quality.
+
+scope:
+  in_scope:
+    - "Hart Ops authentication and navigation"
+    - "Platform dashboard (multi-tenant 'omni view')"
+    - "Organization onboarding and management (3-step wizard)"
+    - "Cross-org event monitoring"
+    - "Platform-level reporting and data quality oversight"
+    - "Settings and team management"
+  out_of_scope:
+    - "Trial client operator experience (see Trial Client Staff Experience)"
+    - "Educator Manager web experience (see Educator Manager Experience)"
+    - "Educator mobile experience (see Educator Mobile Experience)"
+    - "Phase 1 feature boundaries and delivery scope (see Phase 1 Scope)"
+    - "Business model, revenue structure, and industry context (see Business Model, Business Environment)"
+
+key_concepts:
+  - term: "Organization"
+    definition: "A tenant on the platform — a trial client company. Hart Ops creates and manages these. Each is an isolated entity with its own campaigns, events, users, and data."
+    sources:
+      - doc: "Briefing Document"
+        details: "Tenant definition"
+      - doc: "Functionality PDF"
+        details: "§4"
+  - term: "Data Quality Score"
+    definition: "A platform-wide percentage measuring completeness of photos, questions, and inventory data across all events and organizations."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§6.2"
+  - term: "Hart Ops user"
+    definition: "A platform administrator employed by Hart. Cannot self-register; first account seeded by Ambar, subsequent users invited by existing Hart Ops staff."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§1.1, §7.2"
+
+core_content:
+  - section_title: "Authentication and Navigation"
+    points:
+      - "Invitation-only via email link. First account seeded by Ambar."
+      - "Standard email/password entry and reset flows."
+      - "Side navigation: Dashboard (default), Organizations, Events, Reports, Settings."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§1.1, §1.2, §1.3, §2"
+  - section_title: "Dashboard (Homepage)"
+    points:
+      - "Five stat cards: Total Organizations, Total Active Events This Week, Top Organizations, Recent Events, Platform Growth."
+      - "Design principle: situational awareness in seconds — know platform state immediately upon login."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§3"
+      - doc: "Briefing Document"
+        details: "Dashboard spec"
+  - section_title: "Organization Management"
+    points:
+      - "Organizations list: company name, event count, search bar."
+      - "Add Organization Wizard (3-Step): Details → Users → Review."
+      - "Organization Detail: status, tabs for Performance, Campaigns, Events, Team Members."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§4, §4.1, §4.2, §4.3"
+  - section_title: "Events (Cross-Org Overview)"
+    points:
+      - "Summary stats bar (Today, This Week, Live Now) and filterable list."
+      - "Cross-tenant visibility — the 'omni view' for monitoring all organizations simultaneously."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§5"
+  - section_title: "Reports and Data Quality"
+    points:
+      - "Reports Dashboard: stat cards for platform reach, multi-line Growth Chart, Top Performer tables."
+      - "Data Quality Overview: large platform-wide percentage score, trend indicators per org/campaign."
+      - "Data Quality Score is Hart's mechanism for identifying poor-quality submissions at scale."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§6.1, §6.2"
+  - section_title: "Settings"
+    points:
+      - "Account: profile management, password updates."
+      - "Team Management: invite and manage Hart Ops users (separate from org team management)."
+    sources:
+      - doc: "Functionality PDF"
+        details: "§7.1, §7.2"
+
+assumptions:
+  - "The first Hart Ops account is seeded by Ambar directly into the backend."
+  - "All Hart Ops users see all organizations (no org-level access control within this role)."
+  - "Hart Ops access to organization data is read-only (monitor, don't modify tenant settings)."
+  - "Utilization metrics serve as a proxy for profitability in Phase 1."
+  - "Onboarding remains a manual Hart Ops task (no self-service signup in Phase 1)."
+
+implications:
+  - "The 'omni view' architecture must be designed for growth even with only two trial clients initially."
+  - "Data Quality Scores must be actionable — drill down to specific campaigns or educators."
+  - "Operational proxies must bridge the financial data gap if financial tracking is deferred."
+  - "Organization onboarding is a potential future bottleneck requiring eventual automation."

@@ -1,0 +1,89 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Hart Ops Events Monitoring (Cross-Org)
+# =============================================================================
+
+id: "mm-ui-004"
+title: "Hart Ops Events Monitoring (Cross-Org)"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "TBD — to be filled manually"
+
+context: |
+  This is the "omni view" — Hart's cross-tenant visibility layer where events across all
+  organizations are monitored simultaneously. The interface prioritizes recency and live
+  status, giving Hart Ops real-time awareness of platform activity. As a Hart Ops
+  administrator, I need to see all events across all organizations in one place so I can
+  identify issues, track live activity, and maintain platform-wide oversight.
+
+scope:
+  in_scope:
+    - "Summary stats bar with key event metrics"
+    - "Filterable cross-org event list with server-side pagination"
+    - "Read-only event detail view for Hart surveillance"
+  out_of_scope:
+    - "Event creation or editing (tenant-side responsibility)"
+    - "Organization-specific event views (see mm-ui-003 detail tabs)"
+    - "Event reporting and data quality metrics (see mm-ui-005)"
+
+key_concepts:
+  - term: "Omni View"
+    definition: "The cross-organization event monitoring interface that aggregates events from all tenants into a single filterable list. Hart's primary tool for real-time platform-wide event oversight."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§4 Events Monitoring — Context"
+  - term: "Live Now"
+    definition: "A metric in the summary stats bar indicating the number of events currently in progress at this moment across all organizations."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§4 Events Monitoring — Summary Stats Bar"
+
+core_content:
+  - section_title: "Summary Stats Bar"
+    points:
+      - "Elements: Key metrics displayed in a horizontal bar at the top of the view."
+      - "Elements: Metrics include — Events Today, Events This Week, Live Now."
+      - "Functionality: Stats update on page load to reflect current platform state."
+      - "Design principle: The stats bar answers 'What is happening right now?' before the user scrolls to the detail list."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§4 Events Monitoring — Summary Stats Bar"
+
+  - section_title: "Filterable Event List"
+    points:
+      - "Entry Point: Navigating to the 'Events' section in the sidebar."
+      - "Elements: Table or list view populated with cross-org event data."
+      - "Functionality: Filters allow narrowing by organization, date range, status, or other event attributes."
+      - "Functionality: Server-side sorting and pagination are mandatory due to the expected volume of cross-org data."
+      - "Design principle: The list is the operational workhorse — it must handle scale gracefully without degrading performance."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§4 Events Monitoring — Filterable List View"
+
+  - section_title: "Event Detail (Read-Only)"
+    points:
+      - "Entry Point: Clicking an event row in the filterable list."
+      - "Functionality: Opens a read-only detail view showing event information for Hart surveillance purposes."
+      - "Functionality: Hart Ops cannot modify event data — this is strictly a monitoring interface."
+      - "Design principle: Read-only access prevents accidental tenant data modification while enabling full visibility."
+    sources:
+      - doc: "Hart Ops Super Admin Spec"
+        details: "§4 Events Monitoring — Filterable List View — Interaction"
+
+assumptions:
+  - "The summary stats bar is not real-time (no WebSocket/polling) — it refreshes on page load or manual refresh."
+  - "Filter state persists during the session but resets on navigation away and back."
+  - "Event detail view likely opens as a side panel or modal rather than a full page navigation — source does not specify."
+  - "The 'Live Now' metric requires events to have a defined start and end time to calculate active status."
+  - "Pagination defaults (page size, initial sort order) will be defined during implementation."
+
+implications:
+  - "Frontend: The event list must support server-side pagination, sorting, and filtering — client-side data handling will not scale."
+  - "Frontend: Summary stats bar component needs an efficient aggregation API call, separate from the list data fetch."
+  - "Frontend: Event detail view component must enforce read-only mode with no edit affordances."
+  - "Backend: Cross-org event query must be optimized with proper indexing — this is the highest-volume query in Hart Ops."
+  - "Backend: 'Live Now' calculation requires a server-side query that compares event time windows against current time."
+  - "Backend: Pagination API must support cursor-based or offset-based pagination with configurable page size."

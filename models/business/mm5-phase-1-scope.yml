@@ -1,0 +1,146 @@
+id: "mm5"
+title: "Phase 1 Scope"
+status: "approved"
+
+dependencies:
+  depends_on:
+    - "mm4"
+  feeds_into:
+    - "mm6"
+    - "mm9"
+
+context: |
+  What Ambar delivers in Phase 1 — the SaaS web platform and mobile application piloted
+  with two external trial clients, the four user roles and their feature boundaries, the
+  event creation wizard as the centerpiece deliverable, what is explicitly deferred, and
+  the architectural constraints that flow from the phasing strategy.
+
+scope:
+  in_scope:
+    - "Phase 1 definition and hypothesis"
+    - "Four user roles across two surfaces (web + mobile)"
+    - "The event creation wizard (4-step flow)"
+    - "Educator mobile card-based task system"
+    - "Explicitly deferred items"
+    - "Architectural constraints (multi-tenant, dynamic config, offline-first)"
+    - "Timeline and team"
+  out_of_scope:
+    - "How Hart runs operations today (see Current Campaign Operations)"
+    - "Business model, revenue structure, and pricing (see Business Model)"
+    - "External market forces and industry dynamics (see Business Environment)"
+    - "Transformation roadmap beyond Phase 1 (see Vision and Transformation Strategy)"
+    - "Screen-level UX detail for individual roles (see role-specific experience models)"
+
+key_concepts:
+  - term: "Trial Client"
+    definition: "An external organization using the platform in Phase 1. Not Hart itself — trial clients approach the platform fresh, without legacy HEMS expectations."
+    sources:
+      - doc: "Briefing Document"
+        details: "Phase 1 definition"
+      - doc: "Chris, Demo Meeting"
+        details: "~55:14"
+  - term: "Event Creation Wizard"
+    definition: "The 4-step flow (Basics → Objectives → Intelligent Report Preview → Optional Advanced Editing) that replaces HEMS's hard-coded questionnaire system."
+    sources:
+      - doc: "Briefing Document"
+        details: "Core feature"
+      - doc: "2026-02-05 Draft of Amendments"
+        details: "Wizard specification"
+  - term: "Smart Matching"
+    definition: "System logic in Step 3 that auto-configures data collection modules based on venue type + selected objectives."
+    sources:
+      - doc: "2026-02-05 Draft of Amendments"
+        details: "Step 3 specification"
+
+core_content:
+  - section_title: "Phase 1 Definition & Hypothesis"
+    points:
+      - "A SaaS platform (web) + mobile app piloted with two trial clients."
+      - "Proves the model works as a product, not just Hart's internal tool."
+      - "External users first (no legacy expectations), protects live operations, validates SaaS thesis early."
+      - "Hart's internal team does NOT use Phase 1 — they continue on HEMS."
+    sources:
+      - doc: "Briefing Document"
+        details: "Phase 1 section"
+      - doc: "Chris, Intro Meeting"
+        details: "~42:04"
+  - section_title: "User Roles & Platform Surfaces"
+    points:
+      - "Hart Ops (Web/Superadmin): Onboard orgs, monitor cross-org events, platform reporting."
+      - "Trial Client Staff (Web): Create campaigns & events, configure data collection, manage brand assets, view reports."
+      - "Educator Manager (Web): Assign educators, monitor live execution, approve & finalize events."
+      - "Educator (Mobile iOS+Android): Execute events — check in, collect data, capture photos, check out."
+    sources:
+      - doc: "2026-01-22 Draft of Proposed Functionality"
+        details: "Role definitions"
+      - doc: "Briefing Document"
+        details: "Role summary"
+  - section_title: "The Event Creation Wizard"
+    points:
+      - "Step 1 — Event Basics: Name, Location, Date/Time, Duration, Campaign, Products, Instructions, Venue Type."
+      - "Step 2 — Event Objectives: Checkbox selection (Brand Awareness, Drive Sales, etc.) driving smart matching."
+      - "Step 3 — Intelligent Report Preview: Auto-configured mock-up of final report. Interactive toggles and profiling selectors."
+      - "Step 4 — Advanced Editing (Optional): Granular module configuration for power users."
+    sources:
+      - doc: "2026-02-05 PDF"
+        details: "Wizard steps"
+      - doc: "2026-01-22 PDF"
+        details: "Feature specification"
+  - section_title: "Explicitly Deferred Items"
+    points:
+      - "Educator scheduling negotiation — accept/decline/reschedule (stays on phone/text). Note: availability entry is now in-app via the Availability tab."
+      - "Hart's own migration (Phase 2)."
+      - "Self-service campaign intake (still via email/phone)."
+      - "Billing and payment processing (Phase 3)."
+      - "ERP API integrations (Phase 3)."
+      - "Data marketplace (Phase 4)."
+      - "Vertical expansion (architecture prepared, not active)."
+      - "Advanced AI image recognition — multi-brand classification (separately funded). Note: basic product detection UI within venue survey photos is implemented in Phase 1 (ImageRecognitionOverlay with bounding boxes, currently simulated)."
+      - "Geofenced consumer profiling (Phase 4)."
+      - "Educator Performance/Training/Earnings tabs (nav future-proofed)."
+      - "Passive Counting, Product Feedback, and QR Code data collection cards (architecture supports future addition)."
+      - "Modifying legacy HEMS (parallel operation)."
+    sources:
+      - doc: "Briefing Document"
+        details: "Deferred items"
+      - doc: "hart_context_v1.yaml"
+        details: "Phase boundaries"
+  - section_title: "Architectural Constraints"
+    points:
+      - "Multi-tenant from day one: isolation between organizations is non-negotiable."
+      - "Dynamic configuration: must avoid HEMS hard-coding mistakes."
+      - "Data schema for aggregation: capture normalized data now for future Data Institute."
+      - "Offline-first architecture: mobile reliability in retail dead zones."
+      - "Greenfield execution: parallel to HEMS with no direct database integration."
+      - "Mobile UX as data integrity: card-based interactions, not forms."
+    sources:
+      - doc: "Vision and Transformation Strategy"
+        details: "Design constraints"
+      - doc: "Chris, Demo Meeting"
+        details: "Architecture discussions"
+  - section_title: "Timeline & Team"
+    points:
+      - "Preparation (Start 18 Feb 2026): 3 weeks studying material, mental models, low-fi wireframes."
+      - "Definition (Start 11 Mar 2026): 2 weeks of calls, wireframe amendments, technical architecture."
+      - "Implementation (Start 25 Mar 2026): 7 weeks of development with weekly check-ins."
+      - "Team: Ethan (Lead Client Contact), Rafael (Engineer), Joe (PM), Luis (CEO Oversight)."
+    sources:
+      - doc: "Briefing Document"
+        details: "Timeline section"
+
+assumptions:
+  - "The two trial clients are Pernod Ricard affiliates (specific complexity profile)."
+  - "Educator scheduling negotiation (accept/decline/reschedule) stays outside the platform in Phase 1, but availability entry is now in-app."
+  - "Compensation fields are purely for data entry in Phase 1 (payroll deferred)."
+  - "Trial clients use the platform for free during the pilot."
+  - "Hart's internal team will not use the platform in Phase 1."
+  - "Smart matching in Step 3 is rule-based (deterministic, not ML)."
+
+implications:
+  - "Phase 1 is a SaaS hypothesis test — features not validating external self-service should be deferred."
+  - "The event creation wizard is the make-or-break feature."
+  - "Mobile UX quality determines the value of the future Data Institute."
+  - "Multi-tenant isolation is a first-class architectural concern from day one."
+  - "The deferred items list must be strictly defended against scope creep."
+  - "Definition-phase wireframes must eliminate all AI ambiguity."
+  - "Implementation is a sprint — 7 weeks is tight, definition must produce ready-to-code backlog."
