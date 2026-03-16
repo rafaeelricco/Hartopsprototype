@@ -1,7 +1,7 @@
 // =============================================================================
-// Full-Page Event Creation Wizard — 5-step flow
-// Step 1: Select Campaign → Step 2: Event Basics → Step 3: Objectives →
-// Step 4: Report Preview → Step 5: Advanced Customization
+// Full-Page Event Creation Wizard — 4-step flow
+// Step 1: Select Campaign → Step 2: Event Basics →
+// Step 3: Objectives + Projected Impact → Step 4: Customization
 // Accessible from /staff/events/create
 // =============================================================================
 
@@ -20,7 +20,6 @@ import {
   Settings2,
   Smartphone,
   Save,
-  Loader2,
   BarChart3,
   Star,
   TrendingUp,
@@ -72,8 +71,7 @@ const STEPS = [
   { num: 1, label: "Campaign", icon: Target },
   { num: 2, label: "Event Basics", icon: FileText },
   { num: 3, label: "Objectives", icon: Target },
-  { num: 4, label: "Report Preview", icon: FileText },
-  { num: 5, label: "Customization", icon: Settings2 },
+  { num: 4, label: "Customization", icon: Settings2 },
 ];
 
 // ── Main Component ───────────────────────────────────────────────────────────
@@ -112,7 +110,6 @@ export function CreateEventPage() {
     Partial<Record<keyof WizardData | "objectives", string>>
   >({});
   const [showEducator, setShowEducator] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [campaignSearch, setCampaignSearch] = useState("");
 
   // Derived data modules from selected objectives
@@ -174,16 +171,7 @@ export function CreateEventPage() {
     if (step === 2 && !validateStep2()) return;
     if (step === 3 && !validateStep3()) return;
     setErrors({});
-
-    // Generation transition for Step 4
-    if (step === 3) {
-      setGenerating(true);
-      setStep(4);
-      setTimeout(() => setGenerating(false), 900);
-      return;
-    }
-
-    setStep((s) => Math.min(s + 1, 5));
+    setStep((s) => Math.min(s + 1, 4));
   }
 
   function handleBack() {
@@ -351,24 +339,38 @@ export function CreateEventPage() {
           <StepBasics data={data} errors={errors} updateField={updateField} />
         )}
         {step === 3 && (
-          <StepObjectives
-            selected={data.objectives}
-            toggle={toggleObjective}
-            error={errors.objectives}
-            inheritedCount={inheritedObjectiveCount}
-          />
+          <div className="flex gap-6">
+            <div className="flex-1 min-w-0">
+              <StepObjectives
+                selected={data.objectives}
+                toggle={toggleObjective}
+                error={errors.objectives}
+                inheritedCount={inheritedObjectiveCount}
+              />
+            </div>
+            <div
+              className="flex-shrink-0 transition-all duration-300"
+              style={{
+                width: data.objectives.length > 0 ? 380 : 0,
+                opacity: data.objectives.length > 0 ? 1 : 0,
+                overflow: "hidden",
+              }}
+            >
+              {data.objectives.length > 0 && (
+                <div className="sticky top-0">
+                  <ProjectedImpactSidebar
+                    data={data}
+                    modules={mappedModules}
+                    modulesByObjective={modulesByObjective}
+                    showEducator={showEducator}
+                    onToggleEducator={() => setShowEducator((p) => !p)}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         )}
         {step === 4 && (
-          <StepReportPreview
-            data={data}
-            modules={mappedModules}
-            modulesByObjective={modulesByObjective}
-            showEducator={showEducator}
-            onToggleEducator={() => setShowEducator((p) => !p)}
-            generating={generating}
-          />
-        )}
-        {step === 5 && (
           <StepAdvanced
             selected={data.advancedModules}
             toggle={toggleAdvanced}
@@ -404,11 +406,10 @@ export function CreateEventPage() {
           )}
         </div>
 
-        {step < 5 ? (
+        {step < 4 ? (
           <Button
             onClick={handleNext}
-            disabled={generating}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 h-auto cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
             style={{ background: "#7D152D", fontSize: "0.875rem" }}
           >
             Continue
@@ -890,7 +891,7 @@ function StepObjectives({
 }
 
 // =============================================================================
-// Step 4 — Report Preview
+// Projected Impact Sidebar (live report preview alongside Objectives)
 // =============================================================================
 
 const SECTION_COLORS = [
@@ -902,13 +903,12 @@ const SECTION_COLORS = [
   "#059669",
 ];
 
-function StepReportPreview({
+function ProjectedImpactSidebar({
   data,
   modules,
   modulesByObjective,
   showEducator,
   onToggleEducator,
-  generating,
 }: {
   data: WizardData;
   modules: DataModule[];
@@ -919,50 +919,15 @@ function StepReportPreview({
   }[];
   showEducator: boolean;
   onToggleEducator: () => void;
-  generating: boolean;
 }) {
   const selectedObjectives = OBJECTIVES.filter((o) =>
     data.objectives.includes(o.id),
   );
 
-  if (generating) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <div
-          className="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
-          style={{ background: "#7D152D0F" }}
-        >
-          <Loader2
-            size={26}
-            style={{ color: "#7D152D", animation: "spin 1s linear infinite" }}
-          />
-        </div>
-        <p style={{ fontSize: "1rem", color: "#0F172A" }} className="mb-1">
-          Generating report preview...
-        </p>
-        <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
-          Mapping {data.objectives.length} objective
-          {data.objectives.length !== 1 ? "s" : ""} to data modules
-        </p>
-        <div className="w-48 h-1.5 rounded-full bg-[#F1F5F9] mt-4 overflow-hidden">
-          <div
-            className="h-full rounded-full"
-            style={{
-              background: "#7D152D",
-              animation: "generateBar 0.9s ease-out forwards",
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div style={{ animation: "fadeInUp 0.3s ease-out" }}>
       <div className="flex items-center justify-between mb-1">
-        <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
-          Intelligent Report Preview
-        </h3>
+        <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Projected Impact</h3>
         <Button
           variant="ghost"
           type="button"
@@ -982,10 +947,10 @@ function StepReportPreview({
           Educator View
         </Button>
       </div>
-      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-5">
+      <p style={{ fontSize: "0.75rem", color: "#94A3B8" }} className="mb-4">
         {showEducator
           ? "Preview of what the educator will see on their mobile device."
-          : "This mock-up shows what the final report will look like based on your objectives."}
+          : "Live preview of your report based on selected objectives."}
       </p>
 
       {!showEducator ? (
@@ -993,7 +958,7 @@ function StepReportPreview({
         <div className="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white">
           {/* Report title bar */}
           <div
-            className="px-5 py-4 border-b border-[#E2E8F0]"
+            className="px-4 py-3 border-b border-[#E2E8F0]"
             style={{
               background: "linear-gradient(135deg, #7D152D 0%, #5C0F21 100%)",
             }}
@@ -1004,10 +969,10 @@ function StepReportPreview({
             >
               Event Report
             </p>
-            <p style={{ fontSize: "1.0625rem", color: "#FFF" }}>
+            <p style={{ fontSize: "0.875rem", color: "#FFF" }}>
               {data.name || "Untitled Event"}
             </p>
-            <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex flex-col gap-1 mt-1.5">
               {data.location && (
                 <span
                   className="flex items-center gap-1"
@@ -1049,7 +1014,7 @@ function StepReportPreview({
           </div>
 
           {/* Objectives summary strip */}
-          <div className="px-5 py-3 border-b border-[#F1F5F9] bg-[#FAFBFC]">
+          <div className="px-4 py-2.5 border-b border-[#F1F5F9] bg-[#FAFBFC]">
             <div className="flex items-center gap-2 flex-wrap">
               <span
                 style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
@@ -1089,7 +1054,7 @@ function StepReportPreview({
                   : ""
               }
             >
-              <div className="px-5 pt-4 pb-2 flex items-center gap-2">
+              <div className="px-4 pt-3 pb-2 flex items-center gap-2">
                 <div
                   className="w-1.5 h-5 rounded-full"
                   style={{
@@ -1104,7 +1069,7 @@ function StepReportPreview({
                 </span>
               </div>
 
-              <div className="px-5 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              <div className="px-4 pb-3 grid grid-cols-1 gap-2">
                 {group.modules.map((mod) => (
                   <SampleModuleCard key={mod.id} mod={mod} />
                 ))}
@@ -1113,7 +1078,7 @@ function StepReportPreview({
           ))}
 
           {/* Report footer */}
-          <div className="px-5 py-3 border-t border-[#E2E8F0] bg-[#FAFBFC] flex items-center justify-between">
+          <div className="px-4 py-2.5 border-t border-[#E2E8F0] bg-[#FAFBFC] flex items-center justify-between">
             <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
               Sample data shown &middot; Actual values collected during event
             </span>
@@ -1126,8 +1091,8 @@ function StepReportPreview({
         /* Educator mobile preview */
         <div className="flex justify-center">
           <div
-            className="w-[300px] rounded-[2rem] border-[6px] border-[#1E293B] bg-white overflow-hidden shadow-xl flex flex-col"
-            style={{ minHeight: 540 }}
+            className="w-[260px] rounded-[2rem] border-[6px] border-[#1E293B] bg-white overflow-hidden shadow-xl flex flex-col"
+            style={{ minHeight: 440 }}
           >
             {/* Phone status bar */}
             <div
