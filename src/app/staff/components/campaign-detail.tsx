@@ -5,7 +5,7 @@
 // =============================================================================
 
 import { useState, useMemo } from "react";
-import { useParams, Link } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import {
   ArrowLeft,
   CalendarDays,
@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { useCampaignContext } from "./campaign-context";
-import { EventWizard } from "./event-wizard";
 import { OBJECTIVES, type EventItem } from "./event-data";
 import { MOCK_PRODUCTS } from "./campaign-data";
 
@@ -67,8 +66,8 @@ type SortDir = "asc" | "desc";
 
 export function CampaignDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { getCampaign, getEventsForCampaign } = useCampaignContext();
-  const [wizardOpen, setWizardOpen] = useState(false);
 
   // Gap #6: filtering and sorting state
   const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">(
@@ -187,6 +186,16 @@ export function CampaignDetail() {
                 })}
               </span>
             </div>
+          </div>
+          <div className="flex-shrink-0">
+            <Button
+              onClick={() => navigate(`/staff/events/create?campaign=${id}`)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto w-full sm:w-auto"
+              style={{ background: "#7D152D", fontSize: "0.875rem" }}
+            >
+              <Plus size={16} strokeWidth={2.5} />
+              Create Event
+            </Button>
           </div>
         </div>
       </div>
@@ -390,7 +399,7 @@ export function CampaignDetail() {
             Create your first event using the guided wizard.
           </p>
           <Button
-            onClick={() => setWizardOpen(true)}
+            onClick={() => navigate(`/staff/events/create?campaign=${id}`)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto"
             style={{ background: "#7D152D", fontSize: "0.875rem" }}
           >
@@ -475,15 +484,6 @@ export function CampaignDetail() {
           )}
         </>
       )}
-
-      {/* Event Creation Wizard */}
-      <EventWizard
-        campaignId={campaign.id}
-        campaign={campaign}
-        open={wizardOpen}
-        onClose={() => setWizardOpen(false)}
-        onCreated={() => setWizardOpen(false)}
-      />
     </div>
   );
 }

@@ -6,7 +6,7 @@
 // =============================================================================
 
 import { useState, useMemo, useCallback } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, useSearchParams, Link } from "react-router";
 import {
   ChevronRight,
   ChevronLeft,
@@ -80,10 +80,34 @@ const STEPS = [
 
 export function CreateEventPage() {
   const navigate = useNavigate();
-  const { campaigns, createEvent, getEventsForCampaign } = useCampaignContext();
+  const { campaigns, createEvent, getCampaign, getEventsForCampaign } =
+    useCampaignContext();
+
+  const [searchParams] = useSearchParams();
+  const campaignIdParam = searchParams.get("campaign");
+  const preselectedCampaign = campaignIdParam
+    ? getCampaign(campaignIdParam)
+    : undefined;
+
+  const backUrl = campaignIdParam
+    ? `/staff/campaigns/${campaignIdParam}`
+    : "/staff/events";
+  const backLabel = campaignIdParam ? "Back to Campaign" : "Back to Events";
 
   const [step, setStep] = useState(1);
-  const [data, setData] = useState<WizardData>(INITIAL_DATA);
+  const [data, setData] = useState<WizardData>(() => {
+    if (preselectedCampaign) {
+      return {
+        ...INITIAL_DATA,
+        campaignId: preselectedCampaign.id,
+        objectives: [...(preselectedCampaign.objectives ?? [])],
+      };
+    }
+    return INITIAL_DATA;
+  });
+  const [inheritedObjectiveCount, setInheritedObjectiveCount] = useState(
+    () => preselectedCampaign?.objectives?.length ?? 0,
+  );
   const [errors, setErrors] = useState<
     Partial<Record<keyof WizardData | "objectives", string>>
   >({});
@@ -168,6 +192,7 @@ export function CreateEventPage() {
   }
 
   function handleSubmit() {
+    const selectedCampaign = getCampaign(data.campaignId);
     const event = createEvent({
       campaignId: data.campaignId,
       name: data.name.trim(),
@@ -178,8 +203,15 @@ export function CreateEventPage() {
       objectives: data.objectives,
       dataModules: mappedModules.map((m) => m.id),
       advancedModules: data.advancedModules,
+      ...(selectedCampaign?.linkedProductIds?.length
+        ? { linkedProductIds: selectedCampaign.linkedProductIds }
+        : {}),
     });
-    navigate(`/staff/events/${event.id}`);
+    navigate(
+      campaignIdParam
+        ? `/staff/campaigns/${data.campaignId}`
+        : `/staff/events/${event.id}`,
+    );
   }
 
   // ── Field updaters ──────────────────────────────────────────────────────────
@@ -223,12 +255,12 @@ export function CreateEventPage() {
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <div className="px-6 pt-5 pb-0">
         <Link
-          to="/staff/events"
+          to={backUrl}
           className="inline-flex items-center gap-1.5 text-[#64748B] hover:text-[#0F172A] transition-colors no-underline mb-4"
           style={{ fontSize: "0.8125rem" }}
         >
           <ArrowLeft size={15} />
-          Back to Events
+          {backLabel}
         </Link>
         <h1 style={{ fontSize: "1.5rem", color: "#0F172A" }} className="mb-1">
           Create Event
@@ -294,7 +326,14 @@ export function CreateEventPage() {
             campaigns={campaigns}
             selectedId={data.campaignId}
             onSelect={(id) => {
-              setData((d) => ({ ...d, campaignId: id }));
+              const selected = getCampaign(id);
+              const objectives = selected?.objectives ?? [];
+              setData((d) => ({
+                ...d,
+                campaignId: id,
+                objectives: [...objectives],
+              }));
+              setInheritedObjectiveCount(objectives.length);
               setErrors((e) => {
                 if (!e.campaignId) return e;
                 const next = { ...e };
@@ -316,6 +355,7 @@ export function CreateEventPage() {
             selected={data.objectives}
             toggle={toggleObjective}
             error={errors.objectives}
+            inheritedCount={inheritedObjectiveCount}
           />
         )}
         {step === 4 && (
@@ -342,7 +382,7 @@ export function CreateEventPage() {
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
-            onClick={step === 1 ? () => navigate("/staff/events") : handleBack}
+            onClick={step === 1 ? () => navigate(backUrl) : handleBack}
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors h-auto cursor-pointer"
             style={{ fontSize: "0.875rem" }}
           >
@@ -353,7 +393,7 @@ export function CreateEventPage() {
           {step > 1 && (
             <Button
               variant="ghost"
-              onClick={() => navigate("/staff/events")}
+              onClick={() => navigate(backUrl)}
               className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A] transition-colors h-auto cursor-pointer"
               style={{ fontSize: "0.8125rem" }}
               title="Save as draft and close"
@@ -725,10 +765,12 @@ function StepObjectives({
   selected,
   toggle,
   error,
+  inheritedCount = 0,
 }: {
   selected: string[];
   toggle: (id: string) => void;
   error?: string | undefined;
+  inheritedCount?: number;
 }) {
   return (
     <div>
@@ -747,10 +789,25 @@ function StepObjectives({
           {selected.length} of {OBJECTIVES.length} selected
         </span>
       </div>
-      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-5">
+      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-3">
         Objectives drive the entire downstream report structure. Select all that
         apply.
       </p>
+
+      {inheritedCount > 0 && (
+        <div
+          className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg"
+          style={{
+            background: "#F0FDF4",
+            fontSize: "0.8125rem",
+            color: "#15803D",
+          }}
+        >
+          <Check size={14} style={{ color: "#15803D" }} />
+          {inheritedCount} objective{inheritedCount !== 1 ? "s" : ""} inherited
+          from campaign — you can still adjust below
+        </div>
+      )}
 
       {error && (
         <div
