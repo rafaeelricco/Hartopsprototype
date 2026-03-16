@@ -41,9 +41,11 @@ import {
   type EventItem,
 } from "./event-data";
 import { useCampaignContext } from "./campaign-context";
+import type { Campaign } from "./campaign-data";
 
 interface EventWizardProps {
   campaignId: string;
+  campaign?: Campaign | undefined;
   open: boolean;
   onClose: () => void;
   onCreated: (event: EventItem) => void;
@@ -78,6 +80,7 @@ const STEPS = [
 
 export function EventWizard({
   campaignId,
+  campaign,
   open,
   onClose,
   onCreated,
@@ -90,6 +93,7 @@ export function EventWizard({
   >({});
   const [showEducator, setShowEducator] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [inheritedObjectiveCount, setInheritedObjectiveCount] = useState(0);
 
   // Derived data modules from selected objectives
   const mappedModules = useMemo(
@@ -114,16 +118,21 @@ export function EventWizard({
     return groups;
   }, [data.objectives]);
 
-  // Reset when opened
+  // Reset when opened — pre-populate from campaign context
   useEffect(() => {
     if (open) {
+      const campaignObjectives = campaign?.objectives ?? [];
       setStep(1);
-      setData(INITIAL_DATA);
+      setData({
+        ...INITIAL_DATA,
+        objectives: [...campaignObjectives],
+      });
+      setInheritedObjectiveCount(campaignObjectives.length);
       setErrors({});
       setShowEducator(false);
       setGenerating(false);
     }
-  }, [open]);
+  }, [open, campaign]);
 
   // ── Validation ────────────────────────────────────────────────────────────
 
@@ -179,6 +188,9 @@ export function EventWizard({
       objectives: data.objectives,
       dataModules: mappedModules.map((m) => m.id),
       advancedModules: data.advancedModules,
+      ...(campaign?.linkedProductIds?.length
+        ? { linkedProductIds: campaign.linkedProductIds }
+        : {}),
     });
     onCreated(event);
   }
@@ -308,6 +320,7 @@ export function EventWizard({
               selected={data.objectives}
               toggle={toggleObjective}
               error={errors.objectives}
+              inheritedCount={inheritedObjectiveCount}
             />
           )}
           {step === 3 && (
@@ -562,10 +575,12 @@ function Step2Objectives({
   selected,
   toggle,
   error,
+  inheritedCount = 0,
 }: {
   selected: string[];
   toggle: (id: string) => void;
   error?: string | undefined;
+  inheritedCount?: number | undefined;
 }) {
   return (
     <div>
@@ -585,10 +600,26 @@ function Step2Objectives({
           {selected.length} of {OBJECTIVES.length} selected
         </span>
       </div>
-      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-5">
+      <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }} className="mb-3">
         Objectives drive the entire downstream report structure. Select all that
         apply.
       </p>
+
+      {/* Inherited badge */}
+      {inheritedCount > 0 && (
+        <div
+          className="flex items-center gap-2 px-3 py-2 mb-4 rounded-lg"
+          style={{
+            background: "#F0FDF4",
+            fontSize: "0.8125rem",
+            color: "#15803D",
+          }}
+        >
+          <Check size={14} style={{ color: "#15803D" }} />
+          {inheritedCount} objective{inheritedCount !== 1 ? "s" : ""} inherited
+          from campaign — you can still adjust below
+        </div>
+      )}
 
       {error && (
         <div

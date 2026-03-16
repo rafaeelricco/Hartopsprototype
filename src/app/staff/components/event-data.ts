@@ -15,6 +15,7 @@ export interface EventItem {
   dataModules: string[];
   advancedModules: string[];
   status: "draft" | "scheduled" | "active" | "completed";
+  linkedProductIds?: string[] | undefined;
   createdAt: string;
 }
 

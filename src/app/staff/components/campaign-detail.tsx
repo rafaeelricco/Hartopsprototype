@@ -479,6 +479,7 @@ export function CampaignDetail() {
       {/* Event Creation Wizard */}
       <EventWizard
         campaignId={campaign.id}
+        campaign={campaign}
         open={wizardOpen}
         onClose={() => setWizardOpen(false)}
         onCreated={() => setWizardOpen(false)}
