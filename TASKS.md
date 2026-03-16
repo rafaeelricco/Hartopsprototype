@@ -11,7 +11,8 @@
     Source: `CONTEXT.md 00:21:55 – "for that sales tracker, I would just want to be able to click off how many I think I I sold during the event."` + `00:11:14 – "So then that that creates a counter for each one."`
 
 - Fold the current Sales Tracking AI shelf-recognition into "venue intelligence" / survey flows (photo now, process and fill in later).
-  Source: `CONTEXT.md 00:16:11 – "I think we need to have rename it to survey as opposed to sales tracking."` + `00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later because if they have the picture, they can see what's there."`
+  - Note: Chris confirmed the current prototype survey UI (take photos, review later) is exactly what he wants. The actual AI backend processing is a separate standalone project (see §8).
+  Source: `CONTEXT.md 00:16:11 – "I think we need to have rename it to survey as opposed to sales tracking."` + `00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later"` + `00:35:47 – "the UI sucks. And in a matter of days, you guys have put together a better UI than they have in three months."`
 
 - Support quick photo capture of shelf, backbar, coolers, etc., with the option to complete details later (e.g. from the car).
   Source: `CONTEXT.md 00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later because if they have the picture, they can see what's there."` + `00:30:42 – "So having an offline mode, having the ability to save the pictures and then upload it later is extremely important, extremely."`
@@ -34,10 +35,12 @@ Campaign creation is too shallow (only name + description in `create-campaign-mo
 (OK) 1. **Expand campaign creation** — Add fields: supplier, distributors, target markets/geography, anticipated event count, linked products (from item master), objectives. Campaign interface in `campaign-data.ts` currently only has `id, name, description, eventCount, status, createdAt`.
 Source: `CONTEXT.md 00:34:50 – "So like with the campaigns, linking that over to more more more things like um which which suppliers, which distributors, what what markets... Like all that information is important because that that will all trickle into the events."`
 
-2. **Event creation inherits from campaign** — Pre-populate objectives, products, venue type from parent campaign. Currently the wizard (`event-wizard.tsx`) asks everything from scratch. Chris: "just assign the account and the date and time."
+(OK) 2. **Event creation inherits from campaign** — Pre-populate objectives, products, venue type from parent campaign. Currently the wizard (`event-wizard.tsx`) asks everything from scratch. Chris: "just assign the account and the date and time."
    Source: `CONTEXT.md 00:51:06 – "That's why I was saying having as much detail in the campaign easier for for creating the events because then that's just pull from the campaign and regurgitate it. Just assign sign the account and the date and time."`
 
-3. **Output-first report preview** — Move projected impact display earlier in the wizard (step 2 or persistent sidebar). Currently buried in step 4 (Report Preview). Chris + Lewis both emphasized this.
+   > ⚠️ **Account assignment at activity/event level is not yet implemented.** This depends on the Account Master, which isn't available — the staging DB isn't publicly accessible yet and the distributor flat-file import hasn't been set up. Once accounts exist, they should be assignable at the activity/event level per Chris's description (Call 2, ~06:21).
+
+(OK) 3. **Output-first report preview** — Move projected impact display earlier in the wizard (step 2 or persistent sidebar). Currently buried in step 4 (Report Preview). Chris + Lewis both emphasized this.
    Source: `CONTEXT.md 00:50:03 – "showing the outputs up front is extremely important and that's going to flip everyone's thinking... from their perspective, seeing how effective this is going to be and some projections off of that is going to be very powerful as you start build these campaigns."`
 
 4. **"What if" adjustment suggestions** — When projections are weak, suggest what to change (account, day, venue type). Chris: "what do I need to do to make this better?"
@@ -49,7 +52,7 @@ Source: `CONTEXT.md 00:34:50 – "So like with the campaigns, linking that over 
 6. **Brand education content** — Expand brand assets beyond SKUs to include serving instructions, brand scripts, setup info, evaluation sheets. Link to campaigns.
    Source: `CONTEXT.md 00:27:25 – "one of the things that we also include is um PDFs on the information of the event like how do you how do you serve the drink? What drinks are served? Information about the brand... that is a sheet of paper that has all the brand information, the setup information."`
 
-7. **Connect item master to campaigns/events** — `EventItem` currently has no `productIds` field. Products at campaign level should flow to events and educator app.
+(OK) 7. **Connect item master to campaigns/events** — `EventItem` now has `linkedProductIds` field, and Activities define product subsets. Products at campaign level flow to events.
    Source: `CONTEXT.md 00:21:55 – "from a from an event structure is going back to the item master being linked into there with this campaign. We know what products I'm going to be done going to be sampled in this this campaign."`
 
 ---
@@ -68,7 +71,10 @@ New capabilities that don't exist yet but Chris identified as key differentiator
    Source: `CONTEXT.md 00:21:55 – "I would just want to be able to click off how many I think I I sold during the event."`
 
 4. **Distributor depletions integration surface** — Placeholder in reports for "Event Impact vs. Distributor Sales." Phase 2 integration, but design the UI slot now.
-   Source: `CONTEXT.md 00:04:36 – "lining that up with those sales and saying, 'These accounts bought x amount of product. We did this in this event. The next month they bought and bought more.' We can start and then driving deriving the actual sales velocity and the influence of doing these events and put a dollar figure on it."`
+   Source: `CONTEXT.md 00:04:36 – "lining that up with those sales and saying... We can start and then driving deriving the actual sales velocity and the influence of doing these events and put a dollar figure on it."`
+
+5. **PowerBI for Phase 1 Reporting** — Punt complex in-app reporting builds directly to PowerBI for the initial release to save time.
+   Source: `CONTEXT.md 00:44:15 – "I punted the reporting into PowerBI for for the this goound for the first eight weeks and then it would be like for swagger that would be integrated into a web portal"`
 
 ---
 
@@ -141,5 +147,17 @@ Expand ops beyond organization/event monitoring into data stewardship.
 2. Prepare stakeholder sessions with Leah and Larry — focus on pain points, avoid replicating old workflows.
    Source: `CONTEXT.md 01:00:32 – "I'm going to say Leah and Larry are probably the best ones for us to start off with."`
 
-3. Co-create critical path wireframes: campaign → event → assignment → execution → report.
-   Source: Derived from overall call structure — no single quote.
+4. **Capability Matrix / Product Spec** — Produce a formalized document or slide deck logging all capabilities in V1 vs future phases. Chris needs this for leadership updates.
+   Source: `CONTEXT.md 00:38:13 – "I can have something I can go back to leadership and saying this is what we're doing and this is where we are"` + `00:43:11 – "we're going off of the same list and we're checking things off"` + `00:46:32 – "we can reformat it fairly easily to give you like what you need."`
+
+---
+
+## 8. Optional / At-Risk AI Work (if pulled into this scope)
+
+Chris flagged existing AI features being built by another team as "at risk" due to poor UI, requesting potential Ambar intervention. Note: Wait for Chris's confirmation on Monday before starting.
+
+1. **Email AI Management UI** — Create a standalone UI (or new page in HEMS) to manage inbound event request emails. Emails → AI draft → Human review → Push to HEMS.
+   Source: `CONTEXT.md 00:49:03 – "I am calling a little bit of risk on our AI projects release... The UI sucks"` + `00:51:32 – "the way that process works is it's capturing the emails trying to determine if there's enough information... It could be a separate management points. It doesn't have to be like native within it."`
+
+2. **Survey AI Integration (MVP)** — Provide a mobile-friendly frontend for the existing Survey AI. Uses the backend AI to count facings, identify brands, and read prices from shelf photos.
+   Source: `CONTEXT.md 00:50:12 – "the AI works as intended where it identifies how many facings are on a shelf. It tries to identify the brand... It's just the setup and the UI on it is not good."` + `00:51:32 – "It wouldn't even be a full roll out. it just be an MVP that would be tested just to get the feedback... just solely focus on the survey part of it"`
