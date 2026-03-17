@@ -7,24 +7,24 @@
 
 > **Status: Not started.** Native mobile app scope — none of these are in the current web prototype. All are Phase 1 requirements per Chris (Call 1).
 
-- [ ] `🟢 P1` Make availability/calendar a primary tab and core flow; design reminders/pings to update availability.
+- [x] `🟢 P1` Make availability/calendar a primary tab and core flow; design reminders/pings to update availability.
       Source: `CONTEXT.md 00:23:52 – "The big thing that needs to be front and center is um availability and having a calendar functionality built into here because one of the things that we're I'm instituting is from a process standpoint is to have the educators communicate via the app more"` + `00:25:09 – "we're moving that as a tab front and center. So that's a reminder and we and some of the ideas came up with some of the managers maybe even having something that pings them once in a while to hey don't forget to update update your availability"`
 
-- [ ] `🟢 P1` Treat location, push notifications, and camera as mandatory; design a non-optional permissions flow.
+- [x] `🟢 P1` Treat location, push notifications, and camera as mandatory; design a non-optional permissions flow.
       Source: `CONTEXT.md 00:26:16 – "all those things need to be mandatory and it's one of the things we were talking about with the push notifications and location. And we've had issues just from a process standpoint where where the app doesn't work because of those functions because of those things were turned off. So I think having all that is mandatory or else it just doesn't work."`
 
-- [ ] `🟢 P1` Sales tracking as simple product counter (+/- per SKU) — calculates profit from units sold.
+- [x] `🟢 P1` Sales tracking as simple product counter (+/- per SKU) — calculates profit from units sold.
       Source: `CONTEXT.md 00:21:55 – "for that sales tracker, I would just want to be able to click off how many I think I I sold during the event."` + `00:11:14 – "So then that that creates a counter for each one."`
 
-- [ ] `🟢 P1` Rename "Sales Tracking" to "Survey" — fold shelf-recognition into venue intelligence / survey flows (photo now, process later).
+- [x] `🟢 P1` Rename "Sales Tracking" to "Survey" — fold shelf-recognition into venue intelligence / survey flows (photo now, process later).
   - Note: Chris confirmed the current prototype survey UI (take photos, review later) is exactly what he wants. AI backend processing is a separate standalone project (see §9).
     Source: `CONTEXT.md 00:16:11 – "I think we need to have rename it to survey as opposed to sales tracking."` + `00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later"` + `00:35:47 – "the UI sucks. And in a matter of days, you guys have put together a better UI than they have in three months."`
 
-- [ ] `🟢 P1` Quick photo capture of shelf, backbar, coolers with offline save & complete-later support.
+- [x] `🟢 P1` Quick photo capture of shelf, backbar, coolers with offline save & complete-later support.
   - Chris: "extremely important, extremely."
     Source: `CONTEXT.md 00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later because if they have the picture, they can see what's there."` + `00:30:42 – "So having an offline mode, having the ability to save the pictures and then upload it later is extremely important, extremely."`
 
-- [ ] `🟢 P1` Brand guide section in-app — serving instructions, brand scripts, setup info (PDF-equivalent).
+- [x] `🟢 P1` Brand guide section in-app — serving instructions, brand scripts, setup info (PDF-equivalent).
       Source: `CONTEXT.md 00:27:25 – "What drinks are served? Information about the brand... having educators pre-qualified like knowing who's been been qualified for this so that they get priority um would be helpful... that is a sheet of paper that has all the brand information, the setup information."` + `00:46:25 – "when you go back to the mobile app, you can then communicate visually to the educator what the bottle looks like, not making any assumptions of that and we're utilizing the brand assets."`
 
 - [ ] `🔵 P2` Educator certification / pre-qualification per brand used in assignment priority.
