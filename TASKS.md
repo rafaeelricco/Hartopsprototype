@@ -80,7 +80,7 @@ New capabilities Chris identified as key differentiators.
 - [ ] `🔵 P2` **Distributor depletions integration surface** — Placeholder in reports for "Event Impact vs. Distributor Sales." Phase 2 integration, but design the UI slot now.
       Source: `CONTEXT.md 00:04:36 – "lining that up with those sales and saying... We can start and then driving deriving the actual sales velocity and the influence of doing these events and put a dollar figure on it."`
 
-- [ ] `🟢 P1` **PowerBI for Phase 1 Reporting** — Punt complex in-app reporting to PowerBI for first 8 weeks. In-app dashboards deferred to P2.
+- [x] `🟢 P1` **PowerBI for Phase 1 Reporting** — Punt complex in-app reporting to PowerBI for first 8 weeks. In-app dashboards deferred to P2.
       Source: `CONTEXT.md 00:44:15 – "I punted the reporting into PowerBI for for the this goound for the first eight weeks and then it would be like for swagger that would be integrated into a web portal"`
 
 ---
@@ -135,7 +135,7 @@ Expand ops beyond organization/event monitoring into data stewardship.
 - [ ] `🟢 P1` Shared data models for account/item masters (imported by both ops and staff). Hierarchies as deep as possible now — Chris: "so we don't have to go back in and build it in later."
       Source: `CONTEXT.md 00:02:15 – "heart would have our own master... everyone's structure is going to be the same."` · Call 2 ~00:03 – "hierarchies as deep as possible now so we don't have to go back in and build it in later on when we need to start slicing and dicing the information"
 
-- [ ] `🟢 P1` API-ready schema with industry-standard identifiers for external BI integration (PowerBI in P1).
+- [x] `🟢 P1` API-ready schema with industry-standard identifiers for external BI integration (PowerBI in P1).
       Source: `CONTEXT.md 00:01:13 – "us having a good item master, not with just keys that are industry standard or identifiers that are industry standard... this can then be lined up with with other data insights and analytics."`
 
 - [ ] `🔵 P2` Survey AI integration surface (Chris has existing tool — prepare data pipes and UI slots).

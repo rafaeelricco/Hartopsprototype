@@ -66,6 +66,11 @@ import {
   type ProofPhoto,
   type ReportScope,
 } from "./reports-data";
+import {
+  exportCampaignMetricsCSV,
+  exportEventDetailsCSV,
+  exportFullDatasetCSV,
+} from "./powerbi-export";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -224,6 +229,7 @@ export function ReportsPage() {
           description: "Branded report with all selected campaign data.",
         });
       } else {
+        exportCampaignMetricsCSV();
         const evtCount = comparisonData.reduce((s, c) => s + c.events, 0);
         toast.success("CSV exported", {
           description: `${comparisonData.length} campaigns, ${evtCount} events — raw data ready.`,
@@ -877,6 +883,136 @@ export function ReportsPage() {
         </div>
       )}
 
+      {/* ── Data Feeds & Exports ───────────────────────────────────────── */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden mb-8">
+        <div className="px-5 py-4 border-b border-[#E2E8F0]">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-5 h-5 bg-[#F8FAFC] rounded flex items-center justify-center border border-[#E2E8F0]">
+              <Table2 size={12} style={{ color: "#0F172A", strokeWidth: 2 }} />
+            </div>
+            <span
+              style={{
+                fontSize: "0.9375rem",
+                color: "#0F172A",
+                fontWeight: 600,
+              }}
+            >
+              Data Feeds & Exports
+            </span>
+          </div>
+          <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+            Download raw dataset feeds for external analysis, business
+            intelligence tools, or custom reporting.
+          </p>
+        </div>
+        <div className="flex flex-col">
+          {/* Campaign Performance Row */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="hidden sm:flex mt-0.5">
+                <FileText size={16} className="text-[#64748B]" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "#0F172A",
+                    fontWeight: 500,
+                  }}
+                >
+                  Campaign Performance
+                </span>
+                <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                  Aggregated metrics per campaign (Events, Samples, Reach,
+                  Sales)
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="h-8 px-3 bg-[#FFFFFF] hover:bg-[#F1F5F9] border-[#E2E8F0] text-[#0F172A] cursor-pointer"
+              onClick={() => {
+                exportCampaignMetricsCSV();
+                toast.success("Downloading Campaign Performance CSV");
+              }}
+            >
+              <Download size={14} className="mr-2" />
+              <span style={{ fontSize: "0.8125rem" }}>Download CSV</span>
+            </Button>
+          </div>
+
+          {/* Event Details Row */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="hidden sm:flex mt-0.5">
+                <FileText size={16} className="text-[#64748B]" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "#0F172A",
+                    fontWeight: 500,
+                  }}
+                >
+                  Event Details
+                </span>
+                <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                  Line-level execution data for every event (Location, Venue,
+                  Status)
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="h-8 px-3 bg-[#FFFFFF] hover:bg-[#F1F5F9] border-[#E2E8F0] text-[#0F172A] cursor-pointer"
+              onClick={() => {
+                exportEventDetailsCSV();
+                toast.success("Downloading Event Details CSV");
+              }}
+            >
+              <Download size={14} className="mr-2" />
+              <span style={{ fontSize: "0.8125rem" }}>Download CSV</span>
+            </Button>
+          </div>
+
+          {/* Full Dataset Row */}
+          <div className="flex items-center justify-between px-5 py-4 hover:bg-[#F8FAFC] transition-colors">
+            <div className="flex items-start gap-4 flex-1">
+              <div className="hidden sm:flex mt-0.5">
+                <FileText size={16} className="text-[#64748B]" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span
+                  style={{
+                    fontSize: "0.875rem",
+                    color: "#0F172A",
+                    fontWeight: 500,
+                  }}
+                >
+                  Full Merged Dataset
+                </span>
+                <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                  Complete flat dataset combining event and campaign metrics for
+                  external BI modeling.
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              className="h-8 px-3 bg-[#FFFFFF] hover:bg-[#F1F5F9] border-[#E2E8F0] text-[#0F172A] cursor-pointer"
+              onClick={() => {
+                exportFullDatasetCSV();
+                toast.success("Downloading Full Dataset CSV");
+              }}
+            >
+              <Download size={14} className="mr-2" />
+              <span style={{ fontSize: "0.8125rem" }}>Download CSV</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* ── Photo Proof Gallery (change #4) ──────────────────────────── */}
       <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden mb-2">
         <div className="px-5 py-4 border-b border-[#E2E8F0]">
@@ -1180,7 +1316,7 @@ function PhotoLightbox({
             e.stopPropagation();
             onPrev();
           }}
-          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10 h-auto cursor-pointer"
+          className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10 cursor-pointer"
         >
           <ChevronLeft size={20} style={{ color: "#0F172A" }} />
         </Button>
@@ -1195,7 +1331,7 @@ function PhotoLightbox({
             e.stopPropagation();
             onNext();
           }}
-          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10 h-auto cursor-pointer"
+          className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-colors z-10 cursor-pointer"
         >
           <ChevronRight size={20} style={{ color: "#0F172A" }} />
         </Button>
@@ -1216,7 +1352,7 @@ function PhotoLightbox({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors h-auto cursor-pointer p-0"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center transition-colors cursor-pointer p-0"
           >
             <X size={16} className="text-white" />
           </Button>
