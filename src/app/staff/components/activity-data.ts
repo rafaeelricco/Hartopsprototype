@@ -67,8 +67,7 @@ export const INITIAL_ACTIVITIES: Activity[] = [
     id: "act-4",
     campaignId: "camp-2",
     name: "Beefeater Gin Focus",
-    description:
-      "Dedicated Beefeater Gin sampling at independent retailers.",
+    description: "Dedicated Beefeater Gin sampling at independent retailers.",
     channels: ["off-premise-independent"],
     linkedProductIds: ["sku-005"],
     venueType: "off-premises",

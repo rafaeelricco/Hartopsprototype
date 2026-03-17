@@ -69,7 +69,13 @@ type SortDir = "asc" | "desc";
 export function CampaignDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getCampaign, getEventsForCampaign, getActivitiesForCampaign, getEventsForActivity, createActivity } = useCampaignContext();
+  const {
+    getCampaign,
+    getEventsForCampaign,
+    getActivitiesForCampaign,
+    getEventsForActivity,
+    createActivity,
+  } = useCampaignContext();
 
   // Gap #6: filtering and sorting state
   const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">(
@@ -469,7 +475,8 @@ export function CampaignDetail() {
               No activities yet
             </p>
             <p style={{ fontSize: "0.8125rem", color: "#CBD5E1" }}>
-              Activities let you template event types with specific product subsets.
+              Activities let you template event types with specific product
+              subsets.
             </p>
           </div>
         ) : (
@@ -534,10 +541,9 @@ export function CampaignDetail() {
                             {p.name}
                           </span>
                         ))}
-                        <span
-                          style={{ fontSize: "0.75rem", color: "#94A3B8" }}
-                        >
-                          · {actEvents.length} event{actEvents.length !== 1 ? "s" : ""}
+                        <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                          · {actEvents.length} event
+                          {actEvents.length !== 1 ? "s" : ""}
                         </span>
                       </div>
                     </div>
@@ -866,10 +872,7 @@ function CreateActivityForm({
           maxLength={120}
         />
         {nameError && (
-          <p
-            className="mt-1"
-            style={{ fontSize: "0.75rem", color: "#EF4444" }}
-          >
+          <p className="mt-1" style={{ fontSize: "0.75rem", color: "#EF4444" }}>
             {nameError}
           </p>
         )}
@@ -968,9 +971,7 @@ function CreateActivityForm({
                   type="button"
                   onClick={() =>
                     setSelectedProducts((prev) =>
-                      active
-                        ? prev.filter((x) => x !== p.id)
-                        : [...prev, p.id],
+                      active ? prev.filter((x) => x !== p.id) : [...prev, p.id],
                     )
                   }
                   className="px-2.5 py-1 rounded-lg border transition-colors cursor-pointer"

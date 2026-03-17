@@ -1877,8 +1877,8 @@ export function OrganizationDetailPage() {
                 Events
               </CardTitle>
               <CardDescription style={{ fontSize: "0.8125rem" }}>
-                {orgEvents.length} recent event{orgEvents.length !== 1 ? "s" : ""} for{" "}
-                {org.name}
+                {orgEvents.length} recent event
+                {orgEvents.length !== 1 ? "s" : ""} for {org.name}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">

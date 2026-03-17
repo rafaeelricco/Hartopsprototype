@@ -73,14 +73,54 @@ export interface ProductRef {
 }
 
 export const MOCK_PRODUCTS: ProductRef[] = [
-  { id: "sku-001", name: "Absolut Vodka 750ml", brand: "Absolut", line: "Absolut Classic" },
-  { id: "sku-002", name: "Absolut Lime 750ml", brand: "Absolut", line: "Absolut Flavors" },
-  { id: "sku-003", name: "Kahlúa 700ml", brand: "Kahlúa", line: "Kahlúa Classic" },
-  { id: "sku-004", name: "Malibu Coconut Rum 750ml", brand: "Malibu", line: "Malibu Classic" },
-  { id: "sku-005", name: "Beefeater Gin 750ml", brand: "Beefeater", line: "Beefeater Classic" },
-  { id: "sku-006", name: "Jameson Irish Whiskey 750ml", brand: "Jameson", line: "Jameson Original" },
-  { id: "sku-007", name: "Maker's Mark Bourbon 750ml", brand: "Maker's Mark", line: "Maker's Mark Classic" },
-  { id: "sku-008", name: "Hendrick's Gin 700ml", brand: "Hendrick's", line: "Hendrick's Classic" },
+  {
+    id: "sku-001",
+    name: "Absolut Vodka 750ml",
+    brand: "Absolut",
+    line: "Absolut Classic",
+  },
+  {
+    id: "sku-002",
+    name: "Absolut Lime 750ml",
+    brand: "Absolut",
+    line: "Absolut Flavors",
+  },
+  {
+    id: "sku-003",
+    name: "Kahlúa 700ml",
+    brand: "Kahlúa",
+    line: "Kahlúa Classic",
+  },
+  {
+    id: "sku-004",
+    name: "Malibu Coconut Rum 750ml",
+    brand: "Malibu",
+    line: "Malibu Classic",
+  },
+  {
+    id: "sku-005",
+    name: "Beefeater Gin 750ml",
+    brand: "Beefeater",
+    line: "Beefeater Classic",
+  },
+  {
+    id: "sku-006",
+    name: "Jameson Irish Whiskey 750ml",
+    brand: "Jameson",
+    line: "Jameson Original",
+  },
+  {
+    id: "sku-007",
+    name: "Maker's Mark Bourbon 750ml",
+    brand: "Maker's Mark",
+    line: "Maker's Mark Classic",
+  },
+  {
+    id: "sku-008",
+    name: "Hendrick's Gin 700ml",
+    brand: "Hendrick's",
+    line: "Hendrick's Classic",
+  },
 ];
 
 // ---------------------------------------------------------------------------

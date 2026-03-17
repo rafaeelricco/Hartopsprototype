@@ -78,8 +78,13 @@ const STEPS = [
 
 export function CreateEventPage() {
   const navigate = useNavigate();
-  const { campaigns, createEvent, getCampaign, getEventsForCampaign, getActivity } =
-    useCampaignContext();
+  const {
+    campaigns,
+    createEvent,
+    getCampaign,
+    getEventsForCampaign,
+    getActivity,
+  } = useCampaignContext();
 
   const [searchParams] = useSearchParams();
   const campaignIdParam = searchParams.get("campaign");
@@ -282,7 +287,8 @@ export function CreateEventPage() {
           }}
         >
           <Target size={14} />
-          Creating event under activity: <strong>{preselectedActivity.name}</strong>
+          Creating event under activity:{" "}
+          <strong>{preselectedActivity.name}</strong>
         </div>
       )}
 
@@ -796,7 +802,12 @@ function StepObjectives({
   inheritedCount?: number;
 }) {
   return (
-    <div className="sticky top-0 z-10 pb-1" style={{ boxShadow: selected.length > 0 ? '0 1px 3px rgba(0,0,0,0.04)' : 'none' }}>
+    <div
+      className="sticky top-0 z-10 pb-1"
+      style={{
+        boxShadow: selected.length > 0 ? "0 1px 3px rgba(0,0,0,0.04)" : "none",
+      }}
+    >
       <div className="flex items-center justify-between mb-2">
         <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
           Select Objectives
@@ -933,7 +944,9 @@ function ProjectedImpactSection({
   return (
     <div style={{ animation: "fadeInUp 0.3s ease-out" }}>
       <div className="flex items-center justify-between mb-1">
-        <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>Projected Impact</h3>
+        <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
+          Projected Impact
+        </h3>
         <Button
           variant="ghost"
           type="button"
@@ -1064,7 +1077,13 @@ function ProjectedImpactSection({
                       background: SECTION_COLORS[gi % SECTION_COLORS.length],
                     }}
                   />
-                  <span style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 500 }}>
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "#0F172A",
+                      fontWeight: 500,
+                    }}
+                  >
                     {group.label}
                   </span>
                   <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>

@@ -3,6 +3,7 @@
 Tasks to accommodate in the prototype and create Linear tickets for:
 
 ## 1. Data & Item Master / Campaign Structure
+
 - Implement master hierarchy model in the app:
   - Organization (distributor) → Supplier (brand) → Market (geography) → Channel → ~~Chain~~ → Brand → Line → Item — 🟡 **Partially done.** Organization, Supplier, Market, Channel, Brand, Line, Item all exist as Campaign/ProductRef fields. Chain (account groupings like Tesco, TGI Fridays) is pending — depends on Account Master.
 - ~~Allow campaign setup to:~~
@@ -16,6 +17,7 @@ Tasks to accommodate in the prototype and create Linear tickets for:
 > ⚠️ **Account assignment at activity/event level is not yet implemented.** This depends on the Account Master, which isn't available — the staging DB isn't publicly accessible yet and the distributor flat-file import hasn't been set up (see §6). Once accounts exist, they should be assignable at the activity/event level per Chris's description (Call 2, ~06:21).
 
 ## 2. Item Master Management
+
 - Simple UI to add new items to Item Master:
   - Fields aligned with “current” minimal requirements (product name / naming convention, and IDs: distributor_id, supplier_id, hart_item_id)
   - New items become globally available (visible to all clients / campaigns)
@@ -24,6 +26,7 @@ Tasks to accommodate in the prototype and create Linear tickets for:
   - (Future) placeholder/flag for later review/clean-up of duplicates
 
 ## 3. Platform “Tier” Structure (Core / SaaS / Affiliate)
+
 - Data model to distinguish:
   - Core (Hart): full view of all items, clients, and campaigns
   - SaaS: scoped to a single org/supplier’s data
@@ -33,6 +36,7 @@ Tasks to accommodate in the prototype and create Linear tickets for:
   - Core view that can see where an item is used across SaaS/affiliate tenants
 
 ## 4. Account & Channel Model
+
 - Account model aligned with:
   - Distributor → Organization → Account (with distributor/retailer IDs) — 🔴 **Blocked.** No account entity exists. Requires staging DB access + distributor flat-file data (both pending, see §6).
   - Geography, channel, chain derived/linked from account where possible — 🔴 **Phase 2.** Depends on account model above.
@@ -42,6 +46,7 @@ Tasks to accommodate in the prototype and create Linear tickets for:
 - Support for flat-file import of accounts (NY distributor feeds) as a first pass — 🔴 **Blocked.** Backend/data engineering task; requires DB access that Hart devs are still configuring (Call 2, ~28:23).
 
 ## 5. Educator Mobile App – Prototype Features
+
 Rafael’s prototype needs to be backed by real flows / APIs:
 
 - Availability & Scheduling:
@@ -60,6 +65,7 @@ Rafael’s prototype needs to be backed by real flows / APIs:
   - Structure aligned with future AI shelf-analysis (but AI itself can be later)
 
 ## 6. Technical Access & Environment
+
 - Staging DB access remediation:
   - Work with Hart devs to open staging DB to Ambar IPs / VPN / security group
   - Alternatively, provision AWS access to let Ambar configure DB access
@@ -68,6 +74,7 @@ Rafael’s prototype needs to be backed by real flows / APIs:
   - Basic schema alignment / migration scripts
 
 ## 7. Documentation & Capability Map
+
 - Produce a “capability map” / short product spec for:
   - Educator app MVP features
   - Campaign / activity / event lifecycle
@@ -76,6 +83,7 @@ Rafael’s prototype needs to be backed by real flows / APIs:
   - Mark what’s in V1 (8-week), what’s explicitly out, and later phases
 
 ## 8. Optional / At-Risk AI Work (if pulled into this scope)
+
 Create tickets only if we agree to pick this up:
 
 - Email AI assistant UI:

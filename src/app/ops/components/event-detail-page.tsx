@@ -257,7 +257,7 @@ export function EventDetailPage() {
             {event.status}
             {isLive && (
               <>
-                {' '}
+                {" "}
                 {event.startTime} – {event.endTime}
               </>
             )}

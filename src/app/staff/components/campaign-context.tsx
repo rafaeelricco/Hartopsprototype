@@ -39,9 +39,7 @@ interface CampaignContextValue {
     linkedProductIds?: string[] | undefined;
     objectives?: string[] | undefined;
   }) => string | null;
-  createActivity: (
-    data: Omit<Activity, "id" | "createdAt">,
-  ) => Activity;
+  createActivity: (data: Omit<Activity, "id" | "createdAt">) => Activity;
   createEvent: (
     event: Omit<EventItem, "id" | "createdAt" | "status">,
   ) => EventItem;
@@ -97,8 +95,7 @@ export function useCampaignContext() {
 export function CampaignProvider({ children }: { children: ReactNode }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
   const [events, setEvents] = useState<EventItem[]>(INITIAL_EVENTS);
-  const [activities, setActivities] =
-    useState<Activity[]>(INITIAL_ACTIVITIES);
+  const [activities, setActivities] = useState<Activity[]>(INITIAL_ACTIVITIES);
 
   const existingCampaignNames = useMemo(
     () => campaigns.map((c) => c.name.toLowerCase()),
@@ -168,9 +165,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     return null;
   }
 
-  function createActivity(
-    data: Omit<Activity, "id" | "createdAt">,
-  ): Activity {
+  function createActivity(data: Omit<Activity, "id" | "createdAt">): Activity {
     const newActivity: Activity = {
       ...data,
       id: generateActivityId(),

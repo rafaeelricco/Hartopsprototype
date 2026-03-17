@@ -24,7 +24,12 @@ export const DEFAULT_QUESTIONS: QuestionnaireQuestion[] = [
     id: "q-3",
     text: "Estimate the foot traffic during the event",
     type: "multiple-choice",
-    options: ["Low (<50)", "Medium (50-150)", "High (150-300)", "Very High (300+)"],
+    options: [
+      "Low (<50)",
+      "Medium (50-150)",
+      "High (150-300)",
+      "Very High (300+)",
+    ],
     required: true,
     category: "venue",
   },

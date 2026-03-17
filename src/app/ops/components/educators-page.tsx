@@ -330,9 +330,7 @@ export function EducatorsPage() {
                     <tr
                       key={educator.id}
                       onClick={() =>
-                        navigate(
-                          `/ops/dashboard/educators/${educator.id}`,
-                        )
+                        navigate(`/ops/dashboard/educators/${educator.id}`)
                       }
                       className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     >
