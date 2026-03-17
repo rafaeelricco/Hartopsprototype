@@ -90,7 +90,6 @@ export function Campaigns() {
   function handleCreate(data: CreateCampaignFormData): string | null {
     const error = createCampaign(data);
     if (error) return error;
-    setModalOpen(false);
     setCurrentPage(1);
     return null;
   }
@@ -283,7 +282,7 @@ export function Campaigns() {
       {/* Create Campaign Modal */}
       <CreateCampaignModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onOpenChange={setModalOpen}
         onSubmit={handleCreate}
         existingNames={existingCampaignNames}
       />
