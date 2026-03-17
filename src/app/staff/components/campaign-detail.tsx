@@ -238,7 +238,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <Truck
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
@@ -257,7 +257,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <Package
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
@@ -288,7 +288,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <Globe
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
@@ -307,7 +307,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <Radio
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
@@ -340,7 +340,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <BarChart2
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
@@ -360,7 +360,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <Target
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
@@ -393,7 +393,7 @@ export function CampaignDetail() {
               <div className="flex items-start gap-3">
                 <Package
                   size={14}
-                  className="mt-0.5 flex-shrink-0"
+                  className="mt-1.5 flex-shrink-0"
                   style={{ color: "#94A3B8" }}
                 />
                 <div>
