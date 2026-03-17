@@ -5,15 +5,17 @@
 
 ## 1. Mobile App – Educator `🟢 P1`
 
-> **Status: Not started.** Native mobile app scope — none of these are in the current web prototype. All are Phase 1 requirements per Chris (Call 1).
+> **Status: Design specs finalized.** Native mobile app — no code yet. `[x]` marks below indicate requirements confirmed during client calls, not implemented features.
 
 - [x] `🟢 P1` Make availability/calendar a primary tab and core flow; design reminders/pings to update availability.
+      → See §4 "Educator availability calendar" for manager-facing view.
       Source: `CONTEXT.md 00:23:52 – "The big thing that needs to be front and center is um availability and having a calendar functionality built into here because one of the things that we're I'm instituting is from a process standpoint is to have the educators communicate via the app more"` + `00:25:09 – "we're moving that as a tab front and center. So that's a reminder and we and some of the ideas came up with some of the managers maybe even having something that pings them once in a while to hey don't forget to update update your availability"`
 
 - [x] `🟢 P1` Treat location, push notifications, and camera as mandatory; design a non-optional permissions flow.
       Source: `CONTEXT.md 00:26:16 – "all those things need to be mandatory and it's one of the things we were talking about with the push notifications and location. And we've had issues just from a process standpoint where where the app doesn't work because of those functions because of those things were turned off. So I think having all that is mandatory or else it just doesn't work."`
 
 - [x] `🟢 P1` Sales tracking as simple product counter (+/- per SKU) — calculates profit from units sold.
+      → See §3 "Product sales counter model" for data module.
       Source: `CONTEXT.md 00:21:55 – "for that sales tracker, I would just want to be able to click off how many I think I I sold during the event."` + `00:11:14 – "So then that that creates a counter for each one."`
 
 - [x] `🟢 P1` Rename "Sales Tracking" to "Survey" — fold shelf-recognition into venue intelligence / survey flows (photo now, process later).
@@ -22,15 +24,18 @@
 
 - [x] `🟢 P1` Quick photo capture of shelf, backbar, coolers with offline save & complete-later support.
   - Chris: "extremely important, extremely."
+    → Phased with §6 "Survey AI integration surface" (P2 data pipes) and §9 "Survey AI Integration" (P3 AI).
     Source: `CONTEXT.md 00:20:16 – "we might need them to take a picture and walk away and come back and fill it out later because if they have the picture, they can see what's there."` + `00:30:42 – "So having an offline mode, having the ability to save the pictures and then upload it later is extremely important, extremely."`
 
 - [x] `🟢 P1` Brand guide section in-app — serving instructions, brand scripts, setup info (PDF-equivalent).
+      → See §2 "Brand education content" for admin-side document management.
       Source: `CONTEXT.md 00:27:25 – "What drinks are served? Information about the brand... having educators pre-qualified like knowing who's been been qualified for this so that they get priority um would be helpful... that is a sheet of paper that has all the brand information, the setup information."` + `00:46:25 – "when you go back to the mobile app, you can then communicate visually to the educator what the bottle looks like, not making any assumptions of that and we're utilizing the brand assets."`
 
 - [ ] `🔵 P2` Educator certification / pre-qualification per brand used in assignment priority.
       Source: `CONTEXT.md 00:27:25 – "having educators pre-qualified like knowing who's been been qualified for this so that they get priority um would be helpful"`
 
 - [ ] `🔵 P2` Educator scoring capture in mobile event flows (reliability, cancellations, certifications). Actual scoring is phase 2, but data capture points should exist.
+      → See §4 "Educator scoring foundation" — §4 is the foundation this builds on.
       Source: `CONTEXT.md 00:54:10 – "we're tagging that this this educator canceled... it needs to be part of a scoring process with the educators."` + `01:09:02 – "educator profiles there is a lot of detail in the educators we currently capture... there was an educator rating which we're not really utilizing yet. All that's definitely important important with that."`
 
 ---
@@ -57,9 +62,11 @@ Campaign creation was too shallow and events didn't inherit from campaigns. Chri
       Source: `CONTEXT.md 00:29:31 – "it being a catchall is a problem because then we're not capturing this information as data."` + `00:48:55 – "there's stuff I I call questionnaires where it's specific to that those those campaigns and events that would need to be tweaked."`
 
 - [x] `🟢 P1` **Brand education content** — Expand brand assets beyond SKUs to include serving instructions, brand scripts, setup info, evaluation sheets. Link to campaigns. Admin-side ability to attach/manage documents per brand/campaign/event.
+      → See §1 "Brand guide section in-app" for mobile consumption.
       Source: `CONTEXT.md 00:27:25 – "one of the things that we also include is um PDFs on the information of the event like how do you how do you serve the drink? What drinks are served? Information about the brand... that is a sheet of paper that has all the brand information, the setup information."`
 
 - [x] `🟢 P1` **Connect item master to campaigns/events** — `EventItem` has `linkedProductIds`, Activities define product subsets. Products at campaign level flow to events.
+      → See §5 "Hart-level Item Master" (CRUD UI) and §6 "Shared data models".
       Source: `CONTEXT.md 00:21:55 – "from a from an event structure is going back to the item master being linked into there with this campaign. We know what products I'm going to be done going to be sampled in this this campaign."`
 
 ---
@@ -69,12 +76,14 @@ Campaign creation was too shallow and events didn't inherit from campaigns. Chri
 New capabilities Chris identified as key differentiators.
 
 - [x] `🟢 P1` 🟢 **Account profile data model** — Track per-account: displays, cold boxes, windows, venue characteristics. Shared `Account` entity created in `@/lib/account-types.ts` with mock data.
+      → See §5 "Hart-level Account Master" (UI, blocked) and §6 "Shared data models" (shared types).
       Source: `CONTEXT.md 00:20:16 – "for the account profile we want to track how many displays are in the account how many cold boxes if there's wind windows so all the things that we're surveying we're keeping tabs and creating a profile as to what that account is."`
 
 - [ ] `🔵 P2` **AI prescriptive suggestion engine (mock)** — Suggest accounts, days, event types based on history. Chris: "no one's doing that right now." Key differentiator but requires account/event history.
       Source: `CONTEXT.md 00:50:03 – "knowing the competition, no one's doing that right now."` + `00:42:01 – "if we have an account master and these account profiles and now we know more about these accounts... the AI can then learn more about the types of accounts."`
 
 - [x] `🟢 P1` **Product sales counter model** — Sales Volume Tracker data module in `event-data.ts` tracks units sold by SKU. Mapped to "Drive Sales" objective.
+      → See §1 "Sales tracking as simple product counter" for mobile UI.
       Source: `CONTEXT.md 00:21:55 – "I would just want to be able to click off how many I think I I sold during the event."`
 
 - [ ] `🔵 P2` **Distributor depletions integration surface** — Placeholder in reports for "Event Impact vs. Distributor Sales." Phase 2 integration, but design the UI slot now.
@@ -93,6 +102,7 @@ Chris spent the most time on this — largest missing area. Educator management 
       Source: `CONTEXT.md 00:52:05 – "having that the educators to pull from as to who's available who matches the the geography... here's availability and here's the score of the educators. These are the people you should you should consider."`
 
 - [ ] `🟢 P1` **Educator availability calendar** — Calendar view by day/week. Chris: "the big thing that needs to be front and center." Highest-priority educator feature.
+      → See §1 "Make availability/calendar a primary tab" for educator-facing mobile view.
       Source: `CONTEXT.md 00:23:52 – "The big thing that needs to be front and center is um availability and having a calendar functionality built into here because one of the things that we're I'm instituting is from a process standpoint is to have the educators communicate via the app more."`
 
 - [ ] `🟢 P1` **Geography-based educator-event matching** — Match by proximity (home address vs venue), availability, skill set. Surface ranked list for manager selection.
@@ -102,6 +112,7 @@ Chris spent the most time on this — largest missing area. Educator management 
       Source: `CONTEXT.md 00:54:10 – "that cancellation process needs to be captured... the educator does not have the the power to cancel it, but we're capturing what's going on and at least it's communicated. The manager makes that that that end call."`
 
 - [~] `🟢 P1` **Educator scoring foundation** — Quality score display in `educators-page.tsx` with color coding and trend tracking. **Partial:** UI displays scores but no data capture flow for cancellations, certifications, or on-time rate.
+  → See §1 "Educator scoring capture" — mobile data capture points (P2) that build on this foundation.
   Source: `CONTEXT.md 00:54:10 – "we're tagging that this this educator canceled... it needs to be part of a scoring process with the educators."`
 
 - [ ] `🟢 P1` **Assignment offer flow** — Educators are contractors. Show pending offers, accepted assignments, declined offers. Chris: "a suggestion saying hey we have this opportunity."
@@ -114,9 +125,11 @@ Chris spent the most time on this — largest missing area. Educator management 
 Expand ops beyond organization/event monitoring into data stewardship.
 
 - [~] `🟢 P1` 🔴 **Hart-level Account Master** — `accounts-page.tsx` created with type/status filters, contact info, events hosted. **Partial:** Not linked in ops sidebar; `account-data.ts` missing. **Blocked on staging DB + distributor flat-file import.** Chris: "Heart would have our own master... everyone's structure is going to be the same."
+  → See §3 "Account profile data model" (type created) and §6 "Shared data models". > ⚠️ `accounts-page.tsx` exists with filters & detail view but is NOT linked in the ops sidebar — inaccessible to users.
   Source: `CONTEXT.md 00:02:15 – "we would have our own so heart would have our own master... everyone's everyone's structure is going to be the same."`
 
 - [ ] `🟢 P1` **Hart-level Item Master** — Simple UI to add new items (product name, distributor_id, supplier_id, hart_item_id). New items globally available. Central product catalog with industry-standard identifiers.
+      → See §2 "Connect item master" (done — products linked to campaigns) and §6 "Shared data models".
       Source: `CONTEXT.md 00:02:15 – "having an item master where we're capturing the right information. Same thing with the account account information so that this can then be lined up with with other data insights and analytics."` · `HART_CLIENT_CALL_NOTES §2`
 
 - [ ] `🟢 P1` **Educator-related dashboard metrics** — Add to ops dashboard: total educators, active assignments today, unassigned events (gap alerts), cancellation rate, availability coverage.
@@ -133,12 +146,14 @@ Expand ops beyond organization/event monitoring into data stewardship.
 ## 6. Cross-Cutting – Data Schema & Integrations
 
 - [ ] `🟢 P1` Shared data models for account/item masters (imported by both ops and staff). Hierarchies as deep as possible now — Chris: "so we don't have to go back in and build it in later."
+      → See §3 "Account profile data model" and §5 "Hart-level Account Master".
       Source: `CONTEXT.md 00:02:15 – "heart would have our own master... everyone's structure is going to be the same."` · Call 2 ~00:03 – "hierarchies as deep as possible now so we don't have to go back in and build it in later on when we need to start slicing and dicing the information"
 
 - [x] `🟢 P1` API-ready schema with industry-standard identifiers for external BI integration (PowerBI in P1).
       Source: `CONTEXT.md 00:01:13 – "us having a good item master, not with just keys that are industry standard or identifiers that are industry standard... this can then be lined up with with other data insights and analytics."`
 
 - [ ] `🔵 P2` Survey AI integration surface (Chris has existing tool — prepare data pipes and UI slots).
+      → Phased with §1 "Quick photo capture" (P1 capture) and §9 "Survey AI Integration" (P3 AI).
       Source: `CONTEXT.md 00:13:39 – "So on this part I can tell you and we're launching it now over the next two weeks."`
 
 - [ ] `🟢 P1` Harmonize ops `EventRecord` and staff `EventItem` into shared base type.
@@ -179,25 +194,26 @@ Expand ops beyond organization/event monitoring into data stewardship.
       Source: `CONTEXT.md 00:49:03 – "I am calling a little bit of risk on our AI projects release... The UI sucks"` + `00:51:32 – "the way that process works is it's capturing the emails trying to determine if there's enough information... It could be a separate management points. It doesn't have to be like native within it."`
 
 - [ ] `⚪ P3` **Survey AI Integration (MVP)** — Mobile-friendly frontend for existing Survey AI. AI counts facings, identifies brands, reads prices from shelf photos.
+      → Phased with §1 "Quick photo capture" (P1 capture) and §6 "Survey AI integration surface" (P2 data pipes).
       Source: `CONTEXT.md 00:50:12 – "the AI works as intended where it identifies how many facings are on a shelf. It tries to identify the brand... It's just the setup and the UI on it is not good."` + `00:51:32 – "It wouldn't even be a full roll out. it just be an MVP that would be tested just to get the feedback... just solely focus on the survey part of it"`
 
 ---
 
 ## Progress Summary
 
-| Section                       | Phase | Done  | Partial | Not Started | Total  |
-| ----------------------------- | ----- | ----- | ------- | ----------- | ------ |
-| §1 Mobile App – Educator      | P1/P2 | 0     | 0       | 8           | 8      |
-| §2 Staff – Campaign & Event   | P1/P2 | 5     | 0       | 2           | 7      |
-| §3 Staff – Data Foundations   | P1/P2 | 1     | 0       | 4           | 5      |
-| §4 Ops – Educator Mgmt        | P1    | 0     | 2       | 4           | 6      |
-| §5 Ops – Monitoring & Masters | P1/P2 | 0     | 1       | 4           | 5      |
-| §6 Cross-Cutting              | P1/P2 | 0     | 0       | 4           | 4      |
-| §7 Platform Tiers             | P2    | 0     | 0       | 2           | 2      |
-| §8 Process & Collaboration    | P1    | 0     | 0       | 3           | 3      |
-| §9 At-Risk AI Work            | P3    | 0     | 0       | 2           | 2      |
-| **Total**                     |       | **6** | **3**   | **33**      | **42** |
+| Section                       | Phase | Done   | Partial | Not Started | Total  |
+| ----------------------------- | ----- | ------ | ------- | ----------- | ------ |
+| §1 Mobile App – Educator      | P1/P2 | 6      | 0       | 2           | 8      |
+| §2 Staff – Campaign & Event   | P1/P2 | 6      | 0       | 1           | 7      |
+| §3 Staff – Data Foundations   | P1/P2 | 3      | 0       | 2           | 5      |
+| §4 Ops – Educator Mgmt        | P1    | 1      | 1       | 4           | 6      |
+| §5 Ops – Monitoring & Masters | P1/P2 | 0      | 1       | 4           | 5      |
+| §6 Cross-Cutting              | P1/P2 | 1      | 0       | 3           | 4      |
+| §7 Platform Tiers             | P2    | 0      | 0       | 2           | 2      |
+| §8 Process & Collaboration    | P1    | 0      | 0       | 3           | 3      |
+| §9 At-Risk AI Work            | P3    | 0      | 0       | 2           | 2      |
+| **Total**                     |       | **17** | **2**   | **23**      | **42** |
 
-**Phase 1 tasks:** 28 total — 6 done, 3 partial, 19 not started (2 blocked)
+**Phase 1 tasks:** 30 total — 17 done, 2 partial, 11 not started (1 blocked)
 **Phase 2 tasks:** 10 total — all not started
-**Phase 3 / TBD tasks:** 4 total — all not started
+**Phase 3 / TBD tasks:** 2 total — all not started
