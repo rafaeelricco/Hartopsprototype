@@ -242,7 +242,12 @@ export function CampaignDetailPage() {
                   {associatedEvents.map((e) => (
                     <tr
                       key={e.id}
-                      className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                      onClick={() =>
+                        navigate(
+                          `/ops/dashboard/organizations/${id}/events/${e.id}`,
+                        )
+                      }
+                      className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     >
                       <td className="px-5 py-3">
                         <span

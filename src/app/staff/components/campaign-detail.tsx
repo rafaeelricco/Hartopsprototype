@@ -681,13 +681,17 @@ export function CampaignDetail() {
 // ---------------------------------------------------------------------------
 
 function EventCard({ event }: { event: EventItem }) {
+  const navigate = useNavigate();
   const status = STATUS_LABELS[event.status] ?? STATUS_LABELS["draft"];
   const objectiveLabels = OBJECTIVES.filter((o) =>
     event.objectives.includes(o.id),
   ).map((o) => o.label);
 
   return (
-    <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-shadow hover:shadow-sm group cursor-pointer">
+    <div
+      onClick={() => navigate(`/staff/events/${event.id}`)}
+      className="bg-white rounded-xl border border-[#E2E8F0] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-shadow hover:shadow-sm group cursor-pointer"
+    >
       {/* Left — icon */}
       <div
         className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center"

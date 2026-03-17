@@ -985,12 +985,8 @@ function EditableField({
           />
         )}
         <div>
-          <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-            {label}
-          </span>
-          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-            {shown}
-          </p>
+          <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{label}</span>
+          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>{shown}</p>
         </div>
       </div>
     );
@@ -1011,13 +1007,8 @@ function EditableField({
           />
         )}
         <div className="flex-1 min-w-0">
-          <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-            {label}
-          </span>
-          <p
-            className="truncate"
-            style={{ fontSize: "0.875rem", color: "#0F172A" }}
-          >
+          <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{label}</span>
+          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
             {shown}
           </p>
         </div>
