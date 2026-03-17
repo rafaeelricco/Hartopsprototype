@@ -9,6 +9,7 @@ import {
   Settings,
   GalleryVerticalEnd,
   Store,
+  Users,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -52,6 +53,11 @@ const data = {
       title: "Account Master",
       url: "/ops/dashboard/accounts",
       icon: Store,
+    },
+    {
+      title: "Educators",
+      url: "/ops/dashboard/educators",
+      icon: Users,
     },
     {
       title: "Events",

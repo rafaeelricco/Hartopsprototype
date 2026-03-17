@@ -89,8 +89,8 @@ New capabilities Chris identified as key differentiators.
 
 Chris spent the most time on this — largest missing area. Educator management is core to Hart operations.
 
-- [~] `🟢 P1` **Educator roster page** — `educators-page.tsx` created with metrics, search, multi-filters, quality scores, pagination. **Partial:** Not linked in ops sidebar navigation; backing `educator-data.ts` file missing (imported but not created).
-  Source: `CONTEXT.md 00:52:05 – "having that the educators to pull from as to who's available who matches the the geography... here's availability and here's the score of the educators. These are the people you should you should consider."`
+- [x] `🟢 P1` **Educator roster page** — `educators-page.tsx` with metrics, search, multi-filters, quality scores, pagination. `educator-data.ts` created with 12 mock educators. Linked in ops sidebar navigation and routed at `/ops/dashboard/educators`.
+      Source: `CONTEXT.md 00:52:05 – "having that the educators to pull from as to who's available who matches the the geography... here's availability and here's the score of the educators. These are the people you should you should consider."`
 
 - [ ] `🟢 P1` **Educator availability calendar** — Calendar view by day/week. Chris: "the big thing that needs to be front and center." Highest-priority educator feature.
       Source: `CONTEXT.md 00:23:52 – "The big thing that needs to be front and center is um availability and having a calendar functionality built into here because one of the things that we're I'm instituting is from a process standpoint is to have the educators communicate via the app more."`
