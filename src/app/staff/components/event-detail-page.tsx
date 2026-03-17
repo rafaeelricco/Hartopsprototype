@@ -32,6 +32,8 @@ import {
   Info,
   Download,
   Loader2,
+  Building2,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -720,56 +722,63 @@ function Phase1Editable({
             )}
           </span>
         </div>
-        <div className="px-5 py-5 space-y-4">
-          <EditableField
-            eventId={event.id}
-            field="name"
-            label="Event Name"
-            value={event.name}
-            type="text"
-            readOnly={readOnly === true}
-          />
-          <EditableField
-            eventId={event.id}
-            field="location"
-            label="Location"
-            value={event.location}
-            type="text"
-            readOnly={readOnly === true}
-          />
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-5">
+          <div className="flex flex-col gap-3">
             <EditableField
               eventId={event.id}
-              field="date"
-              label="Date"
-              value={event.date}
-              type="date"
+              field="name"
+              label="Event Name"
+              value={event.name}
+              type="text"
+              icon={Pencil}
               readOnly={readOnly === true}
             />
             <EditableField
               eventId={event.id}
-              field="duration"
-              label="Duration"
-              value={event.duration}
+              field="location"
+              label="Location"
+              value={event.location}
+              type="text"
+              icon={MapPin}
+              readOnly={readOnly === true}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <EditableField
+                eventId={event.id}
+                field="date"
+                label="Date"
+                value={event.date}
+                type="date"
+                icon={CalendarDays}
+                readOnly={readOnly === true}
+              />
+              <EditableField
+                eventId={event.id}
+                field="duration"
+                label="Duration"
+                value={event.duration}
+                type="select"
+                options={DURATION_OPTIONS}
+                icon={Clock}
+                readOnly={readOnly === true}
+              />
+            </div>
+            <EditableField
+              eventId={event.id}
+              field="venueType"
+              label="Venue Type"
+              value={event.venueType}
               type="select"
-              options={DURATION_OPTIONS}
+              options={[
+                { value: "off-premises", label: "Off-Premises" },
+                { value: "on-premises", label: "On-Premises" },
+                { value: "special", label: "Special" },
+              ]}
+              displayValue={VENUE_LABELS[event.venueType] || event.venueType}
+              icon={Building2}
               readOnly={readOnly === true}
             />
           </div>
-          <EditableField
-            eventId={event.id}
-            field="venueType"
-            label="Venue Type"
-            value={event.venueType}
-            type="select"
-            options={[
-              { value: "off-premises", label: "Off-Premises" },
-              { value: "on-premises", label: "On-Premises" },
-              { value: "special", label: "Special" },
-            ]}
-            displayValue={VENUE_LABELS[event.venueType] || event.venueType}
-            readOnly={readOnly === true}
-          />
         </div>
       </div>
 
@@ -898,7 +907,7 @@ function Phase1Editable({
   );
 }
 
-// ── Inline-editable field component (vertical block layout) ──────────────────
+// ── Inline-editable field component (compact icon+label+value layout) ────────
 
 function EditableField({
   eventId,
@@ -909,6 +918,7 @@ function EditableField({
   options,
   displayValue,
   readOnly,
+  icon: Icon,
 }: {
   eventId: string;
   field: "name" | "location" | "date" | "duration" | "venueType";
@@ -918,6 +928,7 @@ function EditableField({
   options?: (string | { value: string; label: string })[];
   displayValue?: string;
   readOnly?: boolean;
+  icon?: LucideIcon;
 }) {
   const { updateEventFields } = useCampaignContext();
   const [editing, setEditing] = useState(false);
@@ -965,17 +976,21 @@ function EditableField({
 
   if (readOnly) {
     return (
-      <div>
-        <span
-          className="block mb-1"
-          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-        >
-          {label}
-        </span>
-        <div className="px-3 py-2">
-          <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-            {shown}
+      <div className="flex items-start gap-3">
+        {Icon && (
+          <Icon
+            size={14}
+            className="mt-1 flex-shrink-0"
+            style={{ color: "#94A3B8" }}
+          />
+        )}
+        <div>
+          <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+            {label}
           </span>
+          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+            {shown}
+          </p>
         </div>
       </div>
     );
@@ -985,86 +1000,102 @@ function EditableField({
     return (
       <button
         onClick={startEdit}
-        className="block w-full text-left group"
+        className="flex items-start gap-3 w-full text-left group rounded-lg hover:bg-[#F8FAFC] transition-colors -mx-2 px-2 py-1.5"
         type="button"
       >
-        <span
-          className="block mb-1"
-          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-        >
-          {label}
-        </span>
-        <div className="flex items-center justify-between rounded-lg border border-transparent group-hover:border-[#E2E8F0] group-hover:bg-[#F8FAFC] px-3 py-2 transition-colors">
-          <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-            {shown}
-          </span>
-          <Pencil
-            size={12}
-            className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+        {Icon && (
+          <Icon
+            size={14}
+            className="mt-1 flex-shrink-0"
             style={{ color: "#94A3B8" }}
           />
+        )}
+        <div className="flex-1 min-w-0">
+          <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+            {label}
+          </span>
+          <p
+            className="truncate"
+            style={{ fontSize: "0.875rem", color: "#0F172A" }}
+          >
+            {shown}
+          </p>
         </div>
+        <Pencil
+          size={12}
+          className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-2"
+          style={{ color: "#94A3B8" }}
+        />
       </button>
     );
   }
 
   return (
-    <div>
-      <span
-        className="block mb-1"
-        style={{ fontSize: "0.6875rem", color: "#1D4ED8" }}
-      >
-        {label}
-      </span>
-      <div className="flex items-center gap-1.5">
-        {type === "select" ? (
-          <select
-            ref={inputRef as React.RefObject<HTMLSelectElement>}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 px-3 py-2 rounded-lg border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30"
-            style={{ fontSize: "0.875rem", color: "#0F172A" }}
+    <div className="flex items-start gap-3 -mx-2 px-2 py-1.5">
+      {Icon && (
+        <Icon
+          size={14}
+          className="mt-1 flex-shrink-0"
+          style={{ color: "#1D4ED8" }}
+        />
+      )}
+      <div className="flex-1 min-w-0">
+        <span
+          className="block mb-1"
+          style={{ fontSize: "0.75rem", color: "#1D4ED8" }}
+        >
+          {label}
+        </span>
+        <div className="flex items-center gap-1.5">
+          {type === "select" ? (
+            <select
+              ref={inputRef as React.RefObject<HTMLSelectElement>}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="flex-1 px-3 py-1.5 rounded-lg border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30"
+              style={{ fontSize: "0.875rem", color: "#0F172A" }}
+            >
+              {options?.map((o) => {
+                const val = typeof o === "string" ? o : o.value;
+                const lab = typeof o === "string" ? o : o.label;
+                return (
+                  <option key={val} value={val}>
+                    {lab}
+                  </option>
+                );
+              })}
+            </select>
+          ) : (
+            <Input
+              ref={inputRef as React.RefObject<HTMLInputElement>}
+              type={type}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="flex-1 px-3 py-1.5 rounded-lg border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30 h-auto shadow-none"
+              style={{ fontSize: "0.875rem", color: "#0F172A" }}
+            />
+          )}
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={save}
+            className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#ECFDF5] transition-colors cursor-pointer"
+            title="Save"
           >
-            {options?.map((o) => {
-              const val = typeof o === "string" ? o : o.value;
-              const lab = typeof o === "string" ? o : o.label;
-              return (
-                <option key={val} value={val}>
-                  {lab}
-                </option>
-              );
-            })}
-          </select>
-        ) : (
-          <Input
-            ref={inputRef as React.RefObject<HTMLInputElement>}
-            type={type}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 px-3 py-2 rounded-lg border border-[#93C5FD] bg-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]/30 h-auto shadow-none"
-            style={{ fontSize: "0.875rem", color: "#0F172A" }}
-          />
-        )}
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={save}
-          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#ECFDF5] transition-colors cursor-pointer"
-          title="Save"
-        >
-          <Check size={14} style={{ color: "#0F766E" }} />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={cancel}
-          className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#FEF2F2] transition-colors cursor-pointer"
-          title="Cancel"
-        >
-          <X size={14} style={{ color: "#B91C1C" }} />
-        </Button>
+            <Check size={14} style={{ color: "#0F766E" }} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={cancel}
+            className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+            title="Cancel"
+          >
+            <X size={14} style={{ color: "#B91C1C" }} />
+          </Button>
+        </div>
       </div>
     </div>
   );
