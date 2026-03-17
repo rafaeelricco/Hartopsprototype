@@ -1,0 +1,109 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Educator Roster & Performance
+# =============================================================================
+
+id: "mm-ui-003"
+title: "Educator Roster & Performance"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "mm-ui-002"
+
+context: |
+  Educator Managers need visibility into their assigned educators' contact
+  information, availability, and performance metrics to make informed staffing
+  decisions. The roster is the reference point when assigning educators to
+  events. As an Educator Manager, I need a sortable roster of my educators
+  with quick access to contact details and performance stats so I can assign
+  the best-fit educator to each event.
+
+scope:
+  in_scope:
+    - "Educator Roster list view with sortable columns"
+    - "Educator Detail view with contact links and Quick Stats"
+    - "Performance sorting and filtering"
+    - "Manager-scoped roster (only assigned educators)"
+  out_of_scope:
+    - "Educator onboarding or account creation (Hart Ops responsibility)"
+    - "Educator mobile app experience (see Educator Mobile Experience)"
+    - "Educator availability editing (educator self-service in mobile app)"
+    - "Event assignment flow (covered in mm-ui-002, references roster)"
+    - "Educator payroll or payment information"
+
+key_concepts:
+  - term: "Quick Stats"
+    definition: "A set of at-a-glance performance metrics for an individual educator: average rating, sales per event, and punctuality. Used by managers to assess educator fitness for event assignment."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5.2"
+  - term: "Scoped Roster"
+    definition: "Each Educator Manager sees only their assigned educators, not the full tenant roster. This scoping ensures managers operate within their defined authority."
+    sources:
+      - doc: "mm8 Educator Manager Experience"
+        details: "Assumptions — Managers see only their scoped slice"
+  - term: "Coordinator Role"
+    definition: "Educator Managers are coordinators, not administrators — they have limited Edit Educator capability. They can view and reference educator data but cannot modify educator profiles or account settings."
+    sources:
+      - doc: "mm8 Educator Manager Experience"
+        details: "Implications — Managers are coordinators"
+
+core_content:
+  - section_title: "Educator Roster List"
+    points:
+      - "Entry Point: 'Educators' item in the side navigation."
+      - "Elements: Tabular list displaying educator records."
+      - "Elements: Columns — Name, Contact (email/phone), Status (Active/Inactive), Performance metrics."
+      - "Functionality: Columns are sortable — click column header to sort ascending/descending."
+      - "Functionality: Roster is scoped to the authenticated manager's assigned educators only."
+      - "Functionality: Clicking an educator row navigates to the Educator Detail View."
+      - "Design principle: The roster is the staffing reference — it should answer 'Who is available and performing well?' at a glance."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5.1"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Core Content — Educator Management"
+
+  - section_title: "Educator Detail View"
+    points:
+      - "Entry Point: Clicking an educator row in the Roster List."
+      - "Elements: Contact links — mailto link for email, tel link for phone (tap-to-call on mobile)."
+      - "Elements: Quick Stats panel — Average Rating, Sales Per Event, Punctuality."
+      - "Elements: Educator status indicator (Active/Inactive)."
+      - "Functionality: Contact links open the device's default email client or phone dialer."
+      - "Functionality: Quick Stats are read-only — derived from aggregated event data, not manually entered."
+      - "Design principle: The detail view answers 'How is this educator performing?' and 'How do I reach them?'"
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5.2"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:33:48"
+
+  - section_title: "Performance Sorting & Filtering"
+    points:
+      - "Functionality: Sort the roster by performance metrics — average rating, sales per event, punctuality."
+      - "Functionality: Filter the roster by status — Active or Inactive educators."
+      - "Functionality: Sorting and filtering persist within the session until explicitly changed."
+      - "Design principle: Performance-based sorting helps managers identify top performers for high-priority events."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5.1, §5.2"
+
+assumptions:
+  - "Quick Stats (avg rating, sales per event, punctuality) are computed server-side from historical event data."
+  - "The roster does not support bulk actions (e.g., bulk status change) in Phase 1."
+  - "Educator profile data (name, contact, status) is managed by Hart Ops — managers have read-only access."
+  - "Performance metrics are updated after each event finalization, not in real-time."
+  - "Search within the roster is anticipated but not explicitly defined in source — filter by name or contact."
+  - "Managers cannot add or remove educators from their roster — assignment is managed at a higher level."
+
+implications:
+  - "Frontend: Roster table component needs sortable column headers with ascending/descending toggle indicators."
+  - "Frontend: Educator Detail View should include direct-action contact links (mailto:, tel:) rather than plain text."
+  - "Frontend: Quick Stats panel should use a consistent card or metric display pattern reusable across the app."
+  - "Backend: Quick Stats API must aggregate performance data from finalized events scoped to the requesting manager."
+  - "Backend: Roster endpoint must enforce manager-level scoping — return only educators assigned to the authenticated manager."
+  - "Backend: Consider caching Quick Stats as they only change on event finalization, not on every request."
+  - "Architecture: The roster feeds into the educator assignment flow (mm-ui-002) — the assignment UI should reference roster data without requiring a separate API call."

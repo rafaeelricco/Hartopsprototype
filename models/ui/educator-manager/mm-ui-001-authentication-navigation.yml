@@ -1,0 +1,147 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Authentication & Navigation
+# =============================================================================
+
+id: "mm-ui-001"
+title: "Authentication & Navigation"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "mm-ui-002"
+    - "mm-ui-003"
+    - "mm-ui-004"
+
+context: |
+  Educator Managers are invited by Trial Client Staff — they cannot self-register.
+  Once authenticated, they land on an action-oriented dashboard that answers
+  "What needs my attention right now?" As an Educator Manager, I need a secure
+  invitation-based onboarding flow and a dashboard that immediately surfaces
+  events requiring staffing, monitoring, or finalization so I can coordinate
+  field operations without searching for work.
+
+scope:
+  in_scope:
+    - "Invitation activation flow triggered by Trial Client Staff"
+    - "Sign In with email and password"
+    - "Forgot Password and reset flow"
+    - "Shared authentication layout"
+    - "Side navigation structure"
+    - "Dashboard as default landing page with 3 stat cards"
+  out_of_scope:
+    - "Self-registration (invitation-only model)"
+    - "MFA/2FA"
+    - "Session management and token refresh mechanics"
+    - "Event detail views (covered in mm-ui-002)"
+    - "Educator roster views (covered in mm-ui-003)"
+    - "Settings and notification preferences (covered in mm-ui-004)"
+
+key_concepts:
+  - term: "Invitation Activation"
+    definition: "A one-time URL sent via email by Trial Client Staff that allows a new Educator Manager to set their password and activate their account. The manager cannot self-register."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §1.1"
+  - term: "Action-Oriented Dashboard"
+    definition: "A landing page designed to surface work that needs doing — not just metrics to observe. Every card and list item is clickable and links directly to the relevant task."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §3"
+  - term: "Scoped Data View"
+    definition: "Educator Managers see only their assigned educators and events, not entire tenant data. This scoping applies to all dashboard metrics and navigation targets."
+    sources:
+      - doc: "mm8 Educator Manager Experience"
+        details: "Implications — Scoped data views"
+
+core_content:
+  - section_title: "Shared Auth Layout"
+    points:
+      - "Elements: Centered white card with rounded corners on a full-screen background."
+      - "Elements: Logo centered above the card."
+      - "Elements: Single-column vertical stack for all form fields, labels above inputs."
+      - "Elements: Full-width rounded button with high-contrast styling as primary action."
+      - "Elements: Centered 'Terms of Service' and 'Privacy Policy' links at the bottom of the viewport."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §1 — Shared Layout"
+
+  - section_title: "Invitation Activation Flow"
+    points:
+      - "Entry Point: Trial Client Staff sends an invitation email containing an activation link."
+      - "Step 1: Manager clicks activation link → Activation screen loads with password creation form."
+      - "Step 2: Manager sets password → System validates password complexity → Redirect to Sign In."
+      - "Validation: Expired activation link displays a 'Contact your administrator' error message."
+      - "Design principle: Activation ends at Sign In (not auto-login) to confirm the manager can authenticate with new credentials."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §1.1"
+
+  - section_title: "Sign In"
+    points:
+      - "Entry Point: Direct URL or redirect from activation flow."
+      - "Functionality: Manager enters email and password → Auth Service validates → Redirect to Dashboard on success."
+      - "Functionality: Account must be in 'Active' state to proceed."
+      - "Functionality: Inactive accounts display a specific 'Account locked' error — not generic 'Invalid credentials'."
+      - "Functionality: Email format validation enforced on the client side."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §2"
+
+  - section_title: "Forgot Password"
+    points:
+      - "Entry Point: 'Forgot Password?' link on the Sign In page, inline with the password field."
+      - "Step 1: Manager enters email → System sends reset link."
+      - "Step 2: Manager clicks reset link → Password reset screen loads → Manager sets new password → Redirect to Sign In."
+      - "Validation: Reset token has a defined expiration window."
+      - "Validation: Used tokens cannot be reused — prevents replay attacks."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §2"
+
+  - section_title: "Side Navigation Structure"
+    points:
+      - "Elements: Persistent side navigation visible on all authenticated screens."
+      - "Elements: Navigation items — Dashboard (default), Events, Educators, Settings."
+      - "Functionality: Dashboard is the default landing page after Sign In."
+      - "Design principle: Navigation items map 1:1 to the Educator Manager's primary workflows."
+      - "Design principle: Navigation designed to be future-proof — Analytics and Training sections anticipated for later phases."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §1.1, §2"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Core Content — Authentication and Navigation"
+
+  - section_title: "Dashboard Landing Experience"
+    points:
+      - "Entry Point: Dashboard is the default landing page after Sign In."
+      - "Elements: 3 Stat Cards — Total Events This Week, Active Events Now, Events Requiring Attention."
+      - "Functionality: Every card and list item is clickable — direct link to the task at hand."
+      - "Functionality: Stat Cards reflect the manager's scoped data only (their educators and events)."
+      - "Design principle: Action-oriented — surfaces things the manager needs to do, not just see."
+      - "Design principle: Dashboard answers the primary question — 'What needs my attention right now?'"
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §3"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Core Content — Dashboard (Homepage)"
+
+assumptions:
+  - "Educator Managers cannot self-register — must be invited by Trial Client Staff."
+  - "Password complexity rules match other platform roles (minimum 8 characters, 1 uppercase, 1 number, 1 special character)."
+  - "Activation link expiration duration will be defined during implementation."
+  - "Session tokens are issued upon successful sign-in (mechanism not specified in source)."
+  - "Rate limiting on sign-in attempts is expected but not explicitly defined in source material."
+  - "Dashboard data is scoped to the manager's assigned slice — not aggregated across the entire tenant."
+  - "Default stat card values are zero for newly activated managers with no assigned events."
+
+implications:
+  - "Frontend: Auth screens share a single layout component with slot-based content swapping for Sign In, Activation, and Forgot Password forms."
+  - "Frontend: Side navigation component is persistent and shared across all authenticated Educator Manager screens."
+  - "Frontend: Dashboard stat cards must link directly to filtered views within Events (mm-ui-002)."
+  - "Frontend: Navigation must be extensible — structure should accommodate future menu items without layout changes."
+  - "Backend: Activation and reset tokens must be single-use with server-side expiration tracking."
+  - "Backend: Authentication must distinguish between 'invalid credentials' and 'inactive account' states."
+  - "Backend: Dashboard API must support manager-scoped queries — filtering by the authenticated manager's assigned educators and events."
+  - "Architecture: Scoped data views require tenant-and-manager-level filtering at the API layer, not just the frontend."

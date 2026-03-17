@@ -1,0 +1,161 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Events Management
+# =============================================================================
+
+id: "mm-ui-002"
+title: "Events Management"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into: []
+
+context: |
+  Educator Managers do not create events — they receive assigned events from
+  Trial Client Staff and manage them through their lifecycle: staffing educators
+  before the event, monitoring live execution during the event, and finalizing
+  the record after the event. As an Educator Manager, I need to view my events
+  across list and calendar views, assign educators, monitor real-time field data,
+  and finalize completed events so the data pipeline can proceed to reporting.
+
+scope:
+  in_scope:
+    - "Events List View with filters (Live, Upcoming, Completed)"
+    - "Monthly Calendar View toggle"
+    - "Pre-Event Detail View with educator assignment"
+    - "During-Event Live Dashboard monitoring"
+    - "Post-Event Review and Finalization workflow"
+    - "Speed-to-Finalize workflow for weekend event clusters"
+  out_of_scope:
+    - "Event creation (Trial Client Staff responsibility)"
+    - "Campaign management (Trial Client Staff responsibility)"
+    - "Educator mobile app data entry (see Educator Mobile Experience)"
+    - "Report generation and analytics (downstream of finalization)"
+    - "Out-of-platform scheduling negotiation (phone/text)"
+
+key_concepts:
+  - term: "Event Finalization"
+    definition: "The act of a manager clicking 'Approve & Finalize' on a completed event. This is irreversible — it locks the event for all actors and terminates the educator's 24-hour editing window."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5"
+      - doc: "Educator Mobile §3.4"
+        details: "Post-event editing window"
+  - term: "Educator Assignment"
+    definition: "The in-platform act of selecting or reassigning an educator to an event. Managers can reference educator availability (maintained in-app) before confirming assignments."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:09:06"
+  - term: "Speed-to-Finalize"
+    definition: "A workflow pattern addressing the bottleneck of weekend event clusters — events pile up on weekends and managers need to finalize them quickly on Monday to unblock the reporting pipeline."
+    sources:
+      - doc: "mm8 Educator Manager Experience"
+        details: "Assumptions — Speed-to-Finalize"
+  - term: "Digital Availability"
+    definition: "Educators maintain day-level and time-slot-level availability via the mobile app's Availability tab. Managers reference this before assigning educators to events, reducing phone/text back-and-forth for initial availability checks."
+    sources:
+      - doc: "Chris, Intro Meeting"
+        details: "~00:33:48"
+
+core_content:
+  - section_title: "Events List & Calendar View"
+    points:
+      - "Entry Point: 'Events' item in the side navigation."
+      - "Elements: Default view is List View showing events in tabular format."
+      - "Elements: Filter controls — Live, Upcoming, Completed status filters."
+      - "Elements: Toggle control to switch between List View and Calendar View."
+      - "Elements: Calendar View displays a monthly grid mapping events to dates."
+      - "Functionality: Clicking any event navigates to its detail view (phase-dependent)."
+      - "Design principle: Managers need both chronological (list) and spatial/temporal (calendar) views to manage weekend clustering patterns."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §4"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Core Content — Events List and Detail Flow"
+
+  - section_title: "Pre-Event Detail View"
+    points:
+      - "Entry Point: Clicking an Upcoming event from the Events List or Calendar."
+      - "Elements: Read-only display of products, instructions, and goals set by Trial Client Staff."
+      - "Elements: Educator Assignment section with CTA to assign or reassign an educator."
+      - "Elements: Educator availability reference panel showing the selected educator's in-app availability."
+      - "Functionality: Manager cannot edit event details (products, instructions, goals) — read-only from Trial Client Staff."
+      - "Design principle: Pre-event focus is entirely on staffing — ensuring the right educator is confirmed for the event."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §4, §5"
+      - doc: "Chris, Demo Meeting"
+        details: "~01:09:06"
+
+  - section_title: "Educator Assignment Flow"
+    points:
+      - "Entry Point: 'Assign Educator' or 'Reassign' CTA on the Pre-Event Detail View."
+      - "Step 1: Select educator from the manager's roster."
+      - "Step 2: View educator's digital availability for the event date/time."
+      - "Step 3: Confirm assignment → System sends notification to the assigned educator."
+      - "Functionality: Reassignment replaces the current educator and notifies both the outgoing and incoming educator."
+      - "Functionality: Availability reference reduces but does not eliminate phone/text coordination — full scheduling negotiation remains external in Phase 1."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5"
+      - doc: "Chris, Intro Meeting"
+        details: "~00:33:48"
+
+  - section_title: "During-Event Live Dashboard"
+    points:
+      - "Entry Point: Clicking a Live event from the Events List or Calendar."
+      - "Elements: Geolocated check-in status showing whether the educator arrived at the venue."
+      - "Elements: Live metrics streaming in real-time from the educator's mobile app."
+      - "Elements: Photo uploads submitted by the educator during the event."
+      - "Functionality: Manager monitors in read-only mode — no editing of live event data."
+      - "Design principle: Live monitoring answers 'Is the event happening as planned?' without requiring manager intervention."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §4"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Core Content — Events List and Detail Flow"
+
+  - section_title: "Post-Event Review & Finalization"
+    points:
+      - "Entry Point: Clicking a Completed event from the Events List (filtered by 'Completed')."
+      - "Elements: Final stats summary (sales data, consumer interactions, samples distributed)."
+      - "Elements: Photo gallery of event photos submitted by the educator."
+      - "Elements: 'Approve & Finalize' CTA button — prominent, high-contrast styling."
+      - "Functionality: Finalization is irreversible — no undo mechanism in Phase 1."
+      - "Functionality: Finalization locks the event record for all actors (manager, educator, Trial Client Staff)."
+      - "Functionality: Finalization terminates the educator's 24-hour post-event editing window immediately."
+      - "Functionality: Speed-to-Finalize — events cluster on weekends; managers need efficient batch review on Monday."
+      - "Design principle: Finalization is the bottleneck of the data pipeline — reporting depends on managers closing events."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §5"
+      - doc: "Educator Mobile §3.4"
+        details: "Post-event editing window"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Assumptions — Speed-to-Finalize; Implications — Finalization bottleneck"
+
+assumptions:
+  - "List View supports sorting by date, status, and assigned educator."
+  - "Calendar View supports navigation between months (previous/next)."
+  - "The transition from Upcoming to Live happens automatically when the event's scheduled date/time arrives."
+  - "Live Data Feed phase shows partial/incoming data in near real-time."
+  - "Finalization is irreversible — no undo mechanism in Phase 1."
+  - "Managers see only events assigned to their scoped set of educators, not all tenant events."
+  - "The 24-hour educator editing window countdown starts at event completion, not at finalization."
+  - "Speed-to-Finalize may require a batch finalization view or queue in future iterations."
+
+implications:
+  - "Frontend: Implement dual-view toggle (List/Calendar) with shared event data source to avoid redundant API calls."
+  - "Frontend: Calendar component must handle dense weekend clustering without visual clutter."
+  - "Frontend: Event detail view needs clear phase indicators showing current lifecycle state (Upcoming, Live, Completed)."
+  - "Frontend: 'Approve & Finalize' CTA requires a confirmation dialog given its irreversibility."
+  - "Frontend: Educator assignment flow needs an inline availability reference panel, not a separate screen."
+  - "Backend: Event lifecycle state machine must enforce phase transitions and prevent edits on finalized events."
+  - "Backend: Live Data Feed requires real-time or near-real-time data ingestion pipeline from the educator mobile app."
+  - "Backend: Finalization endpoint must atomically lock the event and terminate the educator editing window."
+  - "Backend: Educator assignment must trigger push notifications to the assigned educator."
+  - "Architecture: Consider WebSocket or SSE for the Live Dashboard phase to push updates without polling."
+  - "Architecture: Finalization is the data pipeline bottleneck — monitoring finalization latency is operationally critical."

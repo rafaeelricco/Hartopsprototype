@@ -1,0 +1,107 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Settings & Notifications
+# =============================================================================
+
+id: "mm-ui-004"
+title: "Settings & Notifications"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "TBD — to be filled manually"
+  feeds_into:
+    - "TBD — to be filled manually"
+
+context: |
+  Educator Managers have the most granular notification set on the platform —
+  they need timely alerts for staffing gaps, event starts, check-in failures,
+  and review readiness. Notification reliability is the primary driver of
+  platform engagement for this role. As an Educator Manager, I need fine-grained
+  control over my notification preferences and access to help resources so I
+  can stay responsive to field operations without being overwhelmed by noise.
+
+scope:
+  in_scope:
+    - "Notification preferences with per-category toggles"
+    - "5 notification categories with trigger conditions"
+    - "Help & Support — FAQ list and contact support fallback"
+  out_of_scope:
+    - "User profile or account management"
+    - "Organization-level settings (Trial Client Staff responsibility)"
+    - "Notification delivery infrastructure (backend concern)"
+    - "FAQ content creation (Trial Client Staff responsibility — consumed here)"
+    - "Push notification permission prompts (OS-level concern)"
+
+key_concepts:
+  - term: "Notification Categories"
+    definition: "Five distinct notification types for Educator Managers, each with specific trigger conditions: new events assigned, unstaffed events (7-day warning), events starting in 1 hour, failed educator check-in, and events ready for review."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §6.1"
+  - term: "Help & Support"
+    definition: "A section that consumes FAQ content managed by Trial Client Staff. Provides self-service answers with a contact support fallback for issues not covered by FAQs."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §6.2"
+  - term: "Notification Reliability"
+    definition: "For Educator Managers, notification reliability is the primary driver of platform engagement. Missed notifications directly impact event staffing and finalization timelines."
+    sources:
+      - doc: "mm8 Educator Manager Experience"
+        details: "Implications — Notification reliability"
+
+core_content:
+  - section_title: "Notification Preferences"
+    points:
+      - "Entry Point: 'Settings' item in the side navigation."
+      - "Elements: 5 notification categories displayed as a list, each with an individual toggle (on/off)."
+      - "Functionality: Per-category toggles allow managers to enable or disable specific notification types."
+      - "Functionality: All categories default to enabled on account activation."
+      - "Design principle: Granular control prevents notification fatigue while ensuring critical alerts are not missed."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §6.1"
+
+  - section_title: "Notification Types Detail"
+    points:
+      - "Elements: Category 1 — New Events Assigned. Trigger: Trial Client Staff assigns an event to the manager's scope."
+      - "Elements: Category 2 — Unstaffed Events Warning. Trigger: An event is 7 days away with no educator assigned."
+      - "Elements: Category 3 — Event Starting Soon. Trigger: An assigned event starts in 1 hour."
+      - "Elements: Category 4 — Failed Educator Check-In. Trigger: Educator has not completed geolocated check-in by event start time."
+      - "Elements: Category 5 — Event Ready for Review. Trigger: Event is completed and awaiting manager finalization."
+      - "Design principle: Each notification type maps to a specific manager action — assign educator, follow up, monitor, or finalize."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §6.1"
+      - doc: "mm8 Educator Manager Experience"
+        details: "Core Content — Settings and Notifications"
+
+  - section_title: "Help & Support"
+    points:
+      - "Entry Point: 'Help & Support' section within Settings, or a dedicated sub-navigation item."
+      - "Elements: FAQ list displaying questions and expandable answers."
+      - "Elements: Search or filter input to find relevant FAQ entries."
+      - "Elements: 'Contact Support' fallback link for issues not covered by FAQs."
+      - "Functionality: FAQ content is managed by Trial Client Staff — displayed here as read-only."
+      - "Functionality: FAQs are the same content set pushed to field educators, providing consistency across roles."
+    sources:
+      - doc: "Functionality PDF"
+        details: "Educator Managers §6.2"
+
+assumptions:
+  - "All 5 notification categories default to enabled upon account activation."
+  - "Notification delivery mechanism (push, email, in-app) is not specified — assume at least in-app and push."
+  - "The 7-day unstaffed warning triggers once per event, not daily."
+  - "Failed check-in notification triggers at event start time, not before."
+  - "FAQ content syncs from the Trial Client Staff-managed help resources — no manual curation by managers."
+  - "'Contact Support' links to an email or external support system — specifics TBD."
+  - "Notification preferences are stored per-manager and persist across sessions."
+
+implications:
+  - "Frontend: Notification preferences screen needs toggle components with immediate save (no separate 'Save' button) or explicit save action — pattern TBD."
+  - "Frontend: FAQ section needs an expandable/collapsible list component with search filtering."
+  - "Frontend: Each notification type should include a brief description of its trigger condition alongside the toggle."
+  - "Backend: Notification preferences API must support per-category, per-manager storage and retrieval."
+  - "Backend: Notification trigger engine must evaluate 5 distinct conditions and respect manager preferences before dispatching."
+  - "Backend: FAQ content endpoint must serve the same content managed by Trial Client Staff in the Brand Assets settings."
+  - "Architecture: Notification reliability is operationally critical — consider delivery confirmation and retry mechanisms."
+  - "Architecture: The notification system is a shared service across roles — Educator Manager preferences are one consumer of a broader notification infrastructure."

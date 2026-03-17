@@ -16,6 +16,7 @@ models/
 ├── ui/
 │   ├── hart-ops/
 │   ├── client-staff/
+│   ├── educator-manager/
 │   └── educator-mobile/
 └── templates/
 ```
@@ -68,6 +69,13 @@ graph TD
     cs6["mm-ui-006 Brand Assets Settings"]
   end
 
+  subgraph EducatorManager["ui/educator-manager"]
+    mgr1["mm-ui-001 Authentication Navigation"]
+    mgr2["mm-ui-002 Events Management"]
+    mgr3["mm-ui-003 Educator Roster"]
+    mgr4["mm-ui-004 Settings Notifications"]
+  end
+
   subgraph EducatorMobile["ui/educator-mobile"]
     em1["mm-ui-001 Authentication"]
     em2["mm-ui-002 Event Execution"]
@@ -100,10 +108,18 @@ graph TD
   mm9 -. context .-> em2
   mm9 -. context .-> em3
   mm9 -. context .-> em4
+  mm8 -. context .-> mgr1
+  mm8 -. context .-> mgr2
+  mm8 -. context .-> mgr3
+  mm8 -. context .-> mgr4
+  mgr1 --> mgr2
+  mgr1 --> mgr3
+  mgr1 --> mgr4
+  mgr3 --> mgr2
+
   em1 --> em2
   em2 --> em3
   em2 --> em4
-  em3 --> em2
 ```
 
 ## Authoring Notes
