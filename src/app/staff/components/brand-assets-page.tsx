@@ -36,6 +36,12 @@ import {
   ChevronsUpDown,
   XCircle,
   CircleAlert,
+  BookOpen,
+  FileText,
+  Download,
+  Link as LinkIcon,
+  Tag,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/app/shared/components/ui/button";
@@ -52,10 +58,21 @@ import {
   type FAQItem,
   type AIPrefilledSKU,
 } from "./brand-assets-data";
+import {
+  INITIAL_DOCUMENTS,
+  DOCUMENT_TYPES,
+  DOCUMENT_TYPE_STYLES,
+  BRAND_LIST,
+  FILE_TYPE_LABELS,
+  type BrandDocument,
+  type DocumentType,
+  type FileType,
+} from "./brand-education-data";
+import { INITIAL_CAMPAIGNS } from "./campaign-data";
 
 // ── Constants & helpers ──────────────────────────────────────────────────────
 
-type Tab = "products" | "help";
+type Tab = "products" | "education" | "help";
 type ViewMode = "grid" | "list";
 type SKUStatus = "active" | "discontinued" | "draft";
 
@@ -114,6 +131,7 @@ function renderFormattedText(text: string) {
 export function BrandAssetsPage() {
   const [tab, setTab] = useState<Tab>("products");
   const [skus, setSkus] = useState<SKU[]>(INITIAL_SKUS);
+  const [docs, setDocs] = useState<BrandDocument[]>(INITIAL_DOCUMENTS);
   const [faqs, setFaqs] = useState<FAQItem[]>(INITIAL_FAQS);
 
   const unpushedCount = useMemo(
@@ -129,7 +147,7 @@ export function BrandAssetsPage() {
       {/* Header */}
       <PageHeader
         title="Brand Assets"
-        subtitle="Manage your product library and help resources for field teams."
+        subtitle="Manage your product library, brand education materials, and help resources for field teams."
       />
 
       {/* Tabs — #5 badges */}
@@ -140,6 +158,13 @@ export function BrandAssetsPage() {
           label="Product Library"
           badge={skus.length}
           onClick={() => setTab("products")}
+        />
+        <TabButton
+          active={tab === "education"}
+          icon={<BookOpen size={15} />}
+          label="Brand Education"
+          badge={docs.length}
+          onClick={() => setTab("education")}
         />
         <TabButton
           active={tab === "help"}
@@ -153,6 +178,8 @@ export function BrandAssetsPage() {
 
       {tab === "products" ? (
         <ProductLibrary skus={skus} setSkus={setSkus} />
+      ) : tab === "education" ? (
+        <BrandEducationTab docs={docs} setDocs={setDocs} />
       ) : (
         <HelpResources
           faqs={faqs}
@@ -1915,6 +1942,1273 @@ function InlineEditSelect({
         />
       )}
     </Button>
+  );
+}
+
+// =============================================================================
+// Brand Education Tab
+// =============================================================================
+
+function BrandEducationTab({
+  docs,
+  setDocs,
+}: {
+  docs: BrandDocument[];
+  setDocs: React.Dispatch<React.SetStateAction<BrandDocument[]>>;
+}) {
+  const [search, setSearch] = useState("");
+  const [brandFilter, setBrandFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [campaignFilter, setCampaignFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [viewingDoc, setViewingDoc] = useState<BrandDocument | null>(null);
+  const [editingDoc, setEditingDoc] = useState<BrandDocument | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [deletingDoc, setDeletingDoc] = useState<BrandDocument | null>(null);
+
+  const hasFilters =
+    search !== "" ||
+    brandFilter !== "all" ||
+    typeFilter !== "all" ||
+    campaignFilter !== "all" ||
+    statusFilter !== "all";
+
+  const filtered = useMemo(() => {
+    let result = docs;
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (d) =>
+          d.title.toLowerCase().includes(q) ||
+          d.description.toLowerCase().includes(q) ||
+          d.brandName.toLowerCase().includes(q) ||
+          d.tags.some((t) => t.toLowerCase().includes(q)),
+      );
+    }
+    if (brandFilter !== "all")
+      result = result.filter((d) => d.brandId === brandFilter);
+    if (typeFilter !== "all")
+      result = result.filter((d) => d.type === typeFilter);
+    if (campaignFilter !== "all")
+      result = result.filter((d) =>
+        d.linkedCampaignIds.includes(campaignFilter),
+      );
+    if (statusFilter !== "all")
+      result = result.filter((d) => d.status === statusFilter);
+    return result.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+  }, [docs, search, brandFilter, typeFilter, campaignFilter, statusFilter]);
+
+  // Stat counts
+  const stats = useMemo(() => {
+    const byType: Record<string, number> = {};
+    for (const t of DOCUMENT_TYPES) byType[t] = 0;
+    docs.forEach((d) => {
+      byType[d.type] = (byType[d.type] ?? 0) + 1;
+    });
+    const active = docs.filter((d) => d.status === "active").length;
+    const draft = docs.filter((d) => d.status === "draft").length;
+    return { total: docs.length, active, draft, byType };
+  }, [docs]);
+
+  // Available campaigns from linked docs
+  const linkedCampaignIds = useMemo(() => {
+    const ids = new Set<string>();
+    docs.forEach((d) => d.linkedCampaignIds.forEach((c) => ids.add(c)));
+    return Array.from(ids);
+  }, [docs]);
+
+  function handleSave(doc: BrandDocument) {
+    setDocs((prev) => {
+      const exists = prev.find((d) => d.id === doc.id);
+      if (exists) return prev.map((d) => (d.id === doc.id ? doc : d));
+      return [doc, ...prev];
+    });
+    setEditingDoc(null);
+    setIsCreating(false);
+    toast.success(isCreating ? "Document added" : "Document updated");
+  }
+
+  function handleDelete(id: string) {
+    setDocs((prev) => prev.filter((d) => d.id !== id));
+    setDeletingDoc(null);
+    setViewingDoc(null);
+    toast.success("Document removed");
+  }
+
+  function clearFilters() {
+    setSearch("");
+    setBrandFilter("all");
+    setTypeFilter("all");
+    setCampaignFilter("all");
+    setStatusFilter("all");
+  }
+
+  const DOC_STATUS_STYLE: Record<
+    string,
+    { bg: string; text: string; label: string }
+  > = {
+    active: { bg: "#ECFDF5", text: "#0F766E", label: "Active" },
+    archived: { bg: "#F1F5F9", text: "#64748B", label: "Archived" },
+    draft: { bg: "#FFF7ED", text: "#C2410C", label: "Draft" },
+  };
+
+  return (
+    <>
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        {[
+          {
+            label: "Total Documents",
+            value: stats.total,
+            color: "#0F172A",
+            bg: "#F8FAFC",
+          },
+          {
+            label: "Active",
+            value: stats.active,
+            color: "#0F766E",
+            bg: "#ECFDF5",
+          },
+          {
+            label: "Draft",
+            value: stats.draft,
+            color: "#C2410C",
+            bg: "#FFF7ED",
+          },
+          {
+            label: "Brands Covered",
+            value: new Set(docs.map((d) => d.brandId)).size,
+            color: "#1D4ED8",
+            bg: "#EFF6FF",
+          },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl px-4 py-3 border border-[#E2E8F0]"
+            style={{ background: s.bg }}
+          >
+            <p
+              style={{
+                fontSize: "0.6875rem",
+                color: "#94A3B8",
+                letterSpacing: "0.03em",
+              }}
+            >
+              {s.label}
+            </p>
+            <p
+              className="mt-0.5"
+              style={{ fontSize: "1.25rem", color: s.color }}
+            >
+              {s.value}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2 flex-wrap flex-1">
+          {/* Search */}
+          <div className="relative flex-1 max-w-xs">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2"
+              style={{ color: "#94A3B8" }}
+            />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search documents..."
+              className="w-full pl-9 pr-8 py-2 rounded-lg border border-[#E2E8F0] bg-white outline-none transition-colors focus:border-[#7D152D]"
+              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+            />
+            {search && (
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 h-auto w-auto p-0 hover:bg-transparent cursor-pointer"
+              >
+                <X size={12} style={{ color: "#94A3B8" }} />
+              </Button>
+            )}
+          </div>
+
+          {/* Brand filter */}
+          <select
+            value={brandFilter}
+            onChange={(e) => setBrandFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
+            <option value="all">All Brands</option>
+            {BRAND_LIST.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Type filter */}
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
+            <option value="all">All Types</option>
+            {DOCUMENT_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+
+          {/* Campaign filter */}
+          <select
+            value={campaignFilter}
+            onChange={(e) => setCampaignFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
+            <option value="all">All Campaigns</option>
+            {linkedCampaignIds.map((cid) => {
+              const camp = INITIAL_CAMPAIGNS.find((c) => c.id === cid);
+              return (
+                <option key={cid} value={cid}>
+                  {camp?.name ?? cid}
+                </option>
+              );
+            })}
+          </select>
+
+          {/* Status filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
+            style={{ fontSize: "0.8125rem", color: "#64748B" }}
+          >
+            <option value="all">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+
+        <Button
+          onClick={() => {
+            setIsCreating(true);
+            setEditingDoc({
+              id: "doc-new-" + Date.now(),
+              title: "",
+              description: "",
+              type: "General",
+              fileUrl: "",
+              fileName: "",
+              fileType: "pdf",
+              fileSizeKB: 0,
+              brandName: "",
+              brandId: "",
+              linkedCampaignIds: [],
+              linkedEventIds: [],
+              tags: [],
+              status: "draft",
+              createdAt: new Date().toISOString().split("T")[0] ?? "",
+              updatedAt: new Date().toISOString().split("T")[0] ?? "",
+              createdBy: "Jane Smith",
+            });
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
+          style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+        >
+          <Plus size={14} />
+          Add Document
+        </Button>
+      </div>
+
+      {/* Active filter indicator */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
+        <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+          {filtered.length} document{filtered.length !== 1 ? "s" : ""} found
+        </p>
+        {hasFilters && (
+          <>
+            <span style={{ color: "#E2E8F0" }}>|</span>
+            {search && (
+              <FilterChip
+                label={`"${search}"`}
+                onRemove={() => setSearch("")}
+              />
+            )}
+            {brandFilter !== "all" && (
+              <FilterChip
+                label={
+                  BRAND_LIST.find((b) => b.id === brandFilter)?.name ??
+                  brandFilter
+                }
+                onRemove={() => setBrandFilter("all")}
+              />
+            )}
+            {typeFilter !== "all" && (
+              <FilterChip
+                label={typeFilter}
+                onRemove={() => setTypeFilter("all")}
+              />
+            )}
+            {campaignFilter !== "all" && (
+              <FilterChip
+                label={
+                  INITIAL_CAMPAIGNS.find((c) => c.id === campaignFilter)
+                    ?.name ?? campaignFilter
+                }
+                onRemove={() => setCampaignFilter("all")}
+              />
+            )}
+            {statusFilter !== "all" && (
+              <FilterChip
+                label={DOC_STATUS_STYLE[statusFilter]?.label ?? statusFilter}
+                onRemove={() => setStatusFilter("all")}
+              />
+            )}
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              onClick={clearFilters}
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md hover:bg-[#FEF2F2] transition-colors h-auto w-auto cursor-pointer"
+              style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+            >
+              <XCircle size={10} />
+              Clear all
+            </Button>
+          </>
+        )}
+      </div>
+
+      {/* Document list */}
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-[#E2E8F0] p-12 text-center">
+          <BookOpen
+            size={32}
+            style={{ color: "#E2E8F0" }}
+            className="mx-auto mb-3"
+          />
+          <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
+            No documents match your filters.
+          </p>
+          {hasFilters && (
+            <Button
+              variant="ghost"
+              onClick={clearFilters}
+              className="mt-2 inline-flex items-center gap-1 h-auto cursor-pointer"
+              style={{ fontSize: "0.8125rem", color: "#7D152D" }}
+            >
+              <RotateCcw size={12} /> Clear filters
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+          <div className="overflow-x-auto">
+            <table
+              className="w-full min-w-[900px]"
+              style={{ borderCollapse: "separate", borderSpacing: 0 }}
+            >
+              <thead>
+                <tr className="border-b border-[#E2E8F0]">
+                  {[
+                    "Document",
+                    "Type",
+                    "Brand",
+                    "Campaigns",
+                    "Status",
+                    "Updated",
+                    "",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left"
+                      style={{
+                        fontSize: "0.6875rem",
+                        color: "#94A3B8",
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((doc) => {
+                  const typeStyle = DOCUMENT_TYPE_STYLES[doc.type];
+                  const statusStyle = (DOC_STATUS_STYLE[doc.status] ??
+                    DOC_STATUS_STYLE["draft"])!;
+                  return (
+                    <tr
+                      key={doc.id}
+                      className="border-b border-[#F8FAFC] last:border-0 hover:bg-[#FAFBFC] transition-colors cursor-pointer"
+                      onClick={() => setViewingDoc(doc)}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: typeStyle.bg }}
+                          >
+                            {(() => {
+                              const Icon = typeStyle.icon;
+                              return (
+                                <Icon
+                                  size={16}
+                                  style={{ color: typeStyle.text }}
+                                />
+                              );
+                            })()}
+                          </div>
+                          <div className="min-w-0">
+                            <p
+                              className="truncate max-w-[280px]"
+                              style={{
+                                fontSize: "0.8125rem",
+                                color: "#0F172A",
+                              }}
+                            >
+                              {doc.title}
+                            </p>
+                            <p
+                              className="truncate max-w-[280px]"
+                              style={{
+                                fontSize: "0.625rem",
+                                color: "#94A3B8",
+                              }}
+                            >
+                              {doc.fileName} &middot;{" "}
+                              {doc.fileSizeKB >= 1000
+                                ? `${(doc.fileSizeKB / 1024).toFixed(1)} MB`
+                                : `${doc.fileSizeKB} KB`}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className="px-2 py-0.5 rounded-md"
+                          style={{
+                            fontSize: "0.625rem",
+                            background: typeStyle.bg,
+                            color: typeStyle.text,
+                          }}
+                        >
+                          {doc.type}
+                        </span>
+                      </td>
+                      <td
+                        className="px-4 py-3"
+                        style={{ fontSize: "0.8125rem", color: "#64748B" }}
+                      >
+                        {doc.brandName}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {doc.linkedCampaignIds.length === 0 ? (
+                            <span
+                              style={{
+                                fontSize: "0.625rem",
+                                color: "#CBD5E1",
+                              }}
+                            >
+                              —
+                            </span>
+                          ) : (
+                            doc.linkedCampaignIds.map((cid) => {
+                              const camp = INITIAL_CAMPAIGNS.find(
+                                (c) => c.id === cid,
+                              );
+                              return (
+                                <span
+                                  key={cid}
+                                  className="px-1.5 py-0.5 rounded bg-[#F1F5F9]"
+                                  style={{
+                                    fontSize: "0.5625rem",
+                                    color: "#64748B",
+                                  }}
+                                >
+                                  {camp?.name ?? cid}
+                                </span>
+                              );
+                            })
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className="px-2 py-0.5 rounded-md"
+                          style={{
+                            fontSize: "0.6875rem",
+                            background: statusStyle.bg,
+                            color: statusStyle.text,
+                          }}
+                        >
+                          {statusStyle.label}
+                        </span>
+                      </td>
+                      <td
+                        className="px-4 py-3"
+                        style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                      >
+                        {fmtDate(doc.updatedAt)}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsCreating(false);
+                              setEditingDoc(doc);
+                            }}
+                            className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors h-auto w-auto cursor-pointer"
+                          >
+                            <Pencil size={13} style={{ color: "#64748B" }} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingDoc(doc);
+                            }}
+                            className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors h-auto w-auto cursor-pointer"
+                          >
+                            <Trash2 size={13} style={{ color: "#B91C1C" }} />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Document Detail Overlay */}
+      {viewingDoc && (
+        <DocDetailOverlay
+          doc={viewingDoc}
+          onEdit={() => {
+            setIsCreating(false);
+            setEditingDoc(viewingDoc);
+            setViewingDoc(null);
+          }}
+          onDelete={() => {
+            setDeletingDoc(viewingDoc);
+            setViewingDoc(null);
+          }}
+          onClose={() => setViewingDoc(null)}
+        />
+      )}
+
+      {/* Edit/Create Modal */}
+      {editingDoc && (
+        <DocEditModal
+          doc={editingDoc}
+          isNew={isCreating}
+          onSave={handleSave}
+          onClose={() => {
+            setEditingDoc(null);
+            setIsCreating(false);
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation */}
+      {deletingDoc && (
+        <DeleteConfirmDialog
+          name={deletingDoc.title}
+          onConfirm={() => handleDelete(deletingDoc.id)}
+          onCancel={() => setDeletingDoc(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// ── Document Detail Overlay ──────────────────────────────────────────────────
+
+function DocDetailOverlay({
+  doc,
+  onEdit,
+  onDelete,
+  onClose,
+}: {
+  doc: BrandDocument;
+  onEdit: () => void;
+  onDelete: () => void;
+  onClose: () => void;
+}) {
+  const typeStyle = DOCUMENT_TYPE_STYLES[doc.type];
+  const statusStyle: Record<
+    string,
+    { bg: string; text: string; label: string }
+  > = {
+    active: { bg: "#ECFDF5", text: "#0F766E", label: "Active" },
+    archived: { bg: "#F1F5F9", text: "#64748B", label: "Archived" },
+    draft: { bg: "#FFF7ED", text: "#C2410C", label: "Draft" },
+  };
+  const st = (statusStyle[doc.status] ?? statusStyle["draft"])!;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(15,23,42,0.6)" }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span
+                  className="px-2 py-0.5 rounded-md"
+                  style={{
+                    fontSize: "0.6875rem",
+                    background: typeStyle.bg,
+                    color: typeStyle.text,
+                  }}
+                >
+                  {(() => {
+                    const Icon = typeStyle.icon;
+                    return <Icon size={12} style={{ color: typeStyle.text }} />;
+                  })()}{" "}
+                  {doc.type}
+                </span>
+                <span
+                  className="px-2 py-0.5 rounded-md"
+                  style={{
+                    fontSize: "0.6875rem",
+                    background: st.bg,
+                    color: st.text,
+                  }}
+                >
+                  {st.label}
+                </span>
+              </div>
+              <h3 style={{ fontSize: "1.125rem", color: "#0F172A" }}>
+                {doc.title}
+              </h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
+            >
+              <X size={16} style={{ color: "#64748B" }} />
+            </Button>
+          </div>
+
+          {/* Description */}
+          <p
+            className="mb-5"
+            style={{ fontSize: "0.875rem", color: "#334155", lineHeight: 1.65 }}
+          >
+            {doc.description}
+          </p>
+
+          {/* File info card */}
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] mb-5">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center"
+              style={{ background: typeStyle.bg }}
+            >
+              <FileText size={18} style={{ color: typeStyle.text }} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p
+                className="truncate"
+                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              >
+                {doc.fileName}
+              </p>
+              <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                {FILE_TYPE_LABELS[doc.fileType]} &middot;{" "}
+                {doc.fileSizeKB >= 1000
+                  ? `${(doc.fileSizeKB / 1024).toFixed(1)} MB`
+                  : `${doc.fileSizeKB} KB`}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] hover:bg-white transition-colors h-auto cursor-pointer"
+              style={{ fontSize: "0.75rem", color: "#0F172A" }}
+              onClick={() => toast.success("Download started")}
+            >
+              <Download size={12} />
+              Download
+            </Button>
+          </div>
+
+          {/* Metadata grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-5">
+            <div>
+              <p
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Brand
+              </p>
+              <p
+                className="mt-0.5"
+                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              >
+                {doc.brandName || "—"}
+              </p>
+            </div>
+            <div>
+              <p
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Created by
+              </p>
+              <p
+                className="mt-0.5"
+                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              >
+                {doc.createdBy}
+              </p>
+            </div>
+            <div>
+              <p
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Created
+              </p>
+              <p
+                className="mt-0.5"
+                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              >
+                {fmtDate(doc.createdAt)}
+              </p>
+            </div>
+          </div>
+
+          {/* Linked campaigns */}
+          {doc.linkedCampaignIds.length > 0 && (
+            <div className="mb-5">
+              <p
+                className="mb-2"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Linked Campaigns
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                {doc.linkedCampaignIds.map((cid) => {
+                  const camp = INITIAL_CAMPAIGNS.find((c) => c.id === cid);
+                  return (
+                    <span
+                      key={cid}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#F1F5F9]"
+                      style={{ fontSize: "0.6875rem", color: "#64748B" }}
+                    >
+                      <LinkIcon size={9} />
+                      {camp?.name ?? cid}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Tags */}
+          {doc.tags.length > 0 && (
+            <div className="mb-5">
+              <p
+                className="mb-2"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  letterSpacing: "0.03em",
+                }}
+              >
+                Tags
+              </p>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {doc.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0]"
+                    style={{ fontSize: "0.625rem", color: "#64748B" }}
+                  >
+                    <Tag size={8} />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p
+            className="mb-5"
+            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+          >
+            Last updated {fmtDate(doc.updatedAt)}
+          </p>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 pt-4 border-t border-[#E2E8F0]">
+            <Button
+              variant="outline"
+              onClick={onEdit}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
+              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+            >
+              <Pencil size={13} /> Edit
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onDelete}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors h-auto cursor-pointer"
+              style={{ fontSize: "0.8125rem", color: "#B91C1C" }}
+            >
+              <Trash2 size={13} /> Remove
+            </Button>
+            <div className="flex-1" />
+            <Button
+              variant="ghost"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg hover:bg-[#F1F5F9] transition-colors h-auto cursor-pointer"
+              style={{ fontSize: "0.8125rem", color: "#64748B" }}
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Document Edit / Create Modal ─────────────────────────────────────────────
+
+function DocEditModal({
+  doc,
+  isNew,
+  onSave,
+  onClose,
+}: {
+  doc: BrandDocument;
+  isNew: boolean;
+  onSave: (d: BrandDocument) => void;
+  onClose: () => void;
+}) {
+  const [form, setForm] = useState<BrandDocument>({ ...doc });
+  const [tagsInput, setTagsInput] = useState(doc.tags.join(", "));
+
+  // File Upload State
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const simulateUpload = (file: File) => {
+    setUploadProgress(0);
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    const ft: FileType =
+      ext === "pdf"
+        ? "pdf"
+        : ext === "doc" || ext === "docx"
+          ? "doc"
+          : ext === "xlsx" || ext === "xls"
+            ? "spreadsheet"
+            : "image";
+
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 30;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setForm((p) => ({
+          ...p,
+          fileName: file.name,
+          fileUrl: `/documents/${file.name}`,
+          fileType: ft,
+          fileSizeKB: Math.round(file.size / 1024) || 1,
+        }));
+        setTimeout(() => setUploadProgress(null), 500);
+      } else {
+        setUploadProgress(progress);
+      }
+    }, 200);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file) simulateUpload(file);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      if (file) simulateUpload(file);
+    }
+  };
+
+  function update<K extends keyof BrandDocument>(
+    key: K,
+    val: BrandDocument[K],
+  ) {
+    setForm((prev) => ({
+      ...prev,
+      [key]: val,
+      updatedAt: new Date().toISOString().split("T")[0] ?? "",
+    }));
+  }
+
+  function handleBrandChange(brandId: string) {
+    const brand = BRAND_LIST.find((b) => b.id === brandId);
+    setForm((prev) => ({
+      ...prev,
+      brandId,
+      brandName: brand?.name ?? "",
+      updatedAt: new Date().toISOString().split("T")[0] ?? "",
+    }));
+  }
+
+  function toggleCampaign(campaignId: string) {
+    setForm((prev) => {
+      const ids = prev.linkedCampaignIds.includes(campaignId)
+        ? prev.linkedCampaignIds.filter((id) => id !== campaignId)
+        : [...prev.linkedCampaignIds, campaignId];
+      return { ...prev, linkedCampaignIds: ids };
+    });
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.title.trim()) {
+      toast.error("Document title is required.");
+      return;
+    }
+    const tags = tagsInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
+    onSave({ ...form, tags });
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(15,23,42,0.6)" }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
+          <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
+            {isNew ? "Add Document" : "Edit Document"}
+          </h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
+          >
+            <X size={16} style={{ color: "#64748B" }} />
+          </Button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <FormField label="Document Title *">
+            <Input
+              value={form.title}
+              onChange={(e) => update("title", e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
+              style={{ fontSize: "0.8125rem" }}
+              placeholder="e.g. Absolut Vodka — Serving Guide"
+            />
+          </FormField>
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Document Type">
+              <select
+                value={form.type}
+                onChange={(e) => update("type", e.target.value as DocumentType)}
+                className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                {DOCUMENT_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <FormField label="Brand">
+              <select
+                value={form.brandId}
+                onChange={(e) => handleBrandChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                <option value="">Select brand...</option>
+                {BRAND_LIST.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          </div>
+
+          <FormField label="Description">
+            <Textarea
+              value={form.description}
+              onChange={(e) => update("description", e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D] resize-none"
+              style={{ fontSize: "0.8125rem" }}
+              placeholder="Brief description of the document..."
+            />
+          </FormField>
+
+          {/* File upload area (simulated) */}
+          <FormField label="File">
+            <div
+              className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors relative flex flex-col items-center justify-center min-h-[140px] ${
+                isDragging
+                  ? "border-[#7D152D] bg-[#7D152D]/5"
+                  : "border-[#E2E8F0] hover:border-[#CBD5E1] bg-[#F8FAFC]"
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              {/* Hidden file input */}
+              <input
+                type="file"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+              />
+
+              {form.fileName ? (
+                <div className="flex flex-col items-center w-full max-w-sm mx-auto">
+                  <div className="flex items-center justify-between gap-3 w-full bg-white p-3 rounded-lg border border-[#E2E8F0] shadow-sm">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="bg-[#F1F5F9] p-2 rounded text-[#64748B]">
+                        <FileText size={20} />
+                      </div>
+                      <div className="text-left min-w-0">
+                        <p className="text-[#0F172A] text-sm font-medium truncate">
+                          {form.fileName}
+                        </p>
+                        <p className="text-[#64748B] text-xs">
+                          {form.fileSizeKB >= 1024
+                            ? `${(form.fileSizeKB / 1024).toFixed(1)} MB`
+                            : `${form.fileSizeKB} KB`}{" "}
+                          · {FILE_TYPE_LABELS[form.fileType]}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      type="button"
+                      onClick={() =>
+                        setForm((p) => ({
+                          ...p,
+                          fileName: "",
+                          fileUrl: "",
+                          fileSizeKB: 0,
+                        }))
+                      }
+                      className="h-8 w-8 text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] flex-shrink-0"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+              ) : uploadProgress !== null ? (
+                <div className="w-full max-w-sm mx-auto">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-[#0F172A]">
+                      Uploading...
+                    </span>
+                    <span className="text-sm text-[#64748B]">
+                      {Math.round(uploadProgress)}%
+                    </span>
+                  </div>
+                  <div className="h-2 w-full bg-[#E2E8F0] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#7D152D] transition-all duration-200 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <div className="bg-white p-3 rounded-full shadow-sm mb-3 text-[#94A3B8]">
+                    <Upload size={24} />
+                  </div>
+                  <p className="text-sm font-medium text-[#0F172A] mb-1">
+                    Click to upload or drag and drop
+                  </p>
+                  <p className="text-xs text-[#64748B] mb-4">
+                    PDF, DOC, XLSX, or images (max 10MB)
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-white text-[#0F172A] border border-[#E2E8F0] hover:bg-[#F8FAFC] shadow-sm text-xs h-8"
+                  >
+                    Select File
+                  </Button>
+                </div>
+              )}
+            </div>
+          </FormField>
+
+          {/* Campaign linking */}
+          <FormField label="Link to Campaigns">
+            <div className="flex flex-wrap gap-2 p-2 border border-[#E2E8F0] rounded-lg min-h-[40px]">
+              {INITIAL_CAMPAIGNS.filter((c) => c.status === "active").map(
+                (camp) => {
+                  const isLinked = form.linkedCampaignIds.includes(camp.id);
+                  return (
+                    <Button
+                      key={camp.id}
+                      type="button"
+                      variant="ghost"
+                      onClick={() => toggleCampaign(camp.id)}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md transition-colors h-auto cursor-pointer"
+                      style={{
+                        fontSize: "0.6875rem",
+                        background: isLinked ? "#7D152D14" : "#F1F5F9",
+                        color: isLinked ? "#7D152D" : "#64748B",
+                        border: isLinked
+                          ? "1px solid #7D152D40"
+                          : "1px solid transparent",
+                      }}
+                    >
+                      {isLinked && <Check size={10} />}
+                      {camp.name}
+                    </Button>
+                  );
+                },
+              )}
+            </div>
+          </FormField>
+
+          {/* Tags */}
+          <FormField label="Tags (comma-separated)">
+            <Input
+              value={tagsInput}
+              onChange={(e) => setTagsInput(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
+              style={{ fontSize: "0.8125rem" }}
+              placeholder="vodka, cocktails, serving-guide"
+            />
+          </FormField>
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Status">
+              <select
+                value={form.status}
+                onChange={(e) =>
+                  update(
+                    "status",
+                    e.target.value as "active" | "archived" | "draft",
+                  )
+                }
+                className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="archived">Archived</option>
+              </select>
+            </FormField>
+            <FormField label="File Type">
+              <select
+                value={form.fileType}
+                onChange={(e) => update("fileType", e.target.value as FileType)}
+                className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                <option value="pdf">PDF</option>
+                <option value="doc">Document</option>
+                <option value="spreadsheet">Spreadsheet</option>
+                <option value="image">Image</option>
+              </select>
+            </FormField>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors h-auto cursor-pointer"
+              style={{ fontSize: "0.8125rem", color: "#64748B" }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
+              style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+            >
+              {isNew ? "Add Document" : "Save Changes"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 
