@@ -68,7 +68,7 @@ Campaign creation was too shallow and events didn't inherit from campaigns. Chri
 
 New capabilities Chris identified as key differentiators.
 
-- [ ] `🟢 P1` 🔴 **Account profile data model** — Track per-account: displays, cold boxes, windows, venue characteristics. No `Account` entity exists yet. **Blocked on staging DB access and Account Master (§5.1).**
+- [x] `🟢 P1` 🟢 **Account profile data model** — Track per-account: displays, cold boxes, windows, venue characteristics. Shared `Account` entity created in `@/lib/account-types.ts` with mock data.
       Source: `CONTEXT.md 00:20:16 – "for the account profile we want to track how many displays are in the account how many cold boxes if there's wind windows so all the things that we're surveying we're keeping tabs and creating a profile as to what that account is."`
 
 - [ ] `🔵 P2` **AI prescriptive suggestion engine (mock)** — Suggest accounts, days, event types based on history. Chris: "no one's doing that right now." Key differentiator but requires account/event history.

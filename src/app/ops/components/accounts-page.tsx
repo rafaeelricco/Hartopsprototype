@@ -21,7 +21,15 @@ import {
   SelectValue,
 } from "../../shared/components/ui/select";
 import { Input } from "@/app/shared/components/ui/input";
-import { MOCK_ACCOUNTS } from "./account-data";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/app/shared/components/ui/sheet";
+import { MOCK_ACCOUNTS } from "@/lib/account-data";
+import { Account } from "@/lib/account-types";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -62,6 +70,7 @@ export function AccountsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   /* ---- Computed stats ---- */
   const totalAccounts = MOCK_ACCOUNTS.length;
@@ -86,7 +95,8 @@ export function AccountsPage() {
           (a.chain && a.chain.toLowerCase().includes(q)) ||
           a.city.toLowerCase().includes(q) ||
           a.state.toLowerCase().includes(q) ||
-          a.contact.toLowerCase().includes(q),
+          a.contactName.toLowerCase().includes(q) ||
+          a.contactPhone.toLowerCase().includes(q),
       );
     }
     if (typeFilter !== "all") {
@@ -125,6 +135,146 @@ export function AccountsPage() {
 
   return (
     <div className="p-6 space-y-6 w-full">
+      {/* Profile Slide-Over */}
+      <Sheet
+        open={!!selectedAccount}
+        onOpenChange={(open) => !open && setSelectedAccount(null)}
+      >
+        <SheetContent className="overflow-y-auto sm:max-w-md">
+          <SheetHeader className="mb-6">
+            <SheetTitle className="text-xl">{selectedAccount?.name}</SheetTitle>
+            <SheetDescription>
+              {selectedAccount?.chain
+                ? `Part of ${selectedAccount.chain} chain`
+                : "Independent Venue"}
+            </SheetDescription>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge
+                variant="secondary"
+                className={
+                  selectedAccount ? getTypeColor(selectedAccount.type) : ""
+                }
+              >
+                {selectedAccount?.type}
+              </Badge>
+              <Badge
+                variant="secondary"
+                className={
+                  selectedAccount ? getStatusColor(selectedAccount.status) : ""
+                }
+              >
+                {selectedAccount?.status}
+              </Badge>
+            </div>
+          </SheetHeader>
+
+          {selectedAccount && (
+            <div className="space-y-6 px-4 pb-6">
+              {/* Contact & Location */}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  Contact & Location
+                </p>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="size-4 shrink-0" />
+                    <span>
+                      {selectedAccount.address}, {selectedAccount.city},{" "}
+                      {selectedAccount.state} {selectedAccount.zipCode}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="size-4 shrink-0" />
+                    <span>
+                      {selectedAccount.contactName} ·{" "}
+                      {selectedAccount.contactPhone}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Venue Profile */}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  Venue Profile
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <ProfileTile
+                    label="Venue Type"
+                    value={
+                      selectedAccount.profile.venueSubType?.replace(
+                        /-/g,
+                        " ",
+                      ) || "—"
+                    }
+                    capitalize
+                  />
+                  <ProfileTile
+                    label="Display Units"
+                    value={selectedAccount.profile.displayCount ?? "—"}
+                  />
+                  <ProfileTile
+                    label="Cold Boxes"
+                    value={selectedAccount.profile.coldBoxCount ?? "—"}
+                  />
+                  <ProfileTile
+                    label="Has Windows"
+                    value={selectedAccount.profile.hasWindows ? "Yes" : "No"}
+                  />
+                  <ProfileTile
+                    label="Shelf Facings"
+                    value={selectedAccount.profile.shelfFacings ?? "—"}
+                  />
+                  <ProfileTile
+                    label="Traffic Estimate"
+                    value={selectedAccount.profile.footTrafficEstimate || "—"}
+                    capitalize
+                  />
+                  <ProfileTile
+                    label="Backbar Presence"
+                    value={
+                      selectedAccount.profile.backbarPresence ? "Yes" : "No"
+                    }
+                  />
+                  <ProfileTile
+                    label="Menu Placement"
+                    value={selectedAccount.profile.menuPlacement ? "Yes" : "No"}
+                  />
+                </div>
+
+                {selectedAccount.profile.notes && (
+                  <div className="mt-3 p-3 rounded-md border border-border">
+                    <div className="text-xs text-muted-foreground mb-1">
+                      Survey Notes
+                    </div>
+                    <div className="text-sm italic text-foreground">
+                      {selectedAccount.profile.notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Activity */}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                  Activity
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <ProfileTile
+                    label="Events Hosted"
+                    value={selectedAccount.eventsHosted}
+                  />
+                  <ProfileTile
+                    label="Last Event"
+                    value={selectedAccount.lastEventDate || "—"}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
       {/* Header */}
       <div>
         <h1 className="text-foreground">Account Master</h1>
@@ -263,7 +413,8 @@ export function AccountsPage() {
                   paged.map((account) => (
                     <tr
                       key={account.id}
-                      className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
+                      onClick={() => setSelectedAccount(account)}
+                      className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"
                     >
                       <td className="px-5 py-3">
                         <div className="min-w-[180px]">
@@ -312,7 +463,7 @@ export function AccountsPage() {
                             className="text-foreground"
                             style={{ fontSize: "0.8125rem" }}
                           >
-                            {account.contact}
+                            {account.contactName} - {account.contactPhone}
                           </span>
                         </div>
                       </td>
@@ -338,7 +489,11 @@ export function AccountsPage() {
                           className="text-muted-foreground"
                           style={{ fontSize: "0.8125rem" }}
                         >
-                          {account.lastEvent || "—"}
+                          {account.lastEventDate
+                            ? new Date(account.lastEventDate)
+                                .toISOString()
+                                .split("T")[0]
+                            : "—"}
                         </span>
                       </td>
                     </tr>
@@ -447,5 +602,30 @@ function StatCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Profile Tile (drawer label-value pair)                               */
+/* ------------------------------------------------------------------ */
+
+function ProfileTile({
+  label,
+  value,
+  capitalize,
+}: {
+  label: string;
+  value: string | number;
+  capitalize?: boolean;
+}) {
+  return (
+    <div className="p-3 rounded-md border border-border">
+      <div className="text-xs text-muted-foreground mb-1">{label}</div>
+      <div
+        className={`text-sm font-medium text-foreground ${capitalize ? "capitalize" : ""}`}
+      >
+        {value}
+      </div>
+    </div>
   );
 }

@@ -15,6 +15,7 @@ import { EventsPage as OpsEventsPage } from "./ops/components/events-page";
 import { EventDetailPage as OpsEventDetailPage } from "./ops/components/event-detail-page";
 import { ReportsPage as OpsReportsPage } from "./ops/components/reports-page";
 import { SettingsPage as OpsSettingsPage } from "./ops/components/settings-page";
+import { AccountsPage } from "./ops/components/accounts-page";
 import { HelpPage } from "./ops/components/help-page";
 import { TermsOfServicePage } from "./ops/components/terms-of-service";
 import { PrivacyPolicyPage } from "./ops/components/privacy-policy";
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
       { path: "events/:eventId", Component: OpsEventDetailPage },
       { path: "reports", Component: OpsReportsPage },
       { path: "settings", Component: OpsSettingsPage },
+      { path: "accounts", Component: AccountsPage },
       { path: "help", Component: HelpPage },
       { path: "*", Component: NotFound },
     ],

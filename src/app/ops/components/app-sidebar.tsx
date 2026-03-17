@@ -8,6 +8,7 @@ import {
   FileBarChart,
   Settings,
   GalleryVerticalEnd,
+  Store,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -46,6 +47,11 @@ const data = {
       title: "Organizations",
       url: "/ops/dashboard/organizations",
       icon: Building2,
+    },
+    {
+      title: "Account Master",
+      url: "/ops/dashboard/accounts",
+      icon: Store,
     },
     {
       title: "Events",

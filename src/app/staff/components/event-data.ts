@@ -7,6 +7,7 @@ export interface EventItem {
   id: string;
   campaignId: string;
   activityId?: string | undefined;
+  accountId?: string | undefined;
   name: string;
   location: string;
   date: string;
