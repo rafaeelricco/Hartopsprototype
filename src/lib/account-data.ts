@@ -1,6 +1,6 @@
 import { Account } from "./account-types";
 
-export const MOCK_ACCOUNTS: Account[] = [
+export let MOCK_ACCOUNTS: Account[] = [
   {
     id: "acc-1",
     name: "Total Wine & More",
@@ -187,4 +187,8 @@ export const MOCK_ACCOUNTS: Account[] = [
 
 export function generateAccountId(): string {
   return `acc-${Math.floor(Math.random() * 10000)}`;
+}
+
+export function addAccount(account: Account): void {
+  MOCK_ACCOUNTS = [account, ...MOCK_ACCOUNTS];
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Building2,
   MapPin,
@@ -9,6 +9,7 @@ import {
   ArrowUpDown,
   Store,
   Phone,
+  Plus,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -28,8 +29,9 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/app/shared/components/ui/sheet";
-import { MOCK_ACCOUNTS } from "@/lib/account-data";
+import { MOCK_ACCOUNTS, addAccount } from "@/lib/account-data";
 import { Account } from "@/lib/account-types";
+import { AddAccountWizard } from "./add-account-wizard";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -71,6 +73,13 @@ export function AccountsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [, forceUpdate] = useState(0);
+
+  const handleNewAccount = useCallback((account: Account) => {
+    addAccount(account);
+    forceUpdate((n) => n + 1);
+  }, []);
 
   /* ---- Computed stats ---- */
   const totalAccounts = MOCK_ACCOUNTS.length;
@@ -275,15 +284,32 @@ export function AccountsPage() {
         </SheetContent>
       </Sheet>
 
+      {/* Add Account Wizard */}
+      <AddAccountWizard
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        existingNames={MOCK_ACCOUNTS.map((a) => a.name)}
+        onSubmit={handleNewAccount}
+      />
+
       {/* Header */}
-      <div>
-        <h1 className="text-foreground">Account Master</h1>
-        <p
-          className="text-muted-foreground mt-1"
-          style={{ fontSize: "0.875rem" }}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-foreground">Account Master</h1>
+          <p
+            className="text-muted-foreground mt-1"
+            style={{ fontSize: "0.875rem" }}
+          >
+            Centralized venue and account management.
+          </p>
+        </div>
+        <Button
+          className="bg-[#7D152D] hover:bg-[#7D152D]/90 cursor-pointer"
+          onClick={() => setAddOpen(true)}
         >
-          Centralized venue and account management.
-        </p>
+          <Plus className="size-4 mr-1" />
+          Add Account
+        </Button>
       </div>
 
       {/* Summary Stats Bar */}
