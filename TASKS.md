@@ -56,7 +56,7 @@ Campaign creation was too shallow and events didn't inherit from campaigns. Chri
 - [x] `🟢 P1` **Structured questionnaire system** — Implemented in `questionnaire-data.ts` with default questions, campaign-specific templates, multiple question types (rating, yes-no, multiple-choice, open-text), and `getQuestionnaireForCampaign()` helper.
       Source: `CONTEXT.md 00:29:31 – "it being a catchall is a problem because then we're not capturing this information as data."` + `00:48:55 – "there's stuff I I call questionnaires where it's specific to that those those campaigns and events that would need to be tweaked."`
 
-- [ ] `🟢 P1` **Brand education content** — Expand brand assets beyond SKUs to include serving instructions, brand scripts, setup info, evaluation sheets. Link to campaigns. Admin-side ability to attach/manage documents per brand/campaign/event.
+- [x] `🟢 P1` **Brand education content** — Expand brand assets beyond SKUs to include serving instructions, brand scripts, setup info, evaluation sheets. Link to campaigns. Admin-side ability to attach/manage documents per brand/campaign/event.
       Source: `CONTEXT.md 00:27:25 – "one of the things that we also include is um PDFs on the information of the event like how do you how do you serve the drink? What drinks are served? Information about the brand... that is a sheet of paper that has all the brand information, the setup information."`
 
 - [x] `🟢 P1` **Connect item master to campaigns/events** — `EventItem` has `linkedProductIds`, Activities define product subsets. Products at campaign level flow to events.
