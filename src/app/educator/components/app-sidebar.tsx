@@ -69,12 +69,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           label: "Account",
           icon: BadgeCheck,
-          onClick: () => navigate("/educator/settings"),
+          onClick: () => navigate("/educator/settings?tab=account"),
         },
         {
           label: "Notifications",
           icon: Bell,
-          onClick: () => navigate("/educator/settings"),
+          onClick: () => navigate("/educator/settings?tab=notifications"),
         },
       ],
     },
