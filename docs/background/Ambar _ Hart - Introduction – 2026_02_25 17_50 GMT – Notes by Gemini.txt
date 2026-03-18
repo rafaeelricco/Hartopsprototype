@@ -1,0 +1,499 @@
+﻿Feb 25, 2026
+Ambar / Hart - Introduction - Transcript
+00:00:00
+ 
+Luis Galeas: Oh. Uh,
+Joe Green: Hey
+Luis Galeas: hello. Did we admit him?
+Ethan Brown: Hey.
+Rafael Ricco: Yep.
+Joe Green: guys,
+Luis Galeas: I thought he Oh, there he is. Oh, no. That's the noteaker.
+Joe Green: there we go.
+Chris: Hello.
+Luis Galeas: Hello.
+Joe Green: Hey
+Rafael Ricco: Hi,
+Chris: Hi. Got a lot of people here.
+Rafael Ricco: Chris.
+Joe Green: Chris.
+Chris: Louis not used to used it to be just you and me.
+Luis Galeas: I know, man. You know, well, unfortunately, it's not a, you know, it's not a one-man operation.
+Chris: No. I thought the machine did all the work for you guys.
+Luis Galeas: Yeah, that stuff being the case a while ago. Uh, thank God I, you know, it's nice to have other people that can, uh, kick some ass. Um, but,
+Chris: Sure.
+Luis Galeas: uh, good stuff. So, uh, maybe we start with some intros. Cool. So, I'll start on our side. I mean, you already know me, Luis, the CEO and founder of Amber.
+ 
+ 
+00:01:09
+ 
+Luis Galeas: Uh, and then we have a couple of our engineers here, uh, and one of our, uh, PMs. Uh, but, uh, let me hand over, uh, to them to make their own intros. Uh, Ethan.
+Ethan Brown: Hi, I'm Ethan.
+Chris: Awesome.
+Ethan Brown: I'm um a lead engineer on the project. Uh a lead engineer, not the lead engineer. I think I'm sharing that role with Raphael. Uh and I'm really looking forward to getting started with this.
+Chris: Good to meet you
+Rafael Ricco: Yeah.
+Chris: again.
+Rafael Ricco: So,
+Ethan Brown: Raphael.
+Rafael Ricco: uh, hi Chris, nice to meet you. So, my name is Rafael. I'm senior software engineer, uh, here at Zumbar. Uh, I'm currently based on Brazil. Uh I joined I joined the team on Bartin about 10 months ago and I already contributed in a few projects here and today my my main interest interests are in intelligence in artificial intelligence fullstack development uh UX UI front end back end etc and yeah so I'm really happy to to be here and support the team and make our vision from for the hard projects happens.
+ 
+ 
+00:02:20
+ 
+Rafael Ricco: That's
+Chris: Good. Good to meet
+Rafael Ricco: it.
+Chris: you.
+Joe Green: Yeah, thanks. Uh, hey Chris. Um, yeah, I'm Joe. I'm a the product manager um on the project. I'm on um I think day three at Amber, so early days, but um come from um a consultancy background, so got a lot of experience kind of um scoping out really similar challenges across like a range of different industries
+Chris: Awesome.
+Joe Green: and client types as well. So really interesting project and uh yeah really looking forward to to getting stuck
+Chris: Good to be here with you,
+Joe Green: in
+Chris: Joe.
+Luis Galeas: Good stuff. And then uh well I suppose uh Chris great about
+Chris: You don't need a you don't need an introduction, but you guys Yes.
+Luis Galeas: you.
+Chris: Well, you guys are are lucky because you have a head. I'm Christopher Razer. I'm a CTO at at our agency. I've been in technology now for going on 11 years. I've I worked at Southern Glaciers, which is the largest distributor of wine and spirits in the United States.
+ 
+ 
+00:03:18
+ 
+Chris: I was part of their transformation team where I got my teeth cut on moving over from being sales and operations and and commercial to technology side of the business. So since then, I've been a a product owner in a lot of different projects, including my my own company because I have another company that does software development for beverage alcohol companies. And my current role with HART is perfect because it's all the things I know that that a company that's in marketing and beverage alcohol needs in order that that work with distributors and suppliers on the technology side. And I'm sure Lewis kind of queued you eyes up as we have huge aspirations on not staying a traditional marketing company but moving over into being more of a data collector and our goal is to move into syndicating data. And we have just to give you guys a scope we do over 60,000 events in the United States. We have over a thousand employees in the United States that go out in the field and execute these events. So it's and we're right now in in expansion mode. So everything you guys are going to do is critical for us supporting support supporting taking our our IP and our software to another level where we're able to expand and do a lot a lot of these different things.
+ 
+ 
+00:04:36
+ 
+Chris: Um the good news is because you have somebody who's technologically inclined and I have a a background in in product ownership, I can provide you a lot of documentation, a lot of detail that you guys can then transcribe into what you need. And I promise I'm not going to be nitpicky on the code or how you do things. I'm more so a bigger picture guy and making sure that we deliver the capabilities needed. But the good part is you have somebody who's done a lot of these things and understand the technology side. So it it's a it makes it very easy to talk to someone like me where I can speak to you guys technically how we how we we c we could do this and how it could be executed but also know the reason why behind that. And that was one thing Lewis did a really good job with in all the times that we talked is you he's really told me a lot about how he you guys like to work as partners and that's what's really got me excited is I'm not not looking for developers just to do things.
+ 
+ 
+00:05:32
+ 
+Chris: I'm looking for partners to throw things back at me, ask the questions why and try to give me some ideas as to how best to handle handle problems because I may even though I'm the client, I may think I know how to have all the answers, but sometimes I don't know what all the options are. So, I'm really looking forward forward to this engagement. I've been talking you guys up to leadership and they are chopping at the bit to get get started. So, I'm happy to finally get things rolling.
+Luis Galeas: Excellent. Good stuff. Uh so thanks everyone for doing some intros. Um so uh there are a couple things that we wanted to uh get for today. So let me just give you roughly an uh an agenda. Uh we want to agree to a meeting schedule. Uh we want to I mean we can obviously change them. Uh but we also want to figure out some coms channels. uh we want to confirm uh whether there will all be other people involved that you
+ 
+ 
+00:06:26
+ 
+Chris: Amen.
+Luis Galeas: would want any of those goals and we have some questions. Uh but I think if I uh Joe I'm going to invert the plan and actually if we start with some questions if that would be okay. Um uh and then we can get the other um housekeeping items done afterwards. Is that okay? Cool.
+Chris: Hallelujah.
+Luis Galeas: Uh uh Ethan and Rafael, I don't know if you can see the uh on the hard channel we have on Slack.
+Ethan Brown: Sure.
+Luis Galeas: Um maybe it's best that I mean I can ask the questions in your behalf of course, but maybe it's best that you ask the questions that you um you thought about.
+Ethan Brown: Do you want me to um just jump jump in
+Luis Galeas: Yeah. And keep in mind that uh the briefing document was an internal document,
+Ethan Brown: there?
+Luis Galeas: right? as in like it's okay if Chris sees it but he hasn't read it. That was the document we put together for internal purposes, right? So just give some it would be good if you give some context on the questions as
+ 
+ 
+00:07:28
+ 
+Ethan Brown: Gotcha.
+Luis Galeas: well.
+Ethan Brown: Uh, okay. So, I had a handful of questions uh reading over our briefing document. Uh, the first one um was uh on the the dashboard for um uh clients. So, one of the things we called out was a a dashboard that would show top performing organizations.
+Luis Galeas: And
+Ethan Brown: Um and my question was how do we how do we measure top like what what's the metric there by which we identify top performing organizations
+Chris: Okay.
+Luis Galeas: I think if sorry if I could interject there if we could extend that as well to what you were saying yesterday.
+Chris: So,
+Luis Galeas: So in the sense that the clients that are going to be using this the dashboards that they're going to be seeing what do they want to see and also for heart as well. So there's a two aspects right there's the heart people that are seeing dashboards and there's the um your clients as well.
+Chris: So I I'll start from the top top. So essentially what we're building out is there's three for this what I'm calling the plat platform move of hems.
+ 
+ 
+00:08:31
+ 
+Chris: Since that application is called hems, we're taking it's currently designed for internal uses only. So all our clients would be the clients we do events for. Um so when we talk about metrics and dashboarding, it's there's a omni view which is us looking at all the clients. So all all I'm going to say supplier because that's the ter terminology. The suppliers are the main clients. They're the ones that that own the beverage alcohol company. they supply it to distributors. Um so for metrics for them it's really on the on the realm of the executions of the events or the ex or are and and profitability for us. So when we talk about dashboards and looking at our our clients from our point of view, it would be how much money are we making on them, how much are we charging, how often are we doing events, the profitability of them, um there's some some financial metrics because in the application we do put in what the cost of the events are and how many we're doing, what the frequency of them are. Um so that's the the intern the internal usage.
+ 
+ 
+00:09:40
+ 
+Chris: If we look at and I apologize Lewis because I'm blanking here. What do we do? There's the affiliate. There's the what I called core which is us affiliate. What was the third one? You
+Luis Galeas: Well, the third one, the third one if there is any um met what we discussed yesterday where uh the educator
+Chris: right.
+Luis Galeas: managers seeing uh educator
+Chris: Okay.
+Luis Galeas: performance
+Chris: So that was so in terms of in terms of levels there there's the cl us measuring the clients in terms of us from a business standpoint and this would be for all all three three of those those applications and then for the actual execution of the events and I I've been putting together an outline for you guys to show what the metrics would be in fact I can pull it up right now I've been doing a um a high-end technical outline that talks about that Uh give me one quick second here. Account educator management system. So the metrics would would be the retail sales reported on average their the brands that that that they have they have performed.
+ 
+ 
+00:10:52
+ 
+Chris: Um preferred categories that that they perform well against be some issues. a score a score associated with them which would be a summation as to how how they actually perform if they show up to the uh show up to an event on time if they leave leave at the appropriate time if they don't and I can't how how often do they cancel the events um and we also do collect from the retailer survey information as to their response as to how well well the event went as well so all those would be metrics that
+Luis Galeas: Cool.
+Chris: would go into measuring the educator. And so you got just we're on the same page. Educator is the person who goes out and and actually does the the events. And I have a um document that I've been putting together that that should help with with laying that out of what those metrics are and how that dashboarding would would work. And I think I put that in the shared in the shared folder right now too which it from a terms of communication I know we're jumping here but a lot of these things if there's further clarification I can do an outline so that we can talk this out and I can put it into a document form that way you guys have my notes and then you can take that I would assume Joe will do that and translate that over to a further technical document.
+ 
+ 
+00:12:10
+ 
+Joe Green: Yeah, that would be
+Ethan Brown: Great.
+Chris: Does that do that help
+Joe Green: helpful.
+Ethan Brown: Yes,
+Chris: him?
+Ethan Brown: it does. Thank you. Uh, okay. Uh, my next question is about campaigns and events. Um in our internal document um you know we were sort of establishing some into entity relationships and um it was mentioned that the campaign contains or owns the events within them and my question was might there be events that are shared between campaigns like industry events where you know multiple campaigns would be uh
+Chris: Yes. Yes. So if we have like say a big convention, there's the um uh food and and wine events that occur occur like in New York City and then Miami. So those would be shared events that we could be doing for multiple clients. um the from a hierarchy standpoint it's really get the hierarchy for the events it gets served back to the clients. So the clients be those suppliers. So the hierarchy follows that that supplier their campaigns their events and their their events.
+ 
+ 
+00:13:19
+ 
+Chris: So it would be within that vertical on our side from a management standpoint. Things that come around the same the same timing say like the account location would could be the same. Um the holidays are all the same. No one has different holidays with within the time time frame frame but they may choose different timing. So on that the way I' I've been tackling that theoretically and from a data perspective is capturing and categorizing like things things like time and if there and location and special the special event. So that would be just a an additional it wouldn't it wouldn't be part of that hierarchy. It would be a um basically some a tag a categorization. So if we were to extrapolate this out and say, okay, what are all the events we do for Easter? Here's all the events for Easter. If we do this one account lots, what are all the events for the account? If we do the food and wine festivals or festivals in general with those type, what are those like? So it's more of a categorization of of the the events than it is campaign.
+ 
+ 
+00:14:28
+ 
+Joe Green: Does the um does the do the suppliers ever have like campaigns in the sense that they might I don't know let's say uh you know a launch campaign for Chicago and within that there might be two or three events that they've earmarked instead of just kind of a one-off standalone that they're like okay we're going do two or three events, try and get like coverage um at different locations, etc. Like is there any scenario where they might want to like bundle or group up like events to then create from a supplier perspective a
+Chris: Um, yes. So,
+Joe Green: campaign
+Chris: usually a campaign would be it could be could be several brands. I'll give you a good good example and you guys are probably familiar with the like the DIO portfolio of say Smeirnoff, Captain Morgan and say Johnny Walker. And a lot of times the campaigns are originate or tied to to budgets. So when when when they're proposed to us, it depends on where the money is coming from. So that gets tied back. So So DA would approach us and say we we're doing Smeirnoff in these months over the next six months or 12 months.
+ 
+ 
+00:15:39
+ 
+Chris: So it's an ongoing campaign with events that that happen and in during those events they may change change it slightly. It's like say for Valentine, say for Easter and so forth, but essentially it's the smearing off campaigns that we look to do throughout the whole year. And a lot of times the messaging is the same, but there might be some some little bit bits of differences. Um the only time that there's mixing would be brands, but it would all be from the same client, so the same supplier essentially. Um there might be times where a single supplier because they're so large and there's different um brands that they pull their money together to do to do something but they essentially it's it's it's coming from them singularly. So they would say okay we're going to do Captain Morgan Smeirnoff and Johnny Walker together and that's one campaign and the events may focus on single brands or multiple brands just depending on on how they want us to execute it.
+Joe Green: Cool. That's
+Chris: But you won't see I would would I would I would not say that you would see a blending of campaigns.
+ 
+ 
+00:16:39
+ 
+Joe Green: helpful.
+Chris: Campaign is is is um kind of a container that would contain that budget and those orders from us.
+Ethan Brown: Okay. Um I had a question about event creation. So the um um the event manager is creating an event and um one of the comments is talking about the the things you can edit. So event creation walks us through several stages, the basics, name, location, daytime, products, etc. Uh instructions, attentive event report, preview. Um and then it said an optionally direct editing of the event mechanics. And I didn't really know what event mechanics meant in this context.
+Chris: So there could be times when the events are tweaked in and if we're talking about in the stage of building the events into the application early on,
+Ethan Brown: Sure.
+Chris: it's basically before it's and solidified. Um, so the user, which would be somebody in the office that's operational, would be putting this information in. So at times they may just create a draft and leave it there until they get most of the information. Um, or what may happen is we're it's been pushed on, we're executing it, but now they come back to us and say, "We need to change some of the locations. We need to change um some of the questions we want to get back.
+ 
+ 
+00:18:18
+ 
+Chris: there might be a change in the point of sale that we use. So the application currently allows us to go into it and make make those ch those changes and man manage that and you you'll see that in the application as
+Ethan Brown: Right. Okay.
+Chris: well.
+Ethan Brown: It just sounded like event mechanics was a was a specific term of art, but it doesn't sound like it. It sounds like we're just talking about editing the property for the
+Chris: It's it's more yeah that's more general and it really just depends on where it is
+Ethan Brown: event.
+Chris: in in the the approval process and execution of the event.
+Joe Green: Cool. I think that I had a few questions I doed in there as well which I might ask and apologies the stuff you've already already covered Chris, but um from the like amen the event uh monitoring side um there's obviously a lot of like data at the minute that's or that's going to be like manually inputed by the educators etc. Is there any other data sources that you currently pull from or would want to pull from?
+ 
+ 
+00:19:17
+ 
+Joe Green: So things like a point of sale or or something like that that's tracking the financial
+Chris: Yes. So, so we are pulling um geolocations from Google to make sure that the app line lines
+Joe Green: data.
+Chris: up with that. Uh we do have an image library that shows on the app side what what brands we're looking to. We have a product ma an item master that has some brand information. Um, we also do have a master account list that that shows the accounts that we call upon which I'm looking to expand on and put more detail into it. And in terms of if we're talking about that that's that's on the back end side in terms of the execution, what we're going to capture there. And so separately from you guys, and Lewis is upset with me about this, but but it's too bad. We've made an investment in doing some image recognition AI that we want to incorporate into the app so that when they're there and taking these surveys, we get some information back via images. And I can we can save that for for another time is there's a whole process flow with that.
+ 
+ 
+00:20:24
+ 
+Chris: But essentially what we're doing is is we're capturing displays of what's on display, what's on the shelf, if it's a if it's a retail place, what the window display is, um price points, uh and what is what's what products are in distribution, and that's narrowed down to specifically what what the clients are asking for if they want to see if Smeirnoff is in account or not, or what certain flavors are, what the price is. Um, on the on premise side, it's menus and seeing what food is what what food's on the menu, what cocktails are on the menu, what is on display and back bar, um, and the price points for all that. So in in collecting as as we started expanding on this, we're looking to expand on the account information database we have in terms of if it's an off on premise account like a bar, do they is it a sports bar? Is it a is it is it just like a cocktail lounge? Is it an event menu event place so forth and getting the granular detail out of that and then just looking for whatever changes that occur and the off-remise sort of thing.
+ 
+ 
+00:21:30
+ 
+Chris: Is it a bodega? Is it a corner store? Is it a grocery store? Is it a wine shop? Like more more detail detail oriented that um how many displays are in the store? And what we're in the process of doing to build onto that is pay for some consumer information where we during these events we would put in a geoence and pull and pull the actual cell sell information about who's around the area and start determining okay what are the consumers and what type of consumers come to this location and how can we attract and advise our clients how can we attract them into when we do these events. So, those are all the the areas that that we're looking at in expanding is around building the account profile. Um, making connections, not not not us doing it, but our clients making connections socially since we know know all the the cell phones around the that area and help them connect socially pre and post events. So, it's also around and also around consumer profiling.
+Luis Galeas: But the data itself, so for quite a few of these, even though we might be for example taking images, uh the the interface for that information would still be the application,
+ 
+ 
+00:22:52
+ 
+Chris: Correct.
+Luis Galeas: right?
+Chris: And the way the images would it we're not leveraging where we're we're saying that that the machine's going to pull all the the information out of the images. What we want and the way that the current system design does is you look at a shelf, you take a picture, the machine looks at the picture and all the bottles and price points and says this is what I think I see and the user says either accepts it or changes the product name to the right name and puts in the right the right price points. So we end up capturing the correct information every single time we're in there and then over time hopefully learns and get gets better at at better at that
+Luis Galeas: Yeah, I I think so in the um you know,
+Chris: process.
+Luis Galeas: we always like to get a little bit of a um of a view of how the industry works, right? And my my impression um I think it's worth commenting here that if I uh let's say I'm I'm uh I'm working at a heart as an educator right or even as an educator manager or someone from ops and I'm trying to arrange an event like a tasting for example at a retail location right the level of access that I will get if that retail location is friendly with me is essentially okay come here set up a booth right but they're not really going to be able to um logistically it wouldn't quite make sense for them to say like okay you know connect
+ 
+ 
+00:24:16
+ 
+Luis Galeas: to our backend CRM point of sale sales data uh what what you get offered right is essentially here have some space feel free to promote the
+Chris: it. Yes.
+Luis Galeas: product
+Chris: And it essentially that collection of the image of the image data would not be for the retailer because the retailer knows what's on their shelf. it would be for the distributor because the distributors for say like national chains and just so you guys know in the United States having a um contract that something's going to be displayed for x amount of time is illegal but there are handshake agreements that and coupons that if the distributor spends money with like say Walmart or I think for you guys Tesco and Tesco should be reflecting that coupon in their price point and Tesco should should have it on display. So what we do is we we do an audit where we go in as a third party and take a picture and then report back the data as to which which accounts are being compliant, which are not and what's actually happening in the field. So from a from a industry standpoint, you are correct Lewis, like we're we're able to go in there because we're providing value.
+ 
+ 
+00:25:28
+ 
+Chris: the retailer taking pictures is somewhat okay nowadays, but a lot of these retailers don't like it. But because we're going in there and executing something of value to them, we're doing doing a tasting, there's an opportunity to then look at the the the shelf and the store and collect data back off of
+Luis Galeas: And how does that relationship normally uh work?
+Chris: that.
+Luis Galeas: So is it you know um is it so I suppose you as heart you have that relationship with those retail locations or is it the your customer that has a relationship with the retail
+Chris: um three there's three relationships.
+Luis Galeas: locations?
+Chris: So the distributor has a relationship with that retailer because they they sell alcohol to them and
+Luis Galeas: Yeah.
+Chris: distribute to them. The they do know who the suppliers are. The suppliers have a loose because a lot of times we're not because we're we're never the ones that actually book the events. We are the we execute the events on behalf of our client and our client could be the distributor or it could be the supplier. So what happens is the on the supplier side a brand team member walks in there and offers them to do an event and then they book it through us or a distributor salesperson goes in and they offer the event book it and they book it through us.
+ 
+ 
+00:26:40
+ 
+Chris: So our our relationship is they they know who our who we are because we're in that store not just for that single distributor, that single supplier, but for multiple distributors, multiple suppliers. So they know who we are and we've been around for over 20 years.
+Luis Galeas: Got
+Chris: So they're famili familiar with us. So our relationship is more around the execution side. Just they know that we show up and this is what we what we do in their store. And because we help move bottles off their shelf or help help um spend money money in their account if it's an on premise on drinks, they they don't don't they don't like to say no because they know it's free money basically on their
+Luis Galeas: it.
+Chris: end.
+Luis Galeas: And and here's a uh this question is not because I'm planning to do this. It's more to understand how it works. What would can I just go, you know, if I fly to uh the states tomorrow, right? Uh and I go walk into one of these retail locations and I say like, hey, you know, I'm an educator for heart.
+ 
+ 
+00:27:36
+ 
+Luis Galeas: Uh going to do a campaign about this. Uh would they just say, okay, set yourself up. Uh, or would they have have they received some schedule at some point that somebody from corporate gave them?
+Chris: they they've received something ahead of time and it would even be corporate because a lot of these accounts are mom and pop a lot of times. If it is corporate then yes there's a there's a schedule that they get communicated and usually there's something that comes ahead of time. doesn't mean that and I've done this in the past being being on on the the supplier side or distributor side where I just show up and say and I have enough of relationship there, hey, would you like a free tasting today? I I got some time here. I can pour a bottle for you and it just depends on whether they want to say yes or no. So, that can happen, but that's not the way that we work because we get paid by by the events. So, those are booked ahead of time. So, a we know and we book book those events and b usually the retailer is informed by the supplier or distributor ahead of
+ 
+ 
+00:28:35
+ 
+Luis Galeas: And how uh what distribution do you have between
+Chris: time.
+Luis Galeas: suppliers and distributors? Is it 50/50? Is it lopsided?
+Chris: Um, it really just depends on the holiday, the time of year. It's it's really mixed. the the bigger distri and so you understand too like the way that that the budgets work. Some they always give a bit of bit of this budget to the distributor to handle and the distributor pays us and they always hold back where the suppliers want their own budget so they can go in make their special negotiation, special deals and they leverage these events and budget that end. So, it can be 50/50. Really just depends on the market, the time of year, and and who the brand is that that's that's being promoted.
+Luis Galeas: Got it. Okay, cool. Um,
+Chris: And I say I'll say 50/50 only because we want more of both the business.
+Luis Galeas: sorry.
+Chris: You know, getting a distributor means means that that's a much broader broader number of of brands and getting big suppliers as well as just good constant business.
+ 
+ 
+00:29:49
+ 
+Luis Galeas: Uh, I think there are more questions here and I don't want to uh take over. So, please resume Ethan. Oh, you're by the
+Ethan Brown: I only had one more comment and I I don't think now is the right time for it's more like details of when we get into mobile app implementation. So I think it's a little premature for that. So I will let um Raphael uh take any questions that he has.
+Rafael Ricco: So did you mean the the question about the the mobile application?
+Ethan Brown: Yeah. Um there was just a question of uh the briefing documents it was talking about check the checkout
+Chris: It's
+Ethan Brown: procedure and um it said the checkout button is disabled until all required tasks are complete and my comment was you know I can imagine situations where that wouldn't happen you know people get sick or whatever it seemed a little heavy-handed in in the app but
+Chris: it's and yes and
+Ethan Brown: it's
+Chris: and I actually have a documentation I added in there on cancel the cancellation process because that's that's not well accounted for.
+ 
+ 
+00:30:56
+ 
+Chris: um what that refers to and you'll see in that that the high-end technical outline essentially what happens most of the time is not necessarily a call out and but it but I would say what happens most of the time say there's a snowstorm like it was in New York recently and the um educator can't get to the account or they get to the account and the retailer is like listen there's 10 feet of snow outside I don't want you I'm going to close down there's no point you being here,
+Ethan Brown: Yeah.
+Chris: go home.
+Ethan Brown: Yeah.
+Chris: The the current process we have right now, we don't count for that. So the app leaves that location as an event that needs to be
+Ethan Brown: Right.
+Chris: executed until the manager then goes in and cancels the event in the application and the back end that they have. Um, and we don't have a formalized process where we're putting in a reason other than the notes as to why this was canceled. And therefore when we do a roll up of the data there's a lot of zeros and it doesn't and it looks like to the client they're like hey you didn't execute this why I'm going to pay for this and you know there's sometimes like your point Ethan if there was a snowstorm and and the educator made that trip they deserve to be paid for that or and the there's other times where they do call out beforehand they haven't made that trip they don't get they don't deserve to be paid for that.
+ 
+ 
+00:32:20
+ 
+Chris: So I I did do a I did finish a technical outline that kind of outlines what that process needs to look like, the example of that. So what the pain points are. So that should help you guys clarify as to how how that works moving forward. You guys asked me some good questions.
+Luis Galeas: Okay.
+Chris: I just finished these outlines. I'm like, this is awesome. I I'm ahead of the game.
+Joe Green: Good timing. Yeah, I think um I think the last question um was uh was one of my ones. It was just about the I think and I was watching the recording of the your your call with Lewis back but it looked like the the the process of coordination of of educators. So mostly by the uh educator manager is currently happening like outside of the app. Um like I think I assume maybe just like WhatsApp like confirming stuff like is that something that you'd like to bring into the app
+Chris: Um,
+Joe Green: potentially?
+Chris: so there are it's so a lot of these people there there's some discussions around that and I had I got some feedback when I was in New York recently on that what needs to happen is there the app needs to be um and I'm I'm doing a process change where in the current and current build where now the educators have to put in their schedule of availability um it was kind of hidden but it was there but I'm trying to I'm trying to change that that if it's not the availability is not digitally
+ 
+ 
+00:33:48
+ 
+Chris: in there they're not going to get booked period um so they have to maintain that so what's happening is there is a a few ender rounds where the educators are getting phone calls from the managers and the managers is saying, "Hey, are you are you for sure available, which to some degree is okay." and they want that personal relationship because part of what what our strength is that we're able to utilize people for people's sake and not it's not like they're trying not they're trying not to make this like Uber drivers where it's it's it's very like like a humanless experience and even though you have a human so they're trying to also manage these like like their employees even though they're really part-time and they're really like gig workers so I think there's some opportunities from the process standpoint of putting more notifications in
+Joe Green: H.B.
+Chris: app as a reminder this is coming up and just to confirm it and utilizing the app um versus the the text messages but I don't think it's going to fully replace the text messages and phone calls just because there's going to be some times where the managers may call and say hey can you I need to fill in fill this in I know this is like in two days are you for sure available I know this is like short notice so I don't think it's ever going to replace those Um, but having that process in place where the educators are man managing their availability
+ 
+ 
+00:35:09
+ 
+Chris: and making sure that's in there and then the app kindly reminding them this is coming up being able to add it into their calendar doing little reminders of popups. I think all that is is necessary that's not built into the app today.
+Joe Green: Cool. Yeah, that that makes sense. I think with a lot of the other stuff they're already talking about, it's something that makes sense to eventually bring into bring into the app experience.
+Chris: And it's not and I know this is like not not rocket science. This is a lot low
+Joe Green: Yeah. Yeah.
+Chris: too.
+Joe Green: Cool. I think um I think from my side anyway that's that's all the questions. I don't know if uh yeah any of the other guys have any final questions.
+Luis Galeas: No, I think get to the housekeeping items.
+Joe Green: Yeah, cool. Um so yeah, for more uh more boring stuff, but we wanted to talk about um some of the meeting schedules and and when we want to catch up. So I think in the short term um like does this uh slot and day like work for you next week?
+ 
+ 
+00:36:11
+ 
+Joe Green: I think it'd be again just a good opportunity to discuss some things,
+Chris: Yes.
+Joe Green: ask some questions, go over any like uh kind of assumptions and bits that we have with you again um before we get properly started in
+Chris: Yep.
+Joe Green: earnest. So if that's okay, we'll put in another slot next week.
+Chris: Yep. And Yeah, that sounds
+Joe Green: Cool. And then yeah after that we're looking to um yeah get started around like the March
+Chris: good.
+Joe Green: 11th I think is is the date we're working towards. Um so again we're looking at uh setting up four like different definition calls which will follow like similar format but we'll obviously we'll have a bit more to discuss with you some things to show you to bounce some ideas off you things like that. Um, but if that's okay, again, I'm kind of working to the assumption that this time is obviously the best.
+Chris: Yes.
+Joe Green: But then,
+Chris: Yes.
+Joe Green: um, from the 11th doing the Wednesday, Friday,
+Chris: and and
+Joe Green: like Wednesday, Friday.
+ 
+ 
+00:37:00
+ 
+Joe Green: I'll put all this on an email as well, just to make it clear. But if that works, that would be good to set
+Chris: and I would I would challenge you guys as to what you need and and I've worked with different developers versus
+Joe Green: up.
+Chris: where people like having user stories for everything to go back and refer to um much much more detail. I I would I really want want to continue especially the way I'd like I like to work as that product owner and help help you guys. whatever you need from me that needs to be documented or if it's just a sit down, we we sit and chat and talk it through and you guys break it down technically so that you have it. I'm good with that. Um that's that would be only only feedback because I agree with you until we actually start that date. I want to give you as much information as possible to to frontload it and make sure that you have all the access you need and we've we've got those those channels established and all that.
+ 
+ 
+00:37:53
+ 
+Joe Green: Yeah. Yeah. Awesome. That makes perfect sense. Um, cool. So, I'll chuck those uh those meetings in. If any of them like cause any issues or any clashes, obviously, let us know. Um and then we'll have some some weekly sessions as well when we get to like implementation a little bit later uh down the line as well. Um a few other bits we did want to cover off quickly. Um will it just be like yourself for now um from a heart perspective or is there anyone else we should loop in?
+Chris: It it should be for me me for right now because that's basically what what my role is is to help help guide these initiatives and I until we get into we so we do have our own
+Joe Green: Mhm.
+Chris: own it's not internal there our app developers. So when we start looking at at translating this and getting into our environment and then I can set up that
+Joe Green: Yeah.
+Chris: meeting.
+Joe Green: Yeah.
+Chris: I usually have a meeting with them um same day a little bit later in the day.
+ 
+ 
+00:38:47
+ 
+Chris: But I I don't I I'm not going to to set that meeting until you guys are ready to have more of a technical discussion where there's technical access. But I do have access to the AWS. So I have I can I can grant you guys access when it comes to the application and all that which I would just ask for us to have a nice hard list as to what the ask are so that we can just ask for that and make this as smooth as
+Joe Green: Yeah.
+Chris: possible.
+Joe Green: Yeah. Yeah. Cool. That makes sense. Um it would also I mean from my perspective it could be really interesting um at some point to maybe speak to um some of like the educator managers or someone some of the users like who are actually engaging with the platforms like obviously you know it inside out but they often have quite unique uh you know uh issues or things they don't like or things they do like. So that could be really helpful to have some conversations around too.
+ 
+ 
+00:39:37
+ 
+Chris: and you got me for that since I've spent I spent already a week in in New York. So, I've been doing a lot of that and kind of getting an idea as to how all this works.
+Joe Green: Awesome.
+Chris: Um I would say this the what I what I discovered from from that that call is the current application as it is 90 to 95% of it is all all being utilized and everything within there's only some small processes where there's some tagging where it's just icons of like colors that's showing where it is in process which all that that is is just tagging is being utilized differently depending on who the person is and what that means to them. Um, so the good news is as it is, if we were to translate it one to one and it was just a little bit better, people would love it. Um, the things that that Lewis and I talked about, we just discussed are that nine that 5% that's outside of the realm. And then everything else that we're looking to build in addition to that is all all new things that that um I'll be honest with you, they I don't really want to lean on them for what that that will be because I'm trying to situate that towards all these new revenue streams for us like all the data collection, all that.
+ 
+ 
+00:40:54
+ 
+Joe Green: Yeah.
+Chris: So,
+Joe Green: Yeah.
+Chris: and a lot of the things that they're going to complain to to you about if I would have given them is, oh, this color should be like this. This highlight needs to be like this. It's a lot of little details which is going to be a waste of time with us because this is all things that that we can build into it from a from a process standpoint when we look at it and I so I I would
+Joe Green: Yeah.
+Chris: say when we get into the implementation a lot of the feedback they're going to get and give you is around that as
+Joe Green: Yeah.
+Chris: to things that highlight things that look what color it should be so forth. So I I I do see a point when we when we're doing the integration and we're doing if we set some time up even if it's post this this pilot to do those tweaks we can do that that point but the other I'll also so you guys know know the way this is going to work and Louis and I talked this out the internal team is not going to utilize what you guys build out until much later because the idea is that the pilot is going to be we have clients they're looking to utilize our tool So I would I would say yes when we're doing this pilot I definitely do want you guys involved in hearing that feedback directly.
+ 
+ 
+00:42:04
+ 
+Chris: Um and this is going to be different feedback from their perspective than from from our internal and I for that purpose I because we're going in a different direction. We don't want them to think about how this used to be like and them thinking about all the things that they wanted from the old way and start thinking new. So having a new perspective in it, I'm sure having you guys into those conversations, Joe, I agree with
+Joe Green: Cool. Yeah, it makes sense.
+Chris: you.
+Joe Green: I think that's that sounds like a yeah, good approach. I think good to get that that feedback loop, but yeah, I agree. Probably a little bit later uh later on in the process. Um, cool. In terms of uh coms, it'd be great to have um like a like a chat channel. I don't know if Lewis has talked to uh to you about this at all yet, but are you guys on are you guys on Teams? Like we're on Slack, but we're happy to to set up a team's channel just so we can, you know, have a kind of an an open line of coms.
+ 
+ 
+00:42:53
+ 
+Joe Green: Uh it's a bit easier to chat through.
+Chris: Yes, Slack is good.
+Joe Green: Okay, perfect. Uh yeah, we can set that up.
+Chris: So,
+Joe Green: Invite you to a
+Chris: yes.
+Luis Galeas: Oh, you're
+Chris: Yeah. Yeah. I I have Slack.
+Luis Galeas: on.
+Chris: So, and and so if you guys want to want to just create a Slack channel,
+Joe Green: sh.
+Chris: we can we can utilize that. Um, I was trying to create a team's channel just just because I've got got I've got that built out, but I'm whatever you guys want to talk through,
+Joe Green: Yeah.
+Chris: I'm okay with that.
+Joe Green: Yeah,
+Chris: Um,
+Joe Green: definitely.
+Luis Galeas: Excellent.
+Chris: I would I would only say I would just only say anything I'm going to share just because of the confidentiality of it. It's easier if I keep it within within our um my our 3665 and you guys can access it that way.
+Joe Green: Cool. Yeah, sounds good. Um, cool. I think that I think that covers everything. Did I I'm not sure if I missed anything, but I think that was most of the admin
+ 
+ 
+00:43:45
+ 
+Luis Galeas: Oh,
+Joe Green: pieces.
+Luis Galeas: the one thing is on the access to the drive. Uh, I tried it um and I couldn't quite get into it. Um
+Chris: You probably have to Did you Did you try clicking the link?
+Luis Galeas: yeah, let me try
+Chris: I was going to say don't do don't do it through teams and and I I did notice
+Luis Galeas: again.
+Chris: that I was I was doing it I wasn't doing it through my company's 365 it was through hearts 365 and I can't create team sites through that so that this is basically a one drive share so it's on sharepoint and link back which may be problematic
+Luis Galeas: Yeah. So I think um I think we we would have to have an account. So the thing is it's weird how these tendency things
+Chris: They all do that.
+Luis Galeas: work.
+Chris: Like even Google does that where you have to have a Google account to access Google Docs.
+Luis Galeas: Yeah. No,
+Chris: It drives baddy.
+Luis Galeas: but but we have a so I have a a Microsoft account with my Amber email.
+ 
+ 
+00:44:51
+ 
+Luis Galeas: Um but it's not in your tenant.
+Chris: Okay.
+Luis Galeas: So I think I would need you would need users with our email inside your tenant to be able to
+Chris: Okay.
+Luis Galeas: access it through your drive.
+Chris: So, there is a way around this and I might do it where I might just create a team site. I'm just going to add you into my my tenant, which would be weird. I'm open to what you guys would want to want to do with it. I just I was just it was just easier for me to do it because that way I can add in the documents directly from my computer, but
+Luis Galeas: Um, let me think for a second. Uh, and you don't have uh your uh your um uh like heart's uh email system is Microsoft, right? Yeah. Uh, cool. ly you won't have a Google Drive.
+Chris: Yes.
+Luis Galeas: Um I think I think uh let me just double check but I think actually you know what leave that we'll message you on Slack about our ideas for that we I won't figure out in 30 seconds I'm not that
+ 
+ 
+00:46:07
+ 
+Chris: You might need to I would try this then if you might need to if you have teams if you because because technically the the the folder is a share drive on shareepoint. point and I know I've invited externals on it and they have and I know Microsoft can be a little testy with it depending on how that works because they all want want you to have um an account with them to to do the verification. Um actually you know what I'm looking at maybe I did not share that back but I thought I did share that back. I shared that's interesting. Let let me know what your thoughts are on it. I can try to Did you receive an email from it from from Microsoft or you just my email is what you tried?
+Luis Galeas: No, I went on your email. I haven't received any email from Microsoft.
+Chris: That might be part of the
+Luis Galeas: Yeah. Um,
+Chris: problem.
+Luis Galeas: let me just double check. I didn't receive anything else. Uh, nope. Nope. Nope.
+ 
+ 
+00:47:21
+ 
+Chris: Okay. it.
+Luis Galeas: Nope.
+Chris: So,
+Luis Galeas: Yeah, it says here. I'll show you what uh what I see on on this side. This is what we see. So, and this is from my So, I'm logged into Microsoft
+Chris: okay. Maybe Okay.
+Luis Galeas: Louis.
+Chris: So maybe um I got a call with my our 365 people. So I'll make this part of my my conversation because for me I' I'd like to have from a management standpoint knowing what I'm sharing with you guys like there so that everything's right right there and that gives me a point. So
+Luis Galeas: cool, right? Um, cool. Well, Joe will send the meetings uh and we will follow up uh you'll get an email invite uh from for Slack. So connect the
+Chris: Did I not did early on?
+Luis Galeas: channel.
+Chris: Didn't I share some stuff with you, Louisis? Like like the video and how the application works and all that.
+Luis Galeas: I have they have watched it
+Chris: Okay.
+Luis Galeas: already.
+Chris: So that I think I did that through through my my Coopercast sites.
+ 
+ 
+00:48:29
+ 
+Chris: So I might
+Luis Galeas: You when you did that you actually did a walk through uh on a live uh call with uh with me there. Um and uh yes and we had the noteaker on uh so there's a video of
+Chris: I did. Oh. Oh, okay.
+Luis Galeas: that and uh no no no no
+Chris: So, I didn't I didn't share and share a video with you on on all that.
+Luis Galeas: no no you did a live demo uh and then with the noteaker my colleagues have seen
+Chris: Okay. Okay. Okay. Okay. Okay. Um, give me a day then. I'm I'm going to try to call my 365 people and see if I because I've got a video from me and the developers showing how everything works in detail and the documents I was mentioning. So, so there's the out outlines of the new things we just talked about and I am working on some more vizos on the the flow just so we can we can have have those things.
+Luis Galeas: Cool.
+Chris: So, let me figure that out. I'm going to call my my 365 people and see because that message means to me that's just a a global setting that's set to not um share it
+Joe Green: Yeah,
+Chris: externally.
+Joe Green: amazing.
+Luis Galeas: All right.
+Joe Green: Super helpful. And yeah, I'll uh I'll get some of those meetings in. Um but so yeah, just give me a shout if anything uh doesn't work and we can move stuff around. But um yeah,
+Chris: No problem.
+Joe Green: sounds good.
+Chris: Okay. All right. Thanks,
+Joe Green: Awesome.
+Chris: J.
+Joe Green: Thank you, Chris.
+ 
+ 
+Transcription ended after 00:51:40
+
+
+This editable transcript was computer generated and might contain errors. People can also change the text after it was created.

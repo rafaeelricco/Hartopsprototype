@@ -1,0 +1,720 @@
+00:00
+me uh make guys familiar with each other so I've given Tom some context. uh But in any case, good to start with some interest. So,  I'll let you introduce yourself.  For sure so  nice to meet you Chris.  I'm one of the engineers here at AM bar on this team.  I manage a lot of uh a lot of things these days, actually,  all over the place. um
+
+00:29
+Infrastructure and large distributed systems are like my passion, same with like open source and like education technologies. And yeah, a little bit about me is I'm currently freezing in Minnesota. I saw you, you're I think located in New York, so I think you can sympathize with the cold. Oh no, I'm actually in Florida. company is in Oh gosh, yeah, was minus 10 this morning for me.
+
+00:56
+And the humidity is, I'm like uh perspiring and uh what's  perspiring is like the evaporation was the. Your freeze. I  mean, there is basically your perspiration is turning into icicles as you as you perspire, because it might as 10 like, whether it's Celsius or Fahrenheit doesn't matter it just instantly freezes. Yeah, so it's well and it's the humidity is so dry so if you see me like blinking 10,000 times, I'm like drying out over here. uh
+
+01:26
+But yeah, other than that, I worry about specifically, I do a bunch of like our infrastructure stuff, our backend stuff,  managing customer deployments  and helping out with things like that  with one of my counterparts. ah Well, ah yeah, so that's probably enough about me. I'd love to learn a little bit more about you,  Besides that you're not in New York, you're in Florida where it's warm and sunny and I wish I could be on the beach.  It was in the 60s this morning and at night.
+
+01:54
+For us, that's as cool as it really needs to get for us, so we're good.  I know for Minnesota, I can imagine.  I've got some, I actually have about 20 years experience in beverage alcohol. I started in sales  and migrated over to the technology side doing enterprise uh transformations at some of the the  biggest distributor in the business, Southern Glaciers.
+
+02:21
+And then I went on my own working for smaller suppliers in the business, worked at Diageo for a year. And now I have my own company where I consult  in the same industry and I have my own own software that that works within the industry. But we're going to talk about today is as I'm the chief technology officer with a hard agency. So we're looking to do some  major technology transformation because. And this is all kind of kind of.
+
+02:50
+just so you guys know, more confidential as to what we're doing. So we've been in the event space. So if you ever go into a chain store, you guys have Kroger's out your way, don't you, Tom? Yes, yep. So if you walk into a Kroger store, you're in Minnesota. Minnesota, I can't remember. think it's, it kind of has a state run, but there's some gray area in there. You have ABC stores, state run.
+
+03:18
+So it's up to the municipality, whether it's a municipal liquor license ah or a private liquor license. But I've lived in  Washington and Wisconsin as well, so I've seen the spectrum as far as heavy drinking cultures to a little bit less.  what our company does is if you go in there and you see somebody sampling, that's what we do. So we provide the sample.  And what we're looking to do is move our business to be transformative  within the industry. Because everyone that does marketing
+
+03:46
+in our industry, they do it very poorly. So we,  and if you want insights, you basically have to pay Stracotta or Nielsen's and their data  is, to be honest, not very reliable and it's only  restricted. Whereas  in the markets we're in,  we do thousands  of  events.  We have people in accounts several times a month. So  the data points that we collect on consumers and retail is a lot.
+
+04:16
+between picture and picture data,  survey data,  and  just from responses from our events. So what I'm looking to do is  be transformative and moving from being events oriented to being data collectors, and then prepare that data to be resold  to the greater market to companies like Strickano, because honestly, you send somebody into a store, they're gonna seek it the hell out.
+
+04:43
+But with us, we're actually bringing value because we're driving sales. They're going to, of course, let us in and it allows us to do whatever we want to do because we're making the money.
+
+04:53
+Cool. So you're looking to do the collection, the aggregation and the transformation and actually bundling this up and distributing it. Correct. Correct. And I can kind of give you guys a kind of an overview. When I was talking to Lewis, my interest in engaging with you guys, and I'll be honest with you, we have an app developer. They're very good in the back ends where we really need to help with is on the data parts, but also on the
+
+05:22
+The actual app front ends with the educators. So the people that go into the accounts are called educators. What happens with these educators are kind of like, I don't want to say they're like Uber delivery drivers, but this is not the full-time gig. So they're part-time with us. They do maybe two events a day just because you'll be in an event for two hours and maybe get to two or three events.
+
+05:52
+So what we have to do is we have to move the app into something that's quick and easy where you can collect information while you're in front of the consumer. You can collect information in the account quickly, efficiently, without any room for error. I'll do this. I'll kind of show you where our business is today and I'll talk to where this wants to go. I've got a video I can share with you and kind of show what the flow looks like so you can kind of get a top-line view.
+
+06:22
+Definitely. You guys are using Google, Seth. I remember where this is now.  My mind is exploding with all the different tools. Zoom, Google, like Apple. Oh, goodness. What's Apple? Apple has something too? I've not used Apple, so I don't want to. Well, it's like built into their messenger. I'm not an Apple guy besides like the laptop I use for work. So I don't know what. iMessage. There we go. Oh, iMessage. All right. Cool. So.
+
+06:50
+From a flow standpoint, our clients, distributors and suppliers, it's all via email and mostly emails. Some phone calls, mostly emails. And I have a project already in play for doing something with maximizing that, but just I want to focus more so on the educator side with you guys today. So right now, our clients will message us for requests. So let's say here's 30 and 30, 40, whatever events.
+
+07:20
+That comes into the application, but it's met by  an operations person. So there's a human touch that gets manually processed and  that event gets put in. The event then gets scheduled within the  app. So our app  is  fairly well mature where we do a lot of the management, a lot of the educator connections.  It does the scheduling  and
+
+07:46
+There's a web app version that we use on the office site to manage the back end. And there's an icon. And there's an Apple app that gets pushed out and information gets pushed out to the educators directly. So once this calendar is loaded, the events are pushed and pushed to educator managers who have visibility to it. And there's educators who actually execute the events. So the educators then on that day go out
+
+08:16
+and  they will have some  things that they may buy samples and they buy things at the actual store. So they record the purchases, record images of the receipts, they sample consumers um and  they survey, they do a light survey, they count and they give feedback on the actual events and they take pictures. So then all that gets fed back through the application and pushed into  a reporting cloud we call Cross Box.
+
+08:45
+which has  recently been stood up, that's separate from the actual app. So the app has its  own database and there's a separate reporting database that's there for both reports and other processes. And then separately, if it's not a scheduled event, if it's a serving an account, it's a separate process. We currently don't have a formal tool for that. We've outsourced it to third party companies and then that data gets manually pulled.
+
+09:15
+and then all that then  gets emailed back to the clients. So lots and lots of inefficiencies, lots of emails and file sharing. um Where I want to go with this and where I want to focus on is essentially these two areas here and the survey tool  and the event  tool. Currently right now we have an iPad app that's handling this and does an okay job.
+
+09:43
+It needs to be geolocated because we do have the good news is we have a master and master item list. We know who the client is.  We know what items that should be sample and we have the standardized question for each of our clients. So that's already all hard coded in. It's one of the problems. It's hard coded in. We need something that's flexible where we can on the fly change that. There should be a standard activity where the CAL survey is standard, where you go in.
+
+10:13
+you  basically take some information about the account, what's on display,  how many displays are available, what's in the cool box,  what's in the front window, so forth, simple things. And then while you're doing the actual events,  you're sampling the consumers. And this is my own experience actually doing these. Essentially, there's a need to building out a very simple interface where you're not typing because it's extremely rude being in front of a consumer and you see there's typing information.
+
+10:42
+It really should be swipes  and taps  very quick. Consumer comes up, the person interacts with the consumer and the educator should just quickly be able to say, male, this this age, lights didn't like,  and have some things to click select on, or maybe even just like a dial where they're just dialing this in very quickly. So just quickly put the sense that  there's less time to actually put it in. Essentially profiling the consumer.
+
+11:12
+And gathering the feedback is currently our clients want to know that they like the products that they buy the products that they say they're going to buy the products. uh And so forth at the end of all this. The educator utilize usually goes to the retailer and says, hey, how many sales I think I got called bottles sold. How many do you see in the register? And they'll record how many bottles that were sold for the event and that gets fed back.
+
+11:40
+So that's the regular events that interface and capturing all that the data part of it's like definitely having  the email to profile it and get ready for insights in the future and capturing all that information properly is really important. You'll learn very quickly. I'm less of a  UI friend and guy and I'm more of making sure that the foundation is done correctly. And we've got the data in the database ready to capture all this.
+
+12:10
+There's always an opportunity on pictures. We capture gigabytes of pictures. Essentially what the real need for the pictures currently is just proof that the educator was there in the account and we share those with hyperlinking back to the clients. I can tell you from, because I was on the client side, they may look at that once and then ever again.  They may, and they will not look at every single picture. They may look at a few here and there.
+
+12:39
+just they may look forward to finding some examples for their deck and then they'll never use it again. Yeah. Okay.  But that said, there's a lot of information that can be derived from that picture.
+
+12:54
+There's companies in the industry now that have trained algorithms to look for bottles  and say what's on the shelf and do all this stuff. That's all well and good. I don't necessarily want to go that route. It would be nice, but I don't think we're quite there yet. That said, on the survey part, so currently  when we go in  for a retail survey, this is going into the account specifically for an activity. So we're not sampling people.
+
+13:24
+We're going into the account, the account's expecting us, and the educator will walk the aisles and they'll look for certain brands and see where certain brands are in place, what the competitors are. So if you think of like a liquor store, what's on display, what's on the end cap, all the things that you do from a retail perspective. Now, while we're doing that, we're also profiling the retailer. So my goal is not just the survey, but also profiling the retailer.
+
+13:54
+So we would know where the location is. We also know from the consumer profile who's shopping at the store, who's buying products, what are their tastes.  So there's an opportunity here to start profiling the combination of the data we get from the survey and the events as to the holistic view of the market. So what are the consumers like? Where are they shopping? What's being sold? What's on display? Who's spending money in these accounts? So there's a lot of.
+
+14:21
+really deep intelligence here that you can't get from anybody else. So that's the shift we want to go that we want to package that information. With this too, there's a need for think a similar application where I kind of envision a dashboard where you take a picture of say a display. I mean, yes, everybody wants to easy but you take a picture of the display and the computer says exactly what this is. It ain't going to happen. But
+
+14:52
+We have the item master. We know what we're going in there for. So you take a picture and you select, say, absolute vodka. And it's absolute vodka 750. Well, we know how many bottles are in each case. So. And we know we have that item information, so if you select that and you say how many cases on display or how many bottles on display, we can do those calculations in the back end as to what's there in the picture. And that's all tied meta wise to that picture in terms of the proof.
+
+15:22
+Um.
+
+15:25
+So that's kind of like an early on release is really that data collection, getting to a way where this works really easily um for the user  and being able to then replace  future wise, replace this email system with  a reporting hub. So like an access portal  and a longer tail of all this, cause Lewis was asking me what was my big hairy deal here.
+
+15:55
+is in order to be a real institute where people can just come in and buy this, we have access to this, we want to build out a web presence where you can come in, purchase all this information of your current client, you can access the pictures, access all this stuff, API to your, this is intelligent systems, we can push information back to them. There's information that is,
+
+16:21
+is universally used for retail identification called TD links we can link to so forth and so forth. essentially replacing this whole email system with a platform that currently does not exist where our clients can interact with us  and where they can come in and purchase on the fly.
+
+16:41
+And I say that because this isn't just for beverage alcohol. This is market information on retailers. And in some of these retailers, in some places, what's a good example? New Jersey, Illinois. So the other benefit of all of this when we start looking at this national is the liquor stores are built into the retail.
+
+17:09
+So if you think about this as well, there's an opportunity for when we go in there for these events to collect additional information about the bigger retailer, what they're doing. there's other things that we can do. And there's other industries, loading this out as a platform. That's what I'm saying. It needs to be not necessarily hard-coded, but allow for us to swap types of stores in and out. So if you think about this whole process here,
+
+17:41
+These two processes  need to be for  retail stores where you'd go in and buy something off the shelf. They need to be for a bar that doesn't necessarily have food. It need to be for restaurant that does have food. So now we're profiling restaurants in major metropolitans and there's a lot of food and beverage companies out there that would love that intelligence. Because if I'm a Italian pasta company, I want to know
+
+18:09
+about these Italian restaurants that have wine licenses  and who are the type of consumers that go in there? What sort of wines they promote? What do their menus look like? Yeah, what are their top-molders, what's the market doing in the area? So now these pictures of menus, and that I can see, well, we're scraping that because it's just raw text. That becomes very, very important because we do take pictures of menus as to what's being focused from a cocktail's perspective. And now they're picking up not just
+
+18:38
+the cocktail menu to picking up the actual menu menu. And being in this business long enough, you can go online, yes, and get this stuff. But guess what? It's not gonna be what's in the store. And what the store is legally binded by is what they present  the customer at that point of purchase. um And I'll throw, oh I'll leave that out. There's some other future crazy things I've been thinking about, but essentially.
+
+19:06
+That's why when I say this has to be flexible is it needs to be coded for what that path looks like for the educator in terms of if it's a restaurant, if it's a bar, if it's a chain store, if it's a regular package store, but then also be able to account for if it's a special event or if we're doing, we're collecting information we're collecting because our clients, they have,
+
+19:35
+their own things they want feedback from. So at times, hard coding doesn't make sense, but having some questionnaires, as I put it, where we  can customize it and gather information back is important.
+
+19:52
+So I'm gonna shut up now and  hear some feedback from you at this point. Yeah, so maybe some questions first about what this journey looks like for you. um So  I wanna know a little bit more, you mentioned a little bit of hesitancy around like image analysis  on the current things that you collect  at um events.
+
+20:20
+ah But also,  you know, some image analysis as far as like, um even just what you were just talking about, as far as like a bar and restaurant, menu scraping. The holy grail that's been in our industry for the past, I'm going to say 15 years, and as companies that have been been working on this, and apparently they're much better at it,  is in order to do the survey, just go in there and take a picture of the cold box and walk away.  And then let the machine
+
+20:47
+look at the prices, look at the items, identify the files, identify the brand, da, da, da, da, da. In order to do that, you have to have extremely robust master data and extremely robust images, which does not exist anywhere. And the companies that are doing this are basically chasing,  chasing a white rabbit that they'll never catch because models change, uh brand names change, brand images change. uh
+
+21:14
+Reading on the shelf tags, shelf tags don't always exist. So you have all these variables then. But essentially a menu, yes, like a cocktail menu. also that could be also problematic too because it may just say bourbon old fashioned and it doesn't say which bourbon. So now you're at having that information. I see value in scraping menu data and getting that because we can.
+
+21:43
+We then throw an AI on there and start teaching it. If it says, urban drinks, toss everything in the bourbon drinks as one categorization. If it's specifically what type of cocktail it is, it could be an old fashioned, could be a cherry old fashioned, it's an old fashioned. Old fashioned is old fashioned, old fashioned. We can train that on that. uh I'm confident about that.  then  if there is brand information, that's just a cherry on top to see what's actually being advertised. uh So that part is easy enough because I've seen enough.
+
+22:12
+A eyes that are good reading text, right? That's possible. Okay, and and I assume like, also some, some, know, like some data annotation to as far as like a menu and maybe a spirit list. So, like, you can see from whatever is offered on the cocktail list and the spirit list. How would you combine those different permutations accomplish? Okay. And if it's on the menu, that means it's being promoted because a lot of times to even if you have a drink menu, or even if you say you have a menu.
+
+22:42
+That may differ for what's on the back bar too, because somebody may bring in some obscure brand and they haven't updated their menu. So on the back bar may differ for some menu, but essentially the menu is extremely important because most customers when they walk into a bar are not going to walk up to the bar. They're going to sit down someplace. So if it's not on the menu, it's not going to be sold. If it's on the back bar, that's great, but then no one's really going to know it's there. But that's all part of that account survey.
+
+23:11
+What happened is when those educators go in there, they will look at the back bar and they will write down, then they will capture everything that's on the back bar and compare it what's on menu.  So that our clients then can confirm that these are actually been placed  and they're being advertised the right way on the menu. Definitely. Okay. Cool. So yeah, see, see. uh Obviously this is a very interesting problem. There's a lot of
+
+23:40
+different angles to  how you can expand even the data collection as far as like, you know, is this retailer in a high-end neighborhood versus a low-end neighborhood and you can annotate it like that. So would your clients be more wealthy, more middle income,  more low income and what do they prefer to buy then? And I have relationships with marketing companies that can do geofencing  and retracing.
+
+24:08
+where we can start pulling in profiles  of who's actually coming into these areas compared to what's on  there. There's so many different directions we can go, going this route, we have the opportunity to catch the foundational data, whereas everybody has like this,  how to put it, em overlay data where people see all these things moving and see people in these areas, but  we're actually  looking into the actual stores  and again,
+
+24:38
+interacting with the consumers. So now we're actually asking them. So that whole,  this whole event can be flipped on its head from just being a sampling to now we include questions that help us profile the consumer. So we put in standardized, we teach our educators now to start asking certain questions like, hey, do you  usually make cocktails at home? Have you  ever tried to make a Mascale drink? Whatever that  or.
+
+25:07
+What sort of things do usually like to eat? Now we start profiling those consumers and now we're creating a database on consumer profiles, which nobody has. And I can even tell you the retailers try to do this  and they try to drive this from sales, whereas we're getting people who are walking into the actual store. Definitely. So on that note, and zeroing in on the event activities data collection,  you mentioned.
+
+25:33
+Uh, like, right now, that's kind of a big hurdle for you guys as far as like,  you want your,  um, your educators, the people running these events to be obviously to be focused on the clientele there, right? They should be very. On professional and not like, distracted on laptops and stuff. So. One of the 1st things that came to my mind as you were like, talking through this was.  Not just like a simplified front end, but how can we use audio and video capture as far as like capture conversations that people are having.
+
+26:01
+Your educator could be asking questions about what is the client like? We could even have some sort of like processing that like, after they say, oh, I like vodka based drinks and then lists a whole bunch of drinks for the educator to prompt them on. Oh, do you like vodka cranberries vodka? Lemonades do you like martinis? Is that kind of like the line of thinking you're going on? Absolutely. The problem with that is I don't know if we can record those conversations because you have a lot of legalities. Yes. Especially if you start going into states like California.
+
+26:30
+That could be very, very, very problematic. And the last thing you want to do is have a little sign that says your conversation would be recorded because people would be like, why are you recording that conversation? Yeah, definitely. So that's that's one of the reasons why I was saying having it because it already happens right now. So what happens is.
+
+26:51
+So what happens is, not even on an iPad,  but the educator will on the phone, after the fact, answer everything. Because they just interacted with the consumers. the  idea would be as they're talking to the consumer, it's just like a swipe thing on one hand. they serve the drink, or right after the person leaves, take, like no kidding, it has to be like  super, super quick.
+
+27:19
+Like it has to be something where they can just very quickly just like swipe left or right. Like keep, have a finger down, left or right, male, female,  lights, don't like, whatever it is, just like real quick swiping motions. Cause if there's any typing, it just takes too long. And yeah, just the fast questionnaire, right? Just tapping big boxes that says, they male, female, brings it to the next one. What kind of liquors did they say they liked? What kind of beers did they say they liked? What kind of wines? Super fast.
+
+27:48
+And this is really where I need the development help on this because we pay for these, well, we pay, but the client pays for these educators. So we need to maximize that time and have them interacting with the consumers. And we don't need them to get frustrated because this is gonna be big change in what they're used to. They're to walking in, dressing nice and pretty, talk about the products.
+
+28:15
+and sometimes they're incentivized to sell more of this. So they have something else to do on this  that they're not incentivized with. There's going to be a bit of a wall  to get over. So building out the backend and the data and all that, like figuring all that stuff out, like,  and so, know, Tom,  I'm a certified product owner scrum. So giving you guys documentation, doing flows,  giving you guys outlines and talking deep on all this.
+
+28:44
+extremely easy to do that. The hard part is really coming up with ideas is how do we make this really easy on the front end? And the good news is I used to do this stuff. So I have firsthand experience as to what they go through and what would work. And then we can always run out there and then tweak it as we go. Got it. I have an important follow up here. So how do you see the capabilities of what you have?
+
+29:14
+today compared to the description you have for the ideal world? So in order for us to grow nationally,  and it's basically transitioning us from being an event company to  a data collector company that does events. And like I said, I like throwing out the term  data institute.
+
+29:40
+Because we're going in there and we're collecting information that nobody else is really collecting currently.  Or if you're Sir Conner or Nielsen is you having a person walk in with a vest. This is I'm with so and so which never works right. The only way you ever get real information you ask him about that in the 50s when they actually used to make cool cars. They were always very very stealthy as to how they collected the information. And this is the best way to do that. People are going to talk when you give them a drink.
+
+30:09
+So this is the best way of getting real consumer information is when you give them a drink and they ask them, what do you like? What do usually drink? And people love giving their opinions, especially when there's a drink in their hands.  it's a matter of, so going from like right now where we're just servicing the events, we're collecting surveys, it's making that data the center of the business  and collecting as much of that and packing, packaging in different ways. So it basically takes this whole system.
+
+30:38
+And goes a step deeper in  how we're actually analyzing and then how we actually share that and getting away from all these emails back and forth between clients. Okay,  understood. So. For context, by the way, we did sign a one way and so. um
+
+31:02
+just because of what I'm gonna ask. uh Chris, how  feasible, I understand that you have a developer  already, right? I understand that that might be  its own discussion,  but how feasible is it for us to also look at the existing code base?
+
+31:22
+Um, it is feasible. I would.
+
+31:29
+So I'm okay with  giving you guys a look underneath the hood. um What I'm seeing is the current application is fairly rudimentary. So the backend processes.
+
+31:49
+So all this management  is,  I'm gonna say good, because it mostly what the app is really does is a lot of the backend management. it's, after all these events are done,  it puts together the billing and it creates invoices  and we have systems that connect back to the clients for paying them. There's a lot of manual processes and I've helped automate a lot of that stuff where it generates the forms because unfortunately,
+
+32:16
+Our distributor clients, they want a bill in Excel, individualized for every single event. And we do thousands of events. So can imagine how many bloody fucking emails that is. It's my language, but it pisses me off. uh So from the management and processing all of this.
+
+32:40
+There's some things in there where I don't see the benefit in the first engagement for us to actually touch because that's all just  is plumbing. What needs to change is the app front end. So that app front end is an iPad app that's not connected directly to the web application. It just pushes information that gets processed. So what I'm seeing is there's hooks that you don't necessarily need to go into the  web application.
+
+33:08
+the things that were ground that need to feed into it. And then we can figure out what those outputs need to be as to how that would work. Does that make sense? Yeah, that makes sense. I suppose that it makes sense in principle, right? But I'm thinking as well, in principle, at least for the beginning, but I'm also thinking of where you want to go. I mean, I suppose it's difficult to know.
+
+33:36
+you know, from the get go, whether the picture you have in mind for the future ah will be doable with this plumbing. And it would be nice to know  not six months from now, but in advance.
+
+33:55
+We can do that. ah
+
+34:01
+What my thought process is, and if we were talking about like just, and it's only  because, you have to understand too,  from us have to be a drip, it can't be a big bang, as much as I'm pushing to move quickly. My  goal would be looking at, by say February, March, to either  fully replace this process,
+
+34:32
+this process and it could even be a back end. So currently that's kind of what the cross box databases is. It copies all the data that's currently within the application and there's a sync. Right now it's a one way sync. It's supposed to be a two way sync. There's one process that's a two way sync that it's pushing information back over to it. That's the process.
+
+35:00
+My  thought process, my thought is, it currently is a standalone app where with our aspirations of going national, bringing in other businesses and having a B2B, what we wanna do is we wanna bring in other companies that do these events and gather the similar data that we're getting from our current,  the future states, from other companies that are in hidey holes that don't make sense for us to go out into higher end states.
+
+35:31
+So I would almost rather build something from scratch and just say, leave the current  platform as it is,  as a core business, put the current business. Let's build out  a new platform that does all these things well, because I don't see the way it's currently designed right now for us to take it, break it and expand it.  I haven't had a chance. just got access to the... m
+
+36:00
+back in administration. My gut feeling is there's a lot of it. It's not spaghetti code because I looked at the tables and the tables are fairly well organized right now. But I don't.  In order for us to hook into  have other companies utilize this, I don't think it's wise for us to take the current current set up. That was never intended for it to be another business to come in. So I would almost challenge to say let's think about this from scratch.
+
+36:29
+and how we're going to build this up from a platform, knowing that there's some of these hooks that we eventually need to get to and then bring that in in the future. And if it means complete redesign, I'm okay with that. And I know the board's okay with that because the intentions of this were never to do what we wanted to do. It was always  very, very similar.
+
+36:52
+Build this platform and treat your existing solution as like, you know, customer zero, right? You're the first customer of this new platform where you're ingesting data into this holistic platform view. Yes.  And I think the value that we can get from this, as well as I saying, Louis,  if we have, we, it's a certain, they're gonna be  iPhone apps or iPad apps, Apple apps here on the outside, it's still a layer that's gonna connect.
+
+37:21
+And we have a way of connecting data that already has connection to the app. And this would take the pressure off of you guys, because I can go back to these other guys and say, figure this shit out. This data needs to come through, it  out. Only because  they're familiar with the current current states, and that just keeps this business going, because my mandate is to run as quickly as possible to that platform, to start a big, brilliant business. We can't do that if we're trying to blow up the core business already.
+
+37:51
+And  then the last thing I hate, I hate repairing and upgrading planes when they're already up in the air. I'd rather run something parallel. And I know the board has an appetite for doing this and say, we're building out the new platform over here. Current state, as Tom put it, customer zero, that doesn't change. None of stuff changes. And then eventually we turn off customer zero, we move fully to the platform.
+
+38:21
+Understood. Okay. Let's do it on that basis then ignore what I've just said. So, okay. Mind you, mind you, at some point, if you need to look under the hood to understand how this is working, absolutely. And make sure that we're getting the data correctly. But there's some even on the data side, and I was looking at the way the schema is laid out, it's good for the application, but it's all around. Essentially, it's all around this management.
+
+38:49
+It's not maximized for the data. We have an item master, we have an account master, there's an educator master.  But we really need to relook at that because we need to start judging  deeper as to information we're gathering from the educator and what they're doing, where they're going.  And even the item master, I'm working right now with some third party companies to get  all the account information that has geocodes, has category information.
+
+39:19
+All that's still kind of in the play and this system is not designed to digest that. It's very linear. So that's all the other stuff I'm working on to bring into a formal platform. Okay, so let me be pragmatic and ask, okay, if we had to say, you know, I understand that, you know, that
+
+39:42
+You can't have a big bang, right? And you want to do things gradually. It's certainly helpful if you have a uh board and colleagues that you know will be  asking for  things to be done um with some sense. with that context,  what is the first tangible  or not tangible, um first concrete milestone? How would we uh define that? Like what  minimum set of functionality do we need to have?
+
+40:12
+I think having a new front end map, front end app, that we can run in parallel with the current app that replaces this process. And or we get to... Sorry. But the front end app would be connected to the same backend? No. So it would be in and around. we have a separate database. So we'd have a separate database that has a mirror of what's in the current app. So you'd have information, you can leverage that.
+
+40:41
+that's real, that's current. But we would create an environment where this would write back to that.  And this environment would be leveraging a different schema and would be for that reporting. So I would say this, the current output of this is these like events.  It's just basically here's what happened in the events and it gets summarized. So  a deliverable from this is we get this information, which is easy to that's that's the
+
+41:11
+of it plus a consumer profile plus retailer profile  and  the retail survey because it's already being captured here so all that reason to be captured here so now we're partitioning it out  and it's packaged so that now  that could be pushed into into the platform portal and then repeat resold
+
+41:35
+Okay.
+
+41:39
+Tom, you have  follow  ups? So this,  can you tell us a little bit more about the existing  iPad app and its flow? And then um just from uh like being device agnostic, are you committed to like an iPad app or like an Android app be acceptable on an Android tablet  with like a simplified web interface that they could even just pull up on their phone and be okay?
+
+42:07
+I usually like to be agnostic. I think the company only because they thought of Apple being as most popular just to build it on an Apple app. It could be a web app. And I've seen some really cool things now where you can install a web app on a phone and it's agnostic and it acts and runs like an app. I think that's a better way to go because, but the only, I would only say one, actually it probably would update. Because then that would update live. Because one of the problems we're running into right now,
+
+42:36
+In that I'm surprised that the app developer didn't do is we had to actually put in a force updates. So now they're forcing everyone they're putting in the code that forces the update or where it's actually work. So I'm assuming if it's a web app that's that's installed there, he looks to the web.  It's it's running live.  The only issue with that is. um Web connectivity  and RAM connectivity. Oh, shit.
+
+43:06
+this crap. So the only problem with that is if you don't have good Internet and it's not right into it constantly, you'll lose it. And a lot of these places, especially in these older cities like New York City, there's not good connectivity. Sometimes you go into a dead spot and we're relying on the educators Internet and they're not giving corporate phones, not getting corporate plans. So that might not work. So therefore.
+
+43:36
+In the past, that was always resolved by having an actual app because then you utilize the RAM on the device to hold on to information. And then when you have to signal it would push it out. OK, I think that's something that would be surmountable. I assume this like a sync sync process, basically, where like it accumulates data throughout the event and then they go somewhere where suddenly there's a they have signal and it's. It can because just a lot of time, not a lot of times, but sometimes you may be in a spot where.
+
+44:05
+the signal's bad or just that service provider doesn't have good service in that spot that the educator has.  So a web app wouldn't necessarily work there, it would just be blank. Whereas a physical installed app would utilize the RAM and as your point, they go home and it just connects and pushes out. Got it. Okay. So definitely if it was like a web app, we'd have to consider like some pre-caching mechanisms so that even if it's offline, there's still some semblance of
+
+44:35
+real interactivity in local device storage. So, okay,  maybe a real embedded application would be the way to go then. um Interesting, okay.  And then what does that current flow look like today as far as, like you said, it's a complex, they're like typing on the side. So what's happening is they will check into the accounts, they'll look in the app and see what's scheduled for the day. They will travel to the accounts, they will check into the accounts.
+
+45:05
+It'll start a timer and show what time they checked into the accounts. ah It'll have the list and questionnaire there.  They  can fill in that  after they've checked into it, they can fill that out at any point in time. So it allows them to take pictures now, take pictures later. It allows for them to fill out the questionnaire during the events, after the events, when they get home. And to some degree, that's okay, but  I'd like to get away from that.
+
+45:34
+And at least force them when they're at the account to finish it and get it and get it done. Because when I walk away, what happens is the educator ends up being very. People forget things or they just remember. Yeah, but not even forgetting. They just make it easy and they just say the same thing over and over and over again. then we see results where all of a sudden they did 15 and they all have the exact same results as to what.
+
+46:03
+And the exact same consumer response. So having something in front of them where it forces them to utilize that is a good thing and it'd be a change management. But there's some activities here where our clients ask for where it's relatively simple. Like how many do you serve and all that. So that would just be. So right now it's wide open where it's more like a glorified form than it really is an application. Gotcha. So.
+
+46:30
+Okay, kind of what I'm envisioning is that like, there's almost like a task list of things that the educator needs to do at at the site. And then, um like you said, like a form for as far as like additional information, you know,  who, how many people did they interact with? What were the big like products that they were  seeing? um Okay.  How does uh the list of things that they should be doing? I mean, it varies per  event, I imagine.
+
+47:00
+ah So, you know, it's not always the same form, right? They're hard coded. um Find recent events.
+
+47:14
+back end. So this is the back end management of it. oh So just to give you kind of a highlight, highlight, these are real events are conducted. It's not from this event. This is the actual actual clients brand. These are the products that are being sampled. This is the dates,  the time from  from and to the accounts regions. This is this information that we have on it. Who the educators are assigned to if it's been completed.
+
+47:44
+Accept it so this is really what does most of it's really that educator management. I guess it's mostly on the back end. That's  mature. um See.
+
+47:58
+Educator images. So proof that they're in the accounts.
+
+48:05
+What gets the pictures up the rocks on the shelf?
+
+48:11
+sampling pictures, um social media, then posting the social media there at the event. Actually, this is a really good one. She's done all these sort of things.
+
+48:23
+And let me go back here. Yeah, I was actually surprised earlier when you said people rarely use the rarely revisit the images and I was like that seems like a great social media aspect that people are under utilizing. So here's the information that we're currently bringing in. So it does ask, we do ask a lot of these questions, but again, it's very rudimentary where you're putting it in. 50 % male, 50 % female is probably bullshit.
+
+48:53
+20 and 20 and 30, but this is probably close to how many people they actually did sample. 95 % Caucasian, 5 % other, they probably just put 5 % in there just so it doesn't look racist. And then the actual products starting inventory, what they started with, what the prices, what the sale prices, how many bottles they sold. When I say they sold, that's the few consumers they sampled that they said, I'm gonna buy one and they walk away with a bottle.
+
+49:22
+and the inventory of each, and then more pictures are captured on that. And then these are like the questions after the sampling that the consumer perspective change, and these are what changes.  So that connection to the client that we're doing this for, they give us specific questions they wanna ask. So it's specific to that client as to what they're looking to get back on. So this is where I see it's good for us to standardize this to a certain degree.
+
+49:51
+and have our own in there. So when they're going in there, we're capturing information that we want that we can then resell and provide back to the client with what they're looking for. Definitely. Yeah, a standard set of questions plus some additional free form for client ad hoc. And outside of the check-in, the way this flow works is basically opens up as a form. So they fill all this information in. And I usually fill this out at the end.
+
+50:18
+And a lot of times too, because  of the  clunkiness of it, you end up writing it down on a side or you do like checks of how many people you've seen and then how many bottles you've sold and what it is. And then you go and take the inventory and all that. Keeping,  yeah, some kind of,  I'm guessing like paper notes on the side almost. And then they fill this in when there's like a break, I'm guessing. Yes.  And then they'll fill it  into that actual phone afterwards.  Even some other things that that
+
+50:47
+would be really cool and cool to start because Google and National Weather Service provides the weather. Well, there was snow, it was slow here because it's cold. Well, you'd be in Minnesota. There's snow outside, you do any events, and maybe that explains why you only sold one bottle. Those sort of insights that we want to derive from it. Definitely. So if you start seeing, and this is why I don't want to leverage, I'm saying like throw what we currently have aside.
+
+51:16
+If we start looking at the areas I want to look at is consumer profile, retail profile, and then educator management around these sort of things is how to start judging how well the educators are doing. Well, things like taking an account of weather, we can start judging things like that. But that can also be derived from third party information. We don't have have an educator tell us. We can pull weather information and know specifically what the weather is like.
+
+51:46
+But also  getting down to really cool things. When we're looking at that platform and say we want to have somebody else utilizing our new system and say they're in Minnesota, right? Well, how do we sell them on that? Well, we can sell them that, hey,  you get onto our program,  our platform, and you start utilizing it.  And now our system  can be intelligent enough where it automatically assigns the right accounts
+
+52:16
+for the right and right brands at the right time, depending on seasonality, depending on our consumer profile, depending on third party information we're bringing in. It could be, I don't wanna say that it's an AI that does that, but the system could tell you, here's where you go. You want 40, 40, here's where you go. It's springtime and you have a mass gal, these 40 counts you should do. And it fits into the schedule and all that. So Louis, when we start talking about like changing all this,
+
+52:46
+This management system is not designed for all this stuff. It's basically designed to like, like you see here, just hard coding all this in there.  And  basically putting the centers, have our own people that are assigning this by managers and doing all these things. Okay. And then how would we, so, okay, so it seems like the information that's necessary for the basis of what the uh educator will use
+
+53:16
+on the day  is coming from here, but we would be building a new app with a new interface, but then how would we connect to this information here? Would we then have a separate thing for it? Would we try to connect directly? I think earlier you alluded to we connect directly to the database.  More thoughts on that. So currently there's a separate database that is a mirror of the app's database  box.
+
+53:42
+That includes some extra tables. So we would build out the application that connects here. This currently links directly to the application database. pushing  my right envision as a first release, we would just push these events  in the current format for the information that it needs to for the current management system to work. That's it.  And honestly, if we're doing all these things in a new way.
+
+54:12
+This would just be for the billing process. So we would basically just push it over as already completed. So I go back to the application here. Here? No. Ready to go.
+
+54:29
+I didn't close it out, did I guys?
+
+54:36
+hatch if you close I don't think so. don't think so either I think it's hiding it.
+
+54:45
+I where that went. ah Essentially,  we would just push it over so that they would it over and they would have direct folks into it so that it would just fit in here for billing purposes. So what we build out would not be for necessarily  the full management because we wouldn't use this process for everybody immediately because we have  have a transformational change with the educators. We have to train those educators. We would want to make sure that this is working
+
+55:14
+work for everybody. So we would basically select  the right educators and have a way  to deliver directly to them. And we wouldn't do, we have about 50 clients we interact with. The last thing I would say would be do this with all 50 clients. I would pick one, like a really big one, a really good one that wants this information. And we would, that way we could then deliver the output and deliver the value around that.
+
+55:41
+And so we would then  just have the best of the best  and build this, start building this platform around that and then start adding more clients on this and start moving things off the old app into the new platform. Definitely. Yeah, certainly a pilot program with one of your customers and  treating them with taking key feedback from them and iterating on it before a wider rollout would be um definitely, I think, a key part of any deployment plan here.
+
+56:11
+Here's  a thought as well. um because I'm thinking as well in terms of scope, right? Like um in terms of delivering value, because there are different ways in which you can do a, you can move from A to B, right? And you can um take the approach where you are effectively, like this sounds to me like what we'd be doing is,
+
+56:38
+We're still in some way, you know, interacting with the old system because we have some access to that mirror database. if you,  if you were, so one of the concerns with me uh that I have about that  is that you would really have to lock down the way in which the current database schema works. Otherwise it's going to be very hard to keep compatibility between the old one and the new one. ah Especially if there's a two way ah sync.
+
+57:08
+of data where it's not only reading, but it's also sending stuff back. um That being said, I'm giving you that context just for what I'm  going to propose as well.  If we actually had a way to build not everything, but a significant part of the management of it as well, do you think you would have appetite on your side to instead of rolling it out?
+
+57:37
+everywhere saying, look, we have a new ah new my  my hands. Take this small customer, see if they would like to try it out and move  out altogether. um So instead of saying, look, we will try several customers  where they will just try this new application, we'll do it bit by bit. Well, if you had a little bit more functionality, because we're quite capable of building more functionality. ah
+
+58:06
+But then you try it in a single customer.  That would work. Yes. Because essentially, to go back to.  I'm calling him back. So if you go back to the Visio. Essentially. What that would entail is  we would know what the events are, because we already know ahead of time. So we be processing that. So that would eliminate this whole communication flow. We know the educators.
+
+58:35
+because we're setting it up and that pushed to the app. And we would set up the billing.  I  know the billing process is designed for every Tom, Dick and Harry from a little guy to a big guy with a big accounting and finance department that links this over.  And the good news is a lot of our bigger clients are moving to more API focused and moving, they're setting more of these processes.
+
+59:04
+everything you're talking about in terms of efficiencies, going back to like the billing example. This is designed for us to  be holistic and create invoices to the small guys and the big guys, but all very manually where it just generates what that invoice is. So, would you discuss it? Would you talk about the list? I completely agree with you. And we could then just API start.
+
+59:31
+Work with somebody who wants this API and where they're getting it directly to their finance and getting the bills directly. They're not getting an email or we're basically delivering all the new processes because all our clients are. They're getting rid of people and they're cutting their man, their man cows. There's less people. So if we come to them and say, hey, we're going to partner with you or an API, the data back to you directly to your business intelligence people. And we're going to invoice you electronically.
+
+01:00:02
+That's all completely different what we have built out here right now. So that's why I saying like, we start here, you're gonna be backing in everything and you're have to break everything and figure out how we're gonna push this and all that. Yeah, yeah, you're right. um So,  okay.
+
+01:00:22
+Let me think for a second. uh Just gonna try to synthesize everything  and think pragmatically here. So, okay. So it seems to me like we can at least have not a North Star for the next year, but we can have at least a North Star  for the  short term,  which is getting you this functionality for this first part. I think the core here is creating a true platform that's ready for B to B.
+
+01:00:51
+that's ready for us to bring in other event companies and where they can log in. There's a portal, there's a web portal that our clients can access and our other affiliates that come in can access that we can  start getting revolutions from that.  And there's that flow with the educators. So we're connecting the  educators to that platform on an app. And we have  a database where we can start leveraging all those insights. I don't think in that first pilot,
+
+01:01:19
+I'm as concerned about all the really cool outputs.  It's replacing all this. Because if we go to our clients, it's client value immediately. So there's value right there. Where they're now getting all the extra points of data for themselves. Then the next step would be after the pilot is, how can we package this to start reselling on the portal platform we currently have? And then how can we, and then simultaneously,  how can we take this whole process now?
+
+01:01:49
+and start winding down the old hems and wind up the new hems to make sure we fill in all the gaps we haven't filled in. Yeah, so it seems to me that the, so I think I've learned something really key in the last few minutes. There is a set of functionality, let's say that it's really big, and there is a subset of functionality that is necessary to deliver for a single
+
+01:02:18
+customer that you have. The set of all things is much larger than the subset of what a single customer needs. Correct. It means that it would actually be advisable to  instead of trying to build the ah entire subset partially in the sense of just building the ah front end connection to the database.
+
+01:02:48
+It might actually be better to build if we are confident we can do it and I'll double check on that. if we would be confident that we could do it,  you know, in a pilot project kind of pricing, building the subset of functionality that is necessary to deliver for a single customer. And then  from there, using that as a demonstration to then continue building functionality that other customers need. Agreed.
+
+01:03:18
+That's great idea. That's a great approach to that. Okay. So if that is the case, then the most important question I have now is what is the smallest feature set customer you have today?
+
+01:03:36
+Any of them. So the funny thing is if we go back to the. So let me go back here to the events. I would say.
+
+01:03:52
+So.
+
+01:03:57
+So the actual.
+
+01:04:04
+We have one really,  really good partner in Prunella Card  and  they have very specific, fairly simple what they look for when we do events. So there would be value that we would give them immediately where they would be appreciative of that. So I would build this with them  and keep it very simple with that. I can get the questionnaire as to what we're collecting it. Sorry, I never, this is not my  baby, so.
+
+01:04:33
+navigating this is a pain in the to me. uh Only because I don't know where I'm going. Let me do this.  Oh, here. So this is by brand. See, this is the other stupid thing here. Having the brand here makes no fucking sense. Knowing that this is print over card makes more sense. ah So like,  let's see, products, accounts.
+
+01:05:02
+I could add it just to see here.
+
+01:05:06
+I won't say this because it's live, but I want to find.
+
+01:05:13
+This is the general setup.  Where is the question?
+
+01:05:20
+Oh, no cancel. That's really nice.
+
+01:05:25
+Yes, I don't want to Don't want to delete it. I don't want to save it. Shoot balls. Which point of sale? So what we can do around all this is that each brand has its own flow sets. So if we wanted to do with Prineau just an absolute, there's questions and survey information from the events that they want.
+
+01:05:55
+From absolute individually, so it would be a lot lot to just that we do absolutely just that. ah
+
+01:06:06
+So I have to look for it exactly, but I can narrow this down to where it would just be one client, one brand in one market. So it would be very simple for us to capture. And then my only challenge back, Louis, would be as we're this pilot, lay out the bones of what the platform would look like. even if it was just a...
+
+01:06:33
+portal that doesn't go anywhere, let's show what the portal looks like. And then an affiliate that would be doing this. And if you can imagine, if it's absolute  for us, imagine absolute for say Florida as well, and for another company that's going in there and nearing it  over there, which would just, and then just be another access for another point. So that whole build of that, and then.
+
+01:07:00
+when we start thinking about the data and what to from an insight standpoint, that's like the next level discussion. think, know, Louis, you know what I'm talking about, to get to that institute, we need this process good as to capturing all that, but you'll have access to the current data that's being, that is being brought in. And I can grant, you'll have full access to that with all the tables. Getting access to the actual app for that is meaningless,
+
+01:07:29
+by having the reporting that that cross box and you guys seeing that we're creating these new points and this is the data we currently have. Now what can we do with this information that we can package this and reach that data institutes where if we're starting to profile markets and cities, consumers, how does all this look? And then how can we package that where we can go to Surcona and say, here's Miami and here's what Miami looks like  from a.
+
+01:07:57
+food and beverage restaurant point of view.  then later on we can build off.
+
+01:08:07
+Got  it. Yeah, no, absolutely. mean, that's definitely the intent, know, that, you know, we want to, we want to keep the  long-term uh goal in mind. um If I can, if you still have a bit more time, can I just uh ask, could you  show us what the educator manager does? So the educator manager  essentially does the insurance that we go to,
+
+01:08:38
+The educator manager just ensures that the educators are doing their job.  So they, you think about it,  they're more local. So within the city, may have a like, using Miami as an example, they may be doing like downtown Miami. So there's an educator manager for one part of the city. And they  have educators that report to them. So if there's an issue or they need to talk to somebody,  they talk directly to that manager.
+
+01:09:06
+The manager does ensure that the educators are assigned. So if there's a scheduling issue, so say the educator gets sick and now he needs to it, flip it, instead of going back to the office, the educator has the power to then reassign them,  reassign that event to somebody else. And the educator is of course doing this through the platform. Through
+
+01:09:33
+All right, the manager is doing that to the platform or do they do that manually? Like, as in like, do they, what's up someone or message you like in this diagram here, you know, we have events slash educator management, this little thing here, but there's also a connection to heart office operations. So if they have to reassign, for example, what's happening there, do they go on the portal or do they message you? In the portal. Okay. They use, because they'll get the assignment of the events is simultaneously with the educator.
+
+01:10:03
+manager and the educator. because it's uh regional, it wouldn't be somebody who doesn't work that area. So these educators are basically contracted to work certain areas because they'll only drive say 100 miles. So they won't drive outside that area. those educators will be assigned to managers. So manager would then pick up the phone  and call another educator and say, hey, I have another opportunity to use you. have time on this day?
+
+01:10:33
+Yes,  and reassign that that events within within the application. Got it. And the  the details of the events  are coming through you, right? Because so so just actually to to get out of the  technical aspects of it and just think about uh the uh the logistical uh aspects of it,  legal and commercial  hard is the one that has the relationship with the educator managers and educators. Right. Yes.
+
+01:11:01
+Yes. And they're technically employees of HART. Yeah. So then  the customer comes to HART because you have those relationships and because you have the infrastructure and  you've built this through many years where you know how to get this done. So they come to you with some requirements and then you will do some, you will have some discussions with them, but you're essentially cleaning up what needs to be done such that at the point that it's given to the educator managers, there's a clear set of requirements and things that need to be done.  And they're just managing it.
+
+01:11:31
+getting done, but they're not defining very much the ah event activities themselves. They  do zero, zero defining of the activities. That defining starts with the client. So the client will define what those activities are currently in an email form, student formats and say, so you understand it'll be like six months. So when,  happens is like the supplier comes to us and say,
+
+01:12:00
+here's the brands we wanna do for the next six months. And we're gonna give our brand team X amount of these to execute for our budget executes. are, so if you can imagine, I don't use print over card. So the commercial man, the commercial executive will come to us and say, we're gonna do this for the next six months. And they'll give us the framework of what they want for each brand. So those questions are done. Going back to this absolute.
+
+01:12:29
+Example, we'll have the questions that they want to capture for absolute for the next six months. Usually, sometimes longer than that, so could be a whole year. And then what they'll say is, we will communicate to you via email as to which accounts and what times, because a lot of times they'll sell by then. Or their distributor partner will also get that same communication we got.
+
+01:12:58
+And the sales people, will they will email us and say, hey, I'm at I want to go to.  Liberty City, the city, Lickers on this day and time and do absolute. So we already are anticipating over that whole year what  this activity looks like. What the questions are. It was coming in is  which accounts at what time and what brands.
+
+01:13:27
+And then we build back because we know there's a lot of what's going to be built with their, their, it's just pay to be built. So we send those bills back back to you distributor because they have money or back to our client that that's the stuff.
+
+01:13:45
+Okay, understood. and then one more thing. when the when heart then enters this data, what does that look like? If we can see the interface for that, that'd be great. So when they like, okay, here's the event activities, like, is it a form that they fill as well? I don't have access to right now because I'm trying to get myself set up. But it's basically so then so
+
+01:14:14
+That data is put in by the educator in a form style. that happens here at the lowest common denominator. And that's the example I showed you when I clicked in. Now I just changed this, so it's not that good example anymore. Let's see we can find that one here. It was like that actual view with the images and the different demographic breakdowns. OK. I think that's the point, Yeah. Something.
+
+01:14:42
+But I think also for for building out the platform that would be extremely helpful for us would be to like, do like a mock customer journey. And that way we can we can really hone in on what touch points are critical  and what we can leave out for for this initial um initial deliverable  and what you know what. Basically, find the rough edges today that we can that we can help polish um what can be built a new like doesn't exist in the current platform.
+
+01:15:13
+and  what we can kind of borrow from the existing platform. Hey, it does this thing really well. Let's not shake  this up too much.  And I think that would also help clarify any  customer lifecycle journeys as well.  Absolutely. And I feel like when we start doing that, you're probably going to narrow down the scope of what the pilot would look like in terms of what can be delivered on. was good example.
+
+01:15:43
+Um, give me one quick second here. I want to see if I can pull this up. That's the view.
+
+01:15:50
+Alex.
+
+01:15:53
+order sampled.
+
+01:15:56
+event kit ready. These are all the statuses  of whether or not they've got everything that they need to execute. And if the event was approved. uh
+
+01:16:13
+That's why I say like with all this,  the management of the actual events  is the  secret sauce. And managing all this stuff, the  samples, the kits, the preparation, the sales information, like all that stuff. It's the front end that goes to  the actual uh educator I know is kind of lacking because it's more of a form style.
+
+01:16:42
+Because everything here, everything here is hard coded in. should remember where I, do you remember when I pushed where I got, actually, no, it's here. That was, that's what I
+
+01:16:55
+So this is  the actual output that occurs from that with the questions.  I think this one doesn't have any questions. Starting inventory, this woman didn't do shit.  Took lot of pictures and then.
+
+01:17:12
+In the inventory drinks purchase. Okay, this is the managed bar night. So, so with this, this is where where for us.
+
+01:17:22
+So right now, this is a very, very good example. So for the on-premise in a restaurant or bar, we're not asking for anything other than just feedback. And this is shared back with the client. Oh yes, thanks. This is perfect. This was so good. Thank you. I'm going to pour it and pour this into my soda bar's back. It's  so like, she  obviously did the event because there's pictures. She obviously was there. There's bad pictures.
+
+01:17:50
+pictures of people with bottles, that's great, so consumers are engaging. There's the drinks being poured, that's great. There's proof of the spends with the receipts, that's all great. This is where  the whole process kind of gets broken down, Lewis, where it's actually  the preparation and all that is very regimented and that's great.  We know what needs to be done in assignments. And when they get there,
+
+01:18:17
+there's the lacking of information. It's like, okay, did you take a picture of the menu? This information with the menu, it's great. It's too free form, right? It's lacking structure. Yeah. And we share this back with the clients and the clients are like, it seems like there's a lot of the same information because this is just PS. There really isn't any real feedback. These educators are going in there. They're just sharing drinks with people. They're not really
+
+01:18:46
+They're not really collecting information as to who they're sharing. it's inventory-oriented. So when I talk about transformation, it's still doing these things  and providing an experience for the consumer. But then there's the other side is capturing more information now that drives value to our clients. Because all this here, I can tell you right now, she's just going up top of her head. She's not actually filling this out. She goes along. It's at the end. So that's why say when we think of the pilots,
+
+01:19:14
+Chaining this up because all this is right now is a form. It's hard-coded because we know it's absolute. We know what they're gonna pour for absolute there. It's gonna be the regular vodka. And then it's just saying, okay, how many drinks did you purchase? What was in the inventory? What was the starting inventory? What was the size? The products we already know that's hard-coded in. And when we set this up at the beginning of the year, this is set up and hard-coded into the actual platform.
+
+01:19:44
+so that every time we assign an absolute non-premise, it knows what the format needs to be and it knows what the questions need to be and it just pushes that out.
+
+01:19:57
+Okay, so there are two things we will  be looking forward to do  at a later stage. One  is  a more in-depth walkthrough to the educator experience. um And the other one  is  actually three. So educator experience a little bit  more, um the hard operations ah that you don't have access  just yet.
+
+01:20:27
+ah But then another one that I think
+
+01:20:31
+is the most important of them all is the original requirements that you get from your customers ah in the things that they're interested in. Because, and here we're seeing that, like you said, that  BS in some sense, right? Like there is some information here, but you know, some of it is BS. And you know, really what you want is the data, the Institute vision that you have, you want that to reflect what your customers are truly interested in.  They  really want to know essentially who's the person
+
+01:21:01
+that's walking into these accounts  because the brand, but they don't ask because they don't want to tax.  because here's the thing, they want to ask for the bare minimum because the longer our  guys are in there, the more money we charge them because we charge by the hour. So essentially they keep things  very, very tight. Give me one quick second here. I will share with you what the example looks like from scratch. ah
+
+01:21:31
+What did you do, teams?  It lost all my favorites.
+
+01:21:40
+I swear to God, I'm going to drive to Seattle and strangle people at Microsoft.
+
+01:21:51
+I had all the channels favored so I could just go straight to it. Now they got rid of it.
+
+01:22:00
+I want to go to teams, is that working better than that? No, it's not.
+
+01:22:07
+You know.
+
+01:22:25
+Sorry, this is  embarrassing. So  essentially this is  what that list would look like. m He wants you to.
+
+01:22:44
+Now Google is telling me what it wants to do. Okay, so this is essentially what the question would be is, after the sampling, did the consumer's perception change, yes or no? Did the events reach drink's goal? If not, why? How many consumers were sampled? On premise, did you sell any drinks? Like, essentially,
+
+01:23:10
+This is the questions that they ask. A lot of times what we do is we just simmer this down to just how matrix were sold because we want to capture that anyways. Yeah. And so forth. And so they'll send us this as example. Please provide any positive call outs. And this is some examples. Love the point of sale material. High visibility drove the interest. Please provide any opportunity challenges. They were asked this is the things that they were asking for that were more in depth.
+
+01:23:38
+What was a cocktail made served? Consumer feedback. What was the main question asked by the consumers during sampling? A lot of this stuff is kind of de-essed. uh But to be honest, we can hard code this in because you'd be surprised at my times the consumer goes, oh, I like it. Okay. That's what they said. Or they say,  or where can I find this? uh That's another good one. uh Are you guys new?
+
+01:24:09
+I have not heard of absolute before or I have heard of absolute before. Those sort of like responses are kind of canned to be put in. And I feel like an off premise is being like a retail. After the sampling,  how did the consumer's perception change? And here's some examples, yes. Like they were kind of giving us more freeform where they wanted to Tom's point to kind of want to actually hear what the voice the consumer is. But to be honest, they're not really doing anything with this. The brand people.
+
+01:24:38
+are interested in this on our client side. The people on the operations and sales side, they'll give a crap about this because they just want to know how many bottles that they sell. And they really want to know, essentially, the people who pay us, they want to know, if I spent $500 on this event, how many bottles did I move off of that? How many impressions did I make? So they're most interested in how many bottles did I just pay for for the sampling.
+
+01:25:08
+how many consumers that I introduced this because it's experiential. And I can now put a price tag onto how many people that $500 got in front of and how many bottles that move that that account is gonna reorder. Cause I'm make back a little bit of that money off.
+
+01:25:26
+I see.  when you have to, a  car customer,  the way I'm contemplating ROI is not just purely on the ah sales.  mean, the sales obviously matter, ah But  I imagine that  many of these might not. If it was solely from the sales, there might not even be a positive ROI. But the fact that there are further eyeballs, there is probably
+
+01:25:55
+request to reorder, there is additional value there that you're getting as a customer. And I haven't sent it to you, but future wise, if we're capturing how many we've sampled here, and then we get the actual orders from the retailer that the distributor delivers to them. Now we can start saying, this is, after you've done this event, they're ordering more bottles. So now you have a lift on sale.
+
+01:26:23
+I'm not getting to that with you guys today, but those are the sort of insights we're driving later on. especially if this information is no longer within the app, it's in a database we're pulling analytics, then that's opportunity to bring in other forms of data. We're now bringing more value to our clients because now we're giving them review, not  just in this form, but we're now giving them a full review and saying we sample X amount of people from a top line.
+
+01:26:53
+We provided,  we  bought X amount of bottles  and now over this month, this is how many bottles the retailers bought and what the Delta is compared to last month and start showing a return on investment. So now justifying those  and that's the value to the sales, the operations sales guys on our client side.
+
+01:27:21
+Brand team they want to know how many impressions because they're all about marketing. So now we can so that could be a separate separate feed. They're doing a lot of this stuff. What they're real ask is they don't know they're asking for is how can we provide more insights to them since we're in these accounts that they can start driving this because. When we give them our views it's in a PowerPoint presentation so listen dies in PowerPoint. So if I go back to the Visio.
+
+01:27:51
+the real value our clients asking for that they're not asking for because they don't think it's possible is how can we take these results and then push it directly to them so that now their business intelligence team is driving more insights by that because the commercial team is going to go back to them and say, okay, overall, how are our sales doing? And they can start saying, you know what? These events are driving more sales and I can see we're getting the right and right consumers or they can start saying, you know what? We're seeing
+
+01:28:21
+this big lift on females. We've been targeting males  and we're actually targeting these events. We're actually sampling more females and they're the ones and now we're starting to see more sales in these accounts and these accounts are actually catering to more females. This is really where the direction of the brand is going. So these are things that they're asking their own people are. Got it.  But they don't have that information because they can't get it. So we're actually giving them  answers to questions that they're asking for and they just don't know that they can ask us.
+
+01:28:52
+So if I were to try to summarize it all,  are  in the service that you're  providing, right? You are uh enabling that or the  big vision for later on is you're enabling them to know what their return on investment will be across different paths. Right. Okay. Okay. That's a good note, sir. um
+
+01:29:19
+ah This is fascinating. ah It's crazy what goes on uh in  different industries that you know we're not  experts and this is really really fascinating. um Okay.  Cool. So, we're due from here so we've got a visa, you've given us uh a show of what the. um
+
+01:29:44
+what the customers uh want. uh At some point, it would be nice once you have access to have a look at ah what the officer, ah like the hard office operations look like.  I think for the educator manager, yes, at some point we might ah look at it, but the educator is, I think, more ah important just to as a reference point, even if we won't implement the exact same functionality. ah But we can leave those for ah later.
+
+01:30:14
+in terms of  giving you a  rough guess  of what we're looking at um so that you don't have any surprises later, this is not going to be something that I think is going to be higher than 25k, might be even less than that.  And this is something definitely that we can do by March, depending on our own bandwidth, when you choose to start. uh Yeah, we're happy as well to
+
+01:30:44
+Take care of absolutely everything. Like I said before, you know, we're very full services. We're very grateful that you're doing some of our job for us by mapping these things out. But everywhere else where there is, you know, supporting the application, you know, helping you host it and maintain it, whatever it is, we can price that in and put it in the contract as you need it. But this is definitely something we would love to be on the ground for because what I see here, right, is that this is
+
+01:31:14
+It's not just what you're building now. ah It's everything that comes after. And I imagine that will bring you in a lot of money. um And if that's the case, we'd like to be a very small piece of a very large pie.  We start getting into that profiling,  like I said, and that transition from events  to being a data institute  that has a platform that people come in. There is some serious money in there because nobody really is doing this.
+
+01:31:44
+It's not just beverage alcohol too. You know, I talked about this, like it is everything food and beverage because  these restaurants going back to. This one here. Where to go?  All the restaurants we go into, especially in the major metros. Everybody wants that information. If you're if you're a coffee company, you're a meat provider,  they're not not capturing all this information. They're just delivering stuff so they know where to go.
+
+01:32:14
+And we were able to sell them that information, go back to that platform play where they can come in and get it. And there's a lot of money involved in that because everybody wants to be in the major metrics.
+
+01:32:27
+Great, all right. So. uh
+
+01:32:31
+In practical terms, can you do sorry go ahead. No, no, go ahead. Go ahead. I was going to say, what would be helpful for me from you guys is provide a kind of pilot outline off of this discussion as to what you see. Some. Some certain fairly rudimentary timelines, I think. February the more aggressive, but be necessary because we're to go into this slow period in January.
+
+01:33:00
+February will have some events around like Valentine's Day and whatnot. March gets crazy because you have St. Patrick's Day. So that's one of the biggest drinking holidays.  Valentine's as well, but  once we get through March, then season starts picking up for spring. You get that run to Cinco de Mayo and then the summertime. So that timing is perfect in terms of that  time period. ah My goal would be
+
+01:33:29
+to turn around and get the budget. And the two things I would ask for you is if you could show some examples of what you guys have done. I think you're supposed to give me that. Oh, I apologize if I haven't sent you that. Let me send you that right now. Do that because I want to show some credence if I'm to be proposing what I want to propose. And if you can put together that just like a.
+
+01:33:59
+A contract outline and my, my thought is. We can have it kind of like a bare bones and then we can attach some technical outlines for deliverables that way you and I are on the same page. As to what that that is and what those look like. But at least gives us a framework we can start from as to. What the engagement would look like in the timeframe and then we can we can then firm up with some technical outlines as to what those the levels look like. So we can agree on this is. What's possible within within this pilot.
+
+01:34:28
+Cool, so let me  give you a very quick preview of what that will be. um
+
+01:34:38
+Let me I'm going to send this to you an email as well, but let me share my screen on second here. um
+
+01:34:50
+So,  cool. So,  terms of what we've done in the past. So this is deck that I'll send you  very shortly. ah You know, it covers, it covers a nice pictures what's in our contract,  but you know the way in which we work is super simple. We, ah we prepare, you know some high level scope. ah Then we define more granularly what the scope.
+
+01:35:19
+is going to be, then we implement and then you evaluate and you tell us what you think. And you only pay if you're happy, which is a guarantee that we offer. It's very ironclad. It's very in your favor. I remember you mentioning that, so I was happy with that as well. Yeah. It's free, Almost. So there's a little bit more here about us. Tom is in our leadership team.
+
+01:35:49
+And in here you have a few examples that you can check if you need more, let me know.  But these are pretty big ones so you can  look at those. I'm sending this on email. And something else that we have is we have an example  software development agreement that we use as the basis for all the agreements that we do. ah In here you can see very clearly what I was telling you. We have phase one, phase two, phase three. ah At the end you get to decide if you're happy or not.
+
+01:36:17
+It's completely up to you. And the way that we do it is that we provide the as part of the contract between stage zero and stage one, we essentially lay out what the scope will be, where we say, look, this is the scope. You know, we will refine it a little bit more at stage one, but just the same page, we write it down here and head back to the way it works. Can you do this for me? Because this is a
+
+01:36:46
+There's definitely this whole pilot and foundational goal in the beginning. And I see that as as firming that up as a design. What I'm getting, I don't have a blank check. What would be really good is, and you can ballpark it. If we were to go that platform route off of the goals we kind of laid out here, what would the long tail be? So if you would, and I wouldn't even ask you to move into all those phases.
+
+01:37:16
+But what I'm trying to do is I'm trying to figure out  a whole year worth of work  and what the deliverables would be in generalizing it. So if you give me this initial  deliverable time  and ballpark and then the rest of it and what we talked about going to that platform and going to a stage where we are that data Institute  and people are able to come in, purchase and there's all that transactions happening on that side.
+
+01:37:45
+That would be great as well.  I will do that on the email as well. I'll send you the,  I'll send you this deck. ah You know, I'll send you  an estimate of like where we set up ballpark of where we think the pilot will land, where we think, you know, the whole thing will land. ah And on top of that, you will have deck  and the example contract. um And then we can go from there. Awesome.
+
+01:38:11
+And now looking at the time I gotta get on the road.  Shit,  no, this is good. This is really, really, really good. I appreciate all this. This has been really good. ah So do send me that. will take a look at  those examples you have, Louis. ah if you have any  similar things, I don't know how to say it. You've done some work in some similar realms in terms of,  and also please put in there, you put your heads together.
+
+01:38:39
+In terms of the pictures, what other things we can do that I'm not thinking about here. Put that in there because I, I'm really looking to lean on developers that are not code monkeys and you, talked about this. I don't want code monkeys. I want partners. And we're looking if it's something that's going to drive revenue, I want to be able able to build that. And if there's something that's good in here that you guys have, that's that's something that's. That I can see that that that can drive more revenue than let's build it. Sure. Yep, absolutely. 100%. Cool.
+
+01:39:10
+All right, gentlemen, thank you so much. Thank you for going over over your time as well and having to take you through everything as well. No,  thank you. Thank you. All right, thank you so much. I'll I'll I'll circle with you tomorrow at the least because I've got a meeting next week with the board. So sooner I get get all that stuff together,  I'm going to give them the ballpark. You kind of share with me now and I will be prepared for next week to some  percent everything on my findings and present which direction we want to go into. So.
+
+01:39:40
+Earlier and earlier the better so I can get all that together, please. You'll have it two hours from now.  It's too damn quick.  You can take it so tomorrow if you want, Louis. I don't need it by two hours.  No,  I'm setting my own deadline here. All  right, Gents. Thank you. Take care.
+
