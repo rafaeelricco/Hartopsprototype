@@ -3,7 +3,6 @@ import { Link } from "react-router";
 import {
   CalendarDays,
   List,
-  Clock,
   MapPin,
   User,
   ChevronRight,
@@ -11,7 +10,6 @@ import {
   Search,
   AlertTriangle,
   Radio,
-  Tag,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";

@@ -857,7 +857,7 @@ export function EventDetailPage() {
 
       {showCancellation && event.status === "Upcoming" && (
         <CancellationPanel
-          onCancel={(reason) => {
+          onCancel={(_reason) => {
             setShowCancellation(false);
           }}
           onClose={() => setShowCancellation(false)}
