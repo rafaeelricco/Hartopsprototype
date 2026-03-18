@@ -1,10 +1,12 @@
 // =============================================================================
-// Settings — Completes the Hart Agency Operating Staff dashboard.
+// Settings — Hart Agency Operating Staff dashboard.
 // 5 tabs: Profile, Notifications, Team, Preferences, Integrations.
+// Follows the educator settings-page pattern (Shadcn UI components).
 // =============================================================================
 
-import { useState, useMemo } from "react";
-import { PageHeader } from "../../shared/components/layouts/page-header";
+import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router";
+import { toast } from "sonner";
 import {
   User,
   Bell,
@@ -13,7 +15,6 @@ import {
   Puzzle,
   Pencil,
   Trash2,
-  X,
   Plus,
   Search,
   Check,
@@ -27,7 +28,6 @@ import {
   Camera,
   Loader2,
   AlertTriangle,
-  CheckCircle2,
   RefreshCw,
   Link2,
   Link2Off,
@@ -36,11 +36,44 @@ import {
   CalendarDays,
   LayoutDashboard,
   LayoutGrid,
+  CheckCircle2,
+  Cloud,
+  Cpu,
+  MessageSquare,
+  Zap,
+  Table,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
-import { ImageWithFallback } from "../../shared/components/ui/ImageWithFallback";
+import { Label } from "@/app/shared/components/ui/label";
+import { Switch } from "@/app/shared/components/ui/switch";
+import { Separator } from "@/app/shared/components/ui/separator";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/app/shared/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/app/shared/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/app/shared/components/ui/dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/app/shared/components/ui/tabs";
 import {
   CURRENT_USER,
   INITIAL_TEAM,
@@ -57,14 +90,101 @@ import {
   type Integration,
 } from "./settings-data";
 
-// ── Shared helpers ───────────────────────────────────────────────────────────
+// ---------------------------------------------------------------------------
+// Lucide icon map for integrations
+// ---------------------------------------------------------------------------
 
-type SettingsTab =
-  | "profile"
-  | "notifications"
-  | "team"
-  | "preferences"
-  | "integrations";
+const INTEGRATION_ICONS: Record<string, React.ElementType> = {
+  smartphone: Smartphone,
+  cpu: Cpu,
+  cloud: Cloud,
+  table: Table,
+  "message-square": MessageSquare,
+  zap: Zap,
+};
+
+function IntegrationIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = INTEGRATION_ICONS[name];
+  if (!Icon) return null;
+  return <Icon className={className} />;
+}
+
+// ---------------------------------------------------------------------------
+// Password rules & strength
+// ---------------------------------------------------------------------------
+
+const PASSWORD_RULES = [
+  { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
+  { label: "1 uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
+  { label: "1 number", test: (v: string) => /[0-9]/.test(v) },
+  { label: "1 special character", test: (v: string) => /[^A-Za-z0-9]/.test(v) },
+];
+
+function PasswordStrength({ password }: { password: string }) {
+  const score = PASSWORD_RULES.filter((r) => r.test(password)).length;
+  const colors = ["#B91C1C", "#D97706", "#0F766E", "#0F766E"];
+  const labels = ["Weak", "Fair", "Good", "Strong"];
+
+  return (
+    <div className="space-y-2 pt-1">
+      <div className="flex items-center gap-2">
+        <div className="flex gap-1 flex-1">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-1 flex-1 rounded-full transition-colors"
+              style={{
+                background: i < score ? colors[score - 1] : "#E2E8F0",
+              }}
+            />
+          ))}
+        </div>
+        <span
+          style={{
+            fontSize: "0.625rem",
+            color: colors[score - 1] ?? "#94A3B8",
+          }}
+        >
+          {labels[score - 1] ?? "Too short"}
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+        {PASSWORD_RULES.map((rule) => {
+          const passed = rule.test(password);
+          return (
+            <div key={rule.label} className="flex items-center gap-1.5">
+              <div
+                className={`w-1.5 h-1.5 rounded-full ${
+                  password.length === 0
+                    ? "bg-border"
+                    : passed
+                      ? "bg-green-500"
+                      : "bg-destructive"
+                }`}
+              />
+              <span
+                className={`${
+                  password.length === 0
+                    ? "text-muted-foreground"
+                    : passed
+                      ? "text-green-600"
+                      : "text-destructive"
+                }`}
+                style={{ fontSize: "0.75rem" }}
+              >
+                {rule.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function fmtRelative(iso: string) {
   if (!iso) return "Never";
@@ -82,59 +202,90 @@ function fmtRelative(iso: string) {
 // Main
 // =============================================================================
 
-export function SettingsPage() {
-  const [tab, setTab] = useState<SettingsTab>("profile");
+type SettingsTab =
+  | "profile"
+  | "notifications"
+  | "team"
+  | "preferences"
+  | "integrations";
 
-  const TABS: { key: SettingsTab; icon: React.ReactNode; label: string }[] = [
-    { key: "profile", icon: <User size={15} />, label: "Profile" },
-    { key: "notifications", icon: <Bell size={15} />, label: "Notifications" },
-    { key: "team", icon: <Users size={15} />, label: "Team" },
-    {
-      key: "preferences",
-      icon: <SlidersHorizontal size={15} />,
-      label: "Preferences",
-    },
-    { key: "integrations", icon: <Puzzle size={15} />, label: "Integrations" },
-  ];
+const VALID_TABS: SettingsTab[] = [
+  "profile",
+  "notifications",
+  "team",
+  "preferences",
+  "integrations",
+];
+
+export function SettingsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramTab = searchParams.get("tab") as SettingsTab | null;
+  const initialTab = paramTab && VALID_TABS.includes(paramTab) ? paramTab : "profile";
+  const [activeTab, setActiveTab] = useState<string>(initialTab);
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab") as SettingsTab | null;
+    if (tabParam && VALID_TABS.includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value }, { replace: true });
+  };
 
   return (
-    <div className="p-6 font-[Inter]">
-      {/* Header */}
-      <PageHeader
-        title="Settings"
-        subtitle="Manage your account, team, and application preferences."
-      />
-
-      {/* Tabs */}
-      <div className="flex items-center gap-1 mb-6 border-b border-[#E2E8F0] overflow-x-auto">
-        {TABS.map((t) => (
-          <Button
-            key={t.key}
-            variant="ghost"
-            onClick={() => setTab(t.key)}
-            className="flex items-center gap-2 px-4 py-3 transition-colors relative whitespace-nowrap h-auto rounded-none hover:bg-transparent cursor-pointer"
-            style={{
-              fontSize: "0.8125rem",
-              color: tab === t.key ? "#7D152D" : "#64748B",
-            }}
-          >
-            {t.icon}
-            {t.label}
-            {tab === t.key && (
-              <span
-                className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t"
-                style={{ background: "#7D152D" }}
-              />
-            )}
-          </Button>
-        ))}
+    <div className="p-6 space-y-6 max-w-3xl">
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage your account, team, and application preferences.
+        </p>
       </div>
 
-      {tab === "profile" && <ProfileTab />}
-      {tab === "notifications" && <NotificationsTab />}
-      {tab === "team" && <TeamTab />}
-      {tab === "preferences" && <PreferencesTab />}
-      {tab === "integrations" && <IntegrationsTab />}
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <TabsList>
+          <TabsTrigger value="profile">
+            <User className="w-4 h-4" />
+            Profile
+          </TabsTrigger>
+          <TabsTrigger value="notifications">
+            <Bell className="w-4 h-4" />
+            Notifications
+          </TabsTrigger>
+          <TabsTrigger value="team">
+            <Users className="w-4 h-4" />
+            Team
+          </TabsTrigger>
+          <TabsTrigger value="preferences">
+            <SlidersHorizontal className="w-4 h-4" />
+            Preferences
+          </TabsTrigger>
+          <TabsTrigger value="integrations">
+            <Puzzle className="w-4 h-4" />
+            Integrations
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile">
+          <ProfileTab />
+        </TabsContent>
+        <TabsContent value="notifications">
+          <NotificationsTab />
+        </TabsContent>
+        <TabsContent value="team">
+          <TeamTab />
+        </TabsContent>
+        <TabsContent value="preferences">
+          <PreferencesTab />
+        </TabsContent>
+        <TabsContent value="integrations">
+          <IntegrationsTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
@@ -149,136 +300,157 @@ function ProfileTab() {
   const [saving, setSaving] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
-  function handleSave() {
+  const handleSave = () => {
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
       setEditing(false);
       toast.success("Profile updated successfully");
     }, 900);
-  }
+  };
 
-  function handleCancel() {
+  const handleCancel = () => {
     setProfile({ ...CURRENT_USER });
     setEditing(false);
-  }
+  };
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {/* Avatar + basic info card */}
-      <SectionCard>
-        <div className="flex items-start gap-5">
-          {/* Avatar */}
-          <div className="relative group flex-shrink-0">
-            <div className="w-20 h-20 rounded-xl overflow-hidden bg-[#F1F5F9]">
-              <ImageWithFallback
-                src={profile.avatarUrl}
-                alt={`${profile.firstName} ${profile.lastName}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <Button
-              variant="ghost"
-              className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-xl opacity-0 hover:opacity-100 transition-opacity p-0 h-full w-full cursor-pointer"
-              onClick={() =>
-                toast.info(
-                  "Avatar upload is simulated — no file will be stored.",
-                )
-              }
-            >
-              <Camera size={18} style={{ color: "#fff" }} />
-            </Button>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <p style={{ fontSize: "1.0625rem", color: "#0F172A" }}>
-                {profile.firstName} {profile.lastName}
-              </p>
-              <span
-                className="px-2 py-0.5 rounded-md"
-                style={{
-                  fontSize: "0.625rem",
-                  background: "#7D152D14",
-                  color: "#7D152D",
-                }}
+    <div className="space-y-6 pt-4">
+      {/* Profile Card — read-only view */}
+      <Card className="gap-0">
+        <CardContent className="px-5 py-5">
+          <div className="flex items-start gap-4">
+            {/* Avatar with camera overlay */}
+            <div className="relative group flex-shrink-0">
+              <Avatar className="size-20 rounded-xl">
+                <AvatarImage
+                  src={profile.avatarUrl}
+                  className="rounded-xl object-cover"
+                />
+                <AvatarFallback className="rounded-xl text-lg">
+                  {profile.firstName[0]}
+                  {profile.lastName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                onClick={() =>
+                  toast.info(
+                    "Avatar upload is simulated — no file will be stored.",
+                  )
+                }
+                className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
               >
-                {profile.role}
-              </span>
+                <Camera className="w-5 h-5 text-white" />
+              </button>
             </div>
-            <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>
-              {profile.email}
-            </p>
-            <p
-              className="mt-0.5"
-              style={{ fontSize: "0.75rem", color: "#94A3B8" }}
-            >
-              {profile.company} &middot;{" "}
-              {profile.timezone.replace("America/", "").replace("_", " ")}
-            </p>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="text-foreground font-medium" style={{ fontSize: "1.0625rem" }}>
+                  {profile.firstName} {profile.lastName}
+                </p>
+                <span
+                  className="px-2 py-0.5 rounded-md"
+                  style={{
+                    fontSize: "0.625rem",
+                    background: "#7D152D14",
+                    color: "#7D152D",
+                  }}
+                >
+                  {profile.role}
+                </span>
+              </div>
+              <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+                {profile.email}
+              </p>
+              <p className="mt-0.5" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                {profile.company} &middot;{" "}
+                {profile.timezone.replace("America/", "").replace("_", " ")}
+              </p>
+            </div>
+
+            {/* Edit button */}
+            {!editing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditing(true)}
+                className="flex-shrink-0 cursor-pointer"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                Edit
+              </Button>
+            )}
           </div>
+        </CardContent>
+      </Card>
 
-          {!editing && (
-            <Button
-              variant="outline"
-              onClick={() => setEditing(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors flex-shrink-0 cursor-pointer h-auto"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-            >
-              <Pencil size={13} /> Edit
-            </Button>
-          )}
-        </div>
-      </SectionCard>
-
-      {/* Editable fields */}
+      {/* Edit Profile Form — shown when editing */}
       {editing && (
-        <SectionCard title="Edit Profile">
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <FieldGroup label="First name">
+        <Card className="gap-0">
+          <CardHeader className="px-5 pt-5 pb-4">
+            <CardTitle className="text-sm font-medium">Edit Profile</CardTitle>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">
+                  First Name
+                </Label>
                 <Input
                   value={profile.firstName}
                   onChange={(e) =>
                     setProfile((p) => ({ ...p, firstName: e.target.value }))
                   }
                 />
-              </FieldGroup>
-              <FieldGroup label="Last name">
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">
+                  Last Name
+                </Label>
                 <Input
                   value={profile.lastName}
                   onChange={(e) =>
                     setProfile((p) => ({ ...p, lastName: e.target.value }))
                   }
                 />
-              </FieldGroup>
+              </div>
             </div>
-            <FieldGroup label="Email">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                Email Address
+              </Label>
               <Input
+                type="email"
                 value={profile.email}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, email: e.target.value }))
                 }
-                type="email"
               />
-            </FieldGroup>
-            <FieldGroup label="Phone">
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                Phone Number
+              </Label>
               <Input
+                type="tel"
                 value={profile.phone}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, phone: e.target.value }))
                 }
-                type="tel"
               />
-            </FieldGroup>
-            <FieldGroup label="Timezone">
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">
+                Timezone
+              </Label>
               <select
                 value={profile.timezone}
                 onChange={(e) =>
                   setProfile((p) => ({ ...p, timezone: e.target.value }))
                 }
-                className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D] bg-white"
-                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+                className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 {TIMEZONES.map((tz) => (
                   <option key={tz} value={tz}>
@@ -286,122 +458,134 @@ function ProfileTab() {
                   </option>
                 ))}
               </select>
-            </FieldGroup>
+            </div>
+
+            {/* Save / Cancel */}
             <div className="flex items-center gap-2 pt-2">
               <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
-                style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+                className="cursor-pointer"
               >
                 {saving ? (
-                  <Loader2 size={14} className="animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <Check size={14} />
+                  <Check className="w-4 h-4" />
                 )}
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
               <Button
                 variant="outline"
                 onClick={handleCancel}
-                className="px-4 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
-                style={{ fontSize: "0.8125rem", color: "#64748B" }}
+                className="cursor-pointer"
               >
                 Cancel
               </Button>
             </div>
-          </div>
-        </SectionCard>
+          </CardContent>
+        </Card>
       )}
 
       {/* Security */}
-      <SectionCard title="Security">
-        <div className="flex items-center justify-between">
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
           <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: "#F1F5F9" }}
-            >
-              <Lock size={16} style={{ color: "#64748B" }} />
+            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+              <Lock className="w-4 h-4 text-muted-foreground" />
             </div>
             <div>
-              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                Password
-              </p>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+              <CardTitle className="text-sm font-medium">Security</CardTitle>
+              <CardDescription className="text-xs">
+                Manage your password and account security.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-foreground">Password</p>
+              <p className="text-xs text-muted-foreground">
                 Last changed 45 days ago
               </p>
             </div>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowPasswordModal(true)}
-            className="px-3 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
-            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-          >
-            Change password
-          </Button>
-        </div>
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#F1F5F9]">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: "#F1F5F9" }}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPasswordModal(true)}
+              className="cursor-pointer"
             >
-              <Shield size={16} style={{ color: "#64748B" }} />
-            </div>
-            <div>
-              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                Two-factor authentication
-              </p>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                Add an extra layer of security to your account
-              </p>
-            </div>
+              Change Password
+            </Button>
           </div>
-          <ToggleSwitch
-            checked={false}
-            onChange={() => toast.info("2FA setup is simulated in this demo.")}
-          />
-        </div>
-      </SectionCard>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm text-foreground">Two-factor authentication</p>
+                <p className="text-xs text-muted-foreground">
+                  Add an extra layer of security to your account
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={false}
+              onCheckedChange={() =>
+                toast.info("2FA setup is simulated in this demo.")
+              }
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Danger zone */}
-      <SectionCard>
-        <div className="flex items-center justify-between">
-          <div>
-            <p style={{ fontSize: "0.8125rem", color: "#B91C1C" }}>
+      <Card className="gap-0">
+        <CardContent className="px-5 py-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-destructive">Delete account</p>
+              <p className="text-xs text-muted-foreground">
+                Permanently remove your account and all associated data. This
+                action cannot be undone.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                toast.error("Account deletion is disabled in this demo.")
+              }
+              className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+            >
               Delete account
-            </p>
-            <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-              Permanently remove your account and all associated data. This
-              action cannot be undone.
-            </p>
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            onClick={() =>
-              toast.error("Account deletion is disabled in this demo.")
-            }
-            className="px-3 py-2 rounded-lg border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors flex-shrink-0 cursor-pointer h-auto"
-            style={{ fontSize: "0.8125rem", color: "#B91C1C" }}
-          >
-            Delete account
-          </Button>
-        </div>
-      </SectionCard>
+        </CardContent>
+      </Card>
 
-      {/* Password modal */}
-      {showPasswordModal && (
-        <PasswordModal onClose={() => setShowPasswordModal(false)} />
-      )}
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        open={showPasswordModal}
+        onOpenChange={setShowPasswordModal}
+      />
     </div>
   );
 }
 
-// ── Password Modal ───────────────────────────────────────────────────────────
+// =============================================================================
+// Change Password Modal
+// =============================================================================
 
-function PasswordModal({ onClose }: { onClose: () => void }) {
+function ChangePasswordModal({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -409,152 +593,161 @@ function PasswordModal({ onClose }: { onClose: () => void }) {
   const [showNext, setShowNext] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  const resetFields = () => {
+    setCurrent("");
+    setNext("");
+    setConfirm("");
+    setShowCurrent(false);
+    setShowNext(false);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!current || !next || !confirm) {
-      toast.error("All fields are required.");
+
+    if (!current) {
+      toast.error("Current password is required.");
       return;
     }
-    if (next.length < 8) {
-      toast.error("New password must be at least 8 characters.");
+
+    const failedRules = PASSWORD_RULES.filter((r) => !r.test(next));
+    if (!next) {
+      toast.error("New password is required.");
+      return;
+    }
+    if (failedRules.length > 0) {
+      toast.error("Password does not meet all requirements.");
+      return;
+    }
+
+    if (!confirm) {
+      toast.error("Please confirm your new password.");
       return;
     }
     if (next !== confirm) {
       toast.error("Passwords do not match.");
       return;
     }
+
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
+      resetFields();
+      onOpenChange(false);
       toast.success("Password changed successfully");
-      onClose();
     }, 1000);
-  }
+  };
 
   return (
-    <Overlay onClose={onClose}>
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-        <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Change Password</h3>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={onClose}
-          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
-        >
-          <X size={16} style={{ color: "#64748B" }} />
-        </Button>
-      </div>
-      <form onSubmit={handleSubmit} className="p-5 space-y-4">
-        <FieldGroup label="Current password">
-          <div className="relative">
-            <Input
-              type={showCurrent ? "text" : "password"}
-              value={current}
-              onChange={(e) => setCurrent(e.target.value)}
-              className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
-              style={{ fontSize: "0.8125rem" }}
-            />
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              type="button"
-              onClick={() => setShowCurrent(!showCurrent)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer h-auto w-auto p-0 hover:bg-transparent"
-            >
-              {showCurrent ? (
-                <EyeOff size={14} style={{ color: "#94A3B8" }} />
-              ) : (
-                <Eye size={14} style={{ color: "#94A3B8" }} />
-              )}
-            </Button>
-          </div>
-        </FieldGroup>
-        <FieldGroup label="New password">
-          <div className="relative">
-            <Input
-              type={showNext ? "text" : "password"}
-              value={next}
-              onChange={(e) => setNext(e.target.value)}
-              className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
-              style={{ fontSize: "0.8125rem" }}
-              placeholder="Min. 8 characters"
-            />
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              type="button"
-              onClick={() => setShowNext(!showNext)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer h-auto w-auto p-0 hover:bg-transparent"
-            >
-              {showNext ? (
-                <EyeOff size={14} style={{ color: "#94A3B8" }} />
-              ) : (
-                <Eye size={14} style={{ color: "#94A3B8" }} />
-              )}
-            </Button>
-          </div>
-          {next.length > 0 && <PasswordStrength password={next} />}
-        </FieldGroup>
-        <FieldGroup label="Confirm new password">
-          <Input
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
-            style={{ fontSize: "0.8125rem" }}
-          />
-        </FieldGroup>
-        <div className="flex items-center justify-end gap-2 pt-2">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
-            style={{ fontSize: "0.8125rem", color: "#64748B" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
-            style={{ background: "#7D152D", fontSize: "0.8125rem" }}
-          >
-            {saving && <Loader2 size={14} className="animate-spin" />}
-            {saving ? "Updating..." : "Update Password"}
-          </Button>
-        </div>
-      </form>
-    </Overlay>
-  );
-}
+    <Dialog
+      open={open}
+      onOpenChange={(value) => {
+        if (!value) resetFields();
+        onOpenChange(value);
+      }}
+    >
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Change Password</DialogTitle>
+          <DialogDescription>
+            Enter your current password and choose a new one.
+          </DialogDescription>
+        </DialogHeader>
 
-function PasswordStrength({ password }: { password: string }) {
-  const score = [
-    password.length >= 8,
-    /[A-Z]/.test(password),
-    /[0-9]/.test(password),
-    /[^A-Za-z0-9]/.test(password),
-  ].filter(Boolean).length;
-  const labels = ["Weak", "Fair", "Good", "Strong"];
-  const colors = ["#B91C1C", "#D97706", "#0F766E", "#0F766E"];
-  return (
-    <div className="flex items-center gap-2 mt-1.5">
-      <div className="flex gap-1 flex-1">
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="h-1 flex-1 rounded-full"
-            style={{ background: i < score ? colors[score - 1] : "#E2E8F0" }}
-          />
-        ))}
-      </div>
-      <span
-        style={{ fontSize: "0.625rem", color: colors[score - 1] ?? "#94A3B8" }}
-      >
-        {labels[score - 1] ?? "Too short"}
-      </span>
-    </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Current password */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">Current Password</Label>
+            <div className="relative">
+              <Input
+                type={showCurrent ? "text" : "password"}
+                value={current}
+                onChange={(e) => setCurrent(e.target.value)}
+                placeholder="Enter current password"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrent((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                {showCurrent ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* New password */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">New Password</Label>
+            <div className="relative">
+              <Input
+                type={showNext ? "text" : "password"}
+                value={next}
+                onChange={(e) => setNext(e.target.value)}
+                placeholder="Min. 8 characters"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNext((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                {showNext ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            {next.length > 0 && <PasswordStrength password={next} />}
+          </div>
+
+          {/* Confirm new password */}
+          <div className="space-y-1.5">
+            <Label className="text-xs">Confirm New Password</Label>
+            <Input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Re-enter new password"
+            />
+            {confirm.length > 0 && next !== confirm && (
+              <p className="text-xs text-destructive">
+                Passwords do not match
+              </p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={saving || !current || !next || !confirm}
+              className="cursor-pointer"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                "Update Password"
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -593,82 +786,78 @@ function NotificationsTab() {
   }
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="space-y-6 pt-4">
       {/* Channel legend */}
-      <div className="flex items-center gap-6 mb-1">
-        <span
-          className="flex items-center gap-1.5"
-          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-        >
-          <Mail size={12} /> Email
+      {/* <div className="flex items-center gap-6">
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Mail className="w-3 h-3" /> Email
         </span>
-        <span
-          className="flex items-center gap-1.5"
-          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-        >
-          <Smartphone size={12} /> Push
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Smartphone className="w-3 h-3" /> Push
         </span>
-        <span
-          className="flex items-center gap-1.5"
-          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-        >
-          <MonitorSmartphone size={12} /> In-App
+        <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <MonitorSmartphone className="w-3 h-3" /> In-App
         </span>
-      </div>
+      </div> */}
 
       {grouped.map(([category, items]) => (
-        <SectionCard key={category} title={category}>
-          <div className="space-y-0">
-            {items.map((item, idx) => (
-              <div
-                key={item.id}
-                className={`flex items-center gap-4 py-3 ${idx < items.length - 1 ? "border-b border-[#F1F5F9]" : ""}`}
-              >
-                <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                    {item.label}
-                  </p>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                    {item.description}
-                  </p>
+        <Card key={category} className="gap-0">
+          <CardHeader className="px-5 pt-5 pb-4">
+            <CardTitle className="text-sm font-semibold">{category}</CardTitle>
+          </CardHeader>
+          <CardContent className="px-5 pb-5">
+            <div className="divide-y divide-border">
+              {items.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex flex-col items-center gap-1">
+                      <Switch
+                        checked={item.email}
+                        onCheckedChange={() => toggle(item.id, "email")}
+                      />
+                      <span className="text-[0.5625rem] text-muted-foreground">Email</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Switch
+                        checked={item.push}
+                        onCheckedChange={() => toggle(item.id, "push")}
+                      />
+                      <span className="text-[0.5625rem] text-muted-foreground">Push</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <Switch
+                        checked={item.inApp}
+                        onCheckedChange={() => toggle(item.id, "inApp")}
+                      />
+                      <span className="text-[0.5625rem] text-muted-foreground">In-App</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <ToggleSwitch
-                    checked={item.email}
-                    onChange={() => toggle(item.id, "email")}
-                    small
-                    label="Email"
-                  />
-                  <ToggleSwitch
-                    checked={item.push}
-                    onChange={() => toggle(item.id, "push")}
-                    small
-                    label="Push"
-                  />
-                  <ToggleSwitch
-                    checked={item.inApp}
-                    onChange={() => toggle(item.id, "inApp")}
-                    small
-                    label="In-App"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       ))}
 
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
-          style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+          className="cursor-pointer"
         >
           {saving ? (
-            <Loader2 size={14} className="animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <Check size={14} />
+            <Check className="w-4 h-4" />
           )}
           {saving ? "Saving..." : "Save Preferences"}
         </Button>
@@ -702,14 +891,6 @@ function TeamTab() {
     return result;
   }, [members, search, roleFilter]);
 
-  const roleCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    members.forEach((m) => {
-      map[m.role] = (map[m.role] ?? 0) + 1;
-    });
-    return map;
-  }, [members]);
-
   function handleInvite(email: string, role: TeamRole) {
     const initials = email.substring(0, 2).toUpperCase();
     const newMember: TeamMember = {
@@ -740,251 +921,164 @@ function TeamTab() {
 
   const STATUS_STYLE: Record<
     string,
-    { bg: string; text: string; label: string }
+    { className: string; label: string }
   > = {
-    active: { bg: "#ECFDF5", text: "#0F766E", label: "Active" },
-    invited: { bg: "#EFF6FF", text: "#2563EB", label: "Invited" },
-    deactivated: { bg: "#F1F5F9", text: "#94A3B8", label: "Deactivated" },
+    active: { className: "bg-green-50 text-green-700 border-green-200", label: "Active" },
+    invited: { className: "bg-blue-50 text-blue-700 border-blue-200", label: "Invited" },
+    deactivated: { className: "bg-muted text-muted-foreground", label: "Deactivated" },
   };
 
   return (
-    <div className="space-y-4">
-      {/* Role summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          {
-            label: "Total",
-            value: members.length,
-            color: "#0F172A",
-            bg: "#F8FAFC",
-          },
-          {
-            label: "Active",
-            value: members.filter((m) => m.status === "active").length,
-            color: "#0F766E",
-            bg: "#ECFDF5",
-          },
-          {
-            label: "Invited",
-            value: members.filter((m) => m.status === "invited").length,
-            color: "#2563EB",
-            bg: "#EFF6FF",
-          },
-          {
-            label: "Field Educators",
-            value: roleCounts["Field Educator"] ?? 0,
-            color: "#7C3AED",
-            bg: "#F5F3FF",
-          },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className="rounded-xl px-4 py-3 border border-[#E2E8F0]"
-            style={{ background: s.bg }}
-          >
-            <p
-              style={{
-                fontSize: "0.6875rem",
-                color: "#94A3B8",
-                letterSpacing: "0.03em",
-              }}
-            >
-              {s.label}
-            </p>
-            <p
-              className="mt-0.5"
-              style={{ fontSize: "1.25rem", color: s.color }}
-            >
-              {s.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
+    <div className="space-y-6 pt-4">
       {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-2 flex-wrap flex-1">
-          <div className="relative flex-1 max-w-xs">
-            <Search
-              size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2"
-              style={{ color: "#94A3B8" }}
-            />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email..."
-              className="w-full pl-9 pr-3 py-2 rounded-lg border border-[#E2E8F0] bg-white outline-none transition-colors focus:border-[#7D152D]"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-            />
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-sm font-semibold">Team</CardTitle>
+                <CardDescription className="text-xs">
+                  Invite and manage team members
+                </CardDescription>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setShowInvite(true)}
+              className="cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Invite Member
+            </Button>
           </div>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
-            style={{ fontSize: "0.8125rem", color: "#64748B" }}
-          >
-            <option value="all">All Roles</option>
-            {TEAM_ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-        </div>
-        <Button
-          onClick={() => setShowInvite(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-11 cursor-pointer"
-          style={{ background: "#7D152D", fontSize: "0.8125rem" }}
-        >
-          <Plus size={14} /> Invite Member
-        </Button>
-      </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 space-y-4">
+          {/* Search & filter */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by name or email..."
+                className="pl-9"
+              />
+            </div>
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="all">All Roles</option>
+              {TEAM_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      {/* Member count */}
-      <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-        {filtered.length} member{filtered.length !== 1 ? "s" : ""}
-      </p>
+          <p className="text-xs text-muted-foreground">
+            {filtered.length} member{filtered.length !== 1 ? "s" : ""}
+          </p>
 
-      {/* Members table */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table
-            className="w-full min-w-[640px]"
-            style={{ borderCollapse: "separate", borderSpacing: 0 }}
-          >
-            <thead>
-              <tr className="border-b border-[#E2E8F0]">
-                {["Member", "Role", "Status", "Last Active", ""].map((h) => (
-                  <th
-                    key={h}
-                    className="px-4 py-3 text-left"
-                    style={{
-                      fontSize: "0.6875rem",
-                      color: "#94A3B8",
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((m) => {
-                const st = STATUS_STYLE[m.status] ?? STATUS_STYLE["active"];
-                return (
-                  <tr
-                    key={m.id}
-                    className="border-b border-[#F8FAFC] last:border-0 hover:bg-[#FAFBFC] transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0"
-                          style={{ background: m.color, fontSize: "0.6875rem" }}
-                        >
-                          {m.initials}
-                        </div>
-                        <div className="min-w-0">
-                          <p
-                            className="truncate"
-                            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-                          >
-                            {m.name}
-                          </p>
-                          <p
-                            className="truncate"
-                            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-                          >
-                            {m.email}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <select
-                        value={m.role}
-                        onChange={(e) =>
-                          handleRoleChange(m.id, e.target.value as TeamRole)
-                        }
-                        className="px-2 py-1 rounded-md border border-[#E2E8F0] bg-white outline-none cursor-pointer"
-                        style={{ fontSize: "0.75rem", color: "#64748B" }}
-                        disabled={m.email === CURRENT_USER.email}
+          {/* Members list */}
+          <div className="divide-y divide-border">
+            {filtered.map((m) => {
+              const st = STATUS_STYLE[m.status] ?? STATUS_STYLE["active"];
+              return (
+                <div
+                  key={m.id}
+                  className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="size-9">
+                      <AvatarFallback
+                        className="text-xs text-white"
+                        style={{ backgroundColor: m.color }}
                       >
-                        {TEAM_ROLES.map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className="px-2 py-0.5 rounded-md"
-                        style={{
-                          fontSize: "0.6875rem",
-                          background: st!.bg,
-                          color: st!.text,
-                        }}
-                      >
-                        {st!.label}
-                      </span>
-                    </td>
-                    <td
-                      className="px-4 py-3"
-                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                        {m.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {m.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {m.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <select
+                      value={m.role}
+                      onChange={(e) =>
+                        handleRoleChange(m.id, e.target.value as TeamRole)
+                      }
+                      disabled={m.email === CURRENT_USER.email}
+                      className="h-7 px-2 rounded-md border border-input bg-transparent text-xs shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
                     >
+                      {TEAM_ROLES.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                    <span
+                      className={`px-2 py-0.5 rounded-md text-[0.6875rem] border ${st!.className}`}
+                    >
+                      {st!.label}
+                    </span>
+                    <span className="text-xs text-muted-foreground w-14 text-right">
                       {m.lastActive ? fmtRelative(m.lastActive) : "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {m.email !== CURRENT_USER.email && (
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          onClick={() => setRemovingId(m.id)}
-                          className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors h-auto w-auto cursor-pointer"
-                        >
-                          <Trash2 size={13} style={{ color: "#B91C1C" }} />
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                    </span>
+                    {m.email !== CURRENT_USER.email && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setRemovingId(m.id)}
+                        className="size-8 text-muted-foreground hover:text-destructive cursor-pointer"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Invite modal */}
-      {showInvite && (
-        <InviteModal
-          onInvite={handleInvite}
-          onClose={() => setShowInvite(false)}
-        />
-      )}
+      <InviteModal
+        open={showInvite}
+        onOpenChange={setShowInvite}
+        onInvite={handleInvite}
+      />
 
       {/* Remove confirm */}
-      {removingId && (
-        <ConfirmDialog
-          title="Remove team member?"
-          description={`"${members.find((m) => m.id === removingId)?.name}" will lose access to this workspace.`}
-          confirmLabel="Remove"
-          onConfirm={() => handleRemove(removingId)}
-          onCancel={() => setRemovingId(null)}
-        />
-      )}
+      <ConfirmRemoveDialog
+        open={!!removingId}
+        memberName={members.find((m) => m.id === removingId)?.name ?? ""}
+        onConfirm={() => removingId && handleRemove(removingId)}
+        onCancel={() => setRemovingId(null)}
+      />
     </div>
   );
 }
 
 function InviteModal({
+  open,
+  onOpenChange,
   onInvite,
-  onClose,
 }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onInvite: (email: string, role: TeamRole) => void;
-  onClose: () => void;
 }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<TeamRole>("Field Educator");
@@ -996,70 +1090,104 @@ function InviteModal({
       return;
     }
     onInvite(email, role);
+    setEmail("");
+    setRole("Field Educator");
   }
 
   return (
-    <Overlay onClose={onClose}>
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#E2E8F0]">
-        <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>
-          Invite Team Member
-        </h3>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          onClick={onClose}
-          className="p-1 hover:bg-[#F1F5F9] rounded-md transition-colors h-auto w-auto cursor-pointer"
-        >
-          <X size={16} style={{ color: "#64748B" }} />
-        </Button>
-      </div>
-      <form onSubmit={handleSubmit} className="p-5 space-y-4">
-        <FieldGroup label="Email address">
-          <Input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder="colleague@company.com"
-          />
-        </FieldGroup>
-        <FieldGroup label="Role">
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as TeamRole)}
-            className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D] bg-white"
-            style={{ fontSize: "0.8125rem" }}
-          >
-            {TEAM_ROLES.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-        </FieldGroup>
-        <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-          An invitation email will be sent. The member can sign in after
-          accepting.
-        </p>
-        <div className="flex items-center justify-end gap-2 pt-2">
-          <Button
-            variant="outline"
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
-            style={{ fontSize: "0.8125rem", color: "#64748B" }}
-          >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Invite Team Member</DialogTitle>
+          <DialogDescription>
+            An invitation email will be sent. The member can sign in after
+            accepting.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Email address</Label>
+            <Input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder="colleague@company.com"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Role</Label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as TeamRole)}
+              className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              {TEAM_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="cursor-pointer">
+              Send Invitation
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ConfirmRemoveDialog({
+  open,
+  memberName,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean;
+  memberName: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onCancel()}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <DialogTitle>Remove team member?</DialogTitle>
+              <DialogDescription>
+                "{memberName}" will lose access to this workspace.
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel} className="cursor-pointer">
             Cancel
           </Button>
           <Button
-            type="submit"
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
-            style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+            variant="destructive"
+            onClick={onConfirm}
+            className="cursor-pointer"
           >
-            Send Invitation
+            Remove
           </Button>
-        </div>
-      </form>
-    </Overlay>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -1084,32 +1212,34 @@ function PreferencesTab() {
   }
 
   return (
-    <div className="max-w-2xl space-y-5">
+    <div className="space-y-6 pt-4">
       {/* Dashboard defaults */}
-      <SectionCard title="Dashboard">
-        <div className="space-y-4">
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+              <LayoutDashboard className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-semibold">Dashboard</CardTitle>
+              <CardDescription className="text-xs">
+                Default dashboard timeframe and layout preferences.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{ background: "#F1F5F9" }}
-              >
-                <LayoutDashboard size={16} style={{ color: "#64748B" }} />
-              </div>
-              <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                  Default timeframe
-                </p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                  Initial timeframe filter when you open the dashboard
-                </p>
-              </div>
+            <div>
+              <p className="text-sm text-foreground">Default timeframe</p>
+              <p className="text-xs text-muted-foreground">
+                Initial timeframe filter when you open the dashboard
+              </p>
             </div>
             <select
               value={dashDefault}
               onChange={(e) => setDashDefault(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              className="h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               {DASHBOARD_DEFAULTS.map((d) => (
                 <option key={d} value={d}>
@@ -1118,25 +1248,33 @@ function PreferencesTab() {
               ))}
             </select>
           </div>
-        </div>
-      </SectionCard>
+        </CardContent>
+      </Card>
 
       {/* Display */}
-      <SectionCard title="Display">
-        <div className="space-y-4">
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+              <LayoutGrid className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-semibold">Display</CardTitle>
+              <CardDescription className="text-xs">
+                Customize how data is displayed across the application.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{ background: "#F1F5F9" }}
-              >
-                <CalendarDays size={16} style={{ color: "#64748B" }} />
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                <CalendarDays className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                  Date format
-                </p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                <p className="text-sm text-foreground">Date format</p>
+                <p className="text-xs text-muted-foreground">
                   How dates are displayed across the application
                 </p>
               </div>
@@ -1144,8 +1282,7 @@ function PreferencesTab() {
             <select
               value={dateFormat}
               onChange={(e) => setDateFormat(e.target.value)}
-              className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer outline-none"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              className="h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               {DATE_FORMATS.map((f) => (
                 <option key={f} value={f}>
@@ -1155,107 +1292,105 @@ function PreferencesTab() {
             </select>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[#F1F5F9]">
+          <Separator />
+
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{ background: "#F1F5F9" }}
-              >
-                <LayoutGrid size={16} style={{ color: "#64748B" }} />
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                <LayoutGrid className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                  Product Library view
-                </p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                <p className="text-sm text-foreground">Product Library view</p>
+                <p className="text-xs text-muted-foreground">
                   Default view mode for the Brand Assets product library
                 </p>
               </div>
             </div>
-            <div className="inline-flex rounded-lg border border-[#E2E8F0] overflow-hidden">
+            <div className="inline-flex rounded-md border border-input overflow-hidden">
               <Button
                 variant="ghost"
+                size="sm"
                 onClick={() => setProductView("grid")}
-                className="px-3 py-1.5 transition-colors h-auto rounded-none cursor-pointer"
-                style={{
-                  fontSize: "0.75rem",
-                  background: productView === "grid" ? "#7D152D" : "#fff",
-                  color: productView === "grid" ? "#fff" : "#64748B",
-                }}
+                className={`rounded-none h-8 cursor-pointer ${
+                  productView === "grid"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                    : ""
+                }`}
               >
                 Grid
               </Button>
               <Button
                 variant="ghost"
+                size="sm"
                 onClick={() => setProductView("list")}
-                className="px-3 py-1.5 transition-colors h-auto rounded-none cursor-pointer"
-                style={{
-                  fontSize: "0.75rem",
-                  background: productView === "list" ? "#7D152D" : "#fff",
-                  color: productView === "list" ? "#fff" : "#64748B",
-                }}
+                className={`rounded-none h-8 cursor-pointer ${
+                  productView === "list"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                    : ""
+                }`}
               >
                 List
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-[#F1F5F9]">
+          <Separator />
+
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
-                style={{ background: "#F1F5F9" }}
-              >
-                <SlidersHorizontal size={16} style={{ color: "#64748B" }} />
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                  Compact mode
-                </p>
-                <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                <p className="text-sm text-foreground">Compact mode</p>
+                <p className="text-xs text-muted-foreground">
                   Reduce spacing and padding for denser layouts
                 </p>
               </div>
             </div>
-            <ToggleSwitch checked={compactMode} onChange={setCompactMode} />
+            <Switch checked={compactMode} onCheckedChange={setCompactMode} />
           </div>
-        </div>
-      </SectionCard>
+        </CardContent>
+      </Card>
 
       {/* Behavior */}
-      <SectionCard title="Behavior">
-        <div className="flex items-center justify-between">
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
           <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center"
-              style={{ background: "#F1F5F9" }}
-            >
-              <CheckCircle2 size={16} style={{ color: "#64748B" }} />
+            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4 text-muted-foreground" />
             </div>
             <div>
-              <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                Auto-save drafts
-              </p>
-              <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+              <CardTitle className="text-sm font-semibold">Behavior</CardTitle>
+              <CardDescription className="text-xs">
+                Application behavior and auto-save settings.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-foreground">Auto-save drafts</p>
+              <p className="text-xs text-muted-foreground">
                 Automatically save event and campaign drafts as you edit
               </p>
             </div>
+            <Switch checked={autoSave} onCheckedChange={setAutoSave} />
           </div>
-          <ToggleSwitch checked={autoSave} onChange={setAutoSave} />
-        </div>
-      </SectionCard>
+        </CardContent>
+      </Card>
 
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer h-auto"
-          style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+          className="cursor-pointer"
         >
           {saving ? (
-            <Loader2 size={14} className="animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            <Check size={14} />
+            <Check className="w-4 h-4" />
           )}
           {saving ? "Saving..." : "Save Preferences"}
         </Button>
@@ -1285,7 +1420,6 @@ function IntegrationsTab() {
       );
       toast.success(`${int.name} disconnected`);
     } else {
-      // Simulate connection flow
       setSyncing(id);
       setTimeout(() => {
         setIntegrations((prev) =>
@@ -1318,149 +1452,162 @@ function IntegrationsTab() {
   const available = integrations.filter((i) => !i.connected);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-4">
       {/* Connected */}
       {connected.length > 0 && (
-        <div>
-          <p
-            className="mb-3 flex items-center gap-2"
-            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-          >
-            <Link2 size={14} style={{ color: "#0F766E" }} />
-            Connected ({connected.length})
-          </p>
-          <div className="space-y-3">
-            {connected.map((int) => (
-              <div
-                key={int.id}
-                className="bg-white rounded-xl border border-[#E2E8F0] px-5 py-4 flex items-center gap-4 hover:shadow-sm transition-shadow"
-              >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: "#ECFDF5", fontSize: "1.25rem" }}
-                >
-                  {int.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                      {int.name}
-                    </p>
-                    <span
-                      className="px-1.5 py-0.5 rounded-md"
-                      style={{
-                        fontSize: "0.5625rem",
-                        background: "#ECFDF5",
-                        color: "#0F766E",
-                      }}
-                    >
-                      Connected
-                    </span>
-                  </div>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                    {int.description}
-                  </p>
-                  {int.lastSync && (
-                    <p
-                      className="mt-0.5 flex items-center gap-1"
-                      style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
-                    >
-                      <Clock size={9} /> Last synced {fmtRelative(int.lastSync)}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={() => handleSync(int.id)}
-                    disabled={!!syncing}
-                    className="p-2 rounded-lg hover:bg-[#F1F5F9] transition-colors disabled:opacity-50 h-auto w-auto cursor-pointer"
-                    title="Sync now"
-                  >
-                    {syncing === int.id ? (
-                      <Loader2
-                        size={14}
-                        className="animate-spin"
-                        style={{ color: "#0F766E" }}
-                      />
-                    ) : (
-                      <RefreshCw size={14} style={{ color: "#64748B" }} />
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => toggleConnect(int.id)}
-                    className="px-3 py-1.5 rounded-lg border-[#FEE2E2] hover:bg-[#FEF2F2] transition-colors cursor-pointer h-auto"
-                    style={{ fontSize: "0.75rem", color: "#B91C1C" }}
-                  >
-                    Disconnect
-                  </Button>
-                </div>
+        <Card className="gap-0">
+          <CardHeader className="px-5 pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+                <Link2 className="w-4 h-4 text-green-700" />
               </div>
-            ))}
-          </div>
-        </div>
+              <div>
+                <CardTitle className="text-sm font-semibold">
+                  Connected ({connected.length})
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Active integrations syncing with your workspace.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-5 pb-5">
+            <div className="divide-y divide-border">
+              {connected.map((int) => (
+                <div
+                  key={int.id}
+                  className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                    <IntegrationIcon name={int.iconName} className="w-5 h-5 text-green-700" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="text-sm font-medium text-foreground">
+                        {int.name}
+                      </p>
+                      <span className="px-1.5 py-0.5 rounded-md text-[0.5625rem] bg-green-50 text-green-700">
+                        Connected
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {int.description}
+                    </p>
+                    {int.lastSync && (
+                      <p className="mt-0.5 flex items-center gap-1 text-[0.6875rem] text-muted-foreground">
+                        <Clock className="w-2.5 h-2.5" /> Last synced{" "}
+                        {fmtRelative(int.lastSync)}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleSync(int.id)}
+                      disabled={!!syncing}
+                      className="size-8 cursor-pointer"
+                      title="Sync now"
+                    >
+                      {syncing === int.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-green-700" />
+                      ) : (
+                        <RefreshCw className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => toggleConnect(int.id)}
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                    >
+                      Disconnect
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Available */}
       {available.length > 0 && (
-        <div>
-          <p
-            className="mb-3 flex items-center gap-2"
-            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-          >
-            <Link2Off size={14} style={{ color: "#94A3B8" }} />
-            Available ({available.length})
-          </p>
-          <div className="space-y-3">
-            {available.map((int) => (
-              <div
-                key={int.id}
-                className="bg-white rounded-xl border border-[#E2E8F0] px-5 py-4 flex items-center gap-4 hover:shadow-sm transition-shadow"
-              >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: "#F1F5F9", fontSize: "1.25rem" }}
-                >
-                  {int.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-                    {int.name}
-                  </p>
-                  <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                    {int.description}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => toggleConnect(int.id)}
-                  disabled={!!syncing}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-[#0F766E] hover:bg-[#ECFDF5] transition-colors disabled:opacity-50 flex-shrink-0 cursor-pointer h-auto"
-                  style={{ fontSize: "0.75rem", color: "#0F766E" }}
-                >
-                  {syncing === int.id ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Plus size={12} />
-                  )}
-                  Connect
-                </Button>
+        <Card className="gap-0">
+          <CardHeader className="px-5 pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+                <Link2Off className="w-4 h-4 text-muted-foreground" />
               </div>
-            ))}
-          </div>
-        </div>
+              <div>
+                <CardTitle className="text-sm font-semibold">
+                  Available ({available.length})
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Integrations ready to connect.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="px-5 pb-5">
+            <div className="divide-y divide-border">
+              {available.map((int) => (
+                <div
+                  key={int.id}
+                  className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <IntegrationIcon name={int.iconName} className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground">
+                      {int.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {int.description}
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleConnect(int.id)}
+                    disabled={!!syncing}
+                    className="cursor-pointer"
+                  >
+                    {syncing === int.id ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Plus className="w-3.5 h-3.5" />
+                    )}
+                    Connect
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* API Key section */}
-      <SectionCard title="API Access">
-        <p className="mb-3" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-          Use your API key to integrate Hart Agency data with external tools.
-          Keep it secret.
-        </p>
-        <APIKeyField />
-      </SectionCard>
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
+              <Lock className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-semibold">API Access</CardTitle>
+              <CardDescription className="text-xs">
+                Use your API key to integrate Hart Agency data with external
+                tools. Keep it secret.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5">
+          <APIKeyField />
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -1484,200 +1631,28 @@ function APIKeyField() {
           value={
             visible ? key : key.replace(/./g, "•").substring(0, 32) + "..."
           }
-          className="w-full px-3 py-2 pr-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] font-mono outline-none"
-          style={{ fontSize: "0.75rem", color: "#64748B" }}
+          className="pr-10 font-mono bg-muted"
         />
-        <Button
-          variant="ghost"
-          size="icon-xs"
+        <button
           onClick={() => setVisible(!visible)}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer h-auto w-auto p-0 hover:bg-transparent"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           {visible ? (
-            <EyeOff size={13} style={{ color: "#94A3B8" }} />
+            <EyeOff className="w-4 h-4" />
           ) : (
-            <Eye size={13} style={{ color: "#94A3B8" }} />
+            <Eye className="w-4 h-4" />
           )}
-        </Button>
+        </button>
       </div>
       <Button
         variant="outline"
+        size="icon"
         onClick={handleCopy}
-        className="p-2 rounded-lg border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors h-auto w-auto cursor-pointer"
+        className="size-9 cursor-pointer"
         title="Copy key"
       >
-        <Copy size={14} style={{ color: "#64748B" }} />
+        <Copy className="w-4 h-4" />
       </Button>
-    </div>
-  );
-}
-
-// =============================================================================
-// Shared UI Primitives
-// =============================================================================
-
-function SectionCard({
-  title,
-  children,
-}: {
-  title?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="bg-white rounded-xl border border-[#E2E8F0] p-5">
-      {title && (
-        <p className="mb-4" style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
-          {title}
-        </p>
-      )}
-      {children}
-    </div>
-  );
-}
-
-function FieldGroup({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label
-        className="block mb-1.5"
-        style={{
-          fontSize: "0.6875rem",
-          color: "#64748B",
-          letterSpacing: "0.02em",
-        }}
-      >
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function ToggleSwitch({
-  checked,
-  onChange,
-  small,
-  label,
-}: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  small?: boolean;
-  label?: string;
-}) {
-  const w = small ? 32 : 40;
-  const h = small ? 18 : 22;
-  const dot = small ? 14 : 18;
-  const pad = 2;
-  return (
-    <Button
-      variant="ghost"
-      onClick={() => onChange(!checked)}
-      className="rounded-full transition-colors flex-shrink-0 relative p-0 hover:bg-transparent cursor-pointer"
-      style={{
-        width: w,
-        height: h,
-        background: checked ? "#0F766E" : "#CBD5E1",
-      }}
-      title={label}
-      aria-label={label}
-    >
-      <span
-        className="absolute rounded-full bg-white shadow-sm transition-all"
-        style={{
-          width: dot,
-          height: dot,
-          top: pad,
-          left: checked ? w - dot - pad : pad,
-        }}
-      />
-    </Button>
-  );
-}
-
-function Overlay({
-  children,
-  onClose,
-}: {
-  children: React.ReactNode;
-  onClose: () => void;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(15,23,42,0.6)" }}
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function ConfirmDialog({
-  title,
-  description,
-  confirmLabel,
-  onConfirm,
-  onCancel,
-}: {
-  title: string;
-  description: string;
-  confirmLabel: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(15,23,42,0.6)" }}
-      onClick={onCancel}
-    >
-      <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: "#FEF2F2" }}
-          >
-            <AlertTriangle size={18} style={{ color: "#B91C1C" }} />
-          </div>
-          <div>
-            <p style={{ fontSize: "0.9375rem", color: "#0F172A" }}>{title}</p>
-            <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
-              {description}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="outline"
-            onClick={onCancel}
-            className="px-4 py-2 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors cursor-pointer h-auto"
-            style={{ fontSize: "0.8125rem", color: "#64748B" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={onConfirm}
-            className="px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto"
-            style={{ background: "#B91C1C", fontSize: "0.8125rem" }}
-          >
-            {confirmLabel}
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

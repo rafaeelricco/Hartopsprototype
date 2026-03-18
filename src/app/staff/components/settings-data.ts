@@ -240,7 +240,7 @@ export interface Integration {
   id: string;
   name: string;
   description: string;
-  icon: string; // emoji or text glyph
+  iconName: string; // Lucide icon name identifier
   connected: boolean;
   lastSync: string | null;
   category: string;
@@ -251,7 +251,7 @@ export const INITIAL_INTEGRATIONS: Integration[] = [
     id: "int-1",
     name: "Educator Mobile App",
     description: "Push FAQs and event assignments to the field educator app",
-    icon: "📱",
+    iconName: "smartphone",
     connected: true,
     lastSync: "2026-03-04T08:00:00Z",
     category: "Field Teams",
@@ -260,7 +260,7 @@ export const INITIAL_INTEGRATIONS: Integration[] = [
     id: "int-2",
     name: "AI Auto Upload Engine",
     description: "ML-powered product data extraction for SKU imports",
-    icon: "🤖",
+    iconName: "cpu",
     connected: true,
     lastSync: "2026-03-02T14:30:00Z",
     category: "Automation",
@@ -269,7 +269,7 @@ export const INITIAL_INTEGRATIONS: Integration[] = [
     id: "int-3",
     name: "Salesforce CRM",
     description: "Sync campaign data and consumer insights to Salesforce",
-    icon: "☁️",
+    iconName: "cloud",
     connected: true,
     lastSync: "2026-03-03T22:00:00Z",
     category: "CRM",
@@ -278,7 +278,7 @@ export const INITIAL_INTEGRATIONS: Integration[] = [
     id: "int-4",
     name: "Google Sheets",
     description: "Auto-export report data to shared Google Sheets",
-    icon: "📊",
+    iconName: "table",
     connected: false,
     lastSync: null,
     category: "Reporting",
@@ -287,7 +287,7 @@ export const INITIAL_INTEGRATIONS: Integration[] = [
     id: "int-5",
     name: "Slack Notifications",
     description: "Send event alerts and campaign updates to Slack channels",
-    icon: "💬",
+    iconName: "message-square",
     connected: false,
     lastSync: null,
     category: "Communication",
@@ -296,7 +296,7 @@ export const INITIAL_INTEGRATIONS: Integration[] = [
     id: "int-6",
     name: "Zapier",
     description: "Connect Hart Agency workflows to 5,000+ apps",
-    icon: "⚡",
+    iconName: "zap",
     connected: false,
     lastSync: null,
     category: "Automation",
