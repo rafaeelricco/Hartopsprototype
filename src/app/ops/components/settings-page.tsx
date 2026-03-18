@@ -135,8 +135,7 @@ function PasswordStrength({ password }: { password: string }) {
 
 export function SettingsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab =
-    searchParams.get("tab") === "team" ? "team" : "account";
+  const initialTab = searchParams.get("tab") === "team" ? "team" : "account";
   const [activeTab, setActiveTab] = useState(initialTab);
 
   // Sync tab state when searchParams change
@@ -246,7 +245,10 @@ function AccountTab() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-foreground font-medium" style={{ fontSize: "1.0625rem" }}>
+                <p
+                  className="text-foreground font-medium"
+                  style={{ fontSize: "1.0625rem" }}
+                >
                   {profile.firstName} {profile.lastName}
                 </p>
                 <span
@@ -263,7 +265,10 @@ function AccountTab() {
               <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>
                 {profile.email}
               </p>
-              <p className="mt-0.5" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+              <p
+                className="mt-0.5"
+                style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+              >
                 {profile.phone}
               </p>
             </div>
@@ -550,9 +555,7 @@ function ChangePasswordModal({
               placeholder="Re-enter new password"
             />
             {confirm.length > 0 && next !== confirm && (
-              <p className="text-xs text-destructive">
-                Passwords do not match
-              </p>
+              <p className="text-xs text-destructive">Passwords do not match</p>
             )}
           </div>
 

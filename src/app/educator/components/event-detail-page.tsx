@@ -50,44 +50,46 @@ import { mockEducators } from "./educator-roster-data";
 
 /* --- Phase Badge (7 states per mm-ui-006) --- */
 
-const phaseBadge: Record<EventStatus, { bg: string; text: string; label: string }> =
-  {
-    Unassigned: {
-      bg: "bg-amber-500/10 border-amber-500/30",
-      text: "text-amber-600",
-      label: "Unassigned",
-    },
-    Pending: {
-      bg: "bg-yellow-500/10 border-yellow-500/30",
-      text: "text-yellow-700",
-      label: "Pending Acceptance",
-    },
-    Confirmed: {
-      bg: "bg-blue-500/10 border-blue-500/30",
-      text: "text-blue-600",
-      label: "Confirmed",
-    },
-    Live: {
-      bg: "bg-green-500/10 border-green-500/30",
-      text: "text-green-600",
-      label: "\u25CF Live Now",
-    },
-    Completed: {
-      bg: "bg-amber-500/10 border-amber-500/30",
-      text: "text-amber-600",
-      label: "Completed \u2014 Awaiting Review",
-    },
-    Finalized: {
-      bg: "bg-muted border-border",
-      text: "text-muted-foreground",
-      label: "Finalized",
-    },
-    Cancelled: {
-      bg: "bg-red-500/10 border-red-500/30",
-      text: "text-red-600",
-      label: "Cancelled",
-    },
-  };
+const phaseBadge: Record<
+  EventStatus,
+  { bg: string; text: string; label: string }
+> = {
+  Unassigned: {
+    bg: "bg-amber-500/10 border-amber-500/30",
+    text: "text-amber-600",
+    label: "Unassigned",
+  },
+  Pending: {
+    bg: "bg-yellow-500/10 border-yellow-500/30",
+    text: "text-yellow-700",
+    label: "Pending Acceptance",
+  },
+  Confirmed: {
+    bg: "bg-blue-500/10 border-blue-500/30",
+    text: "text-blue-600",
+    label: "Confirmed",
+  },
+  Live: {
+    bg: "bg-green-500/10 border-green-500/30",
+    text: "text-green-600",
+    label: "\u25CF Live Now",
+  },
+  Completed: {
+    bg: "bg-amber-500/10 border-amber-500/30",
+    text: "text-amber-600",
+    label: "Completed \u2014 Awaiting Review",
+  },
+  Finalized: {
+    bg: "bg-muted border-border",
+    text: "text-muted-foreground",
+    label: "Finalized",
+  },
+  Cancelled: {
+    bg: "bg-red-500/10 border-red-500/30",
+    text: "text-red-600",
+    label: "Cancelled",
+  },
+};
 
 const eventTypeBadgeColors: Record<string, string> = {
   Tasting: "bg-purple-500/10 text-purple-600 border-purple-500/20",
@@ -121,7 +123,10 @@ function LifecycleIndicator({ currentPhase }: { currentPhase: EventStatus }) {
     return (
       <div className="flex items-center gap-2">
         <Ban className="w-5 h-5 text-red-500" />
-        <span className="text-red-600 font-semibold" style={{ fontSize: "0.875rem" }}>
+        <span
+          className="text-red-600 font-semibold"
+          style={{ fontSize: "0.875rem" }}
+        >
           Event Cancelled
         </span>
       </div>
@@ -200,13 +205,17 @@ function CancellationPanel({
     useState<CancellationReason | null>(null);
 
   const isEducatorCancel = mode === "educator";
-  const title = isEducatorCancel ? "Cancel Educator Assignment" : "Cancel Event";
+  const title = isEducatorCancel
+    ? "Cancel Educator Assignment"
+    : "Cancel Event";
   const description = isEducatorCancel
     ? "Select a reason for cancellation. This will unassign the current educator and return the event to Unassigned status."
     : "Select a reason for cancellation. This is irreversible \u2014 the event will be permanently cancelled.";
 
   return (
-    <Card className={`gap-0 ${isEducatorCancel ? "border-amber-500/30" : "border-destructive/30"}`}>
+    <Card
+      className={`gap-0 ${isEducatorCancel ? "border-amber-500/30" : "border-destructive/30"}`}
+    >
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center gap-2">
           {isEducatorCancel ? (
@@ -246,7 +255,9 @@ function CancellationPanel({
             variant={isEducatorCancel ? "default" : "destructive"}
             className="cursor-pointer"
           >
-            {isEducatorCancel ? "Confirm & Find Replacement" : "Confirm Cancellation"}
+            {isEducatorCancel
+              ? "Confirm & Find Replacement"
+              : "Confirm Cancellation"}
           </Button>
           <Button
             variant="outline"
@@ -293,7 +304,10 @@ function InfoCard({
           {value}
         </p>
         {subValue && (
-          <p className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+          <p
+            className="text-muted-foreground"
+            style={{ fontSize: "0.8125rem" }}
+          >
             {subValue}
           </p>
         )}
@@ -345,7 +359,10 @@ function MetricCard({
           {value}
         </p>
         {subValue && (
-          <p className="text-muted-foreground" style={{ fontSize: "0.6875rem" }}>
+          <p
+            className="text-muted-foreground"
+            style={{ fontSize: "0.6875rem" }}
+          >
             {subValue}
           </p>
         )}
@@ -367,7 +384,9 @@ export function EventDetailPage() {
   const [assignedEducator, setAssignedEducator] = useState(
     event?.educatorName || null,
   );
-  const [activePhotoTab, setActivePhotoTab] = useState<"all" | "receipts" | "socialMedia" | "venue">("all");
+  const [activePhotoTab, setActivePhotoTab] = useState<
+    "all" | "receipts" | "socialMedia" | "venue"
+  >("all");
 
   if (!event) {
     return (
@@ -456,7 +475,10 @@ export function EventDetailPage() {
             {event.eventType}
           </Badge>
         </div>
-        <h1 className="text-foreground" style={{ fontSize: "1.5rem", fontWeight: 600 }}>
+        <h1
+          className="text-foreground"
+          style={{ fontSize: "1.5rem", fontWeight: 600 }}
+        >
           {event.name}
         </h1>
         <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1 flex-wrap">
@@ -490,11 +512,17 @@ export function EventDetailPage() {
                 <p className="text-foreground" style={{ fontWeight: 600 }}>
                   Event Cancelled
                 </p>
-                <p className="text-muted-foreground" style={{ fontSize: "0.875rem" }}>
+                <p
+                  className="text-muted-foreground"
+                  style={{ fontSize: "0.875rem" }}
+                >
                   Reason: {event.cancellationReason || "Not specified"}
                 </p>
                 {event.cancelledAt && (
-                  <p className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                  <p
+                    className="text-muted-foreground"
+                    style={{ fontSize: "0.8125rem" }}
+                  >
                     Cancelled on{" "}
                     {new Date(event.cancelledAt).toLocaleDateString("en-US", {
                       month: "long",
@@ -544,7 +572,11 @@ export function EventDetailPage() {
                   {currentPhase === "Pending" && (
                     <span
                       className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
-                      style={{ fontSize: "0.625rem", fontWeight: 500, lineHeight: "1.125rem" }}
+                      style={{
+                        fontSize: "0.625rem",
+                        fontWeight: 500,
+                        lineHeight: "1.125rem",
+                      }}
                     >
                       Pending
                     </span>
@@ -625,7 +657,10 @@ export function EventDetailPage() {
                 >
                   Pickup: {event.kitMaterials.pickupLocation}
                 </p>
-                <ul className="text-muted-foreground space-y-0.5 mt-1" style={{ fontSize: "0.8125rem" }}>
+                <ul
+                  className="text-muted-foreground space-y-0.5 mt-1"
+                  style={{ fontSize: "0.8125rem" }}
+                >
                   {event.kitMaterials.items.map((item) => (
                     <li key={item} className="flex items-start gap-1.5">
                       <span className="text-border mt-1.5">&bull;</span>
@@ -814,7 +849,11 @@ export function EventDetailPage() {
                 </p>
                 <p
                   className="text-foreground"
-                  style={{ fontSize: "1.5rem", fontWeight: 600, lineHeight: 1.2 }}
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                  }}
                 >
                   {event.checkInStatus === "checked-in"
                     ? "Confirmed"
@@ -851,7 +890,11 @@ export function EventDetailPage() {
               icon={Boxes}
               label="Inventory"
               value={event.inventoryData?.current ?? "\u2014"}
-              subValue={event.inventoryData ? `Pre-event: ${event.inventoryData.preEvent}` : undefined}
+              subValue={
+                event.inventoryData
+                  ? `Pre-event: ${event.inventoryData.preEvent}`
+                  : undefined
+              }
             />
             {/* 6. Photos */}
             <MetricCard
@@ -870,7 +913,10 @@ export function EventDetailPage() {
                   <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
                     Educator Notes
                   </CardTitle>
-                  <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                  <span
+                    className="text-muted-foreground"
+                    style={{ fontSize: "0.8125rem" }}
+                  >
                     ({event.educatorLiveNotes.length})
                   </span>
                 </div>
@@ -894,329 +940,371 @@ export function EventDetailPage() {
       )}
 
       {/* Post-event finalization section */}
-      {(event.status === "Completed" || currentPhase === "Finalized") && event.finalStats && (
-        <div className="space-y-4">
-          <h2
-            className="text-foreground"
-            style={{ fontSize: "1.125rem", fontWeight: 600 }}
-          >
-            Final Stats
-          </h2>
-
-          {/* Check-in record */}
-          {event.checkInStatus && (
-            <Card className="gap-0">
-              <CardContent className="px-5 py-4">
-                <div className="flex items-center gap-3">
-                  {event.checkInStatus === "checked-in" ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  ) : (
-                    <XCircle className="w-5 h-5 text-destructive" />
-                  )}
-                  <div>
-                    <p
-                      className="text-foreground"
-                      style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                    >
-                      Geo Check-In:{" "}
-                      {event.checkInStatus === "checked-in"
-                        ? "Confirmed"
-                        : "Failed"}
-                    </p>
-                    <p
-                      className="text-muted-foreground"
-                      style={{ fontSize: "0.8125rem" }}
-                    >
-                      {event.checkInTime
-                        ? `Arrived at ${event.checkInTime}`
-                        : "No check-in recorded"}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Stats grid (expanded per mm-ui-002) */}
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-            <MetricCard
-              icon={ShoppingCart}
-              label="Total Samples"
-              value={event.finalStats.totalSamples}
-            />
-            <MetricCard
-              icon={User}
-              label="Interactions"
-              value={event.finalStats.totalInteractions}
-            />
-            <MetricCard
-              label="Sales"
-              value={event.finalStats.totalSales}
-            />
-            <MetricCard
-              icon={Star}
-              label="Rating"
-              value={event.finalStats.rating}
-              accent="#d97706"
-            />
-            <MetricCard
-              icon={ClipboardList}
-              label="Questionnaires"
-              value={event.questionnairesCompletedFinal ?? 0}
-            />
-            <MetricCard
-              icon={Camera}
-              label="Photos"
-              value={event.finalStats.photosSubmitted}
-            />
-            <MetricCard
-              icon={Timer}
-              label="Actual Duration"
-              value={event.finalStats.duration}
-            />
-          </div>
-
-          {/* Inventory Comparison (pre vs post per mm-ui-002) */}
-          {event.inventoryComparison && (
-            <Card className="gap-0">
-              <CardHeader className="px-5 pt-5 pb-3">
-                <div className="flex items-center gap-2">
-                  <Boxes className="w-4 h-4 text-muted-foreground" />
-                  <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-                    Inventory Comparison
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-                      Pre-Event
-                    </p>
-                    <p className="text-foreground" style={{ fontSize: "1.25rem", fontWeight: 600 }}>
-                      {event.inventoryComparison.preEvent}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-                      Post-Event
-                    </p>
-                    <p className="text-foreground" style={{ fontSize: "1.25rem", fontWeight: 600 }}>
-                      {event.inventoryComparison.postEvent}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-                      Sold / Used
-                    </p>
-                    <p className="text-green-600" style={{ fontSize: "1.25rem", fontWeight: 600 }}>
-                      -{event.inventoryComparison.preEvent - event.inventoryComparison.postEvent}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Educator Notes (final) */}
-          {event.educatorNotesFinal && (
-            <Card className="gap-0">
-              <CardHeader className="px-5 pt-5 pb-3">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
-                  <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-                    Educator Notes
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
-                <p className="text-foreground" style={{ fontSize: "0.875rem" }}>
-                  {event.educatorNotesFinal}
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Photo gallery with categories per mm-ui-002 */}
-          {allPhotos.length > 0 && (
-            <Card className="gap-0">
-              <CardHeader className="px-5 pt-5 pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Image className="w-4 h-4 text-muted-foreground" />
-                    <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-                      Event Photos
-                    </CardTitle>
-                    <span
-                      className="text-muted-foreground"
-                      style={{ fontSize: "0.8125rem" }}
-                    >
-                      ({allPhotos.length})
-                    </span>
-                  </div>
-                  {currentPhase !== "Finalized" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer"
-                    >
-                      <Download className="w-3.5 h-3.5 mr-1.5" />
-                      Download All
-                    </Button>
-                  )}
-                </div>
-                {/* Photo category tabs */}
-                {categorizedPhotos && (
-                  <div className="flex gap-1 mt-3">
-                    {(
-                      [
-                        { key: "all" as const, label: "All", count: allPhotos.length },
-                        { key: "receipts" as const, label: "Receipts", count: categorizedPhotos.receipts.length },
-                        { key: "socialMedia" as const, label: "Social Media", count: categorizedPhotos.socialMedia.length },
-                        { key: "venue" as const, label: "Venue", count: categorizedPhotos.venue.length },
-                      ] as const
-                    ).map((tab) => (
-                      <button
-                        key={tab.key}
-                        onClick={() => setActivePhotoTab(tab.key)}
-                        className={`px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
-                          activePhotoTab === tab.key
-                            ? "bg-muted text-foreground"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                        style={{ fontSize: "0.75rem" }}
-                      >
-                        {tab.label}
-                        <span className="ml-1 text-muted-foreground">
-                          {tab.count}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </CardHeader>
-              <CardContent className="px-5 pb-5">
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                  {displayedPhotos.map((_, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square rounded-lg bg-muted border border-border flex items-center justify-center"
-                    >
-                      <Camera className="w-5 h-5 text-muted-foreground/40" />
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Export Data button */}
-          {(event.status === "Completed" || currentPhase === "Finalized") && (
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="cursor-pointer"
-              >
-                <FileDown className="w-3.5 h-3.5 mr-1.5" />
-                Export Event Data
-              </Button>
-            </div>
-          )}
-
-          {/* Approve & Finalize */}
-          {!finalized && !event.finalizedAt && event.status === "Completed" && (
-            <Card
-              className={`gap-0 ${showFinalizeConfirm ? "border-amber-500/40" : "border-amber-500/30"}`}
+      {(event.status === "Completed" || currentPhase === "Finalized") &&
+        event.finalStats && (
+          <div className="space-y-4">
+            <h2
+              className="text-foreground"
+              style={{ fontSize: "1.125rem", fontWeight: 600 }}
             >
-              <CardContent className="px-5 py-5">
-                {showFinalizeConfirm ? (
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p
-                          className="text-foreground"
-                          style={{ fontWeight: 600 }}
-                        >
-                          Confirm Finalization
-                        </p>
-                        <p
-                          className="text-muted-foreground mt-1"
-                          style={{ fontSize: "0.875rem" }}
-                        >
-                          This action is <strong>irreversible</strong>. It will
-                          lock the event record for all actors and terminate the
-                          educator&apos;s editing window immediately.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 ml-8">
-                      <Button
-                        onClick={handleFinalize}
-                        className="cursor-pointer"
-                      >
-                        Yes, Approve & Finalize
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowFinalizeConfirm(false)}
-                        className="cursor-pointer"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
+              Final Stats
+            </h2>
+
+            {/* Check-in record */}
+            {event.checkInStatus && (
+              <Card className="gap-0">
+                <CardContent className="px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    {event.checkInStatus === "checked-in" ? (
+                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-destructive" />
+                    )}
                     <div>
                       <p
                         className="text-foreground"
-                        style={{ fontWeight: 600 }}
+                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
                       >
-                        Ready for Review
+                        Geo Check-In:{" "}
+                        {event.checkInStatus === "checked-in"
+                          ? "Confirmed"
+                          : "Failed"}
                       </p>
                       <p
                         className="text-muted-foreground"
-                        style={{ fontSize: "0.875rem" }}
+                        style={{ fontSize: "0.8125rem" }}
                       >
-                        Review the stats above and finalize this event to unlock
-                        reporting.
+                        {event.checkInTime
+                          ? `Arrived at ${event.checkInTime}`
+                          : "No check-in recorded"}
                       </p>
                     </div>
-                    <Button
-                      onClick={() => setShowFinalizeConfirm(true)}
-                      className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
-                    >
-                      Approve & Finalize
-                    </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
 
-          {(finalized || event.finalizedAt) && (
-            <Card className="gap-0 border-green-500/30">
-              <CardContent className="px-5 py-5 flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <div>
-                  <p className="text-foreground" style={{ fontWeight: 600 }}>
-                    Event Finalized
-                  </p>
+            {/* Stats grid (expanded per mm-ui-002) */}
+            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+              <MetricCard
+                icon={ShoppingCart}
+                label="Total Samples"
+                value={event.finalStats.totalSamples}
+              />
+              <MetricCard
+                icon={User}
+                label="Interactions"
+                value={event.finalStats.totalInteractions}
+              />
+              <MetricCard label="Sales" value={event.finalStats.totalSales} />
+              <MetricCard
+                icon={Star}
+                label="Rating"
+                value={event.finalStats.rating}
+                accent="#d97706"
+              />
+              <MetricCard
+                icon={ClipboardList}
+                label="Questionnaires"
+                value={event.questionnairesCompletedFinal ?? 0}
+              />
+              <MetricCard
+                icon={Camera}
+                label="Photos"
+                value={event.finalStats.photosSubmitted}
+              />
+              <MetricCard
+                icon={Timer}
+                label="Actual Duration"
+                value={event.finalStats.duration}
+              />
+            </div>
+
+            {/* Inventory Comparison (pre vs post per mm-ui-002) */}
+            {event.inventoryComparison && (
+              <Card className="gap-0">
+                <CardHeader className="px-5 pt-5 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Boxes className="w-4 h-4 text-muted-foreground" />
+                    <CardTitle
+                      style={{ fontSize: "0.9375rem", fontWeight: 600 }}
+                    >
+                      Inventory Comparison
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="px-5 pb-5">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <p
+                        className="text-muted-foreground"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        Pre-Event
+                      </p>
+                      <p
+                        className="text-foreground"
+                        style={{ fontSize: "1.25rem", fontWeight: 600 }}
+                      >
+                        {event.inventoryComparison.preEvent}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p
+                        className="text-muted-foreground"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        Post-Event
+                      </p>
+                      <p
+                        className="text-foreground"
+                        style={{ fontSize: "1.25rem", fontWeight: 600 }}
+                      >
+                        {event.inventoryComparison.postEvent}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p
+                        className="text-muted-foreground"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        Sold / Used
+                      </p>
+                      <p
+                        className="text-green-600"
+                        style={{ fontSize: "1.25rem", fontWeight: 600 }}
+                      >
+                        -
+                        {event.inventoryComparison.preEvent -
+                          event.inventoryComparison.postEvent}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Educator Notes (final) */}
+            {event.educatorNotesFinal && (
+              <Card className="gap-0">
+                <CardHeader className="px-5 pt-5 pb-3">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                    <CardTitle
+                      style={{ fontSize: "0.9375rem", fontWeight: 600 }}
+                    >
+                      Educator Notes
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="px-5 pb-5">
                   <p
-                    className="text-muted-foreground"
+                    className="text-foreground"
                     style={{ fontSize: "0.875rem" }}
                   >
-                    This event has been finalized and locked. The data is now
-                    available for reporting.
+                    {event.educatorNotesFinal}
                   </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Photo gallery with categories per mm-ui-002 */}
+            {allPhotos.length > 0 && (
+              <Card className="gap-0">
+                <CardHeader className="px-5 pt-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Image className="w-4 h-4 text-muted-foreground" />
+                      <CardTitle
+                        style={{ fontSize: "0.9375rem", fontWeight: 600 }}
+                      >
+                        Event Photos
+                      </CardTitle>
+                      <span
+                        className="text-muted-foreground"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
+                        ({allPhotos.length})
+                      </span>
+                    </div>
+                    {currentPhase !== "Finalized" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5 mr-1.5" />
+                        Download All
+                      </Button>
+                    )}
+                  </div>
+                  {/* Photo category tabs */}
+                  {categorizedPhotos && (
+                    <div className="flex gap-1 mt-3">
+                      {(
+                        [
+                          {
+                            key: "all" as const,
+                            label: "All",
+                            count: allPhotos.length,
+                          },
+                          {
+                            key: "receipts" as const,
+                            label: "Receipts",
+                            count: categorizedPhotos.receipts.length,
+                          },
+                          {
+                            key: "socialMedia" as const,
+                            label: "Social Media",
+                            count: categorizedPhotos.socialMedia.length,
+                          },
+                          {
+                            key: "venue" as const,
+                            label: "Venue",
+                            count: categorizedPhotos.venue.length,
+                          },
+                        ] as const
+                      ).map((tab) => (
+                        <button
+                          key={tab.key}
+                          onClick={() => setActivePhotoTab(tab.key)}
+                          className={`px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                            activePhotoTab === tab.key
+                              ? "bg-muted text-foreground"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          {tab.label}
+                          <span className="ml-1 text-muted-foreground">
+                            {tab.count}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="px-5 pb-5">
+                  <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                    {displayedPhotos.map((_, i) => (
+                      <div
+                        key={i}
+                        className="aspect-square rounded-lg bg-muted border border-border flex items-center justify-center"
+                      >
+                        <Camera className="w-5 h-5 text-muted-foreground/40" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Export Data button */}
+            {(event.status === "Completed" || currentPhase === "Finalized") && (
+              <div className="flex items-center gap-3">
+                <Button variant="outline" size="sm" className="cursor-pointer">
+                  <FileDown className="w-3.5 h-3.5 mr-1.5" />
+                  Export Event Data
+                </Button>
+              </div>
+            )}
+
+            {/* Approve & Finalize */}
+            {!finalized &&
+              !event.finalizedAt &&
+              event.status === "Completed" && (
+                <Card
+                  className={`gap-0 ${showFinalizeConfirm ? "border-amber-500/40" : "border-amber-500/30"}`}
+                >
+                  <CardContent className="px-5 py-5">
+                    {showFinalizeConfirm ? (
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p
+                              className="text-foreground"
+                              style={{ fontWeight: 600 }}
+                            >
+                              Confirm Finalization
+                            </p>
+                            <p
+                              className="text-muted-foreground mt-1"
+                              style={{ fontSize: "0.875rem" }}
+                            >
+                              This action is <strong>irreversible</strong>. It
+                              will lock the event record for all actors and
+                              terminate the educator&apos;s editing window
+                              immediately.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 ml-8">
+                          <Button
+                            onClick={handleFinalize}
+                            className="cursor-pointer"
+                          >
+                            Yes, Approve & Finalize
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowFinalizeConfirm(false)}
+                            className="cursor-pointer"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p
+                            className="text-foreground"
+                            style={{ fontWeight: 600 }}
+                          >
+                            Ready for Review
+                          </p>
+                          <p
+                            className="text-muted-foreground"
+                            style={{ fontSize: "0.875rem" }}
+                          >
+                            Review the stats above and finalize this event to
+                            unlock reporting.
+                          </p>
+                        </div>
+                        <Button
+                          onClick={() => setShowFinalizeConfirm(true)}
+                          className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          Approve & Finalize
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+            {(finalized || event.finalizedAt) && (
+              <Card className="gap-0 border-green-500/30">
+                <CardContent className="px-5 py-5 flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="text-foreground" style={{ fontWeight: 600 }}>
+                      Event Finalized
+                    </p>
+                    <p
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.875rem" }}
+                    >
+                      This event has been finalized and locked. The data is now
+                      available for reporting.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
       {/* Cancellation actions (pre-event only, per mm-ui-006 branches) */}
       {isPreEvent && !showEducatorCancel && !showEventCancel && (

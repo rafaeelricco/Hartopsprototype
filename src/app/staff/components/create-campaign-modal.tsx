@@ -586,7 +586,9 @@ export function CreateCampaignModal({
                   style={{ fontSize: "0.8125rem" }}
                 >
                   Linked Products{" "}
-                  <span className="text-muted-foreground">(from item master)</span>
+                  <span className="text-muted-foreground">
+                    (from item master)
+                  </span>
                 </label>
                 <Input
                   type="text"

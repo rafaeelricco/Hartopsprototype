@@ -30,8 +30,7 @@ const statusColors: Record<string, string> = {
   "Pending Invitation": "bg-amber-500/10 text-amber-500 border-amber-500/20",
 };
 
-const gridCols =
-  "grid-cols-[1fr_70px_140px_50px_90px_90px_90px_80px]";
+const gridCols = "grid-cols-[1fr_70px_140px_50px_90px_90px_90px_80px]";
 
 export function EducatorsPage() {
   const navigate = useNavigate();
@@ -50,9 +49,7 @@ export function EducatorsPage() {
   };
 
   const filtered = mockEducators
-    .filter(
-      (e) => statusFilter === "All" || e.status === statusFilter,
-    )
+    .filter((e) => statusFilter === "All" || e.status === statusFilter)
     .filter(
       (e) =>
         !search ||
@@ -243,7 +240,9 @@ export function EducatorsPage() {
                     className={`inline-flex items-center rounded-full border px-2 py-0.5 font-medium w-fit ${statusColors[edu.status] || "bg-muted text-muted-foreground border-border"}`}
                     style={{ fontSize: "0.6875rem" }}
                   >
-                    {edu.status === "Pending Invitation" ? "Pending" : edu.status}
+                    {edu.status === "Pending Invitation"
+                      ? "Pending"
+                      : edu.status}
                   </span>
 
                   {/* Avg Rating */}

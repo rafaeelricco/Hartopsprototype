@@ -42,9 +42,7 @@ export interface Educator {
 }
 
 // Generate availability for a 14-day window starting 2026-03-18
-function generateAvailability(
-  seed: number,
-): Educator["availability"] {
+function generateAvailability(seed: number): Educator["availability"] {
   const start = new Date("2026-03-18");
   const result: Educator["availability"] = [];
   const allSlots: ("morning" | "afternoon" | "evening")[] = [

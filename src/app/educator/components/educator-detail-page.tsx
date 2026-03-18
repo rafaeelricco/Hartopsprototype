@@ -552,7 +552,13 @@ export function EducatorDetailPage() {
                 >
                   <ChevronLeft size={16} style={{ color: "#64748B" }} />
                 </Button>
-                <h3 style={{ fontSize: "0.9375rem", fontWeight: 600, color: "#0F172A" }}>
+                <h3
+                  style={{
+                    fontSize: "0.9375rem",
+                    fontWeight: 600,
+                    color: "#0F172A",
+                  }}
+                >
                   {MONTHS[calMonth]} {calYear}
                 </h3>
                 <Button

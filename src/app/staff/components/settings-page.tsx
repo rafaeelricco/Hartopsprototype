@@ -103,7 +103,13 @@ const INTEGRATION_ICONS: Record<string, React.ElementType> = {
   zap: Zap,
 };
 
-function IntegrationIcon({ name, className }: { name: string; className?: string }) {
+function IntegrationIcon({
+  name,
+  className,
+}: {
+  name: string;
+  className?: string;
+}) {
   const Icon = INTEGRATION_ICONS[name];
   if (!Icon) return null;
   return <Icon className={className} />;
@@ -220,7 +226,8 @@ const VALID_TABS: SettingsTab[] = [
 export function SettingsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const paramTab = searchParams.get("tab") as SettingsTab | null;
-  const initialTab = paramTab && VALID_TABS.includes(paramTab) ? paramTab : "profile";
+  const initialTab =
+    paramTab && VALID_TABS.includes(paramTab) ? paramTab : "profile";
   const [activeTab, setActiveTab] = useState<string>(initialTab);
 
   useEffect(() => {
@@ -347,7 +354,10 @@ function ProfileTab() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <p className="text-foreground font-medium" style={{ fontSize: "1.0625rem" }}>
+                <p
+                  className="text-foreground font-medium"
+                  style={{ fontSize: "1.0625rem" }}
+                >
                   {profile.firstName} {profile.lastName}
                 </p>
                 <span
@@ -364,7 +374,10 @@ function ProfileTab() {
               <p style={{ fontSize: "0.8125rem", color: "#64748B" }}>
                 {profile.email}
               </p>
-              <p className="mt-0.5" style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+              <p
+                className="mt-0.5"
+                style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+              >
                 {profile.company} &middot;{" "}
                 {profile.timezone.replace("America/", "").replace("_", " ")}
               </p>
@@ -442,9 +455,7 @@ function ProfileTab() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">
-                Timezone
-              </Label>
+              <Label className="text-xs text-muted-foreground">Timezone</Label>
               <select
                 value={profile.timezone}
                 onChange={(e) =>
@@ -525,7 +536,9 @@ function ProfileTab() {
                 <Shield className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-sm text-foreground">Two-factor authentication</p>
+                <p className="text-sm text-foreground">
+                  Two-factor authentication
+                </p>
                 <p className="text-xs text-muted-foreground">
                   Add an extra layer of security to your account
                 </p>
@@ -546,7 +559,9 @@ function ProfileTab() {
         <CardContent className="px-5 py-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-destructive">Delete account</p>
+              <p className="text-sm font-medium text-destructive">
+                Delete account
+              </p>
               <p className="text-xs text-muted-foreground">
                 Permanently remove your account and all associated data. This
                 action cannot be undone.
@@ -715,9 +730,7 @@ function ChangePasswordModal({
               placeholder="Re-enter new password"
             />
             {confirm.length > 0 && next !== confirm && (
-              <p className="text-xs text-destructive">
-                Passwords do not match
-              </p>
+              <p className="text-xs text-destructive">Passwords do not match</p>
             )}
           </div>
 
@@ -824,21 +837,27 @@ function NotificationsTab() {
                         checked={item.email}
                         onCheckedChange={() => toggle(item.id, "email")}
                       />
-                      <span className="text-[0.5625rem] text-muted-foreground">Email</span>
+                      <span className="text-[0.5625rem] text-muted-foreground">
+                        Email
+                      </span>
                     </div>
                     <div className="flex flex-col items-center gap-1">
                       <Switch
                         checked={item.push}
                         onCheckedChange={() => toggle(item.id, "push")}
                       />
-                      <span className="text-[0.5625rem] text-muted-foreground">Push</span>
+                      <span className="text-[0.5625rem] text-muted-foreground">
+                        Push
+                      </span>
                     </div>
                     <div className="flex flex-col items-center gap-1">
                       <Switch
                         checked={item.inApp}
                         onCheckedChange={() => toggle(item.id, "inApp")}
                       />
-                      <span className="text-[0.5625rem] text-muted-foreground">In-App</span>
+                      <span className="text-[0.5625rem] text-muted-foreground">
+                        In-App
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -919,13 +938,19 @@ function TeamTab() {
     toast.success("Role updated");
   }
 
-  const STATUS_STYLE: Record<
-    string,
-    { className: string; label: string }
-  > = {
-    active: { className: "bg-green-50 text-green-700 border-green-200", label: "Active" },
-    invited: { className: "bg-blue-50 text-blue-700 border-blue-200", label: "Invited" },
-    deactivated: { className: "bg-muted text-muted-foreground", label: "Deactivated" },
+  const STATUS_STYLE: Record<string, { className: string; label: string }> = {
+    active: {
+      className: "bg-green-50 text-green-700 border-green-200",
+      label: "Active",
+    },
+    invited: {
+      className: "bg-blue-50 text-blue-700 border-blue-200",
+      label: "Invited",
+    },
+    deactivated: {
+      className: "bg-muted text-muted-foreground",
+      label: "Deactivated",
+    },
   };
 
   return (
@@ -1106,7 +1131,9 @@ function InviteModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Email address</Label>
+            <Label className="text-xs text-muted-foreground">
+              Email address
+            </Label>
             <Input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -1175,7 +1202,11 @@ function ConfirmRemoveDialog({
           </div>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel} className="cursor-pointer">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="cursor-pointer"
+          >
             Cancel
           </Button>
           <Button
@@ -1479,7 +1510,10 @@ function IntegrationsTab() {
                   className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0"
                 >
                   <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
-                    <IntegrationIcon name={int.iconName} className="w-5 h-5 text-green-700" />
+                    <IntegrationIcon
+                      name={int.iconName}
+                      className="w-5 h-5 text-green-700"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
@@ -1557,7 +1591,10 @@ function IntegrationsTab() {
                   className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0"
                 >
                   <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                    <IntegrationIcon name={int.iconName} className="w-5 h-5 text-muted-foreground" />
+                    <IntegrationIcon
+                      name={int.iconName}
+                      className="w-5 h-5 text-muted-foreground"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">
@@ -1596,7 +1633,9 @@ function IntegrationsTab() {
               <Lock className="w-4 h-4 text-muted-foreground" />
             </div>
             <div>
-              <CardTitle className="text-sm font-semibold">API Access</CardTitle>
+              <CardTitle className="text-sm font-semibold">
+                API Access
+              </CardTitle>
               <CardDescription className="text-xs">
                 Use your API key to integrate Hart Agency data with external
                 tools. Keep it secret.

@@ -67,11 +67,56 @@ const VENUE_SUB_TYPES = [
 ];
 
 const US_STATES = [
-  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
-  "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-  "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-  "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-  "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
+  "AL",
+  "AK",
+  "AZ",
+  "AR",
+  "CA",
+  "CO",
+  "CT",
+  "DE",
+  "FL",
+  "GA",
+  "HI",
+  "ID",
+  "IL",
+  "IN",
+  "IA",
+  "KS",
+  "KY",
+  "LA",
+  "ME",
+  "MD",
+  "MA",
+  "MI",
+  "MN",
+  "MS",
+  "MO",
+  "MT",
+  "NE",
+  "NV",
+  "NH",
+  "NJ",
+  "NM",
+  "NY",
+  "NC",
+  "ND",
+  "OH",
+  "OK",
+  "OR",
+  "PA",
+  "RI",
+  "SC",
+  "SD",
+  "TN",
+  "TX",
+  "UT",
+  "VT",
+  "VA",
+  "WA",
+  "WV",
+  "WI",
+  "WY",
   "DC",
 ];
 
@@ -108,7 +153,9 @@ export function AddAccountWizard({
 }: AddAccountWizardProps) {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<AccountWizardData>({ ...INITIAL_DATA });
-  const [errors, setErrors] = useState<Partial<Record<keyof AccountWizardData, string>>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof AccountWizardData, string>>
+  >({});
   const [submitted, setSubmitted] = useState(false);
 
   /* ---- helpers --------------------------------------------------- */
@@ -144,7 +191,8 @@ export function AddAccountWizard({
 
   const validateStep1 = (): boolean => {
     const errs: Partial<Record<keyof AccountWizardData, string>> = {};
-    if (!data.accountName.trim()) errs.accountName = "Account Name is required.";
+    if (!data.accountName.trim())
+      errs.accountName = "Account Name is required.";
     else if (
       existingNames.some(
         (n) => n.toLowerCase() === data.accountName.trim().toLowerCase(),
@@ -166,9 +214,14 @@ export function AddAccountWizard({
     if (!data.zipCode.trim()) errs.zipCode = "Zip Code is required.";
     else if (!/^\d{5}(-\d{4})?$/.test(data.zipCode.trim()))
       errs.zipCode = "Enter a valid US zip code (e.g. 10001).";
-    if (!data.contactName.trim()) errs.contactName = "Contact Name is required.";
-    if (!data.contactPhone.trim()) errs.contactPhone = "Contact Phone is required.";
-    if (data.contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.contactEmail.trim()))
+    if (!data.contactName.trim())
+      errs.contactName = "Contact Name is required.";
+    if (!data.contactPhone.trim())
+      errs.contactPhone = "Contact Phone is required.";
+    if (
+      data.contactEmail.trim() &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.contactEmail.trim())
+    )
       errs.contactEmail = "Enter a valid email address.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -211,7 +264,9 @@ export function AddAccountWizard({
       zipCode: data.zipCode.trim(),
       contactName: data.contactName.trim(),
       contactPhone: data.contactPhone.trim(),
-      ...(data.contactEmail.trim() ? { contactEmail: data.contactEmail.trim() } : {}),
+      ...(data.contactEmail.trim()
+        ? { contactEmail: data.contactEmail.trim() }
+        : {}),
       profile: {
         venueSubType: data.venueSubType,
         footTrafficEstimate: "medium",
@@ -403,7 +458,9 @@ export function AddAccountWizard({
                   <option value="">Select venue sub-type</option>
                   {VENUE_SUB_TYPES.map((vt) => (
                     <option key={vt} value={vt}>
-                      {vt.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                      {vt
+                        .replace(/-/g, " ")
+                        .replace(/\b\w/g, (c) => c.toUpperCase())}
                     </option>
                   ))}
                 </select>
@@ -610,7 +667,11 @@ export function AddAccountWizard({
                     <ReviewRow label="Account" value={data.accountName} />
                     <ReviewRow
                       label="Type"
-                      value={data.type === "on-premise" ? "On-Premise" : "Off-Premise"}
+                      value={
+                        data.type === "on-premise"
+                          ? "On-Premise"
+                          : "Off-Premise"
+                      }
                     />
                     <ReviewRow
                       label="Venue Sub-Type"
@@ -620,9 +681,14 @@ export function AddAccountWizard({
                     />
                     <ReviewRow
                       label="Status"
-                      value={data.status.charAt(0).toUpperCase() + data.status.slice(1)}
+                      value={
+                        data.status.charAt(0).toUpperCase() +
+                        data.status.slice(1)
+                      }
                     />
-                    {data.chain && <ReviewRow label="Chain" value={data.chain} />}
+                    {data.chain && (
+                      <ReviewRow label="Chain" value={data.chain} />
+                    )}
                   </div>
                 </div>
 
@@ -704,10 +770,7 @@ export function AddAccountWizard({
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <>
-      <span
-        className="text-muted-foreground"
-        style={{ fontSize: "0.8125rem" }}
-      >
+      <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
         {label}
       </span>
       <span

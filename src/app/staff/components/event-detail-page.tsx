@@ -1008,9 +1008,7 @@ function EditableField({
         )}
         <div className="flex-1 min-w-0">
           <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>{label}</span>
-          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-            {shown}
-          </p>
+          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>{shown}</p>
         </div>
         <Pencil
           size={12}

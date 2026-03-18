@@ -20,7 +20,11 @@ export type CancellationReason =
   | "Retailer Cancellation"
   | "Other";
 
-export type StatusDisplayGroup = "Upcoming" | "Live" | "Completed" | "Cancelled";
+export type StatusDisplayGroup =
+  | "Upcoming"
+  | "Live"
+  | "Completed"
+  | "Cancelled";
 
 export interface EventItem {
   id: string;
@@ -209,8 +213,7 @@ export const mockEvents: EventItem[] = [
     educatorName: "James Rodriguez",
     status: "Completed",
     products: ["Malibu Original", "Malibu Strawberry", "Malibu Pineapple"],
-    instructions:
-      "Summer theme setup. Use provided beach-themed table runner.",
+    instructions: "Summer theme setup. Use provided beach-themed table runner.",
     goals: "100+ samplings, 20+ cases sold.",
     notes:
       "Beach-themed POS materials in educator kit. Manager: Lisa T. (201-555-0198)",
@@ -493,7 +496,11 @@ export const mockEvents: EventItem[] = [
     educatorId: "edu-1",
     educatorName: "Ana Martinez",
     status: "Finalized",
-    products: ["Hendrick's Original", "Hendrick's Neptunia", "Hendrick's Orbium"],
+    products: [
+      "Hendrick's Original",
+      "Hendrick's Neptunia",
+      "Hendrick's Orbium",
+    ],
     instructions:
       "Garden party theme. Use cucumber garnishes and floral arrangements. Neat and G&T pours.",
     goals: "60+ tastings, 12+ bottles sold.",
@@ -562,7 +569,11 @@ export const mockEvents: EventItem[] = [
     educatorId: null,
     educatorName: null,
     status: "Cancelled",
-    products: ["Maker's Mark Original", "Maker's 46", "Maker's Mark Cask Strength"],
+    products: [
+      "Maker's Mark Original",
+      "Maker's 46",
+      "Maker's Mark Cask Strength",
+    ],
     instructions: "Standard bourbon tasting setup. Offer neat pours only.",
     goals: "50+ tastings, 10+ bottles sold.",
     compensation: { rate: "$35/hr" },

@@ -169,6 +169,11 @@ export const topEducators: TopEducator[] = [
   { name: "Sarah Chen", eventsThisMonth: 14, avgRating: 4.9, trend: "up" },
   { name: "Emily Park", eventsThisMonth: 12, avgRating: 4.8, trend: "up" },
   { name: "Carlos Mendez", eventsThisMonth: 11, avgRating: 4.7, trend: "up" },
-  { name: "James Rodriguez", eventsThisMonth: 9, avgRating: 4.5, trend: "down" },
+  {
+    name: "James Rodriguez",
+    eventsThisMonth: 9,
+    avgRating: 4.5,
+    trend: "down",
+  },
   { name: "Maria Santos", eventsThisMonth: 8, avgRating: 4.4, trend: "down" },
 ];

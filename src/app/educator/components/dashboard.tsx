@@ -164,11 +164,7 @@ export function Dashboard() {
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {dashboardStats.map((stat, index) => (
-          <StatCard
-            key={stat.label}
-            stat={stat}
-            icon={statIcons[index]!}
-          />
+          <StatCard key={stat.label} stat={stat} icon={statIcons[index]!} />
         ))}
       </div>
 
@@ -199,18 +195,8 @@ export function Dashboard() {
                 margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
               >
                 <defs>
-                  <linearGradient
-                    id="fillEvents"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="0%"
-                      stopColor="#7D152D"
-                      stopOpacity={0.2}
-                    />
+                  <linearGradient id="fillEvents" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#7D152D" stopOpacity={0.2} />
                     <stop
                       offset="100%"
                       stopColor="#7D152D"

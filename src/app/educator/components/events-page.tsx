@@ -108,9 +108,7 @@ function sortEvents(events: EventItem[], sortBy: SortOption): EventItem[] {
       case "status":
         return STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status];
       case "educator":
-        return (a.educatorName || "zzz").localeCompare(
-          b.educatorName || "zzz",
-        );
+        return (a.educatorName || "zzz").localeCompare(b.educatorName || "zzz");
       case "date":
       default: {
         // Primary: lifecycle priority, Secondary: date
@@ -124,10 +122,10 @@ function sortEvents(events: EventItem[], sortBy: SortOption): EventItem[] {
 }
 
 function getFilterCount(tab: FilterTab): number {
-  if (tab === "All") return mockEvents.filter((e) => e.status !== "Cancelled").length;
-  return mockEvents.filter(
-    (e) => getStatusDisplayGroup(e.status) === tab,
-  ).length;
+  if (tab === "All")
+    return mockEvents.filter((e) => e.status !== "Cancelled").length;
+  return mockEvents.filter((e) => getStatusDisplayGroup(e.status) === tab)
+    .length;
 }
 
 function matchesFilter(event: EventItem, tab: FilterTab): boolean {
@@ -527,15 +525,12 @@ export function EventsPage() {
           <CardHeader className="px-5 pt-5 pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle
-                  style={{ fontSize: "1rem", fontWeight: 600 }}
-                >
+                <CardTitle style={{ fontSize: "1rem", fontWeight: 600 }}>
                   {cardTitle}
                 </CardTitle>
                 <CardDescription style={{ fontSize: "0.8125rem" }}>
                   {filteredEvents.length} event
-                  {filteredEvents.length !== 1 ? "s" : ""} matching your
-                  filters
+                  {filteredEvents.length !== 1 ? "s" : ""} matching your filters
                 </CardDescription>
               </div>
             </div>
