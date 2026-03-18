@@ -29,8 +29,10 @@ import {
   ClipboardList,
   Boxes,
   UserX,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
+import { Badge } from "@/app/shared/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -314,7 +316,7 @@ function MetricCard({
   label: string;
   value: React.ReactNode;
   accent?: string;
-  subValue?: string;
+  subValue?: string | undefined;
 }) {
   return (
     <Card className="gap-0">
@@ -429,44 +431,46 @@ export function EventDetailPage() {
           <ArrowLeft className="w-4 h-4" />
           Back to Events
         </Link>
-        <div className="flex items-start justify-between flex-wrap gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1
-                className="text-foreground"
-                style={{ fontSize: "1.5rem", fontWeight: 600 }}
-              >
-                {event.name}
-              </h1>
-              {/* Phase badge */}
-              <span
-                className={`inline-flex items-center rounded-full border px-3 py-1 font-semibold ${badge.bg} ${badge.text}`}
-                style={{ fontSize: "0.75rem" }}
-              >
-                {badge.label}
-              </span>
-              {/* Event type badge */}
-              <span
-                className={`inline-flex items-center rounded-full border px-2 py-0.5 ${eventTypeBadgeColors[event.eventType]}`}
-                style={{ fontSize: "0.6875rem", fontWeight: 500 }}
-              >
-                {event.eventType}
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-3 text-muted-foreground flex-wrap"
-              style={{ fontSize: "0.875rem" }}
-            >
-              <span>{event.campaignName}</span>
-              <span className="text-border">&middot;</span>
-              <span className="font-medium text-foreground">
-                {event.brandName}
-              </span>
-              <span className="text-border">&middot;</span>
-              <span>{event.clientName}</span>
-            </div>
-          </div>
+        <div className="flex items-center gap-2 flex-wrap mb-2">
+          {/* Phase badge */}
+          <Badge
+            variant="secondary"
+            className={`text-xs ${badge.bg} ${badge.text} border-transparent`}
+          >
+            {currentPhase === "Live" && (
+              <span className="inline-block size-1.5 rounded-full bg-green-500 mr-1 animate-pulse" />
+            )}
+            {badge.label}
+            {currentPhase === "Live" && (
+              <>
+                {" "}
+                {event.time} – {event.duration}
+              </>
+            )}
+          </Badge>
+          {/* Event type badge */}
+          <Badge
+            variant="secondary"
+            className={`text-xs ${eventTypeBadgeColors[event.eventType]} border-transparent`}
+          >
+            {event.eventType}
+          </Badge>
         </div>
+        <h1 className="text-foreground" style={{ fontSize: "1.5rem", fontWeight: 600 }}>
+          {event.name}
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1 flex-wrap">
+          <span>{event.id}</span>
+          <span>·</span>
+          <Building2 className="size-3" />
+          <span>{event.clientName}</span>
+          <span>·</span>
+          <Megaphone className="size-3" />
+          <span>{event.campaignName}</span>
+          <span>·</span>
+          <Tag className="size-3" />
+          <span>{event.brandName}</span>
+        </p>
       </div>
 
       {/* Lifecycle Indicator */}
