@@ -22,6 +22,13 @@ import {
   MessageSquare,
   Image,
   Ban,
+  DollarSign,
+  Phone,
+  Download,
+  FileDown,
+  ClipboardList,
+  Boxes,
+  UserX,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import {
@@ -31,32 +38,52 @@ import {
   CardHeader,
   CardTitle,
 } from "@/app/shared/components/ui/card";
-import { getEventById, type CancellationReason } from "./events-data";
+import {
+  getEventById,
+  isUpcoming,
+  type EventStatus,
+  type CancellationReason,
+} from "./events-data";
 import { mockEducators } from "./educator-roster-data";
 
-/* --- Phase Badge --- */
+/* --- Phase Badge (7 states per mm-ui-006) --- */
 
-const phaseBadge: Record<string, { bg: string; text: string; label: string }> =
+const phaseBadge: Record<EventStatus, { bg: string; text: string; label: string }> =
   {
-    Upcoming: {
+    Unassigned: {
+      bg: "bg-amber-500/10 border-amber-500/30",
+      text: "text-amber-600",
+      label: "Unassigned",
+    },
+    Pending: {
+      bg: "bg-yellow-500/10 border-yellow-500/30",
+      text: "text-yellow-700",
+      label: "Pending Acceptance",
+    },
+    Confirmed: {
       bg: "bg-blue-500/10 border-blue-500/30",
       text: "text-blue-600",
-      label: "Upcoming",
+      label: "Confirmed",
     },
     Live: {
       bg: "bg-green-500/10 border-green-500/30",
       text: "text-green-600",
-      label: "● Live Now",
+      label: "\u25CF Live Now",
     },
     Completed: {
       bg: "bg-amber-500/10 border-amber-500/30",
       text: "text-amber-600",
-      label: "Completed — Awaiting Review",
+      label: "Completed \u2014 Awaiting Review",
     },
     Finalized: {
       bg: "bg-muted border-border",
       text: "text-muted-foreground",
       label: "Finalized",
+    },
+    Cancelled: {
+      bg: "bg-red-500/10 border-red-500/30",
+      text: "text-red-600",
+      label: "Cancelled",
     },
   };
 
@@ -67,15 +94,42 @@ const eventTypeBadgeColors: Record<string, string> = {
   Promo: "bg-pink-500/10 text-pink-600 border-pink-500/20",
 };
 
-/* --- Lifecycle Indicator --- */
+/* --- Lifecycle Indicator (6 steps + Cancelled branch per mm-ui-006) --- */
 
-const lifecycleSteps = ["Upcoming", "Live", "Completed", "Finalized"];
+const lifecycleSteps: EventStatus[] = [
+  "Unassigned",
+  "Pending",
+  "Confirmed",
+  "Live",
+  "Completed",
+  "Finalized",
+];
 
-function LifecycleIndicator({ currentPhase }: { currentPhase: string }) {
+const lifecycleLabels: Record<string, string> = {
+  Unassigned: "Unassigned",
+  Pending: "Pending",
+  Confirmed: "Confirmed",
+  Live: "Live",
+  Completed: "Completed",
+  Finalized: "Finalized",
+};
+
+function LifecycleIndicator({ currentPhase }: { currentPhase: EventStatus }) {
+  if (currentPhase === "Cancelled") {
+    return (
+      <div className="flex items-center gap-2">
+        <Ban className="w-5 h-5 text-red-500" />
+        <span className="text-red-600 font-semibold" style={{ fontSize: "0.875rem" }}>
+          Event Cancelled
+        </span>
+      </div>
+    );
+  }
+
   const currentIndex = lifecycleSteps.indexOf(currentPhase);
 
   return (
-    <div className="flex items-center gap-0 w-full max-w-lg">
+    <div className="flex items-center gap-0 w-full max-w-2xl">
       {lifecycleSteps.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
@@ -92,19 +146,19 @@ function LifecycleIndicator({ currentPhase }: { currentPhase: string }) {
                 }`}
                 style={{ fontSize: "0.6875rem", fontWeight: 600 }}
               >
-                {isPast ? "✓" : i + 1}
+                {isPast ? "\u2713" : i + 1}
               </div>
               <span
-                className={`${
+                className={`text-center ${
                   isActive
                     ? "text-foreground font-semibold"
                     : isPast
                       ? "text-muted-foreground font-medium"
                       : "text-muted-foreground"
                 }`}
-                style={{ fontSize: "0.6875rem" }}
+                style={{ fontSize: "0.625rem" }}
               >
-                {step}
+                {lifecycleLabels[step]}
               </span>
             </div>
             {i < lifecycleSteps.length - 1 && (
@@ -121,7 +175,7 @@ function LifecycleIndicator({ currentPhase }: { currentPhase: string }) {
   );
 }
 
-/* --- Cancellation Modal --- */
+/* --- Cancellation Panel (shared for educator & event cancel per mm-ui-006) --- */
 
 const cancellationReasons: CancellationReason[] = [
   "Weather",
@@ -132,27 +186,38 @@ const cancellationReasons: CancellationReason[] = [
 ];
 
 function CancellationPanel({
+  mode,
   onCancel,
   onClose,
 }: {
+  mode: "educator" | "event";
   onCancel: (reason: CancellationReason) => void;
   onClose: () => void;
 }) {
   const [selectedReason, setSelectedReason] =
     useState<CancellationReason | null>(null);
 
+  const isEducatorCancel = mode === "educator";
+  const title = isEducatorCancel ? "Cancel Educator Assignment" : "Cancel Event";
+  const description = isEducatorCancel
+    ? "Select a reason for cancellation. This will unassign the current educator and return the event to Unassigned status."
+    : "Select a reason for cancellation. This is irreversible \u2014 the event will be permanently cancelled.";
+
   return (
-    <Card className="gap-0 border-destructive/30">
+    <Card className={`gap-0 ${isEducatorCancel ? "border-amber-500/30" : "border-destructive/30"}`}>
       <CardHeader className="px-5 pt-5 pb-3">
         <div className="flex items-center gap-2">
-          <Ban className="w-4 h-4 text-destructive" />
+          {isEducatorCancel ? (
+            <UserX className="w-4 h-4 text-amber-600" />
+          ) : (
+            <Ban className="w-4 h-4 text-destructive" />
+          )}
           <CardTitle style={{ fontSize: "1rem", fontWeight: 600 }}>
-            Cancel Event
+            {title}
           </CardTitle>
         </div>
         <CardDescription style={{ fontSize: "0.8125rem" }}>
-          Select a reason for cancellation. This will unassign the current
-          educator and notify them.
+          {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="px-5 pb-5 space-y-4">
@@ -176,10 +241,10 @@ function CancellationPanel({
           <Button
             onClick={() => selectedReason && onCancel(selectedReason)}
             disabled={!selectedReason}
-            variant="destructive"
+            variant={isEducatorCancel ? "default" : "destructive"}
             className="cursor-pointer"
           >
-            Confirm Cancellation
+            {isEducatorCancel ? "Confirm & Find Replacement" : "Confirm Cancellation"}
           </Button>
           <Button
             variant="outline"
@@ -243,11 +308,13 @@ function MetricCard({
   label,
   value,
   accent,
+  subValue,
 }: {
   icon?: React.ElementType;
   label: string;
   value: React.ReactNode;
   accent?: string;
+  subValue?: string;
 }) {
   return (
     <Card className="gap-0">
@@ -275,6 +342,11 @@ function MetricCard({
         >
           {value}
         </p>
+        {subValue && (
+          <p className="text-muted-foreground" style={{ fontSize: "0.6875rem" }}>
+            {subValue}
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -287,11 +359,13 @@ export function EventDetailPage() {
   const event = getEventById(eventId || "");
   const [showAssignment, setShowAssignment] = useState(false);
   const [showFinalizeConfirm, setShowFinalizeConfirm] = useState(false);
-  const [showCancellation, setShowCancellation] = useState(false);
+  const [showEducatorCancel, setShowEducatorCancel] = useState(false);
+  const [showEventCancel, setShowEventCancel] = useState(false);
   const [finalized, setFinalized] = useState(false);
   const [assignedEducator, setAssignedEducator] = useState(
     event?.educatorName || null,
   );
+  const [activePhotoTab, setActivePhotoTab] = useState<"all" | "receipts" | "socialMedia" | "venue">("all");
 
   if (!event) {
     return (
@@ -312,12 +386,13 @@ export function EventDetailPage() {
     );
   }
 
-  const phaseKey = finalized
+  const currentPhase: EventStatus = finalized
     ? "Finalized"
     : event.status === "Completed" && event.finalizedAt
       ? "Finalized"
       : event.status;
-  const badge = phaseBadge[phaseKey] ?? phaseBadge["Upcoming"]!;
+  const badge = phaseBadge[currentPhase];
+  const isPreEvent = isUpcoming(currentPhase);
 
   const handleFinalize = () => {
     setFinalized(true);
@@ -328,6 +403,19 @@ export function EventDetailPage() {
     setAssignedEducator(name);
     setShowAssignment(false);
   };
+
+  const handleEducatorCancel = (_reason: CancellationReason) => {
+    setAssignedEducator(null);
+    setShowEducatorCancel(false);
+  };
+
+  // Photo gallery helpers
+  const allPhotos = event.photoUrls || [];
+  const categorizedPhotos = event.photoCategories;
+  const displayedPhotos =
+    activePhotoTab === "all" || !categorizedPhotos
+      ? allPhotos
+      : categorizedPhotos[activePhotoTab] || [];
 
   return (
     <div className="p-6 space-y-6">
@@ -370,11 +458,11 @@ export function EventDetailPage() {
               style={{ fontSize: "0.875rem" }}
             >
               <span>{event.campaignName}</span>
-              <span className="text-border">·</span>
+              <span className="text-border">&middot;</span>
               <span className="font-medium text-foreground">
                 {event.brandName}
               </span>
-              <span className="text-border">·</span>
+              <span className="text-border">&middot;</span>
               <span>{event.clientName}</span>
             </div>
           </div>
@@ -384,84 +472,189 @@ export function EventDetailPage() {
       {/* Lifecycle Indicator */}
       <Card className="gap-0">
         <CardContent className="px-5 py-4">
-          <LifecycleIndicator currentPhase={phaseKey} />
+          <LifecycleIndicator currentPhase={currentPhase} />
         </CardContent>
       </Card>
 
+      {/* Cancelled event: minimal detail */}
+      {currentPhase === "Cancelled" && (
+        <Card className="gap-0 border-red-500/20">
+          <CardContent className="px-5 py-5 space-y-3">
+            <div className="flex items-center gap-3">
+              <Ban className="w-5 h-5 text-red-500" />
+              <div>
+                <p className="text-foreground" style={{ fontWeight: 600 }}>
+                  Event Cancelled
+                </p>
+                <p className="text-muted-foreground" style={{ fontSize: "0.875rem" }}>
+                  Reason: {event.cancellationReason || "Not specified"}
+                </p>
+                {event.cancelledAt && (
+                  <p className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    Cancelled on{" "}
+                    {new Date(event.cancelledAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Info Cards Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <InfoCard
-          icon={Clock}
-          label="Date & Time"
-          value={new Date(event.date).toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-          subValue={
-            <span className="flex items-center gap-1.5">
-              <Timer className="w-3 h-3" />
-              {event.time} ({event.duration})
-            </span>
-          }
-        />
-        <InfoCard
-          icon={MapPin}
-          label="Venue"
-          value={event.venue}
-          subValue={event.venueAddress}
-        />
-        <InfoCard
-          icon={User}
-          label="Assigned Educator"
-          value={
-            assignedEducator || (
-              <span className="text-amber-500">Not Assigned</span>
-            )
-          }
-          action={
-            event.status === "Upcoming" ? (
-              <button
-                onClick={() => setShowAssignment(!showAssignment)}
-                className="text-primary hover:opacity-80 transition-opacity cursor-pointer flex items-center gap-1 mt-1"
-                style={{ fontSize: "0.8125rem" }}
+      {currentPhase !== "Cancelled" && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <InfoCard
+            icon={Clock}
+            label="Date & Time"
+            value={new Date(event.date).toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+            subValue={
+              <span className="flex items-center gap-1.5">
+                <Timer className="w-3 h-3" />
+                {event.time} ({event.duration})
+              </span>
+            }
+          />
+          <InfoCard
+            icon={MapPin}
+            label="Venue"
+            value={event.venue}
+            subValue={event.venueAddress}
+          />
+          <InfoCard
+            icon={User}
+            label="Assigned Educator"
+            value={
+              assignedEducator ? (
+                <span className="flex items-center gap-2">
+                  {assignedEducator}
+                  {currentPhase === "Pending" && (
+                    <span
+                      className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                      style={{ fontSize: "0.625rem", fontWeight: 500, lineHeight: "1.125rem" }}
+                    >
+                      Pending
+                    </span>
+                  )}
+                  {currentPhase === "Confirmed" && (
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                  )}
+                </span>
+              ) : (
+                <span className="text-amber-500">Not Assigned</span>
+              )
+            }
+            action={
+              isPreEvent ? (
+                <button
+                  onClick={() => setShowAssignment(!showAssignment)}
+                  className="text-primary hover:opacity-80 transition-opacity cursor-pointer flex items-center gap-1 mt-1"
+                  style={{ fontSize: "0.8125rem" }}
+                >
+                  {assignedEducator ? "Reassign" : "Assign Educator"}{" "}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              ) : undefined
+            }
+          />
+          <InfoCard
+            icon={Building2}
+            label="Account"
+            value={event.venue.split(",")[0]}
+            subValue={
+              <span
+                className="inline-flex items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 mt-1"
+                style={{ fontSize: "0.6875rem", fontWeight: 500 }}
               >
-                {assignedEducator ? "Reassign" : "Assign Educator"}{" "}
-                <ChevronDown className="w-3 h-3" />
-              </button>
-            ) : undefined
-          }
-        />
-        <InfoCard
-          icon={Building2}
-          label="Account"
-          value={event.venue.split(",")[0]}
-          subValue={
-            <span
-              className="inline-flex items-center rounded-full border border-border bg-muted/50 px-2 py-0.5 mt-1"
-              style={{ fontSize: "0.6875rem", fontWeight: 500 }}
-            >
-              {event.accountType}
-            </span>
-          }
-        />
-        <InfoCard
-          icon={Package}
-          label="Products"
-          value={`${event.products.length} product${event.products.length !== 1 ? "s" : ""}`}
-          subValue={event.products.join(", ")}
-        />
-        <InfoCard
-          icon={Tag}
-          label="Brand & Duration"
-          value={event.brandName}
-          subValue={`Duration: ${event.duration}`}
-        />
-      </div>
+                {event.accountType}
+              </span>
+            }
+          />
+          <InfoCard
+            icon={Package}
+            label="Products"
+            value={`${event.products.length} product${event.products.length !== 1 ? "s" : ""}`}
+            subValue={event.products.join(", ")}
+          />
+          <InfoCard
+            icon={Tag}
+            label="Brand & Duration"
+            value={event.brandName}
+            subValue={`Duration: ${event.duration}`}
+          />
+        </div>
+      )}
+
+      {/* Pre-Event extra sections: Compensation, Kit/Materials, Contact Info */}
+      {currentPhase !== "Cancelled" && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {event.compensation && (
+            <InfoCard
+              icon={DollarSign}
+              label="Compensation"
+              value={event.compensation.rate}
+              subValue={event.compensation.notes}
+            />
+          )}
+          {event.kitMaterials && (
+            <Card className="gap-0">
+              <CardContent className="p-4 space-y-1.5">
+                <div
+                  className="flex items-center gap-2 text-muted-foreground"
+                  style={{ fontSize: "0.75rem" }}
+                >
+                  <Boxes className="w-3.5 h-3.5" />
+                  Kit / Materials
+                </div>
+                <p
+                  className="text-foreground"
+                  style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                >
+                  Pickup: {event.kitMaterials.pickupLocation}
+                </p>
+                <ul className="text-muted-foreground space-y-0.5 mt-1" style={{ fontSize: "0.8125rem" }}>
+                  {event.kitMaterials.items.map((item) => (
+                    <li key={item} className="flex items-start gap-1.5">
+                      <span className="text-border mt-1.5">&bull;</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+          {event.storeContactName && (
+            <InfoCard
+              icon={Phone}
+              label="Store Contact"
+              value={event.storeContactName}
+              subValue={
+                event.storeContactPhone ? (
+                  <a
+                    href={`tel:${event.storeContactPhone}`}
+                    className="text-primary hover:opacity-80"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {event.storeContactPhone}
+                  </a>
+                ) : undefined
+              }
+            />
+          )}
+        </div>
+      )}
 
       {/* Educator Assignment Panel */}
-      {showAssignment && event.status === "Upcoming" && (
+      {showAssignment && isPreEvent && (
         <Card className="gap-0 border-primary/30">
           <CardHeader className="px-5 pt-5 pb-3">
             <CardTitle style={{ fontSize: "1rem", fontWeight: 600 }}>
@@ -482,12 +675,22 @@ export function EventDetailPage() {
                     className="flex items-center justify-between p-3.5 hover:bg-muted/50 transition-colors"
                   >
                     <div className="space-y-0.5">
-                      <p
-                        className="text-foreground"
-                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                      >
-                        {edu.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p
+                          className="text-foreground"
+                          style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                        >
+                          {edu.name}
+                        </p>
+                        {edu.distanceMiles != null && (
+                          <span
+                            className="text-muted-foreground"
+                            style={{ fontSize: "0.6875rem" }}
+                          >
+                            ~{edu.distanceMiles} mi
+                          </span>
+                        )}
+                      </div>
                       <div
                         className="flex items-center gap-3 text-muted-foreground"
                         style={{ fontSize: "0.75rem" }}
@@ -521,41 +724,43 @@ export function EventDetailPage() {
       )}
 
       {/* Read-only event details */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card className="gap-0">
-          <CardHeader className="px-5 pt-5 pb-3">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-muted-foreground" />
-              <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-                Instructions
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <p className="text-foreground" style={{ fontSize: "0.875rem" }}>
-              {event.instructions}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="gap-0">
-          <CardHeader className="px-5 pt-5 pb-3">
-            <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-muted-foreground" />
-              <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-                Goals
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <p className="text-foreground" style={{ fontSize: "0.875rem" }}>
-              {event.goals}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {currentPhase !== "Cancelled" && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="gap-0">
+            <CardHeader className="px-5 pt-5 pb-3">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+                  Instructions
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="px-5 pb-5">
+              <p className="text-foreground" style={{ fontSize: "0.875rem" }}>
+                {event.instructions}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="gap-0">
+            <CardHeader className="px-5 pt-5 pb-3">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-muted-foreground" />
+                <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+                  Goals
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="px-5 pb-5">
+              <p className="text-foreground" style={{ fontSize: "0.875rem" }}>
+                {event.goals}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Notes */}
-      {event.notes && (
+      {event.notes && currentPhase !== "Cancelled" && (
         <Card className="gap-0">
           <CardHeader className="px-5 pt-5 pb-3">
             <div className="flex items-center gap-2">
@@ -576,7 +781,7 @@ export function EventDetailPage() {
         </Card>
       )}
 
-      {/* Live monitoring section */}
+      {/* Live monitoring section (6 data streams per mm-ui-002) */}
       {event.status === "Live" && event.liveMetrics && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -588,7 +793,8 @@ export function EventDetailPage() {
               Live Monitoring
             </h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+            {/* 1. Check-In */}
             <Card className="gap-0">
               <CardContent className="p-4 space-y-1.5">
                 <p
@@ -614,31 +820,77 @@ export function EventDetailPage() {
                   className="text-muted-foreground"
                   style={{ fontSize: "0.75rem" }}
                 >
-                  {event.checkInTime || "—"}
+                  {event.checkInTime || "\u2014"}
                 </p>
               </CardContent>
             </Card>
+            {/* 2. Samples */}
             <MetricCard
               icon={ShoppingCart}
               label="Samples"
               value={event.liveMetrics.samplesDistributed}
             />
+            {/* 3. Consumer Interactions */}
             <MetricCard
               icon={User}
               label="Interactions"
               value={event.liveMetrics.consumerInteractions}
             />
+            {/* 4. Questionnaires */}
+            <MetricCard
+              icon={ClipboardList}
+              label="Questionnaires"
+              value={event.questionnairesCompleted ?? 0}
+            />
+            {/* 5. Inventory */}
+            <MetricCard
+              icon={Boxes}
+              label="Inventory"
+              value={event.inventoryData?.current ?? "\u2014"}
+              subValue={event.inventoryData ? `Pre-event: ${event.inventoryData.preEvent}` : undefined}
+            />
+            {/* 6. Photos */}
             <MetricCard
               icon={Camera}
               label="Photos"
               value={event.photoCount || 0}
             />
           </div>
+
+          {/* Educator Live Notes stream */}
+          {event.educatorLiveNotes && event.educatorLiveNotes.length > 0 && (
+            <Card className="gap-0">
+              <CardHeader className="px-5 pt-5 pb-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+                    Educator Notes
+                  </CardTitle>
+                  <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
+                    ({event.educatorLiveNotes.length})
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent className="px-5 pb-5">
+                <div className="space-y-2">
+                  {event.educatorLiveNotes.map((note, i) => (
+                    <p
+                      key={i}
+                      className="text-foreground pl-3 border-l-2 border-border"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
+                      {note}
+                    </p>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
       {/* Post-event finalization section */}
-      {event.status === "Completed" && event.finalStats && (
+      {(event.status === "Completed" || currentPhase === "Finalized") && event.finalStats && (
         <div className="space-y-4">
           <h2
             className="text-foreground"
@@ -681,8 +933,8 @@ export function EventDetailPage() {
             </Card>
           )}
 
-          {/* Stats grid */}
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          {/* Stats grid (expanded per mm-ui-002) */}
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
             <MetricCard
               icon={ShoppingCart}
               label="Total Samples"
@@ -704,6 +956,11 @@ export function EventDetailPage() {
               accent="#d97706"
             />
             <MetricCard
+              icon={ClipboardList}
+              label="Questionnaires"
+              value={event.questionnairesCompletedFinal ?? 0}
+            />
+            <MetricCard
               icon={Camera}
               label="Photos"
               value={event.finalStats.photosSubmitted}
@@ -715,26 +972,128 @@ export function EventDetailPage() {
             />
           </div>
 
-          {/* Photo gallery */}
-          {event.photoUrls && event.photoUrls.length > 0 && (
+          {/* Inventory Comparison (pre vs post per mm-ui-002) */}
+          {event.inventoryComparison && (
             <Card className="gap-0">
               <CardHeader className="px-5 pt-5 pb-3">
                 <div className="flex items-center gap-2">
-                  <Image className="w-4 h-4 text-muted-foreground" />
+                  <Boxes className="w-4 h-4 text-muted-foreground" />
                   <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
-                    Event Photos
+                    Inventory Comparison
                   </CardTitle>
-                  <span
-                    className="text-muted-foreground"
-                    style={{ fontSize: "0.8125rem" }}
-                  >
-                    ({event.photoUrls.length})
-                  </span>
                 </div>
               </CardHeader>
               <CardContent className="px-5 pb-5">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                      Pre-Event
+                    </p>
+                    <p className="text-foreground" style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+                      {event.inventoryComparison.preEvent}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                      Post-Event
+                    </p>
+                    <p className="text-foreground" style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+                      {event.inventoryComparison.postEvent}
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
+                      Sold / Used
+                    </p>
+                    <p className="text-green-600" style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+                      -{event.inventoryComparison.preEvent - event.inventoryComparison.postEvent}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Educator Notes (final) */}
+          {event.educatorNotesFinal && (
+            <Card className="gap-0">
+              <CardHeader className="px-5 pt-5 pb-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                  <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+                    Educator Notes
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className="px-5 pb-5">
+                <p className="text-foreground" style={{ fontSize: "0.875rem" }}>
+                  {event.educatorNotesFinal}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Photo gallery with categories per mm-ui-002 */}
+          {allPhotos.length > 0 && (
+            <Card className="gap-0">
+              <CardHeader className="px-5 pt-5 pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Image className="w-4 h-4 text-muted-foreground" />
+                    <CardTitle style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+                      Event Photos
+                    </CardTitle>
+                    <span
+                      className="text-muted-foreground"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
+                      ({allPhotos.length})
+                    </span>
+                  </div>
+                  {currentPhase !== "Finalized" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      Download All
+                    </Button>
+                  )}
+                </div>
+                {/* Photo category tabs */}
+                {categorizedPhotos && (
+                  <div className="flex gap-1 mt-3">
+                    {(
+                      [
+                        { key: "all" as const, label: "All", count: allPhotos.length },
+                        { key: "receipts" as const, label: "Receipts", count: categorizedPhotos.receipts.length },
+                        { key: "socialMedia" as const, label: "Social Media", count: categorizedPhotos.socialMedia.length },
+                        { key: "venue" as const, label: "Venue", count: categorizedPhotos.venue.length },
+                      ] as const
+                    ).map((tab) => (
+                      <button
+                        key={tab.key}
+                        onClick={() => setActivePhotoTab(tab.key)}
+                        className={`px-2.5 py-1 rounded-md font-medium transition-colors cursor-pointer ${
+                          activePhotoTab === tab.key
+                            ? "bg-muted text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        {tab.label}
+                        <span className="ml-1 text-muted-foreground">
+                          {tab.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="px-5 pb-5">
                 <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
-                  {event.photoUrls.map((_, i) => (
+                  {displayedPhotos.map((_, i) => (
                     <div
                       key={i}
                       className="aspect-square rounded-lg bg-muted border border-border flex items-center justify-center"
@@ -747,8 +1106,22 @@ export function EventDetailPage() {
             </Card>
           )}
 
+          {/* Export Data button */}
+          {(event.status === "Completed" || currentPhase === "Finalized") && (
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="cursor-pointer"
+              >
+                <FileDown className="w-3.5 h-3.5 mr-1.5" />
+                Export Event Data
+              </Button>
+            </div>
+          )}
+
           {/* Approve & Finalize */}
-          {!finalized && !event.finalizedAt && (
+          {!finalized && !event.finalizedAt && event.status === "Completed" && (
             <Card
               className={`gap-0 ${showFinalizeConfirm ? "border-amber-500/40" : "border-amber-500/30"}`}
             >
@@ -770,7 +1143,7 @@ export function EventDetailPage() {
                         >
                           This action is <strong>irreversible</strong>. It will
                           lock the event record for all actors and terminate the
-                          educator's editing window immediately.
+                          educator&apos;s editing window immediately.
                         </p>
                       </div>
                     </div>
@@ -841,12 +1214,22 @@ export function EventDetailPage() {
         </div>
       )}
 
-      {/* Cancellation Section (Upcoming events only) */}
-      {event.status === "Upcoming" && !showCancellation && (
-        <div className="flex items-center justify-end pt-2">
+      {/* Cancellation actions (pre-event only, per mm-ui-006 branches) */}
+      {isPreEvent && !showEducatorCancel && !showEventCancel && (
+        <div className="flex items-center justify-end gap-3 pt-2">
+          {assignedEducator && (
+            <Button
+              variant="outline"
+              onClick={() => setShowEducatorCancel(true)}
+              className="cursor-pointer text-amber-600 border-amber-500/30 hover:bg-amber-500/5"
+            >
+              <UserX className="w-4 h-4 mr-1.5" />
+              Cancel Educator
+            </Button>
+          )}
           <Button
             variant="outline"
-            onClick={() => setShowCancellation(true)}
+            onClick={() => setShowEventCancel(true)}
             className="cursor-pointer text-destructive border-destructive/30 hover:bg-destructive/5"
           >
             <Ban className="w-4 h-4 mr-1.5" />
@@ -855,12 +1238,21 @@ export function EventDetailPage() {
         </div>
       )}
 
-      {showCancellation && event.status === "Upcoming" && (
+      {showEducatorCancel && isPreEvent && (
         <CancellationPanel
+          mode="educator"
+          onCancel={handleEducatorCancel}
+          onClose={() => setShowEducatorCancel(false)}
+        />
+      )}
+
+      {showEventCancel && isPreEvent && (
+        <CancellationPanel
+          mode="event"
           onCancel={(_reason) => {
-            setShowCancellation(false);
+            setShowEventCancel(false);
           }}
-          onClose={() => setShowCancellation(false)}
+          onClose={() => setShowEventCancel(false)}
         />
       )}
     </div>

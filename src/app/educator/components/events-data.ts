@@ -1,7 +1,16 @@
 // Events data for Educator Manager
 // Scoped to the manager's assigned educator set only
+// Status model per mm-ui-006: 7 lifecycle states
 
-export type EventStatus = "Upcoming" | "Live" | "Completed";
+export type EventStatus =
+  | "Unassigned"
+  | "Pending"
+  | "Confirmed"
+  | "Live"
+  | "Completed"
+  | "Finalized"
+  | "Cancelled";
+
 export type EventType = "Tasting" | "Demo" | "Activation" | "Promo";
 export type AccountType = "Retail" | "Wholesale" | "Pop-up";
 export type CancellationReason =
@@ -10,6 +19,8 @@ export type CancellationReason =
   | "Car Accident"
   | "Retailer Cancellation"
   | "Other";
+
+export type StatusDisplayGroup = "Upcoming" | "Live" | "Completed" | "Cancelled";
 
 export interface EventItem {
   id: string;
@@ -31,6 +42,11 @@ export interface EventItem {
   instructions: string;
   goals: string;
   notes?: string;
+  // Pre-event fields (mm-ui-002 Pre-Event Detail View)
+  compensation?: { rate: string; notes?: string };
+  kitMaterials?: { pickupLocation: string; items: string[] };
+  storeContactName?: string;
+  storeContactPhone?: string;
   // Live event fields
   checkInStatus?: "checked-in" | "pending" | "failed";
   checkInTime?: string;
@@ -39,6 +55,9 @@ export interface EventItem {
     consumerInteractions: number;
     salesGenerated: number;
   };
+  questionnairesCompleted?: number;
+  educatorLiveNotes?: string[];
+  inventoryData?: { preEvent: number; current: number };
   photoCount?: number;
   photoUrls?: string[];
   // Completed event fields
@@ -50,12 +69,41 @@ export interface EventItem {
     photosSubmitted: number;
     duration: string;
   };
+  inventoryComparison?: { preEvent: number; postEvent: number };
+  questionnairesCompletedFinal?: number;
+  educatorNotesFinal?: string;
+  photoCategories?: {
+    receipts: string[];
+    socialMedia: string[];
+    venue: string[];
+  };
   completedAt?: string;
   finalizedAt?: string | null;
   // Cancellation
   cancellationReason?: CancellationReason;
   cancelledAt?: string;
 }
+
+// --- Status helpers ---
+
+const PRE_EVENT_STATUSES: EventStatus[] = [
+  "Unassigned",
+  "Pending",
+  "Confirmed",
+];
+
+export function isUpcoming(status: EventStatus): boolean {
+  return PRE_EVENT_STATUSES.includes(status);
+}
+
+export function getStatusDisplayGroup(status: EventStatus): StatusDisplayGroup {
+  if (isUpcoming(status)) return "Upcoming";
+  if (status === "Live") return "Live";
+  if (status === "Cancelled") return "Cancelled";
+  return "Completed"; // Completed + Finalized
+}
+
+// --- Mock data ---
 
 export const mockEvents: EventItem[] = [
   {
@@ -73,7 +121,7 @@ export const mockEvents: EventItem[] = [
     eventType: "Tasting",
     educatorId: null,
     educatorName: null,
-    status: "Upcoming",
+    status: "Unassigned",
     products: [
       "Absolut Vodka 750ml",
       "Absolut Citron 750ml",
@@ -85,6 +133,18 @@ export const mockEvents: EventItem[] = [
       "Sample 80+ consumers, drive 15+ bottle sales, collect consumer profiles.",
     notes:
       "High-traffic location on weekends. Store manager contact: John D. (917-555-0142)",
+    compensation: { rate: "$35/hr", notes: "4-hour minimum" },
+    kitMaterials: {
+      pickupLocation: "Hart Ops Warehouse, 120 W 31st St, NYC",
+      items: [
+        "Absolut branded table cover",
+        "Tasting cups (200ct)",
+        "Recipe cards",
+        "Ice bucket + tongs",
+      ],
+    },
+    storeContactName: "John D.",
+    storeContactPhone: "917-555-0142",
   },
   {
     id: "evt-102",
@@ -107,6 +167,9 @@ export const mockEvents: EventItem[] = [
       "Station near the whiskey endcap. Highlight the Cold Brew for younger consumers.",
     goals: "60+ samplings, 10+ sales, push Cold Brew variant.",
     notes: "Endcap display pre-arranged with store. Backup table in car.",
+    compensation: { rate: "$35/hr" },
+    storeContactName: "Mike R.",
+    storeContactPhone: "201-555-0311",
     checkInStatus: "checked-in",
     checkInTime: "3:52 PM",
     liveMetrics: {
@@ -114,6 +177,13 @@ export const mockEvents: EventItem[] = [
       consumerInteractions: 28,
       salesGenerated: 6,
     },
+    questionnairesCompleted: 12,
+    educatorLiveNotes: [
+      "3:55 PM — Setup complete, good foot traffic already.",
+      "4:30 PM — Cold Brew getting strong interest from 25-35 demographic.",
+      "5:15 PM — Store manager added endcap signage, helping visibility.",
+    ],
+    inventoryData: { preEvent: 48, current: 42 },
     photoCount: 4,
     photoUrls: [
       "/placeholder-photo-1.jpg",
@@ -144,6 +214,9 @@ export const mockEvents: EventItem[] = [
     goals: "100+ samplings, 20+ cases sold.",
     notes:
       "Beach-themed POS materials in educator kit. Manager: Lisa T. (201-555-0198)",
+    compensation: { rate: "$35/hr" },
+    storeContactName: "Lisa T.",
+    storeContactPhone: "201-555-0198",
     checkInStatus: "checked-in",
     checkInTime: "11:48 AM",
     finalStats: {
@@ -153,6 +226,20 @@ export const mockEvents: EventItem[] = [
       rating: 4.5,
       photosSubmitted: 8,
       duration: "4h 15m",
+    },
+    inventoryComparison: { preEvent: 60, postEvent: 42 },
+    questionnairesCompletedFinal: 34,
+    educatorNotesFinal:
+      "Great event. Pineapple variant was the crowd favorite. Several customers asked about Malibu merch. Store manager offered to extend the activation next month.",
+    photoCategories: {
+      receipts: ["/placeholder-photo-1.jpg", "/placeholder-photo-2.jpg"],
+      socialMedia: ["/placeholder-photo-3.jpg", "/placeholder-photo-4.jpg"],
+      venue: [
+        "/placeholder-photo-5.jpg",
+        "/placeholder-photo-6.jpg",
+        "/placeholder-photo-7.jpg",
+        "/placeholder-photo-8.jpg",
+      ],
     },
     completedAt: "2026-03-19T16:15:00",
     finalizedAt: null,
@@ -183,13 +270,26 @@ export const mockEvents: EventItem[] = [
     eventType: "Demo",
     educatorId: null,
     educatorName: null,
-    status: "Upcoming",
+    status: "Unassigned",
     products: ["Kahlúa Original", "Kahlúa Vanilla", "Kahlúa Mint Mocha"],
     instructions:
       "Espresso martini recipe cards on table. Demo the espresso martini prep.",
     goals: "50+ samplings, 12+ bottle sales.",
     notes:
       "Bring portable espresso machine from warehouse. Store has power outlet at endcap.",
+    compensation: { rate: "$35/hr", notes: "Equipment setup bonus: +$25" },
+    kitMaterials: {
+      pickupLocation: "Hart Ops Warehouse, 120 W 31st St, NYC",
+      items: [
+        "Portable espresso machine",
+        "Kahlúa branded apron",
+        "Recipe cards (100ct)",
+        "Cocktail shaker set",
+        "Martini glasses (12ct)",
+      ],
+    },
+    storeContactName: "Tom W.",
+    storeContactPhone: "718-555-0244",
   },
   {
     id: "evt-105",
@@ -206,13 +306,16 @@ export const mockEvents: EventItem[] = [
     eventType: "Activation",
     educatorId: "edu-5",
     educatorName: "Maria Santos",
-    status: "Upcoming",
+    status: "Confirmed",
     products: ["Beefeater London Dry 1.75L", "Beefeater Pink 750ml"],
     instructions:
       "Use the provided Costco-approved sampling setup. Focus on G&T pairing suggestions.",
     goals: "120+ samplings, 30+ unit sales.",
     notes:
       "Costco requires wristband check for samples. Arrive 30 min early for badge.",
+    compensation: { rate: "$40/hr", notes: "Wholesale venue premium rate" },
+    storeContactName: "Dave P.",
+    storeContactPhone: "201-555-0477",
   },
   {
     id: "evt-106",
@@ -235,6 +338,9 @@ export const mockEvents: EventItem[] = [
     goals: "40+ tastings, 8+ bottles sold.",
     notes:
       "VIP-level presentation expected. High-value clientele at this location.",
+    compensation: { rate: "$45/hr", notes: "Premium brand rate" },
+    storeContactName: "Alex M.",
+    storeContactPhone: "212-555-0399",
     checkInStatus: "checked-in",
     checkInTime: "2:45 PM",
     finalStats: {
@@ -244,6 +350,30 @@ export const mockEvents: EventItem[] = [
       rating: 4.8,
       photosSubmitted: 12,
       duration: "4h 10m",
+    },
+    inventoryComparison: { preEvent: 36, postEvent: 25 },
+    questionnairesCompletedFinal: 22,
+    educatorNotesFinal:
+      "Exceptional crowd. Several corporate buyers interested in bulk orders. The 18-year expression was the top seller. Suggest repeating this venue for the next prestige launch.",
+    photoCategories: {
+      receipts: [
+        "/placeholder-photo-1.jpg",
+        "/placeholder-photo-2.jpg",
+        "/placeholder-photo-3.jpg",
+      ],
+      socialMedia: [
+        "/placeholder-photo-4.jpg",
+        "/placeholder-photo-5.jpg",
+        "/placeholder-photo-6.jpg",
+      ],
+      venue: [
+        "/placeholder-photo-7.jpg",
+        "/placeholder-photo-8.jpg",
+        "/placeholder-photo-9.jpg",
+        "/placeholder-photo-10.jpg",
+        "/placeholder-photo-11.jpg",
+        "/placeholder-photo-12.jpg",
+      ],
     },
     completedAt: "2026-03-18T19:10:00",
     finalizedAt: null,
@@ -285,6 +415,9 @@ export const mockEvents: EventItem[] = [
     goals: "30+ premium tastings, 5+ bottles sold.",
     notes:
       "Store has dedicated tasting corner. Ask for manager Alex on arrival.",
+    compensation: { rate: "$40/hr" },
+    storeContactName: "Alex K.",
+    storeContactPhone: "212-555-0188",
     checkInStatus: "checked-in",
     checkInTime: "4:48 PM",
     liveMetrics: {
@@ -292,6 +425,12 @@ export const mockEvents: EventItem[] = [
       consumerInteractions: 15,
       salesGenerated: 3,
     },
+    questionnairesCompleted: 7,
+    educatorLiveNotes: [
+      "4:50 PM — Setup complete. Copper mugs are a hit for display.",
+      "5:20 PM — Steady stream of interest. Craft story resonates well.",
+    ],
+    inventoryData: { preEvent: 24, current: 21 },
     photoCount: 6,
     photoUrls: [
       "/placeholder-photo-1.jpg",
@@ -317,15 +456,124 @@ export const mockEvents: EventItem[] = [
     eventType: "Activation",
     educatorId: "edu-7",
     educatorName: "Carlos Mendez",
-    status: "Upcoming",
+    status: "Pending",
     products: ["Avión Silver", "Avión Reposado", "Avión Añejo"],
     instructions:
       "Taste all three expressions. Lead with Silver, finish with Añejo. Use agave-themed display.",
     goals: "70+ samplings, 15+ bottles sold.",
     notes:
       "Agave plant props available in warehouse kit #12. Confirm pickup day-of.",
+    compensation: { rate: "$35/hr" },
+    kitMaterials: {
+      pickupLocation: "Hart Ops Warehouse, 120 W 31st St, NYC",
+      items: [
+        "Agave plant props (kit #12)",
+        "Avión branded table cover",
+        "Tasting cups (200ct)",
+        "Expression flight cards",
+      ],
+    },
+    storeContactName: "Nina S.",
+    storeContactPhone: "212-555-0533",
+  },
+  // Finalized event — locked, data available for reporting
+  {
+    id: "evt-109",
+    name: "Hendrick's Gin Garden Party",
+    campaignName: "Hendrick's Curiosities",
+    brandName: "Hendrick's",
+    clientName: "William Grant & Sons",
+    date: "2026-03-15",
+    time: "1:00 PM – 5:00 PM",
+    duration: "4h",
+    venue: "Eataly, Flatiron",
+    venueAddress: "200 5th Ave, New York, NY 10010",
+    accountType: "Retail",
+    eventType: "Activation",
+    educatorId: "edu-1",
+    educatorName: "Ana Martinez",
+    status: "Finalized",
+    products: ["Hendrick's Original", "Hendrick's Neptunia", "Hendrick's Orbium"],
+    instructions:
+      "Garden party theme. Use cucumber garnishes and floral arrangements. Neat and G&T pours.",
+    goals: "60+ tastings, 12+ bottles sold.",
+    compensation: { rate: "$40/hr" },
+    storeContactName: "Marco V.",
+    storeContactPhone: "212-555-0621",
+    checkInStatus: "checked-in",
+    checkInTime: "12:45 PM",
+    finalStats: {
+      totalSamples: 72,
+      totalInteractions: 58,
+      totalSales: 15,
+      rating: 4.9,
+      photosSubmitted: 10,
+      duration: "4h 05m",
+    },
+    inventoryComparison: { preEvent: 40, postEvent: 25 },
+    questionnairesCompletedFinal: 28,
+    educatorNotesFinal:
+      "Phenomenal event. The garden party theme drew a lot of attention. Neptunia was the surprise hit — outsold Original 2:1. Several customers asked about future tastings.",
+    photoCategories: {
+      receipts: ["/placeholder-photo-1.jpg", "/placeholder-photo-2.jpg"],
+      socialMedia: [
+        "/placeholder-photo-3.jpg",
+        "/placeholder-photo-4.jpg",
+        "/placeholder-photo-5.jpg",
+      ],
+      venue: [
+        "/placeholder-photo-6.jpg",
+        "/placeholder-photo-7.jpg",
+        "/placeholder-photo-8.jpg",
+        "/placeholder-photo-9.jpg",
+        "/placeholder-photo-10.jpg",
+      ],
+    },
+    completedAt: "2026-03-15T17:05:00",
+    finalizedAt: "2026-03-16T09:30:00",
+    photoCount: 10,
+    photoUrls: [
+      "/placeholder-photo-1.jpg",
+      "/placeholder-photo-2.jpg",
+      "/placeholder-photo-3.jpg",
+      "/placeholder-photo-4.jpg",
+      "/placeholder-photo-5.jpg",
+      "/placeholder-photo-6.jpg",
+      "/placeholder-photo-7.jpg",
+      "/placeholder-photo-8.jpg",
+      "/placeholder-photo-9.jpg",
+      "/placeholder-photo-10.jpg",
+    ],
+  },
+  // Cancelled event — terminal state
+  {
+    id: "evt-110",
+    name: "Maker's Mark Bourbon Tasting",
+    campaignName: "Maker's Mark Spring",
+    brandName: "Maker's Mark",
+    clientName: "Beam Suntory",
+    date: "2026-03-17",
+    time: "3:00 PM – 7:00 PM",
+    duration: "4h",
+    venue: "Liquor Barn, Newark",
+    venueAddress: "50 Market St, Newark, NJ 07102",
+    accountType: "Retail",
+    eventType: "Tasting",
+    educatorId: null,
+    educatorName: null,
+    status: "Cancelled",
+    products: ["Maker's Mark Original", "Maker's 46", "Maker's Mark Cask Strength"],
+    instructions: "Standard bourbon tasting setup. Offer neat pours only.",
+    goals: "50+ tastings, 10+ bottles sold.",
+    compensation: { rate: "$35/hr" },
+    storeContactName: "Ray P.",
+    storeContactPhone: "973-555-0744",
+    cancellationReason: "Retailer Cancellation",
+    cancelledAt: "2026-03-16T14:00:00",
   },
 ];
+
+// --- Query helpers ---
 
 export function getEventById(id: string): EventItem | undefined {
   return mockEvents.find((e) => e.id === id);
@@ -335,10 +583,15 @@ export function getEventsByStatus(status: EventStatus): EventItem[] {
   return mockEvents.filter((e) => e.status === status);
 }
 
+export function getUpcomingEvents(): EventItem[] {
+  return mockEvents.filter((e) => isUpcoming(e.status));
+}
+
 export function getEventsRequiringAttention(): EventItem[] {
   return mockEvents.filter(
     (e) =>
-      (e.status === "Upcoming" && !e.educatorId) ||
-      (e.status === "Completed" && !e.finalizedAt),
+      e.status === "Unassigned" ||
+      (e.status === "Completed" && !e.finalizedAt) ||
+      e.status === "Pending",
   );
 }

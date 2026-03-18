@@ -12,6 +12,7 @@ export interface Educator {
   punctuality: number; // percentage
   totalEvents: number;
   joinedDate: string;
+  distanceMiles?: number; // approximate distance from manager's geography center
 }
 
 export const mockEducators: Educator[] = [
@@ -26,6 +27,7 @@ export const mockEducators: Educator[] = [
     punctuality: 98,
     totalEvents: 47,
     joinedDate: "2025-06-15",
+    distanceMiles: 8,
   },
   {
     id: "edu-2",
@@ -38,6 +40,7 @@ export const mockEducators: Educator[] = [
     punctuality: 95,
     totalEvents: 32,
     joinedDate: "2025-08-20",
+    distanceMiles: 15,
   },
   {
     id: "edu-3",
@@ -50,6 +53,7 @@ export const mockEducators: Educator[] = [
     punctuality: 88,
     totalEvents: 28,
     joinedDate: "2025-09-10",
+    distanceMiles: 22,
   },
   {
     id: "edu-4",
@@ -62,6 +66,7 @@ export const mockEducators: Educator[] = [
     punctuality: 100,
     totalEvents: 53,
     joinedDate: "2025-04-01",
+    distanceMiles: 5,
   },
   {
     id: "edu-5",
@@ -74,6 +79,7 @@ export const mockEducators: Educator[] = [
     punctuality: 92,
     totalEvents: 19,
     joinedDate: "2025-11-05",
+    distanceMiles: 28,
   },
   {
     id: "edu-6",
@@ -86,6 +92,7 @@ export const mockEducators: Educator[] = [
     punctuality: 97,
     totalEvents: 41,
     joinedDate: "2025-05-22",
+    distanceMiles: 12,
   },
   {
     id: "edu-7",
@@ -98,6 +105,7 @@ export const mockEducators: Educator[] = [
     punctuality: 82,
     totalEvents: 15,
     joinedDate: "2025-10-18",
+    distanceMiles: 35,
   },
   {
     id: "edu-8",
@@ -110,6 +118,7 @@ export const mockEducators: Educator[] = [
     punctuality: 94,
     totalEvents: 22,
     joinedDate: "2025-12-02",
+    distanceMiles: 18,
   },
 ];
 

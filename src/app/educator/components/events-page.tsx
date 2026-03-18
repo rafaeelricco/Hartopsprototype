@@ -9,7 +9,10 @@ import {
   ChevronLeft,
   Search,
   AlertTriangle,
-  Radio,
+  CheckCircle2,
+  Clock,
+  Ban,
+  ArrowUpDown,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -22,26 +25,38 @@ import {
 } from "@/app/shared/components/ui/card";
 import {
   mockEvents,
-  getEventsRequiringAttention,
+  isUpcoming,
+  getStatusDisplayGroup,
   type EventStatus,
+  type StatusDisplayGroup,
   type EventItem,
 } from "./events-data";
 
 type ViewMode = "list" | "calendar";
-type FilterTab = "All" | EventStatus;
+type FilterTab = "All" | StatusDisplayGroup;
+type SortOption = "date" | "status" | "educator";
 
 const filterTabs: FilterTab[] = ["All", "Upcoming", "Live", "Completed"];
 
-const statusColors: Record<string, string> = {
-  Upcoming: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+// Status badge colors for all 7 lifecycle states (mm-ui-006)
+const statusColors: Record<EventStatus, string> = {
+  Unassigned: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  Pending: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20",
+  Confirmed: "bg-blue-500/10 text-blue-600 border-blue-500/20",
   Live: "bg-green-500/10 text-green-600 border-green-500/20",
   Completed: "bg-muted text-muted-foreground border-border",
+  Finalized: "bg-muted/60 text-muted-foreground/70 border-border",
+  Cancelled: "bg-red-500/10 text-red-600 border-red-500/20",
 };
 
-const statusDotColors: Record<string, string> = {
-  Upcoming: "bg-blue-500",
+const statusDotColors: Record<EventStatus, string> = {
+  Unassigned: "bg-amber-500",
+  Pending: "bg-yellow-500",
+  Confirmed: "bg-blue-500",
   Live: "bg-green-500 animate-pulse",
   Completed: "bg-muted-foreground",
+  Finalized: "bg-muted-foreground/50",
+  Cancelled: "bg-red-500",
 };
 
 const eventTypeBadgeColors: Record<string, string> = {
@@ -49,6 +64,17 @@ const eventTypeBadgeColors: Record<string, string> = {
   Demo: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
   Activation: "bg-orange-500/10 text-orange-600 border-orange-500/20",
   Promo: "bg-pink-500/10 text-pink-600 border-pink-500/20",
+};
+
+// Sort priority: Live first, then Upcoming substates by date, then Completed, Finalized, Cancelled
+const STATUS_SORT_ORDER: Record<EventStatus, number> = {
+  Live: 0,
+  Unassigned: 1,
+  Pending: 2,
+  Confirmed: 3,
+  Completed: 4,
+  Finalized: 5,
+  Cancelled: 6,
 };
 
 const MONTHS = [
@@ -76,51 +102,57 @@ function getFirstDayOfMonth(year: number, month: number) {
   return new Date(year, month, 1).getDay();
 }
 
-/* --- Stat Card (matching dashboard pattern) --- */
+function sortEvents(events: EventItem[], sortBy: SortOption): EventItem[] {
+  return [...events].sort((a, b) => {
+    switch (sortBy) {
+      case "status":
+        return STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status];
+      case "educator":
+        return (a.educatorName || "zzz").localeCompare(
+          b.educatorName || "zzz",
+        );
+      case "date":
+      default: {
+        // Primary: lifecycle priority, Secondary: date
+        const statusDiff =
+          STATUS_SORT_ORDER[a.status] - STATUS_SORT_ORDER[b.status];
+        if (statusDiff !== 0) return statusDiff;
+        return a.date.localeCompare(b.date);
+      }
+    }
+  });
+}
 
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-  accent,
-}: {
-  label: string;
-  value: number;
-  icon: React.ElementType;
-  accent?: string;
-}) {
-  return (
-    <Card className="gap-0">
-      <CardHeader className="pb-2 pt-5 px-5">
-        <div className="flex items-center justify-between">
-          <CardDescription style={{ fontSize: "0.8125rem" }}>
-            {label}
-          </CardDescription>
-          <div
-            className="flex items-center justify-center size-8 rounded-md"
-            style={{ backgroundColor: accent ? `${accent}14` : "#7D152D14" }}
-          >
-            <Icon
-              className="size-4"
-              style={{ color: accent || "#7D152D" }}
-            />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="px-5 pb-5">
-        <div
-          className="text-foreground"
-          style={{
-            fontSize: "1.75rem",
-            fontWeight: 600,
-            lineHeight: 1.2,
-          }}
-        >
-          {value}
-        </div>
-      </CardContent>
-    </Card>
-  );
+function getFilterCount(tab: FilterTab): number {
+  if (tab === "All") return mockEvents.filter((e) => e.status !== "Cancelled").length;
+  return mockEvents.filter(
+    (e) => getStatusDisplayGroup(e.status) === tab,
+  ).length;
+}
+
+function matchesFilter(event: EventItem, tab: FilterTab): boolean {
+  if (tab === "All") return event.status !== "Cancelled";
+  return getStatusDisplayGroup(event.status) === tab;
+}
+
+// Human-readable status label for the badge
+function getStatusLabel(status: EventStatus): string {
+  switch (status) {
+    case "Unassigned":
+      return "Unassigned";
+    case "Pending":
+      return "Pending";
+    case "Confirmed":
+      return "Confirmed";
+    case "Live":
+      return "Live";
+    case "Completed":
+      return "Completed";
+    case "Finalized":
+      return "Finalized";
+    case "Cancelled":
+      return "Cancelled";
+  }
 }
 
 /* --- Calendar View --- */
@@ -248,28 +280,109 @@ function CalendarView({
   );
 }
 
+/* --- Educator column with assignment status indicator --- */
+
+function EducatorCell({ event }: { event: EventItem }) {
+  if (!event.educatorName) {
+    return (
+      <span
+        className="text-muted-foreground flex items-center gap-1.5"
+        style={{ fontSize: "0.8125rem" }}
+      >
+        <User className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="text-amber-500 font-medium">Unassigned</span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="text-muted-foreground flex items-center gap-1.5"
+      style={{ fontSize: "0.8125rem" }}
+    >
+      <User className="w-3.5 h-3.5 flex-shrink-0" />
+      <span className="truncate">{event.educatorName}</span>
+      {event.status === "Pending" && (
+        <span
+          className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+        >
+          <Clock className="w-2.5 h-2.5 mr-0.5" />
+          Pending
+        </span>
+      )}
+      {event.status === "Confirmed" && (
+        <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+      )}
+    </span>
+  );
+}
+
+/* --- Event name column with indicators --- */
+
+function EventNameCell({ event }: { event: EventItem }) {
+  return (
+    <div className="flex items-center gap-2 min-w-0">
+      <span
+        className="text-foreground truncate"
+        style={{ fontSize: "0.875rem", fontWeight: 500 }}
+      >
+        {event.name}
+      </span>
+      <span
+        className={`inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 ${eventTypeBadgeColors[event.eventType]}`}
+        style={{
+          fontSize: "0.625rem",
+          fontWeight: 500,
+          lineHeight: "1.25rem",
+        }}
+      >
+        {event.eventType}
+      </span>
+      {event.status === "Unassigned" && (
+        <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+      )}
+      {event.status === "Completed" && !event.finalizedAt && (
+        <span
+          className="text-amber-500 flex-shrink-0 font-medium"
+          style={{ fontSize: "0.6875rem" }}
+        >
+          Review
+        </span>
+      )}
+      {event.status === "Cancelled" && (
+        <Ban className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+      )}
+    </div>
+  );
+}
+
 /* --- Main Events Page --- */
 
 export function EventsPage() {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("date");
   const [calYear, setCalYear] = useState(2026);
   const [calMonth, setCalMonth] = useState(2); // March
 
-  const filteredEvents = mockEvents
-    .filter((e) => activeFilter === "All" || e.status === activeFilter)
-    .filter(
-      (e) =>
-        !search ||
-        e.name.toLowerCase().includes(search.toLowerCase()) ||
-        e.venue.toLowerCase().includes(search.toLowerCase()) ||
-        e.brandName.toLowerCase().includes(search.toLowerCase()) ||
-        (e.educatorName || "").toLowerCase().includes(search.toLowerCase()),
-    );
+  const filteredEvents = sortEvents(
+    mockEvents
+      .filter((e) => matchesFilter(e, activeFilter))
+      .filter(
+        (e) =>
+          !search ||
+          e.name.toLowerCase().includes(search.toLowerCase()) ||
+          e.venue.toLowerCase().includes(search.toLowerCase()) ||
+          e.brandName.toLowerCase().includes(search.toLowerCase()) ||
+          (e.educatorName || "").toLowerCase().includes(search.toLowerCase()),
+      ),
+    sortBy,
+  );
 
-  const liveCount = mockEvents.filter((e) => e.status === "Live").length;
-  const attentionCount = getEventsRequiringAttention().length;
+  const cardTitle =
+    activeFilter === "All" ? "All Events" : `${activeFilter} Events`;
 
   const handlePrevMonth = () => {
     if (calMonth === 0) {
@@ -289,72 +402,72 @@ export function EventsPage() {
     }
   };
 
+  const cycleSortOption = () => {
+    const options: SortOption[] = ["date", "status", "educator"];
+    const currentIdx = options.indexOf(sortBy);
+    setSortBy(options[(currentIdx + 1) % options.length]!);
+  };
+
   return (
-    <div className="p-6 space-y-6">
-      {/* Page header */}
+    <div className="p-6 space-y-6 w-full">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-foreground" style={{ fontSize: "1.5rem", fontWeight: 600 }}>
-            Events
-          </h1>
+          <h1 className="text-foreground">Events</h1>
           <p
             className="text-muted-foreground mt-1"
             style={{ fontSize: "0.875rem" }}
           >
-            Manage your assigned events across all stages.
+            Monitor and manage events across all campaigns.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
           <Button
-            variant={viewMode === "list" ? "default" : "outline"}
-            size="sm"
+            variant="ghost"
             onClick={() => setViewMode("list")}
-            className="cursor-pointer"
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
+              viewMode === "list"
+                ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
+                : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
+            }`}
+            style={{ fontSize: "0.8125rem" }}
           >
-            <List className="w-4 h-4 mr-1.5" />
+            <List size={15} />
             List
           </Button>
           <Button
-            variant={viewMode === "calendar" ? "default" : "outline"}
-            size="sm"
+            variant="ghost"
             onClick={() => setViewMode("calendar")}
-            className="cursor-pointer"
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
+              viewMode === "calendar"
+                ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
+                : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
+            }`}
+            style={{ fontSize: "0.8125rem" }}
           >
-            <CalendarDays className="w-4 h-4 mr-1.5" />
+            <CalendarDays size={15} />
             Calendar
           </Button>
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Total Events"
-          value={mockEvents.length}
-          icon={CalendarDays}
-        />
-        <StatCard
-          label="Live Now"
-          value={liveCount}
-          icon={Radio}
-          accent="#16a34a"
-        />
-        <StatCard
-          label="Needs Attention"
-          value={attentionCount}
-          icon={AlertTriangle}
-          accent="#d97706"
-        />
-      </div>
+      {/* Filters Row — search, tabs, sort in one row (matching ops pattern) */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[220px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or location..."
+            className="pl-9"
+          />
+        </div>
 
-      {/* Filters + Search */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+        {/* Filter tabs */}
         <div className="flex gap-1 p-1 bg-muted rounded-lg">
           {filterTabs.map((tab) => {
-            const count =
-              tab === "All"
-                ? mockEvents.length
-                : mockEvents.filter((e) => e.status === tab).length;
+            const count = getFilterCount(tab);
             return (
               <button
                 key={tab}
@@ -381,15 +494,23 @@ export function EventsPage() {
             );
           })}
         </div>
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search events, brands..."
-            className="pl-9"
-          />
-        </div>
+
+        {/* Sort */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={cycleSortOption}
+          className="cursor-pointer text-muted-foreground"
+        >
+          <ArrowUpDown className="w-3.5 h-3.5 mr-1.5" />
+          <span style={{ fontSize: "0.8125rem" }}>
+            {sortBy === "date"
+              ? "Date newest"
+              : sortBy === "status"
+                ? "Status"
+                : "Educator"}
+          </span>
+        </Button>
       </div>
 
       {/* Content */}
@@ -409,7 +530,7 @@ export function EventsPage() {
                 <CardTitle
                   style={{ fontSize: "1rem", fontWeight: 600 }}
                 >
-                  All Events
+                  {cardTitle}
                 </CardTitle>
                 <CardDescription style={{ fontSize: "0.8125rem" }}>
                   {filteredEvents.length} event
@@ -422,7 +543,7 @@ export function EventsPage() {
           <CardContent className="px-0 pb-0">
             {/* Table header */}
             <div
-              className="grid grid-cols-[1fr_100px_100px_1fr_160px_90px] gap-4 px-5 py-3 border-y border-border bg-muted/30 text-muted-foreground font-medium"
+              className="grid grid-cols-[1fr_100px_100px_1fr_180px_100px] gap-4 px-5 py-3 border-y border-border bg-muted/30 text-muted-foreground font-medium"
               style={{ fontSize: "0.75rem" }}
             >
               <span>Event</span>
@@ -444,38 +565,11 @@ export function EventsPage() {
                   <Link
                     key={event.id}
                     to={`/educator/events/${event.id}`}
-                    className="grid grid-cols-[1fr_100px_100px_1fr_160px_90px] gap-4 px-5 py-3.5 items-center hover:bg-muted/50 transition-colors group"
+                    className={`grid grid-cols-[1fr_100px_100px_1fr_180px_100px] gap-4 px-5 py-3.5 items-center hover:bg-muted/50 transition-colors group ${
+                      event.status === "Cancelled" ? "opacity-60" : ""
+                    }`}
                   >
-                    {/* Event name + type badge */}
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span
-                        className="text-foreground truncate"
-                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                      >
-                        {event.name}
-                      </span>
-                      <span
-                        className={`inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 ${eventTypeBadgeColors[event.eventType]}`}
-                        style={{
-                          fontSize: "0.625rem",
-                          fontWeight: 500,
-                          lineHeight: "1.25rem",
-                        }}
-                      >
-                        {event.eventType}
-                      </span>
-                      {event.status === "Upcoming" && !event.educatorId && (
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
-                      )}
-                      {event.status === "Completed" && !event.finalizedAt && (
-                        <span
-                          className="text-amber-500 flex-shrink-0 font-medium"
-                          style={{ fontSize: "0.6875rem" }}
-                        >
-                          Review
-                        </span>
-                      )}
-                    </div>
+                    <EventNameCell event={event} />
                     {/* Date */}
                     <span
                       className="text-muted-foreground"
@@ -502,17 +596,7 @@ export function EventsPage() {
                       <span className="truncate">{event.venue}</span>
                     </span>
                     {/* Educator */}
-                    <span
-                      className="text-muted-foreground flex items-center gap-1.5"
-                      style={{ fontSize: "0.8125rem" }}
-                    >
-                      <User className="w-3.5 h-3.5 flex-shrink-0" />
-                      {event.educatorName || (
-                        <span className="text-amber-500 font-medium">
-                          Unassigned
-                        </span>
-                      )}
-                    </span>
+                    <EducatorCell event={event} />
                     {/* Status */}
                     <div className="flex items-center gap-2">
                       <span
@@ -522,7 +606,7 @@ export function EventsPage() {
                         {event.status === "Live" && (
                           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse mr-1.5" />
                         )}
-                        {event.status}
+                        {getStatusLabel(event.status)}
                       </span>
                       <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                     </div>
