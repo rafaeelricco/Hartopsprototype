@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { AuthLayout } from "./auth-layout";
-import { PasswordInput } from "./password-input";
+import { AuthLayout } from "@/app/ops/components/auth-layout";
+import { PasswordInput } from "@/app/ops/components/password-input";
 import { Input } from "@/app/shared/components/ui/input";
 import { Button } from "@/app/shared/components/ui/button";
 
 export function SignIn() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("staff@gmail.com");
+  const [email, setEmail] = useState("manager@gmail.com");
   const [password, setPassword] = useState("12345678");
   const [errors, setErrors] = useState<{
     email?: string | undefined;
@@ -45,13 +45,13 @@ export function SignIn() {
     // Simulate auth call
     await new Promise((resolve) => setTimeout(resolve, 1200));
 
-    // Consolidated Auth Logic
-    if (email === "staff@gmail.com" && password === "12345678") {
-      navigate("/staff/dashboard");
-    } else if (email === "ops@gmail.com" && password === "12345678") {
-      navigate("/ops/dashboard");
-    } else if (email === "manager@gmail.com" && password === "12345678") {
+    if (email === "manager@gmail.com" && password === "12345678") {
       navigate("/educator/dashboard");
+    } else if (email === "locked@hartagency.com") {
+      setErrors({
+        general:
+          "Your account is locked. Please contact your administrator for assistance.",
+      });
     } else {
       setErrors({ general: "Invalid email or password. Please try again." });
     }
@@ -61,8 +61,8 @@ export function SignIn() {
 
   return (
     <AuthLayout
-      title="Sign In"
-      subtitle="Welcome back. Sign in to your account."
+      title="Educator Manager Sign In"
+      subtitle="Welcome back. Sign in to manage your team."
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {errors.general && (
@@ -106,7 +106,7 @@ export function SignIn() {
               Password
             </label>
             <Link
-              to="/ops/forgot-password"
+              to="/educator/forgot-password"
               className="text-primary hover:opacity-80 transition-opacity"
               style={{ fontSize: "0.8125rem" }}
             >

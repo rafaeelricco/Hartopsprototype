@@ -37,6 +37,15 @@ import { BrandAssetsPage } from "./staff/components/brand-assets-page";
 import { SettingsPage as StaffSettingsPage } from "./staff/components/settings-page";
 import { CreateEventPage } from "./staff/components/create-event-page";
 
+// ---- EDUCATOR MANAGER IMPORTS ----
+import { DashboardLayout as EducatorDashboardLayout } from "./educator/components/dashboard-layout";
+import { Dashboard as EducatorDashboard } from "./educator/components/dashboard";
+import { EventsPage as EducatorEventsPage } from "./educator/components/events-page";
+import { EventDetailPage as EducatorEventDetailPage } from "./educator/components/event-detail-page";
+import { EducatorsPage as EducatorEducatorsPage } from "./educator/components/educators-page";
+import { EducatorDetailPage as EducatorEducatorDetailPage } from "./educator/components/educator-detail-page";
+import { SettingsPage as EducatorSettingsPage } from "./educator/components/settings-page";
+
 export const router = createBrowserRouter([
   // ---- OPS PLATFORM (/ops) ----
   { path: "/ops", Component: OpsSignIn, ErrorBoundary: NotFound },
@@ -90,6 +99,24 @@ export const router = createBrowserRouter([
       { path: "reports", Component: StaffReportsPage },
       { path: "brand-assets", Component: BrandAssetsPage },
       { path: "settings", Component: StaffSettingsPage },
+    ],
+  },
+
+  // ---- EDUCATOR MANAGER PLATFORM (/educator) ----
+  { path: "/educator", Component: OpsSignIn },
+  { path: "/educator/activate", Component: OpsActivateAccount },
+  { path: "/educator/forgot-password", Component: OpsForgotPassword },
+  { path: "/educator/reset-password", Component: OpsResetPassword },
+  {
+    path: "/educator",
+    Component: EducatorDashboardLayout,
+    children: [
+      { path: "dashboard", Component: EducatorDashboard },
+      { path: "events", Component: EducatorEventsPage },
+      { path: "events/:eventId", Component: EducatorEventDetailPage },
+      { path: "educators", Component: EducatorEducatorsPage },
+      { path: "educators/:id", Component: EducatorEducatorDetailPage },
+      { path: "settings", Component: EducatorSettingsPage },
     ],
   },
 
