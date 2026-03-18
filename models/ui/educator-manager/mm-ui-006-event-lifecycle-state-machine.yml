@@ -1,0 +1,177 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Event Lifecycle State Machine & Routing
+# =============================================================================
+
+id: "mm-ui-006"
+title: "Event Lifecycle State Machine & Routing"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "mm-ui-001"
+    - "mm-ui-002"
+  feeds_into:
+    - "mm-ui-002"
+
+context: |
+  Events flow through a defined lifecycle from the Educator Manager's perspective.
+  Each status determines which UI elements are visible, which actions are available,
+  and which notifications fire. No single model previously defined this state machine,
+  creating ambiguity about event behavior across phases. As an Educator Manager, I need
+  to understand at a glance what state each event is in and what action I should take
+  next, so the staffing-to-finalization pipeline flows without confusion.
+
+scope:
+  in_scope:
+    - "Event status definitions (7 states)"
+    - "State transition rules with triggers and guard conditions"
+    - "Event intake and routing from Trial Client Staff to Educator Manager"
+    - "UI behavior per state (visible elements, available actions)"
+    - "Notification mapping per state transition"
+    - "Multi-educator state handling"
+    - "Cancellation branches (educator cancel vs event cancel)"
+  out_of_scope:
+    - "Event creation workflow (Trial Client Staff responsibility)"
+    - "Educator mobile app data entry flows"
+    - "Report generation downstream of finalization"
+    - "Campaign management"
+
+key_concepts:
+  - term: "Event Status"
+    definition: "The current lifecycle phase of an event from the Educator Manager's perspective. Seven statuses exist: Unassigned, Assigned (Pending Acceptance), Confirmed, Live, Completed, Finalized, and Cancelled. Each status maps to specific UI behavior and available actions."
+    sources:
+      - doc: "PDF-EM"
+        details: "§4-5 — event phases: upcoming, live, completed, finalized"
+      - doc: "DC1"
+        details: "~00:52:05 — educator accept/reject creates intermediate assignment states"
+  - term: "State Transition"
+    definition: "A change from one event status to another. Transitions are triggered by user actions (manager assigns educator, manager finalizes), system events (event start time arrives), or external actions (educator accepts/declines in mobile app). Invalid transitions are blocked by the system."
+    sources:
+      - doc: "MM8"
+        details: "Implications — Finalization as data pipeline bottleneck"
+  - term: "Account Master Routing"
+    definition: "The mechanism by which newly created events are automatically routed to the correct Educator Manager. Events are tied to account masters (venue entities), and each account master has a geographic assignment. The account's geography determines which manager receives the event notification."
+    sources:
+      - doc: "DC2"
+        details: "~00:04:49 — account hierarchy with geography, channel, chain categorization"
+      - doc: "DC1"
+        details: "~00:51:06 — managers are tied to geography; account geography determines manager"
+
+core_content:
+  - section_title: "Event Intake & Routing"
+    points:
+      - "Trigger: Trial Client Staff creates an event, assigns it to an account master, and sets the event details (products, instructions, goals, compensation)."
+      - "Step 1: System identifies the account master's geographic assignment and routes the event to the corresponding Educator Manager."
+      - "Step 2: Manager receives a 'New Events Available' notification (Category 1 in mm-ui-004)."
+      - "Step 3: Event appears in the manager's Events List with status 'Unassigned'."
+      - "Functionality: Routing is automatic — no manual dispatch or manager acceptance step required."
+      - "Functionality: Events arrive fully defined. The manager's role begins at educator assignment, not event configuration."
+      - "Design principle: The routing mechanism is invisible to the manager. Events simply appear in their list, scoped by geography."
+    sources:
+      - doc: "DC1"
+        details: "~00:43:10 — once event is solidified on ops side, manager takes over"
+      - doc: "DC1"
+        details: "~00:51:06 — managers tied to geography; account geography determines routing"
+      - doc: "DC2"
+        details: "~00:06:21 — accounts assigned at event level with geography and channel"
+      - doc: "DEMO"
+        details: "~07:46 — events pushed simultaneously to managers and educators"
+
+  - section_title: "Status Definitions"
+    points:
+      - "Status: Unassigned — Event created and routed to manager. No educator assigned. Appears in 'Upcoming' list and on the dashboard 'Events Requiring Attention' card. Available action: Assign Educator."
+      - "Status: Assigned (Pending Acceptance) — Manager has assigned an educator. Awaiting educator's accept/reject response in the mobile app. Appears in 'Upcoming' list with 'Pending' badge. Available actions: Reassign, Cancel Educator."
+      - "Status: Confirmed — Educator has accepted the assignment. Event is fully staffed. Appears in 'Upcoming' list with 'Confirmed' badge. Available actions: Reassign, Cancel Educator."
+      - "Status: Live — Event's scheduled start time has arrived. Auto-triggered by system clock. Live data streaming from educator's mobile app. Appears in 'Live Events' list. Manager monitors in read-only mode. Available action: none (monitoring only)."
+      - "Status: Completed — Event has ended. Educator has checked out or event duration has elapsed. Educator's 24-hour post-event editing window begins. Appears in 'Completed' list. Available action: Approve & Finalize."
+      - "Status: Finalized — Manager clicked 'Approve & Finalize'. Irreversible. Event locked for all actors (manager, educator, Trial Client Staff). Educator's editing window terminated immediately. Data pipeline proceeds to reporting. Appears in 'Completed' list with 'Finalized' badge. No further actions available."
+      - "Status: Cancelled — Event itself cancelled (retailer cancellation, weather, or other external factor). Terminal state distinct from educator cancellation. Removed from active lists. No further actions available."
+    sources:
+      - doc: "PDF-EM"
+        details: "§4-5 — event filters: All, Live, Upcoming, Completed; finalization locks event"
+      - doc: "DC1"
+        details: "~00:52:05 — educator accept/reject; assignment as suggested opportunity"
+      - doc: "DC1"
+        details: "~00:54:10 — cancellation reasons, event must still happen (replacement needed)"
+      - doc: "MM8"
+        details: "Assumptions — Speed-to-Finalize; 24-hour editing window"
+
+  - section_title: "State Transitions"
+    points:
+      - "Transition: [New] → Unassigned. Trigger: Trial Client Staff creates event within manager's geographic scope. Manager action: none (automatic routing). Notification: Category 1 — New Events Available."
+      - "Transition: Unassigned → Assigned (Pending). Trigger: Manager selects and assigns an educator. Manager action: Assign Educator. Notification: Push notification sent to educator as suggested opportunity."
+      - "Transition: Assigned (Pending) → Confirmed. Trigger: Educator accepts assignment in mobile app. Manager action: none (automatic). Notification: none (status badge updates in near real-time)."
+      - "Transition: Assigned (Pending) → Unassigned. Trigger: Educator declines assignment in mobile app. Manager action: none (automatic revert). Notification: Decline notification to manager; event re-appears on 'Events Requiring Attention' dashboard card."
+      - "Transition: Confirmed → Live. Trigger: Event's scheduled start time arrives (system clock). Manager action: none (automatic). Notification: Category 3 — Event Starting Soon (fires 1 hour before)."
+      - "Transition: Live → Live (Alert). Trigger: Educator has not completed geolocated check-in by event start time. Manager action: none (automatic alert). Notification: Category 4 — Failed Educator Check-In."
+      - "Transition: Live → Completed. Trigger: Educator completes check-out or event duration elapses. Manager action: none (automatic). Notification: Category 5 — Event Ready for Review."
+      - "Transition: Completed → Finalized. Trigger: Manager clicks 'Approve & Finalize'. Manager action: Approve & Finalize (with confirmation dialog). Notification: none. Side effect: educator editing window terminated, event locked."
+      - "Transition: Any pre-Live → Cancelled. Trigger: Event itself cancelled (retailer cancellation, weather). Manager action: Cancel Event with reason. Notification: none. Terminal state."
+      - "Transition: Confirmed/Assigned → Unassigned (Educator Cancellation). Trigger: Manager initiates educator cancellation workflow with reason. Manager action: Cancel Educator + select reason. Side effect: event returns to Unassigned; cancellation tagged to educator for scoring; outgoing educator notified."
+    sources:
+      - doc: "DC1"
+        details: "~00:52:05-00:55:09 — assignment as suggestion, accept/reject, cancellation reasons, replacement as priority"
+      - doc: "PDF-EM"
+        details: "§5 — Approve & Finalize; event locked; educator editing window terminated"
+      - doc: "MM8"
+        details: "Assumptions — 24-hour editing window; Finalization bottleneck"
+
+  - section_title: "UI Behavior Per State"
+    points:
+      - "Unassigned: Pre-Event Detail View displayed. 'Assign Educator' CTA is prominent and highlighted. No educator info section. Event details (products, instructions, goals) are read-only."
+      - "Assigned (Pending): Pre-Event Detail View displayed. Educator info shows name, photo, and 'Pending Acceptance' badge. 'Reassign' button available. Event details read-only."
+      - "Confirmed: Pre-Event Detail View displayed. Educator info shows name, photo, contact links, and 'Confirmed' badge. 'Reassign' button available. Event details read-only."
+      - "Live: During-Event Live Dashboard displayed. Real-time data streams visible (check-in, inventory, questionnaires, notes, photos). All data is read-only for the manager. No action buttons except monitoring."
+      - "Completed: Post-Event Review displayed. Final stats, photos, notes, inventory comparison visible. 'Approve & Finalize' CTA button prominent with high-contrast styling. Photo download and data export available."
+      - "Finalized: Post-Event Review displayed (same as Completed but locked). No action buttons. 'Finalized' badge and lock icon. All data permanently read-only."
+      - "Cancelled: Minimal detail view showing event name, cancellation reason, date cancelled. No action buttons."
+      - "Design principle: The event detail view morphs based on lifecycle status — same URL/route, different layout and available actions."
+    sources:
+      - doc: "PDF-EM"
+        details: "§4-5 — event card content, pre/during/post event elements, finalization CTA"
+
+  - section_title: "Multi-Educator State Handling"
+    points:
+      - "Functionality: Events with multiple educators track each educator's status independently (Pending, Confirmed, Checked-In, Completed)."
+      - "Functionality: Event-level status reflects the most conservative educator status. Example: if 2 of 3 educators have checked in, event shows 'Partial Check-In' indicator."
+      - "Functionality: Each educator card in the event detail shows individual check-in time, task progress, and submitted data."
+      - "Assumption: Finalization of a multi-educator event requires all assigned educators to have completed their tasks and checked out."
+      - "Design principle: Multi-educator events surface individual progress without hiding the aggregate event status."
+    sources:
+      - doc: "PDF-EM"
+        details: "§5 — manager can add 1+ educators to the event"
+      - doc: "DC1"
+        details: "~00:52:05 — assignment flow; manager assigns educator(s)"
+
+  - section_title: "Cancellation Branches"
+    points:
+      - "Branch 1 — Educator Cancellation: Educator cannot attend (illness, weather, car accident, personal). Manager initiates cancellation in-platform. Manager selects reason from predefined list: weather, illness, car accident, retailer cancellation, other. Cancellation is tagged to the educator for scoring. Event returns to 'Unassigned' status. Manager immediately searches for replacement."
+      - "Branch 2 — Event Cancellation: The event itself is cancelled (retailer cancels permission, venue closure, weather makes event impossible). Event enters terminal 'Cancelled' status. No replacement needed. Event removed from active lists."
+      - "Functionality: Educator cancellation reasons are categorized for scoring accuracy — the system distinguishes between educator-controllable (illness, no-show) and external (weather, retailer) reasons."
+      - "Design principle: The cancellation workflow exists to protect event execution — finding a replacement is the primary goal, not just recording the cancellation."
+    sources:
+      - doc: "DC1"
+        details: "~00:53:09 — cancellation reasons: weather, illness, car accident, retailer cancellation"
+      - doc: "DC1"
+        details: "~00:54:10 — educator cannot self-cancel; manager makes the call; cancellation tagged for scoring; finding replacement is most important"
+
+assumptions:
+  - "Event statuses are mutually exclusive — an event can only be in one status at a time."
+  - "The transition from Confirmed to Live is automatic and time-based (system clock)."
+  - "The 24-hour educator editing window countdown starts at event completion (check-out), not at finalization."
+  - "Finalization is irreversible — no undo mechanism in Phase 1."
+  - "Event cancellation (retailer-initiated) is a separate action from educator cancellation (swapping the person, not cancelling the event)."
+  - "Educator acceptance/rejection is tracked in-platform even if initial negotiation uses phone/text in Phase 1."
+  - "Events can only be cancelled before they go Live. Once Live, the event must proceed to Completed."
+  - "The Cancelled status is terminal — cancelled events cannot be re-activated."
+
+implications:
+  - "Frontend: Event cards in list and calendar views must display the current lifecycle status with visual indicators — color-coded badges or status icons (e.g., orange for Unassigned, yellow for Pending, green for Confirmed, red pulse for Live, blue for Completed, gray lock for Finalized)."
+  - "Frontend: Event detail view must conditionally render different layouts based on status — Pre-Event, Live Dashboard, or Post-Event Review."
+  - "Frontend: Status transitions should update the UI in near real-time without requiring page refresh (consider WebSocket or polling)."
+  - "Backend: Event lifecycle state machine must enforce valid transitions and reject invalid ones (e.g., cannot go from Unassigned to Finalized)."
+  - "Backend: Each status transition must be persisted with timestamp, actor, and reason for audit trail."
+  - "Backend: Status transitions must trigger the appropriate notifications as defined in mm-ui-004."
+  - "Backend: Account master geography lookup must be performant — used on every event creation to determine manager routing."
+  - "Architecture: Consider event-sourcing pattern for the lifecycle state machine to maintain a complete audit trail of all transitions."
+  - "Architecture: The state machine is shared across roles — educator mobile app and Trial Client Staff web app both read event status, but only specific roles can trigger specific transitions."

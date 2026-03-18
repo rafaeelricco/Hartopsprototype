@@ -1,0 +1,85 @@
+# =============================================================================
+# UI & FEATURE MENTAL MODEL — Account & Profile Management
+# =============================================================================
+
+id: "mm-ui-005"
+title: "Account & Profile Management"
+status: "draft"
+
+dependencies:
+  depends_on:
+    - "mm-ui-001"
+  feeds_into: ["mm-ui-001"]
+
+context: |
+  Educator Managers need self-service access to their own profile information
+  and password management. This is a minimal settings surface — managers are
+  coordinators, not administrators, so account management is limited to personal
+  profile data and credential updates. As an Educator Manager, I need to update
+  my contact information and change my password so my team can reach me and my
+  account stays secure.
+
+scope:
+  in_scope:
+    - "Profile information display and editing (photo, name, email, phone)"
+    - "Change Password flow with modal"
+    - "Save Changes action"
+  out_of_scope:
+    - "Notification preferences (covered in mm-ui-004)"
+    - "Help & Support (covered in mm-ui-004)"
+    - "Team management or inviting other users (Trial Client Staff responsibility)"
+    - "Organization-level settings (Trial Client Staff responsibility)"
+    - "Role or permission changes (Hart Ops responsibility)"
+
+key_concepts:
+  - term: "Self-Service Profile"
+    definition: "Educator Managers can edit their own contact information (name, email, phone, photo) without requiring Hart Ops or Trial Client Staff intervention. This is the only area where the manager has write access to account data."
+    sources:
+      - doc: "PDF-EM"
+        details: "Educator Managers §6.1 — Profile photo upload, Name, Email address, Phone Number (can be edited)"
+
+core_content:
+  - section_title: "Profile Management"
+    points:
+      - "Entry Point: 'Settings' item in the side navigation → Account/Profile section."
+      - "Elements: Profile photo upload — allows manager to set or update their profile image."
+      - "Elements: Name field (editable)."
+      - "Elements: Email address field (editable)."
+      - "Elements: Phone number field (editable)."
+      - "Elements: 'Save Changes' button to persist profile updates."
+      - "Functionality: All profile fields are editable by the manager."
+      - "Functionality: Email and phone validation enforced on save."
+      - "Design principle: Minimal surface — only personal contact information is editable. No organizational or role settings."
+    sources:
+      - doc: "PDF-EM"
+        details: "Educator Managers §6.1 — Profile photo upload, Name, Email address, Phone Number (can be edited)"
+
+  - section_title: "Change Password"
+    points:
+      - "Entry Point: 'Change Password' link within the Account/Profile section."
+      - "Elements: Modal dialog with three fields — Current password, New password, Confirm new password."
+      - "Functionality: Current password must be validated before allowing the change."
+      - "Functionality: New password must meet security requirements (minimum 8 characters, 1 uppercase, 1 number, 1 special character)."
+      - "Functionality: New password and confirmation must match."
+      - "Functionality: Error messages displayed if any requirements are not met."
+      - "Functionality: On successful password change, session remains active (user is not logged out)."
+      - "Design principle: Password change uses a modal to avoid navigating away from the settings page."
+    sources:
+      - doc: "PDF-EM"
+        details: "Educator Managers §6.1 — 'Change Password' link opens modal with Current password, New password, Confirm new password"
+
+assumptions:
+  - "Profile photo format accepts common image types (JPEG, PNG) with reasonable size limits."
+  - "Email address change does not require re-verification in Phase 1 — this may be added in later phases."
+  - "Phone number format validation follows standard US phone number patterns."
+  - "Profile changes take effect immediately on save — no approval workflow."
+  - "Password change behavior (stay logged in vs force re-login) should be consistent across platform roles. Educator app forces re-login on password change (PDF-ED §4). Educator Manager behavior TBD — recommend aligning with Educator app for consistency and security."
+  - "Password security requirements match other platform roles (minimum 8 characters, 1 uppercase, 1 number, 1 special character)."
+
+implications:
+  - "Frontend: Profile management needs a form component with inline validation and a 'Save Changes' action."
+  - "Frontend: Change Password modal requires three password fields with visibility toggle and real-time validation feedback."
+  - "Frontend: Profile photo upload requires a file input component with image preview and format/size validation."
+  - "Backend: Profile update API must validate email format, phone format, and enforce uniqueness constraints on email."
+  - "Backend: Change Password API must verify current password before accepting the new password."
+  - "Backend: Profile photo storage requires an image upload endpoint with format and size validation."
