@@ -21,6 +21,13 @@ export interface UpcomingEvent {
   attentionReason?: string;
 }
 
+export interface TopEducator {
+  name: string;
+  eventsThisMonth: number;
+  avgRating: number;
+  trend: "up" | "down";
+}
+
 export const dashboardStats: DashboardStat[] = [
   {
     label: "Total Events This Week",
@@ -135,3 +142,33 @@ export const upcomingEvents: UpcomingEvent[] = [
 export const attentionEvents = upcomingEvents.filter(
   (e) => e.requiresAttention,
 );
+
+// Weekly activity chart data (events per day this week)
+export const weeklyActivity = [
+  { day: "Mon", count: 3 },
+  { day: "Tue", count: 5 },
+  { day: "Wed", count: 4 },
+  { day: "Thu", count: 6 },
+  { day: "Fri", count: 7 },
+  { day: "Sat", count: 2 },
+  { day: "Sun", count: 1 },
+];
+
+// Monthly event trend (last 6 months)
+export const eventsTrend = [
+  { month: "Oct", events: 28 },
+  { month: "Nov", events: 35 },
+  { month: "Dec", events: 22 },
+  { month: "Jan", events: 41 },
+  { month: "Feb", events: 38 },
+  { month: "Mar", events: 47 },
+];
+
+// Top educators by performance
+export const topEducators: TopEducator[] = [
+  { name: "Sarah Chen", eventsThisMonth: 14, avgRating: 4.9, trend: "up" },
+  { name: "Emily Park", eventsThisMonth: 12, avgRating: 4.8, trend: "up" },
+  { name: "Carlos Mendez", eventsThisMonth: 11, avgRating: 4.7, trend: "up" },
+  { name: "James Rodriguez", eventsThisMonth: 9, avgRating: 4.5, trend: "down" },
+  { name: "Maria Santos", eventsThisMonth: 8, avgRating: 4.4, trend: "down" },
+];
