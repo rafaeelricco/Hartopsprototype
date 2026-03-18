@@ -1,6 +1,10 @@
 # =============================================================================
 # UI & FEATURE MENTAL MODEL — Events Lifecycle & Assignment
 # =============================================================================
+# NOTE: This model covers UI workflows and screen-level behavior for events.
+# For the formal state machine (status definitions, transition rules, guard
+# conditions, and UI behavior per state), see mm-ui-006.
+# =============================================================================
 
 id: "mm-ui-002"
 title: "Events Lifecycle & Assignment"
@@ -265,9 +269,9 @@ assumptions:
   - "Events are routed to managers based on account geography — the account master's geographic assignment determines which manager receives the event notification."
   - "Event details are fully defined (solidified) by Trial Client Staff before the event is sent to the manager for educator assignment."
   - "Educator scoring is an aggregate metric derived from: event completion rate, punctuality, cancellation history, sales performance, and ratings. Exact formula TBD."
-  - "Events route to managers based on account master geography — the account's geographic assignment determines which manager receives the event notification."
-  - "Educator acceptance/rejection of assignments is tracked in-platform even if initial negotiation happens via phone/text in Phase 1."
-  - "Educator employment classification: Source material is contradictory — DEMO ~01:10 describes educators as 'technically employees of Hart,' while DC1 ~00:52 describes them as contractors who can accept or reject assignments. The platform models the relationship as contractor-like (suggested opportunities, accept/reject) regardless of legal classification. Exact legal status requires clarification from Hart."
+  # NOTE: Duplicate assumptions about geography routing and educator acceptance removed (already covered in lines above).
+  - "Educator employment classification: The platform models the educator relationship as contractor-like (suggested opportunities, accept/reject) regardless of legal classification."
+  # OPEN QUESTION: Source material is contradictory on educator legal status — DEMO ~01:10 says 'technically employees of Hart,' DC1 ~00:52 describes contractors. Exact legal classification requires clarification from Hart.
 
 implications:
   - "Frontend: Implement dual-view toggle (List/Calendar) with shared event data source to avoid redundant API calls."

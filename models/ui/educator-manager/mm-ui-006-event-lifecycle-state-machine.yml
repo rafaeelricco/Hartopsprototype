@@ -1,6 +1,10 @@
 # =============================================================================
 # UI & FEATURE MENTAL MODEL — Event Lifecycle State Machine & Routing
 # =============================================================================
+# NOTE: This model is the authoritative source for event status definitions,
+# state transitions, and routing rules. For screen-level UI workflows
+# (list/calendar views, assignment flow, finalization), see mm-ui-002.
+# =============================================================================
 
 id: "mm-ui-006"
 title: "Event Lifecycle State Machine & Routing"
