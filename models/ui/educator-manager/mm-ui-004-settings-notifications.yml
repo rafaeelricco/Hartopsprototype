@@ -8,9 +8,8 @@ status: "draft"
 
 dependencies:
   depends_on:
-    - "TBD — to be filled manually"
-  feeds_into:
-    - "TBD — to be filled manually"
+    - "mm-ui-001"
+  feeds_into: []
 
 context: |
   Educator Managers have the most granular notification set on the platform —
@@ -64,7 +63,7 @@ core_content:
   - section_title: "Notification Types Detail"
     points:
       - "Elements: Category 1 — New Events Assigned. Trigger: Trial Client Staff assigns an event to the manager's scope."
-      - "Elements: Category 2 — Unstaffed Events Warning. Trigger: An event is 7 days away with no educator assigned."
+      - "Elements: Category 2 — Unstaffed Events Warning. Trigger: An event is 7 days away with no educator assigned. This is the primary signal for managers to act on availability gaps before they become critical."
       - "Elements: Category 3 — Event Starting Soon. Trigger: An assigned event starts in 1 hour."
       - "Elements: Category 4 — Failed Educator Check-In. Trigger: Educator has not completed geolocated check-in by event start time."
       - "Elements: Category 5 — Event Ready for Review. Trigger: Event is completed and awaiting manager finalization."
@@ -74,6 +73,8 @@ core_content:
         details: "Educator Managers §6.1"
       - doc: "mm8 Educator Manager Experience"
         details: "Core Content — Settings and Notifications"
+      - doc: "Definition Call 1/4"
+        details: "~00:25:09 — availability gaps surfaced to managers; Category 2 (Unstaffed Events Warning) is the notification-layer expression of this"
 
   - section_title: "Help & Support"
     points:
@@ -95,6 +96,7 @@ assumptions:
   - "FAQ content syncs from the Trial Client Staff-managed help resources — no manual curation by managers."
   - "'Contact Support' links to an email or external support system — specifics TBD."
   - "Notification preferences are stored per-manager and persist across sessions."
+  - "The effectiveness of the Unstaffed Events Warning (Category 2) depends on educators maintaining their availability in-app. The manager notification system's value degrades if educator availability data is stale. Pinging educators to update availability is a mobile-app concern, but managers benefit directly from fresh availability data."
 
 implications:
   - "Frontend: Notification preferences screen needs toggle components with immediate save (no separate 'Save' button) or explicit save action — pattern TBD."

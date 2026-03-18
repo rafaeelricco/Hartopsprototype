@@ -8,7 +8,7 @@ status: "draft"
 
 dependencies:
   depends_on:
-    - "TBD — to be filled manually"
+    - "mm-ui-001"
   feeds_into:
     - "mm-ui-002"
 
@@ -35,7 +35,7 @@ scope:
 
 key_concepts:
   - term: "Quick Stats"
-    definition: "A set of at-a-glance performance metrics for an individual educator: average rating, sales per event, and punctuality. Used by managers to assess educator fitness for event assignment."
+    definition: "A set of at-a-glance performance metrics for an individual educator: average rating, sales per event, punctuality, and completed events count. Used by managers to assess educator fitness for event assignment."
     sources:
       - doc: "Functionality PDF"
         details: "Educator Managers §5.2"
@@ -49,14 +49,27 @@ key_concepts:
     sources:
       - doc: "mm8 Educator Manager Experience"
         details: "Implications — Managers are coordinators"
+  - term: "Geography Proximity"
+    definition: "Educators are contracted to work within approximately a 100-mile radius of their home address. The roster surfaces this geographic context so managers can make proximity-aware assignment decisions without asking the educator to travel unreasonably far."
+    sources:
+      - doc: "Demo Meeting"
+        details: "~01:10:03 — educators contracted to specific areas; won't drive outside ~100-mile radius from home"
+      - doc: "Definition Call 1/4"
+        details: "~00:52:05 — geography used to match educators to accounts at assignment time"
+  - term: "Brand Certification"
+    definition: "Educators can be pre-qualified on specific brands they repeatedly service. Certified educators get priority in assignment suggestions for those brands. Certification data is managed by Hart Ops and displayed as read-only on the roster."
+    sources:
+      - doc: "Definition Call 1/4"
+        details: "~00:27:25 — educators pre-qualified on brands; certified educators get priority; certification speeds up event preparation"
 
 core_content:
   - section_title: "Educator Roster List"
     points:
       - "Entry Point: 'Educators' item in the side navigation."
-      - "Elements: Tabular list displaying educator records."
+      - "Elements: List grouped by status (Active/Inactive) using visual section headers — not just a filter."
       - "Elements: Columns — Name, Contact (email/phone), Status (Active/Inactive), Performance metrics."
-      - "Functionality: Columns are sortable — click column header to sort ascending/descending."
+      - "Elements: Inline contact action icons (tel and mailto) directly in each row for one-tap communication without navigating to the detail view."
+      - "Functionality: Columns are sortable — including by Completed Events count in addition to rating, sales, and punctuality."
       - "Functionality: Roster is scoped to the authenticated manager's assigned educators only."
       - "Functionality: Clicking an educator row navigates to the Educator Detail View."
       - "Design principle: The roster is the staffing reference — it should answer 'Who is available and performing well?' at a glance."
@@ -65,21 +78,32 @@ core_content:
         details: "Educator Managers §5.1"
       - doc: "mm8 Educator Manager Experience"
         details: "Core Content — Educator Management"
+      - doc: "Briefing Document"
+        details: "Educator Roster — grouped by status, inline contact icons, sortable by Completed Events"
 
   - section_title: "Educator Detail View"
     points:
       - "Entry Point: Clicking an educator row in the Roster List."
       - "Elements: Contact links — mailto link for email, tel link for phone (tap-to-call on mobile)."
-      - "Elements: Quick Stats panel — Average Rating, Sales Per Event, Punctuality."
+      - "Elements: Quick Stats panel — Average Rating, Sales Per Event, Punctuality, Completed Events count."
       - "Elements: Educator status indicator (Active/Inactive)."
+      - "Elements: Geography / operating area — home base or region indicating where the educator is contracted to work."
+      - "Elements: Brand certifications — read-only badges or tags showing which brands the educator is pre-qualified for."
       - "Functionality: Contact links open the device's default email client or phone dialer."
       - "Functionality: Quick Stats are read-only — derived from aggregated event data, not manually entered."
-      - "Design principle: The detail view answers 'How is this educator performing?' and 'How do I reach them?'"
+      - "Functionality: Brand certifications are managed by Hart Ops — read-only for managers."
+      - "Design principle: The detail view answers 'How is this educator performing?', 'How do I reach them?', and 'Are they right for this event?'"
     sources:
       - doc: "Functionality PDF"
         details: "Educator Managers §5.2"
       - doc: "Chris, Intro Meeting"
         details: "~00:33:48"
+      - doc: "Demo Meeting"
+        details: "~01:10:03 — educators contracted to specific geographic areas"
+      - doc: "Definition Call 1/4"
+        details: "~00:27:25 — brand certifications; pre-qualified educators get priority"
+      - doc: "Definition Call 1/4"
+        details: "~00:52:05 — geography and score surfaced for assignment decisions"
 
   - section_title: "Performance Sorting & Filtering"
     points:
@@ -98,12 +122,18 @@ assumptions:
   - "Performance metrics are updated after each event finalization, not in real-time."
   - "Search within the roster is anticipated but not explicitly defined in source — filter by name or contact."
   - "Managers cannot add or remove educators from their roster — assignment is managed at a higher level."
+  - "Educators are part-time — typically 2 events per day, approximately 2 hours each. The roster is designed for a workforce that is not full-time and whose availability can vary day to day."
+  - "Brand certification data is managed by Hart Ops — displayed as read-only badges or tags on the educator detail view."
 
 implications:
-  - "Frontend: Roster table component needs sortable column headers with ascending/descending toggle indicators."
+  - "Frontend: Roster list rows should include inline contact action icons (tel/mailto) for one-tap communication — not just in the detail view."
+  - "Frontend: Status grouping (Active/Inactive) should use visual section headers, not just a filter toggle."
+  - "Frontend: Roster table component needs sortable column headers with ascending/descending toggle indicators, including a Completed Events sort."
   - "Frontend: Educator Detail View should include direct-action contact links (mailto:, tel:) rather than plain text."
   - "Frontend: Quick Stats panel should use a consistent card or metric display pattern reusable across the app."
+  - "Frontend: Brand certifications should render as read-only badges or tags — not editable fields."
   - "Backend: Quick Stats API must aggregate performance data from finalized events scoped to the requesting manager."
+  - "Backend: Completed Events count must be aggregated from finalized events for the educator."
   - "Backend: Roster endpoint must enforce manager-level scoping — return only educators assigned to the authenticated manager."
   - "Backend: Consider caching Quick Stats as they only change on event finalization, not on every request."
   - "Architecture: The roster feeds into the educator assignment flow (mm-ui-002) — the assignment UI should reference roster data without requiring a separate API call."

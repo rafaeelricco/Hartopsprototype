@@ -8,7 +8,7 @@ status: "draft"
 
 dependencies:
   depends_on:
-    - "TBD — to be filled manually"
+    - "mm8"
   feeds_into:
     - "mm-ui-002"
     - "mm-ui-003"
@@ -117,6 +117,7 @@ core_content:
     points:
       - "Entry Point: Dashboard is the default landing page after Sign In."
       - "Elements: 3 Stat Cards — Total Events This Week, Active Events Now, Events Requiring Attention."
+      - "Functionality: 'Events Requiring Attention' card highlights specifically: (1) upcoming events with no educator assigned, and (2) events where the assigned educator failed their geolocated check-in."
       - "Functionality: Every card and list item is clickable — direct link to the task at hand."
       - "Functionality: Stat Cards reflect the manager's scoped data only (their educators and events)."
       - "Design principle: Action-oriented — surfaces things the manager needs to do, not just see."
@@ -126,6 +127,10 @@ core_content:
         details: "Educator Managers §3"
       - doc: "mm8 Educator Manager Experience"
         details: "Core Content — Dashboard (Homepage)"
+      - doc: "Definition Call 1/4"
+        details: "~00:54:10 — cancellation → unstaffed events immediately needing a replacement; surfaced on dashboard as needing attention"
+      - doc: "Definition Call 1/4"
+        details: "~00:25:09 — availability gaps surfaced to managers so they can act on unstaffed slots"
 
 assumptions:
   - "Educator Managers cannot self-register — must be invited by Trial Client Staff."

@@ -1,29 +1,35 @@
 # =============================================================================
-# UI & FEATURE MENTAL MODEL — Events Management
+# UI & FEATURE MENTAL MODEL — Events Lifecycle & Assignment
 # =============================================================================
 
 id: "mm-ui-002"
-title: "Events Management"
+title: "Events Lifecycle & Assignment"
 status: "draft"
 
 dependencies:
   depends_on:
-    - "TBD — to be filled manually"
+    - "mm-ui-001"
   feeds_into: []
 
 context: |
   Educator Managers do not create events — they receive assigned events from
   Trial Client Staff and manage them through their lifecycle: staffing educators
   before the event, monitoring live execution during the event, and finalizing
-  the record after the event. As an Educator Manager, I need to view my events
-  across list and calendar views, assign educators, monitor real-time field data,
-  and finalize completed events so the data pipeline can proceed to reporting.
+  the record after the event. Cancellations and reassignments are a normal part
+  of operations (weather, illness, retailer cancellations) and require a defined
+  manager-controlled workflow. As an Educator Manager, I need to view my events
+  across list and calendar views, assign the right educator based on geography
+  and availability, handle cancellations and reassignments, monitor real-time
+  field data, and finalize completed events so the data pipeline can proceed
+  to reporting.
 
 scope:
   in_scope:
     - "Events List View with filters (Live, Upcoming, Completed)"
     - "Monthly Calendar View toggle"
     - "Pre-Event Detail View with educator assignment"
+    - "Geography-based educator matching and assignment suggestions"
+    - "Cancellation & Reassignment workflow with reason tracking"
     - "During-Event Live Dashboard monitoring"
     - "Post-Event Review and Finalization workflow"
     - "Speed-to-Finalize workflow for weekend event clusters"
@@ -93,9 +99,11 @@ core_content:
   - section_title: "Educator Assignment Flow"
     points:
       - "Entry Point: 'Assign Educator' or 'Reassign' CTA on the Pre-Event Detail View."
-      - "Step 1: Select educator from the manager's roster."
-      - "Step 2: View educator's digital availability for the event date/time."
-      - "Step 3: Confirm assignment → System sends notification to the assigned educator."
+      - "Step 1: Search/filter roster to identify Active educators without scheduling conflicts."
+      - "Step 2: System surfaces assignment suggestions ranked by geography proximity (educator home address vs. event account address) and educator score."
+      - "Step 3: View educator's digital availability for the event date/time."
+      - "Step 4: Confirm assignment → System sends notification to the assigned educator as a suggested opportunity."
+      - "Functionality: Educators are not employees — assignment is a suggestion they can accept or reject. Final confirmation may still require out-of-platform contact in Phase 1."
       - "Functionality: Reassignment replaces the current educator and notifies both the outgoing and incoming educator."
       - "Functionality: Availability reference reduces but does not eliminate phone/text coordination — full scheduling negotiation remains external in Phase 1."
     sources:
@@ -103,6 +111,26 @@ core_content:
         details: "Educator Managers §5"
       - doc: "Chris, Intro Meeting"
         details: "~00:33:48"
+      - doc: "Definition Call 1/4"
+        details: "~00:52:05 — geography proximity, educator scoring as assignment factors; educators accept/reject as non-employees"
+      - doc: "Demo Meeting"
+        details: "~01:10:03 — educators contracted to work within ~100-mile radius of home address; manager calls to confirm availability"
+
+  - section_title: "Cancellation & Reassignment Workflow"
+    points:
+      - "Trigger: Educator cannot attend a confirmed event (illness, weather, car accident, retailer cancellation)."
+      - "Step 1: Educator communicates inability to the manager (out-of-platform in Phase 1 — phone/text)."
+      - "Step 2: Manager opens the event and initiates cancellation — educator does not have the power to self-cancel."
+      - "Step 3: Manager selects a cancellation reason from a predefined category list (weather, illness, car accident, retailer cancellation, other)."
+      - "Step 4: Cancellation is confirmed and tagged to the educator for scoring purposes."
+      - "Step 5: Manager immediately searches for a replacement educator using the same assignment flow — finding a replacement is the most critical outcome."
+      - "Functionality: Outgoing educator and incoming replacement both receive notifications on reassignment."
+      - "Design principle: The cancellation workflow exists to protect event execution — the goal is a replacement, not just a record of the cancellation."
+    sources:
+      - doc: "Definition Call 1/4"
+        details: "~00:53:09 — cancellation reasons: weather, illness, car accident, retailer cancellation"
+      - doc: "Definition Call 1/4"
+        details: "~00:54:10 — educator cannot self-cancel; manager makes the call; cancellation tagged for scoring; finding a replacement is the most important next step"
 
   - section_title: "During-Event Live Dashboard"
     points:
@@ -146,6 +174,8 @@ assumptions:
   - "Managers see only events assigned to their scoped set of educators, not all tenant events."
   - "The 24-hour educator editing window countdown starts at event completion, not at finalization."
   - "Speed-to-Finalize may require a batch finalization view or queue in future iterations."
+  - "Cancellation reasons are categorized (weather, illness, car accident, retailer-initiated, other) for scoring accuracy."
+  - "Educator acceptance/rejection of assignments is tracked but remains external (phone/text) in Phase 1."
 
 implications:
   - "Frontend: Implement dual-view toggle (List/Calendar) with shared event data source to avoid redundant API calls."
@@ -153,9 +183,12 @@ implications:
   - "Frontend: Event detail view needs clear phase indicators showing current lifecycle state (Upcoming, Live, Completed)."
   - "Frontend: 'Approve & Finalize' CTA requires a confirmation dialog given its irreversibility."
   - "Frontend: Educator assignment flow needs an inline availability reference panel, not a separate screen."
+  - "Frontend: Assignment suggestion list should surface geography proximity and educator score as ranked signals."
+  - "Frontend: Cancellation flow requires a reason selection modal before confirming — the reason is required, not optional."
   - "Backend: Event lifecycle state machine must enforce phase transitions and prevent edits on finalized events."
   - "Backend: Live Data Feed requires real-time or near-real-time data ingestion pipeline from the educator mobile app."
   - "Backend: Finalization endpoint must atomically lock the event and terminate the educator editing window."
   - "Backend: Educator assignment must trigger push notifications to the assigned educator."
+  - "Backend: Cancellation events must be persisted with reason codes for educator scoring aggregation."
   - "Architecture: Consider WebSocket or SSE for the Live Dashboard phase to push updates without polling."
   - "Architecture: Finalization is the data pipeline bottleneck — monitoring finalization latency is operationally critical."
