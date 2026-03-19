@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router";
+import { useState, useMemo } from "react";
+import { Link, useSearchParams } from "react-router";
 import {
   CalendarDays,
   List,
@@ -13,6 +13,10 @@ import {
   Clock,
   Ban,
   ArrowUpDown,
+  ListChecks,
+  ShoppingCart,
+  Camera,
+  Star,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -25,7 +29,6 @@ import {
 } from "@/app/shared/components/ui/card";
 import {
   mockEvents,
-  isUpcoming,
   getStatusDisplayGroup,
   type EventStatus,
   type StatusDisplayGroup,
@@ -293,6 +296,11 @@ function EducatorCell({ event }: { event: EventItem }) {
     );
   }
 
+  const extraCount =
+    event.assignedEducators && event.assignedEducators.length > 1
+      ? event.assignedEducators.length - 1
+      : 0;
+
   return (
     <span
       className="text-muted-foreground flex items-center gap-1.5"
@@ -300,6 +308,14 @@ function EducatorCell({ event }: { event: EventItem }) {
     >
       <User className="w-3.5 h-3.5 flex-shrink-0" />
       <span className="truncate">{event.educatorName}</span>
+      {extraCount > 0 && (
+        <span
+          className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-primary/10 text-primary border-primary/20"
+          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+        >
+          +{extraCount}
+        </span>
+      )}
       {event.status === "Pending" && (
         <span
           className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
@@ -355,15 +371,366 @@ function EventNameCell({ event }: { event: EventItem }) {
   );
 }
 
+/* --- Speed-to-Finalize Queue (G8 per mm-ui-002) --- */
+
+function FinalizationQueue({ onExit }: { onExit: () => void }) {
+  const pendingEvents = useMemo(
+    () => mockEvents.filter((e) => e.status === "Completed" && !e.finalizedAt),
+    [],
+  );
+  const [expandedId, setExpandedId] = useState<string | null>(
+    pendingEvents[0]?.id ?? null,
+  );
+  const [finalized, setFinalized] = useState<Set<string>>(new Set());
+  const [showConfirm, setShowConfirm] = useState<string | null>(null);
+
+  const remaining = pendingEvents.filter((e) => !finalized.has(e.id));
+
+  const handleFinalize = (id: string) => {
+    setFinalized((prev) => new Set(prev).add(id));
+    setShowConfirm(null);
+    // Auto-advance to next
+    const nextEvent = remaining.find((e) => e.id !== id);
+    if (nextEvent) {
+      setExpandedId(nextEvent.id);
+    }
+  };
+
+  return (
+    <div className="p-6 space-y-6 w-full">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-foreground flex items-center gap-2">
+            <ListChecks className="w-6 h-6" />
+            Finalization Queue
+          </h1>
+          <p
+            className="text-muted-foreground mt-1"
+            style={{ fontSize: "0.875rem" }}
+          >
+            Review and finalize completed events sequentially.{" "}
+            <strong>{remaining.length}</strong> event
+            {remaining.length !== 1 ? "s" : ""} pending review.
+          </p>
+        </div>
+        <Button variant="outline" onClick={onExit} className="cursor-pointer">
+          Back to Events
+        </Button>
+      </div>
+
+      {remaining.length === 0 ? (
+        <Card className="gap-0 border-green-500/30">
+          <CardContent className="p-8 text-center">
+            <CheckCircle2 className="w-10 h-10 text-green-500 mx-auto mb-3" />
+            <p
+              className="text-foreground"
+              style={{ fontWeight: 600, fontSize: "1rem" }}
+            >
+              All events finalized
+            </p>
+            <p
+              className="text-muted-foreground mt-1"
+              style={{ fontSize: "0.875rem" }}
+            >
+              No more completed events pending review.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {pendingEvents.map((event, idx) => {
+            const isFinalized = finalized.has(event.id);
+            const isExpanded = expandedId === event.id && !isFinalized;
+            return (
+              <Card
+                key={event.id}
+                className={`gap-0 transition-all ${
+                  isFinalized
+                    ? "opacity-50 border-green-500/20"
+                    : isExpanded
+                      ? "border-primary/30"
+                      : ""
+                }`}
+              >
+                {/* Summary row — always visible */}
+                <button
+                  onClick={() =>
+                    !isFinalized && setExpandedId(isExpanded ? null : event.id)
+                  }
+                  className="w-full text-left px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-muted/30 transition-colors"
+                  disabled={isFinalized}
+                >
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <span
+                      className="flex items-center justify-center size-7 rounded-full bg-muted text-muted-foreground flex-shrink-0"
+                      style={{ fontSize: "0.75rem", fontWeight: 500 }}
+                    >
+                      {isFinalized ? (
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      ) : (
+                        idx + 1
+                      )}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="text-foreground truncate"
+                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                      >
+                        {event.name}
+                      </p>
+                      <div
+                        className="flex items-center gap-3 text-muted-foreground mt-0.5"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {new Date(event.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
+                          {event.venue}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          {event.educatorName || "—"}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Inline key stats */}
+                    {event.finalStats && (
+                      <div className="hidden md:flex items-center gap-4 text-muted-foreground flex-shrink-0">
+                        <span
+                          className="flex items-center gap-1"
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          <ShoppingCart className="w-3 h-3" />
+                          {event.finalStats.totalSamples} samples
+                        </span>
+                        <span
+                          className="flex items-center gap-1"
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          <User className="w-3 h-3" />
+                          {event.finalStats.totalInteractions}
+                        </span>
+                        <span
+                          className="flex items-center gap-1"
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          <Star className="w-3 h-3 text-amber-400" />
+                          {event.finalStats.rating}
+                        </span>
+                        <span
+                          className="flex items-center gap-1"
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          <Camera className="w-3 h-3" />
+                          {event.finalStats.photosSubmitted}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <ChevronRight
+                    className={`w-4 h-4 text-muted-foreground transition-transform flex-shrink-0 ml-3 ${
+                      isExpanded ? "rotate-90" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Expanded detail — post-event stats inline */}
+                {isExpanded && event.finalStats && (
+                  <div className="px-5 pb-5 space-y-4 border-t border-border">
+                    {/* Stats grid */}
+                    <div className="grid gap-3 grid-cols-2 md:grid-cols-4 mt-4">
+                      {[
+                        {
+                          label: "Total Samples",
+                          value: event.finalStats.totalSamples,
+                        },
+                        {
+                          label: "Interactions",
+                          value: event.finalStats.totalInteractions,
+                        },
+                        {
+                          label: "Sales",
+                          value: event.finalStats.totalSales,
+                        },
+                        {
+                          label: "Rating",
+                          value: event.finalStats.rating,
+                        },
+                        {
+                          label: "Duration",
+                          value: event.finalStats.duration,
+                        },
+                        {
+                          label: "Photos",
+                          value: event.finalStats.photosSubmitted,
+                        },
+                        {
+                          label: "Questionnaires",
+                          value: event.questionnairesCompletedFinal ?? 0,
+                        },
+                      ].map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="rounded-lg border border-border p-3"
+                        >
+                          <p
+                            className="text-muted-foreground"
+                            style={{ fontSize: "0.6875rem" }}
+                          >
+                            {stat.label}
+                          </p>
+                          <p
+                            className="text-foreground"
+                            style={{
+                              fontSize: "1.125rem",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {stat.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Inventory comparison */}
+                    {event.inventoryComparison && (
+                      <div className="flex items-center gap-6 text-sm">
+                        <span className="text-muted-foreground">
+                          Inventory: {event.inventoryComparison.preEvent} →{" "}
+                          {event.inventoryComparison.postEvent}
+                        </span>
+                        <span className="text-green-600 font-medium">
+                          -
+                          {event.inventoryComparison.preEvent -
+                            event.inventoryComparison.postEvent}{" "}
+                          sold
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Educator notes */}
+                    {event.educatorNotesFinal && (
+                      <div className="rounded-lg border border-border p-3">
+                        <p
+                          className="text-muted-foreground mb-1"
+                          style={{ fontSize: "0.6875rem" }}
+                        >
+                          Educator Notes
+                        </p>
+                        <p
+                          className="text-foreground"
+                          style={{ fontSize: "0.8125rem" }}
+                        >
+                          {event.educatorNotesFinal}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Photo count */}
+                    {event.photoCount && event.photoCount > 0 && (
+                      <p
+                        className="text-muted-foreground flex items-center gap-1"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        {event.photoCount} photos submitted
+                        {event.photoCategories && (
+                          <span>
+                            {" "}
+                            ({
+                              event.photoCategories.receipts.length
+                            } receipts,{" "}
+                            {event.photoCategories.socialMedia.length} social,{" "}
+                            {event.photoCategories.venue.length} venue)
+                          </span>
+                        )}
+                      </p>
+                    )}
+
+                    {/* Finalize CTA */}
+                    {showConfirm === event.id ? (
+                      <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 space-y-3">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p
+                              className="text-foreground"
+                              style={{ fontWeight: 600 }}
+                            >
+                              Confirm Finalization
+                            </p>
+                            <p
+                              className="text-muted-foreground mt-1"
+                              style={{ fontSize: "0.875rem" }}
+                            >
+                              This action is <strong>irreversible</strong>. It
+                              will lock the event record and terminate the
+                              educator&apos;s editing window.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 ml-8">
+                          <Button
+                            onClick={() => handleFinalize(event.id)}
+                            className="cursor-pointer"
+                          >
+                            Yes, Approve & Finalize
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => setShowConfirm(null)}
+                            className="cursor-pointer"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <Link
+                          to={`/educator/events/${event.id}`}
+                          className="text-primary hover:opacity-80 transition-opacity"
+                          style={{ fontSize: "0.8125rem" }}
+                        >
+                          View full detail →
+                        </Link>
+                        <Button
+                          onClick={() => setShowConfirm(event.id)}
+                          className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          Approve & Finalize
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* --- Main Events Page --- */
 
 export function EventsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("date");
   const [calYear, setCalYear] = useState(2026);
   const [calMonth, setCalMonth] = useState(2); // March
+
+  const isFinalizationMode = searchParams.get("mode") === "finalize";
 
   const filteredEvents = sortEvents(
     mockEvents
@@ -406,6 +773,15 @@ export function EventsPage() {
     setSortBy(options[(currentIdx + 1) % options.length]!);
   };
 
+  // G8: Finalization queue mode
+  if (isFinalizationMode) {
+    return <FinalizationQueue onExit={() => setSearchParams({})} />;
+  }
+
+  const completedPendingCount = mockEvents.filter(
+    (e) => e.status === "Completed" && !e.finalizedAt,
+  ).length;
+
   return (
     <div className="p-6 space-y-6 w-full">
       {/* Header */}
@@ -419,33 +795,47 @@ export function EventsPage() {
             Monitor and manage events across all campaigns.
           </p>
         </div>
-        <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
-          <Button
-            variant="ghost"
-            onClick={() => setViewMode("list")}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
-              viewMode === "list"
-                ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
-                : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
-            }`}
-            style={{ fontSize: "0.8125rem" }}
-          >
-            <List size={15} />
-            List
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => setViewMode("calendar")}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
-              viewMode === "calendar"
-                ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
-                : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
-            }`}
-            style={{ fontSize: "0.8125rem" }}
-          >
-            <CalendarDays size={15} />
-            Calendar
-          </Button>
+        <div className="flex items-center gap-2">
+          {/* G8: Finalization queue entry point */}
+          {completedPendingCount > 0 && (
+            <Button
+              variant="outline"
+              onClick={() => setSearchParams({ mode: "finalize" })}
+              className="cursor-pointer text-amber-600 border-amber-500/30 hover:bg-amber-500/5"
+              style={{ fontSize: "0.8125rem" }}
+            >
+              <ListChecks className="w-4 h-4 mr-1.5" />
+              Finalize ({completedPendingCount})
+            </Button>
+          )}
+          <div className="flex items-center bg-[#F1F5F9] rounded-lg p-1">
+            <Button
+              variant="ghost"
+              onClick={() => setViewMode("list")}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
+                viewMode === "list"
+                  ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
+                  : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
+              }`}
+              style={{ fontSize: "0.8125rem" }}
+            >
+              <List size={15} />
+              List
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setViewMode("calendar")}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md transition-all h-auto cursor-pointer ${
+                viewMode === "calendar"
+                  ? "bg-white text-[#0F172A] shadow-sm hover:bg-white hover:text-[#0F172A] hover:shadow-sm"
+                  : "text-[#64748B] hover:text-[#0F172A] hover:bg-transparent"
+              }`}
+              style={{ fontSize: "0.8125rem" }}
+            >
+              <CalendarDays size={15} />
+              Calendar
+            </Button>
+          </div>
         </div>
       </div>
 

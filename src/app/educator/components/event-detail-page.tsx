@@ -15,7 +15,7 @@ import {
   Star,
   ShoppingCart,
   AlertTriangle,
-  ChevronDown,
+  ChevronUp,
   Building2,
   Tag,
   Timer,
@@ -24,15 +24,19 @@ import {
   Ban,
   DollarSign,
   Phone,
+  Mail,
   Download,
   FileDown,
   ClipboardList,
   Boxes,
   UserX,
   Megaphone,
+  Award,
+  Search,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Badge } from "@/app/shared/components/ui/badge";
+import { Input } from "@/app/shared/components/ui/input";
 import {
   Card,
   CardContent,
@@ -41,12 +45,29 @@ import {
   CardTitle,
 } from "@/app/shared/components/ui/card";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/app/shared/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/app/shared/components/ui/dialog";
+import { Checkbox } from "@/app/shared/components/ui/checkbox";
+import {
   getEventById,
   isUpcoming,
   type EventStatus,
+  type EventItem,
   type CancellationReason,
+  type AssignedEducator,
 } from "./events-data";
-import { mockEducators } from "./educator-roster-data";
+import { mockEducators, type Educator } from "./educator-roster-data";
+import { CURRENT_EDUCATOR_MANAGER } from "./settings-data";
 
 /* --- Phase Badge (7 states per mm-ui-006) --- */
 
@@ -371,6 +392,114 @@ function MetricCard({
   );
 }
 
+/* --- Assignment Helpers (G3, G4, G7 per mm-ui-002) --- */
+
+function hasSchedulingConflict(educator: Educator, event: EventItem): boolean {
+  return educator.upcomingEvents.some((ue) => ue.date === event.date);
+}
+
+function getCompositeScore(educator: Educator): number {
+  const distancePenalty = (educator.distanceMiles ?? 50) / 100;
+  return educator.avgRating - distancePenalty + educator.punctuality / 200;
+}
+
+function rankEducators(educators: Educator[], event: EventItem): Educator[] {
+  return [...educators].sort((a, b) => {
+    const aConflict = hasSchedulingConflict(a, event);
+    const bConflict = hasSchedulingConflict(b, event);
+    if (aConflict !== bConflict) return aConflict ? 1 : -1;
+    return getCompositeScore(b) - getCompositeScore(a);
+  });
+}
+
+/* --- Availability Strip (compact 7-day view for assignment panel, G1) --- */
+
+const SLOT_COLORS: Record<string, string> = {
+  morning: "bg-yellow-400/70 text-yellow-900",
+  afternoon: "bg-slate-300/70 text-slate-800",
+  evening: "bg-purple-400/70 text-purple-900",
+};
+
+const SLOT_SHORT: Record<string, string> = {
+  morning: "AM",
+  afternoon: "PM",
+  evening: "Eve",
+};
+
+function AvailabilityStrip({
+  educator,
+  eventDate,
+}: {
+  educator: Educator;
+  eventDate: string;
+}) {
+  const center = new Date(eventDate);
+  const days: { dateStr: string; dayLabel: string; isEventDay: boolean }[] = [];
+  for (let i = -2; i <= 4; i++) {
+    const d = new Date(center);
+    d.setDate(d.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0] as string;
+    days.push({
+      dateStr,
+      dayLabel: d.toLocaleDateString("en-US", { weekday: "short" }),
+      isEventDay: dateStr === eventDate,
+    });
+  }
+
+  return (
+    <div className="mt-2 rounded-lg border border-border bg-muted/30 p-2.5">
+      <p
+        className="text-muted-foreground mb-1.5 flex items-center gap-1"
+        style={{ fontSize: "0.6875rem", fontWeight: 500 }}
+      >
+        <Clock className="w-3 h-3" /> Availability
+      </p>
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((day) => {
+          const avail = educator.availability.find(
+            (a) => a.date === day.dateStr,
+          );
+          return (
+            <div
+              key={day.dateStr}
+              className={`text-center rounded-md p-1 ${
+                day.isEventDay ? "ring-1 ring-primary bg-primary/5" : ""
+              }`}
+            >
+              <p
+                className={`font-medium ${day.isEventDay ? "text-primary" : "text-muted-foreground"}`}
+                style={{ fontSize: "0.5625rem" }}
+              >
+                {day.dayLabel}
+              </p>
+              {avail && avail.slots.length > 0 ? (
+                <div className="flex flex-col gap-0.5 mt-0.5">
+                  {avail.slots.map((slot) => (
+                    <span
+                      key={slot}
+                      className={`rounded px-0.5 py-px ${SLOT_COLORS[slot]}`}
+                      style={{ fontSize: "0.5rem", fontWeight: 500 }}
+                    >
+                      {SLOT_SHORT[slot]}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span
+                  className="text-muted-foreground/50 block mt-0.5"
+                  style={{ fontSize: "0.5rem" }}
+                >
+                  —
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* --- Main Component --- */
 
 export function EventDetailPage() {
@@ -378,15 +507,20 @@ export function EventDetailPage() {
   const event = getEventById(eventId || "");
   const [showAssignment, setShowAssignment] = useState(false);
   const [showFinalizeConfirm, setShowFinalizeConfirm] = useState(false);
-  const [showEducatorCancel, setShowEducatorCancel] = useState(false);
   const [showEventCancel, setShowEventCancel] = useState(false);
   const [finalized, setFinalized] = useState(false);
-  const [assignedEducator, setAssignedEducator] = useState(
-    event?.educatorName || null,
-  );
   const [activePhotoTab, setActivePhotoTab] = useState<
     "all" | "receipts" | "socialMedia" | "venue"
   >("all");
+  const [assignmentSearch, setAssignmentSearch] = useState("");
+  const [expandedEducator, setExpandedEducator] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
+  const [assignedEducators, setAssignedEducators] = useState<
+    AssignedEducator[]
+  >(event?.assignedEducators || []);
+  const [draftSelectedIds, setDraftSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   if (!event) {
     return (
@@ -420,14 +554,43 @@ export function EventDetailPage() {
     setShowFinalizeConfirm(false);
   };
 
-  const handleAssign = (name: string) => {
-    setAssignedEducator(name);
-    setShowAssignment(false);
+  const handleOpenAssignment = () => {
+    setDraftSelectedIds(new Set(assignedEducators.map((e) => e.educatorId)));
+    setShowAssignment(true);
   };
 
-  const handleEducatorCancel = (_reason: CancellationReason) => {
-    setAssignedEducator(null);
-    setShowEducatorCancel(false);
+  const handleConfirmAssignments = () => {
+    const newAssignments: AssignedEducator[] = [];
+    draftSelectedIds.forEach((id) => {
+      const existing = assignedEducators.find((e) => e.educatorId === id);
+      if (existing) {
+        newAssignments.push(existing);
+      } else {
+        const edu = mockEducators.find((e) => e.id === id);
+        if (edu) {
+          newAssignments.push({
+            educatorId: id,
+            educatorName: edu.name,
+            assignmentStatus: "Pending",
+          });
+        }
+      }
+    });
+    setAssignedEducators(newAssignments);
+    setShowAssignment(false);
+    setActionFeedback(`Educator assignments updated.`);
+    setTimeout(() => setActionFeedback(null), 3000);
+  };
+
+  const handleRemoveEducator = (educatorId: string) => {
+    const educatorToRemove = assignedEducators.find(
+      (e) => e.educatorId === educatorId,
+    );
+    setAssignedEducators((prev) =>
+      prev.filter((e) => e.educatorId !== educatorId),
+    );
+    setActionFeedback(`${educatorToRemove?.educatorName} removed from event.`);
+    setTimeout(() => setActionFeedback(null), 3000);
   };
 
   // Photo gallery helpers
@@ -562,46 +725,99 @@ export function EventDetailPage() {
             value={event.venue}
             subValue={event.venueAddress}
           />
-          <InfoCard
-            icon={User}
-            label="Assigned Educator"
-            value={
-              assignedEducator ? (
-                <span className="flex items-center gap-2">
-                  {assignedEducator}
-                  {currentPhase === "Pending" && (
-                    <span
-                      className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
-                      style={{
-                        fontSize: "0.625rem",
-                        fontWeight: 500,
-                        lineHeight: "1.125rem",
-                      }}
-                    >
-                      Pending
-                    </span>
-                  )}
-                  {currentPhase === "Confirmed" && (
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
-                  )}
-                </span>
-              ) : (
-                <span className="text-amber-500">Not Assigned</span>
-              )
-            }
-            action={
-              isPreEvent ? (
-                <button
-                  onClick={() => setShowAssignment(!showAssignment)}
-                  className="text-primary hover:opacity-80 transition-opacity cursor-pointer flex items-center gap-1 mt-1"
-                  style={{ fontSize: "0.8125rem" }}
+          {/* Multi-educator cards (G6, G7 per mm-ui-002 §4) */}
+          {assignedEducators.length > 0 ? (
+            <Card className="gap-0 md:col-span-1">
+              <CardContent className="p-4 space-y-2">
+                <div
+                  className="flex items-center justify-between text-muted-foreground"
+                  style={{ fontSize: "0.75rem" }}
                 >
-                  {assignedEducator ? "Reassign" : "Assign Educator"}{" "}
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-              ) : undefined
-            }
-          />
+                  <span className="flex items-center gap-2">
+                    <User className="w-3.5 h-3.5" />
+                    Assigned Educators ({assignedEducators.length})
+                  </span>
+                  {isPreEvent && (
+                    <button
+                      onClick={handleOpenAssignment}
+                      className="text-primary hover:opacity-80 transition-opacity cursor-pointer font-medium"
+                    >
+                      Manage
+                    </button>
+                  )}
+                </div>
+                {assignedEducators.map((ae) => (
+                  <div
+                    key={ae.educatorId}
+                    className="flex items-center justify-between p-2 rounded-md border border-border"
+                  >
+                    <div className="space-y-0.5">
+                      <p
+                        className="text-foreground flex items-center gap-2"
+                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                      >
+                        {ae.educatorName}
+                        {ae.assignmentStatus === "Accepted" && (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                        )}
+                        {ae.assignmentStatus === "Pending" && (
+                          <span
+                            className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                            style={{
+                              fontSize: "0.5625rem",
+                              fontWeight: 500,
+                              lineHeight: "1rem",
+                            }}
+                          >
+                            Pending
+                          </span>
+                        )}
+                        {ae.assignmentStatus === "Declined" && (
+                          <span
+                            className="inline-flex items-center rounded-full border px-1.5 py-0 bg-red-500/10 text-red-600 border-red-500/20"
+                            style={{
+                              fontSize: "0.5625rem",
+                              fontWeight: 500,
+                              lineHeight: "1rem",
+                            }}
+                          >
+                            Declined
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    {isPreEvent && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveEducator(ae.educatorId)}
+                        className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : (
+            <InfoCard
+              icon={User}
+              label="Assigned Educators"
+              value={<span className="text-amber-500">Not Assigned</span>}
+              action={
+                isPreEvent ? (
+                  <button
+                    onClick={handleOpenAssignment}
+                    className="text-primary hover:opacity-80 transition-opacity cursor-pointer font-medium mt-1"
+                    style={{ fontSize: "0.8125rem" }}
+                  >
+                    Assign Educators
+                  </button>
+                ) : undefined
+              }
+            />
+          )}
           <InfoCard
             icon={Building2}
             label="Account"
@@ -643,9 +859,9 @@ export function EventDetailPage() {
           )}
           {event.kitMaterials && (
             <Card className="gap-0">
-              <CardContent className="p-4 space-y-1.5">
+              <CardContent className="p-4 space-y-0.5">
                 <div
-                  className="flex items-center gap-2 text-muted-foreground"
+                  className="flex items-center gap-2 text-muted-foreground mb-1.5"
                   style={{ fontSize: "0.75rem" }}
                 >
                   <Boxes className="w-3.5 h-3.5" />
@@ -657,110 +873,324 @@ export function EventDetailPage() {
                 >
                   Pickup: {event.kitMaterials.pickupLocation}
                 </p>
-                <ul
-                  className="text-muted-foreground space-y-0.5 mt-1"
-                  style={{ fontSize: "0.8125rem" }}
-                >
-                  {event.kitMaterials.items.map((item) => (
-                    <li key={item} className="flex items-start gap-1.5">
-                      <span className="text-border mt-1.5">&bull;</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="items" className="border-none">
+                    <AccordionTrigger
+                      className="py-2 hover:no-underline text-primary hover:opacity-80 transition-opacity [&>svg]:text-primary"
+                      style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                    >
+                      View Items ({event.kitMaterials.items.length})
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-2">
+                      <ul
+                        className="text-muted-foreground space-y-1 mt-1"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
+                        {event.kitMaterials.items.map((item) => (
+                          <li key={item} className="flex items-start gap-1.5">
+                            <span className="text-border mt-0.5">&bull;</span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </Card>
           )}
           {event.storeContactName && (
-            <InfoCard
-              icon={Phone}
-              label="Store Contact"
-              value={event.storeContactName}
-              subValue={
-                event.storeContactPhone ? (
-                  <a
-                    href={`tel:${event.storeContactPhone}`}
-                    className="text-primary hover:opacity-80"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {event.storeContactPhone}
-                  </a>
-                ) : undefined
-              }
-            />
+            <Card className="gap-0">
+              <CardContent className="p-4 space-y-1.5">
+                <div
+                  className="flex items-center gap-2 text-muted-foreground"
+                  style={{ fontSize: "0.75rem" }}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  Store Contact
+                </div>
+                <p
+                  className="text-foreground"
+                  style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                >
+                  {event.storeContactName}
+                </p>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {event.storeContactPhone && (
+                    <a
+                      href={`tel:${event.storeContactPhone}`}
+                      className="text-primary hover:opacity-80 flex items-center gap-1"
+                      style={{ fontSize: "0.8125rem" }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Phone className="w-3 h-3" />
+                      {event.storeContactPhone}
+                    </a>
+                  )}
+                  {event.storeContactEmail && (
+                    <a
+                      href={`mailto:${event.storeContactEmail}`}
+                      className="text-primary hover:opacity-80 flex items-center gap-1"
+                      style={{ fontSize: "0.8125rem" }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Mail className="w-3 h-3" />
+                      {event.storeContactEmail}
+                    </a>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           )}
+          {/* G9: Educator Manager contact info (mm-ui-002 §3) */}
+          <Card className="gap-0">
+            <CardContent className="p-4 space-y-1.5">
+              <div
+                className="flex items-center gap-2 text-muted-foreground"
+                style={{ fontSize: "0.75rem" }}
+              >
+                <User className="w-3.5 h-3.5" />
+                Your Contact Info
+              </div>
+              <p
+                className="text-foreground"
+                style={{ fontSize: "0.875rem", fontWeight: 500 }}
+              >
+                {CURRENT_EDUCATOR_MANAGER.firstName}{" "}
+                {CURRENT_EDUCATOR_MANAGER.lastName}
+              </p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <a
+                  href={`tel:${CURRENT_EDUCATOR_MANAGER.phone}`}
+                  className="text-primary hover:opacity-80 flex items-center gap-1"
+                  style={{ fontSize: "0.8125rem" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Phone className="w-3 h-3" />
+                  {CURRENT_EDUCATOR_MANAGER.phone}
+                </a>
+                <a
+                  href={`mailto:${CURRENT_EDUCATOR_MANAGER.email}`}
+                  className="text-primary hover:opacity-80 flex items-center gap-1"
+                  style={{ fontSize: "0.8125rem" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Mail className="w-3 h-3" />
+                  {CURRENT_EDUCATOR_MANAGER.email}
+                </a>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
-      {/* Educator Assignment Panel */}
-      {showAssignment && isPreEvent && (
-        <Card className="gap-0 border-primary/30">
-          <CardHeader className="px-5 pt-5 pb-3">
-            <CardTitle style={{ fontSize: "1rem", fontWeight: 600 }}>
-              Assign Educator
-            </CardTitle>
-            <CardDescription style={{ fontSize: "0.8125rem" }}>
-              Select an educator from your roster. Ranked by geography proximity
-              and performance score.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
-              {mockEducators
-                .filter((e) => e.status === "Active")
-                .map((edu) => (
+      {/* Educator Assignment Panel (enhanced per mm-ui-002 §4) */}
+      {/* Educator Assignment Modal */}
+      <Dialog
+        open={showAssignment && isPreEvent}
+        onOpenChange={setShowAssignment}
+      >
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5 pb-3 shrink-0 border-b border-border">
+            <DialogTitle style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+              Manage Educators
+            </DialogTitle>
+            <DialogDescription style={{ fontSize: "0.875rem" }}>
+              Select educators to assign them to this event. Ranked by
+              geography, score, and availability.
+            </DialogDescription>
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                value={assignmentSearch}
+                onChange={(e) => setAssignmentSearch(e.target.value)}
+                placeholder="Search educators by name..."
+                className="pl-9 h-9"
+              />
+            </div>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto p-5 pb-0 bg-muted/20">
+            <div className="divide-y divide-border rounded-lg border border-border bg-card overflow-hidden">
+              {rankEducators(
+                mockEducators
+                  .filter((e) => e.status === "Active")
+                  .filter(
+                    (e) =>
+                      !assignmentSearch ||
+                      e.name
+                        .toLowerCase()
+                        .includes(assignmentSearch.toLowerCase()),
+                  ),
+                event,
+              ).map((edu) => {
+                const conflict = hasSchedulingConflict(edu, event);
+                const isBrandCertified = edu.brandCertifications.includes(
+                  event.brandName,
+                );
+                const isExpanded = expandedEducator === edu.id;
+                const isSelected = draftSelectedIds.has(edu.id);
+                return (
                   <div
                     key={edu.id}
-                    className="flex items-center justify-between p-3.5 hover:bg-muted/50 transition-colors"
+                    className={`p-3.5 transition-colors ${
+                      conflict ? "bg-muted/30" : "hover:bg-muted/50"
+                    } ${
+                      isSelected
+                        ? "bg-primary/5 border-l-2 border-l-primary"
+                        : "border-l-2 border-l-transparent"
+                    }`}
                   >
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <p
-                          className="text-foreground"
-                          style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                        >
-                          {edu.name}
-                        </p>
-                        {edu.distanceMiles != null && (
-                          <span
-                            className="text-muted-foreground"
-                            style={{ fontSize: "0.6875rem" }}
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        id={`edu-${edu.id}`}
+                        checked={isSelected}
+                        disabled={conflict}
+                        className="mt-0.5"
+                        onCheckedChange={(checked) => {
+                          setDraftSelectedIds((prev) => {
+                            const next = new Set(prev);
+                            if (checked) next.add(edu.id);
+                            else next.delete(edu.id);
+                            return next;
+                          });
+                        }}
+                      />
+                      <div className="flex items-center justify-between flex-1 min-w-0">
+                        <div className="space-y-0.5 flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <label
+                              htmlFor={`edu-${edu.id}`}
+                              className={`text-foreground cursor-pointer ${conflict ? "opacity-60" : ""}`}
+                              style={{
+                                fontSize: "0.875rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              {edu.name}
+                            </label>
+                            {edu.distanceMiles != null && (
+                              <span
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.6875rem" }}
+                              >
+                                ~{edu.distanceMiles} mi
+                              </span>
+                            )}
+                            {isBrandCertified && (
+                              <span
+                                className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0 bg-primary/10 text-primary border border-primary/20"
+                                style={{
+                                  fontSize: "0.5625rem",
+                                  fontWeight: 500,
+                                  lineHeight: "1.125rem",
+                                }}
+                              >
+                                <Award className="w-2.5 h-2.5" />
+                                {event.brandName}
+                              </span>
+                            )}
+                            {conflict && (
+                              <span
+                                className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0 bg-red-500/10 text-red-600 border border-red-500/20"
+                                style={{
+                                  fontSize: "0.5625rem",
+                                  fontWeight: 500,
+                                  lineHeight: "1.125rem",
+                                }}
+                              >
+                                <AlertTriangle className="w-2.5 h-2.5" />
+                                Conflict
+                              </span>
+                            )}
+                          </div>
+                          {/* Metrics row */}
+                          <div
+                            className={`flex items-center gap-3 text-muted-foreground ${conflict ? "opacity-60" : ""}`}
+                            style={{ fontSize: "0.75rem" }}
                           >
-                            ~{edu.distanceMiles} mi
-                          </span>
-                        )}
-                      </div>
-                      <div
-                        className="flex items-center gap-3 text-muted-foreground"
-                        style={{ fontSize: "0.75rem" }}
-                      >
-                        <span className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-amber-400" />{" "}
-                          {edu.avgRating}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <ShoppingCart className="w-3 h-3" />{" "}
-                          {edu.salesPerEvent}/evt
-                        </span>
-                        <span>{edu.punctuality}% on-time</span>
+                            <span className="flex items-center gap-1">
+                              <Star className="w-3 h-3 text-amber-400" />{" "}
+                              {edu.avgRating}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <ShoppingCart className="w-3 h-3" />{" "}
+                              {edu.salesPerEvent}/evt
+                            </span>
+                            <span>{edu.punctuality}% on-time</span>
+                          </div>
+                          {/* G2: Brand certifications row */}
+                          {edu.brandCertifications.length > 0 && (
+                            <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                              {edu.brandCertifications.map((cert) => (
+                                <span
+                                  key={cert}
+                                  className={`inline-flex items-center rounded-full px-1.5 py-0 border ${
+                                    cert === event.brandName
+                                      ? "bg-primary/10 text-primary border-primary/20"
+                                      : "bg-muted text-muted-foreground border-border"
+                                  }`}
+                                  style={{
+                                    fontSize: "0.5625rem",
+                                    fontWeight: 500,
+                                    lineHeight: "1rem",
+                                  }}
+                                >
+                                  {cert}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 ml-3">
+                          {/* G1: Toggle availability strip */}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              setExpandedEducator(isExpanded ? null : edu.id)
+                            }
+                            className="cursor-pointer h-7 px-2 text-muted-foreground"
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <Clock className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant={
-                        assignedEducator === edu.name ? "outline" : "default"
-                      }
-                      onClick={() => handleAssign(edu.name)}
-                      className="cursor-pointer"
-                    >
-                      {assignedEducator === edu.name ? "Assigned" : "Assign"}
-                    </Button>
+                    {/* G1: Expandable availability calendar strip */}
+                    {isExpanded && (
+                      <div className="mt-2 ml-8">
+                        <AvailabilityStrip
+                          educator={edu}
+                          eventDate={event.date}
+                        />
+                      </div>
+                    )}
                   </div>
-                ))}
+                );
+              })}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+          <div className="p-5 border-t border-border shrink-0 bg-muted/10 flex items-center justify-end gap-3 rounded-b-lg">
+            <Button
+              variant="outline"
+              onClick={() => setShowAssignment(false)}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmAssignments}
+              className="cursor-pointer"
+            >
+              Confirm Assignments
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Read-only event details */}
       {currentPhase !== "Cancelled" && (
@@ -832,7 +1262,35 @@ export function EventDetailPage() {
               Live Monitoring
             </h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+          {/* G12: Failed check-in prominent alert */}
+          {event.checkInStatus === "failed" && (
+            <Card className="gap-0 border-red-500/40 bg-red-500/5">
+              <CardContent className="px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center size-9 rounded-full bg-red-500/10">
+                    <XCircle className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <p
+                      className="text-red-600"
+                      style={{ fontWeight: 600, fontSize: "0.875rem" }}
+                    >
+                      Failed Check-In — Educator not within geofence radius
+                    </p>
+                    <p
+                      className="text-red-500/70"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
+                      Category 4 notification sent. Contact educator to verify
+                      location.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-7">
             {/* 1. Check-In */}
             <Card className="gap-0">
               <CardContent className="p-4 space-y-1.5">
@@ -842,13 +1300,15 @@ export function EventDetailPage() {
                 >
                   {event.checkInStatus === "checked-in" ? (
                     <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                  ) : event.checkInStatus === "failed" ? (
+                    <XCircle className="w-3.5 h-3.5 text-red-500" />
                   ) : (
-                    <XCircle className="w-3.5 h-3.5 text-destructive" />
+                    <Clock className="w-3.5 h-3.5 text-yellow-500" />
                   )}
                   Check-In
                 </p>
                 <p
-                  className="text-foreground"
+                  className={`${event.checkInStatus === "failed" ? "text-red-600" : "text-foreground"}`}
                   style={{
                     fontSize: "1.5rem",
                     fontWeight: 600,
@@ -857,7 +1317,9 @@ export function EventDetailPage() {
                 >
                   {event.checkInStatus === "checked-in"
                     ? "Confirmed"
-                    : "Pending"}
+                    : event.checkInStatus === "failed"
+                      ? "Failed"
+                      : "Pending"}
                 </p>
                 <p
                   className="text-muted-foreground"
@@ -879,13 +1341,19 @@ export function EventDetailPage() {
               label="Interactions"
               value={event.liveMetrics.consumerInteractions}
             />
-            {/* 4. Questionnaires */}
+            {/* 4. Sales (G13) */}
+            <MetricCard
+              icon={DollarSign}
+              label="Sales"
+              value={event.liveMetrics.salesGenerated}
+            />
+            {/* 5. Questionnaires */}
             <MetricCard
               icon={ClipboardList}
               label="Questionnaires"
               value={event.questionnairesCompleted ?? 0}
             />
-            {/* 5. Inventory */}
+            {/* 6. Inventory */}
             <MetricCard
               icon={Boxes}
               label="Inventory"
@@ -896,7 +1364,7 @@ export function EventDetailPage() {
                   : undefined
               }
             />
-            {/* 6. Photos */}
+            {/* 7. Photos */}
             <MetricCard
               icon={Camera}
               label="Photos"
@@ -1127,16 +1595,14 @@ export function EventDetailPage() {
                         ({allPhotos.length})
                       </span>
                     </div>
-                    {currentPhase !== "Finalized" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5 mr-1.5" />
-                        Download All
-                      </Button>
-                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 mr-1.5" />
+                      Download All
+                    </Button>
                   </div>
                   {/* Photo category tabs */}
                   {categorizedPhotos && (
@@ -1307,18 +1773,8 @@ export function EventDetailPage() {
         )}
 
       {/* Cancellation actions (pre-event only, per mm-ui-006 branches) */}
-      {isPreEvent && !showEducatorCancel && !showEventCancel && (
+      {isPreEvent && !showEventCancel && (
         <div className="flex items-center justify-end gap-3 pt-2">
-          {assignedEducator && (
-            <Button
-              variant="outline"
-              onClick={() => setShowEducatorCancel(true)}
-              className="cursor-pointer text-amber-600 border-amber-500/30 hover:bg-amber-500/5"
-            >
-              <UserX className="w-4 h-4 mr-1.5" />
-              Cancel Educator
-            </Button>
-          )}
           <Button
             variant="outline"
             onClick={() => setShowEventCancel(true)}
@@ -1330,14 +1786,6 @@ export function EventDetailPage() {
         </div>
       )}
 
-      {showEducatorCancel && isPreEvent && (
-        <CancellationPanel
-          mode="educator"
-          onCancel={handleEducatorCancel}
-          onClose={() => setShowEducatorCancel(false)}
-        />
-      )}
-
       {showEventCancel && isPreEvent && (
         <CancellationPanel
           mode="event"
@@ -1346,6 +1794,45 @@ export function EventDetailPage() {
           }}
           onClose={() => setShowEventCancel(false)}
         />
+      )}
+
+      {/* G15: 24-hour editing window indicator for Completed events */}
+      {event.status === "Completed" &&
+        !finalized &&
+        !event.finalizedAt &&
+        event.completedAt && (
+          <Card className="gap-0 border-blue-500/20 bg-blue-500/5">
+            <CardContent className="px-5 py-3 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-blue-500" />
+              <p className="text-blue-600" style={{ fontSize: "0.8125rem" }}>
+                Educator editing window active until{" "}
+                <strong>
+                  {new Date(
+                    new Date(event.completedAt).getTime() + 24 * 60 * 60 * 1000,
+                  ).toLocaleString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </strong>
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+      {/* G16: Action feedback banner */}
+      {actionFeedback && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-sm animate-in fade-in slide-in-from-bottom-2">
+          <Card className="gap-0 border-green-500/30 bg-green-50 shadow-lg">
+            <CardContent className="px-4 py-3 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+              <p className="text-green-800" style={{ fontSize: "0.8125rem" }}>
+                {actionFeedback}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );

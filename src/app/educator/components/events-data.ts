@@ -26,6 +26,14 @@ export type StatusDisplayGroup =
   | "Completed"
   | "Cancelled";
 
+export type AssignmentStatus = "Pending" | "Accepted" | "Declined";
+
+export interface AssignedEducator {
+  educatorId: string;
+  educatorName: string;
+  assignmentStatus: AssignmentStatus;
+}
+
 export interface EventItem {
   id: string;
   name: string;
@@ -41,6 +49,7 @@ export interface EventItem {
   eventType: EventType;
   educatorId: string | null;
   educatorName: string | null;
+  assignedEducators?: AssignedEducator[];
   status: EventStatus;
   products: string[];
   instructions: string;
@@ -51,6 +60,7 @@ export interface EventItem {
   kitMaterials?: { pickupLocation: string; items: string[] };
   storeContactName?: string;
   storeContactPhone?: string;
+  storeContactEmail?: string;
   // Live event fields
   checkInStatus?: "checked-in" | "pending" | "failed";
   checkInTime?: string;
@@ -149,6 +159,7 @@ export const mockEvents: EventItem[] = [
     },
     storeContactName: "John D.",
     storeContactPhone: "917-555-0142",
+    storeContactEmail: "john.d@wholefoods.com",
   },
   {
     id: "evt-102",
@@ -165,6 +176,13 @@ export const mockEvents: EventItem[] = [
     eventType: "Promo",
     educatorId: "edu-2",
     educatorName: "Sarah Chen",
+    assignedEducators: [
+      {
+        educatorId: "edu-2",
+        educatorName: "Sarah Chen",
+        assignmentStatus: "Accepted",
+      },
+    ],
     status: "Live",
     products: ["Jameson Original", "Jameson Black Barrel", "Jameson Cold Brew"],
     instructions:
@@ -174,6 +192,7 @@ export const mockEvents: EventItem[] = [
     compensation: { rate: "$35/hr" },
     storeContactName: "Mike R.",
     storeContactPhone: "201-555-0311",
+    storeContactEmail: "mike.r@totalwine.com",
     checkInStatus: "checked-in",
     checkInTime: "3:52 PM",
     liveMetrics: {
@@ -220,6 +239,7 @@ export const mockEvents: EventItem[] = [
     compensation: { rate: "$35/hr" },
     storeContactName: "Lisa T.",
     storeContactPhone: "201-555-0198",
+    storeContactEmail: "lisa.t@bevmo.com",
     checkInStatus: "checked-in",
     checkInTime: "11:48 AM",
     finalStats: {
@@ -293,6 +313,7 @@ export const mockEvents: EventItem[] = [
     },
     storeContactName: "Tom W.",
     storeContactPhone: "718-555-0244",
+    storeContactEmail: "tom.w@traderjoes.com",
   },
   {
     id: "evt-105",
@@ -309,6 +330,18 @@ export const mockEvents: EventItem[] = [
     eventType: "Activation",
     educatorId: "edu-5",
     educatorName: "Maria Santos",
+    assignedEducators: [
+      {
+        educatorId: "edu-5",
+        educatorName: "Maria Santos",
+        assignmentStatus: "Accepted",
+      },
+      {
+        educatorId: "edu-8",
+        educatorName: "Lisa Thompson",
+        assignmentStatus: "Pending",
+      },
+    ],
     status: "Confirmed",
     products: ["Beefeater London Dry 1.75L", "Beefeater Pink 750ml"],
     instructions:
@@ -421,8 +454,8 @@ export const mockEvents: EventItem[] = [
     compensation: { rate: "$40/hr" },
     storeContactName: "Alex K.",
     storeContactPhone: "212-555-0188",
-    checkInStatus: "checked-in",
-    checkInTime: "4:48 PM",
+    storeContactEmail: "alex.k@astorwines.com",
+    checkInStatus: "failed",
     liveMetrics: {
       samplesDistributed: 18,
       consumerInteractions: 15,
@@ -459,6 +492,13 @@ export const mockEvents: EventItem[] = [
     eventType: "Activation",
     educatorId: "edu-7",
     educatorName: "Carlos Mendez",
+    assignedEducators: [
+      {
+        educatorId: "edu-7",
+        educatorName: "Carlos Mendez",
+        assignmentStatus: "Pending",
+      },
+    ],
     status: "Pending",
     products: ["Avión Silver", "Avión Reposado", "Avión Añejo"],
     instructions:

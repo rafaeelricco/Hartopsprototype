@@ -308,14 +308,24 @@ export function Dashboard() {
                 Unstaffed or awaiting finalization
               </CardDescription>
             </div>
-            <Link
-              to="/educator/events"
-              className="text-primary hover:opacity-80 transition-opacity flex items-center gap-1"
-              style={{ fontSize: "0.8125rem" }}
-            >
-              View all events
-              <ChevronRight className="w-4 h-4" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/educator/events?mode=finalize"
+                className="text-amber-600 hover:opacity-80 transition-opacity flex items-center gap-1"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                Start Finalization Queue
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/educator/events"
+                className="text-primary hover:opacity-80 transition-opacity flex items-center gap-1"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                View all events
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="px-0 pb-0">
