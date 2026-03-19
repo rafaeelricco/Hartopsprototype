@@ -25,8 +25,8 @@ scope:
     - "Change Password flow with modal"
     - "Save Changes action"
   out_of_scope:
-    - "Notification preferences (covered in mm-ui-004)"
-    - "Help & Support (covered in mm-ui-004)"
+    - "Notification preferences"
+    - "Help & Support"
     - "Team management or inviting other users (Trial Client Staff responsibility)"
     - "Organization-level settings (Trial Client Staff responsibility)"
     - "Role or permission changes (Hart Ops responsibility)"

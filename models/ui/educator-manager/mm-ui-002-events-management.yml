@@ -3,7 +3,7 @@
 # =============================================================================
 # NOTE: This model covers UI workflows and screen-level behavior for events.
 # For the formal state machine (status definitions, transition rules, guard
-# conditions, and UI behavior per state), see mm-ui-006.
+# conditions, and UI behavior per state).
 # =============================================================================
 
 id: "mm-ui-002"
@@ -78,12 +78,7 @@ key_concepts:
 core_content:
   - section_title: "Event Intake & Routing"
     points:
-      - "Trigger: Trial Client Staff creates an event and assigns it to an account within the manager's geographic scope."
-      - "Step 1: System routes the event to the manager based on account master geography — the account's geographic assignment determines which manager receives the event."
-      - "Step 2: Manager receives a 'New Events Available' notification (Category 1 in mm-ui-004)."
-      - "Step 3: Event appears in the Events List under 'Upcoming' with status 'Unassigned' (no educator assigned yet)."
-      - "Functionality: Events auto-populate in the manager's list — no accept/acknowledge step required from the manager."
-      - "Functionality: Event details (products, instructions, goals, compensation) are fully defined by Trial Client Staff before routing — the manager receives a complete, ready-to-staff event."
+      - "Summary: Events arrive fully defined from Trial Client Staff, auto-populate in the manager's list based on account geography, and are ready for educator assignment. No accept/acknowledge step required."
       - "Design principle: Events arrive ready for educator assignment. The manager's primary action on intake is staffing, not configuration."
     sources:
       - doc: "DC1"
@@ -93,7 +88,7 @@ core_content:
       - doc: "DC2"
         details: "~00:07:33 — events templated from campaigns, assigned to accounts for execution"
       - doc: "DEMO"
-        details: "~07:46 — events pushed simultaneously to educator managers and educators"
+        details: "~07:46 — events pushed to educator managers for assignment (educators receive after manager assigns)"
 
   - section_title: "Events List & Calendar View"
     points:
@@ -202,7 +197,7 @@ core_content:
       - "Elements: Real-time notes submitted by the educator during the event."
       - "Functionality: Manager monitors in read-only mode — no editing of live event data."
       - "Functionality: Check-in success displays a green status indicator with timestamp and location confirmation."
-      - "Functionality: Check-in failure (educator not within geofence radius of venue) triggers a 'Failed Check-In' notification (Category 4 in mm-ui-004) and displays a red status indicator."
+      - "Functionality: Check-in failure (educator not within geofence radius of venue) triggers a 'Failed Check-In' notification (Category 4) and displays a red status indicator."
       - "Functionality: Check-out requires geolocation verification at the venue and all mandatory tasks completed."
       - "Design principle: Live monitoring answers 'Is the event happening as planned?' without requiring manager intervention."
     sources:
@@ -210,8 +205,7 @@ core_content:
         details: "Educator Managers §4"
       - doc: "PDF-EM"
         details: "§5 — During-Event Elements: check-in timestamp, real-time inventory/sales, questionnaires, notes, photos"
-      - doc: "IPF"
-        details: "Geolocation verification — within 500ft of venue"
+
       - doc: "MM8"
         details: "Core Content — Events List and Detail Flow"
 

@@ -17,12 +17,12 @@ dependencies:
     - "mm-ui-006"
 
 context: |
-  Educator Managers are invited by either Trial Client Staff or Hart Ops staff — they cannot self-register.
-  Once authenticated, they land on an action-oriented dashboard that answers
-  "What needs my attention right now?" As an Educator Manager, I need a secure
-  invitation-based onboarding flow and a dashboard that immediately surfaces
-  events requiring staffing, monitoring, or finalization so I can coordinate
-  field operations without searching for work.
+  Educator Managers are granted platform access by Trial Client Staff or Hart Ops
+  staff — they cannot self-register. Once authenticated, they land on an
+  action-oriented dashboard that answers "What needs my attention right now?"
+  As an Educator Manager, I need a dashboard that immediately surfaces events
+  requiring staffing, monitoring, or finalization so I can coordinate field
+  operations without searching for work.
 
 scope:
   in_scope:
@@ -33,13 +33,13 @@ scope:
     - "Side navigation structure"
     - "Dashboard as default landing page with 3 stat cards"
   out_of_scope:
-    - "Self-registration (invitation-only model)"
+    - "Self-registration — access is controlled via invitation by Trial Client Staff or Hart Ops"
     - "MFA/2FA"
     - "Session management and token refresh mechanics"
-    - "Event detail views (covered in mm-ui-002)"
-    - "Educator roster views (covered in mm-ui-003)"
-    - "Settings and notification preferences (covered in mm-ui-004)"
-    - "Profile and account management (covered in mm-ui-005)"
+    - "Event detail views"
+    - "Educator roster views"
+    - "Settings and notification preferences"
+    - "Profile and account management"
 
 key_concepts:
   - term: "Invitation Activation"
@@ -47,8 +47,7 @@ key_concepts:
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §1.1"
-      - doc: "IPF"
-        details: "Trial Client Staff Settings §8.2 — Team Management: Client Staff can invite Staff, Educators, and Educator Managers"
+
   - term: "Action-Oriented Dashboard"
     definition: "A landing page designed to surface work that needs doing — not just metrics to observe. Every card and list item is clickable and links directly to the relevant task."
     sources:
@@ -154,7 +153,7 @@ assumptions:
 implications:
   - "Frontend: Auth screens share a single layout component with slot-based content swapping for Sign In, Activation, and Forgot Password forms."
   - "Frontend: Side navigation component is persistent and shared across all authenticated Educator Manager screens."
-  - "Frontend: Dashboard stat cards must link directly to filtered views within Events (mm-ui-002)."
+  - "Frontend: Dashboard stat cards must link directly to filtered views within Events."
   - "Frontend: Recent Educator Activity feed requires a chronological list component with activity type indicators (check-in, completion, cancellation)."
   - "Backend: Activity feed API must aggregate recent educator actions scoped to the requesting manager's assigned educators."
   - "Frontend: Navigation must be extensible — structure should accommodate future menu items without layout changes."

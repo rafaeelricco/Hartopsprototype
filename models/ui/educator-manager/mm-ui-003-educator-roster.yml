@@ -30,7 +30,7 @@ scope:
     - "Educator onboarding or account creation (Hart Ops responsibility)"
     - "Educator mobile app experience (see Educator Mobile Experience)"
     - "Educator availability editing (educator self-service in mobile app)"
-    - "Event assignment flow (covered in mm-ui-002, references roster)"
+    - "Event assignment flow"
     - "Educator payroll or payment information"
 
 key_concepts:
@@ -79,14 +79,13 @@ core_content:
       - "Functionality: Roster is scoped to the authenticated manager's assigned educators only."
       - "Functionality: Clicking an educator card navigates to the Educator Detail View."
       - "Design principle: The roster is the staffing reference — it should answer 'Who is available and performing well?' at a glance."
-      - "Functionality: Educators who have been invited but not yet completed activation show with a 'Pending Invitation' status badge in the roster, distinct from Active and Inactive statuses."
+      - "Assumption: Educators who have been invited but not yet completed activation show with a 'Pending Invitation' status badge in the roster, distinct from Active and Inactive statuses."
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §5.1 — educator card (name, contact, next event, events assigned), filter bar (all/active/inactive), search bar, sort dropdown (events completed, name, ratings)"
       - doc: "MM8"
         details: "Core Content — Educator Management"
-      - doc: "IPF"
-        details: "Educator Roster — grouped by status, inline contact icons, sortable by Completed Events"
+
 
   - section_title: "Educator Detail View"
     points:
@@ -100,7 +99,7 @@ core_content:
       - "Functionality: 'Edit Educator' button allows manager to update contact details only (phone, email) — not profile, status, or certifications."
       - "Functionality: Quick Stats are read-only — derived from aggregated event data, not manually entered."
       - "Functionality: Brand certifications are managed by Hart Ops — read-only for managers."
-      - "Functionality: Clicking any upcoming event card redirects to the Event Details page (mm-ui-002)."
+      - "Functionality: Clicking any upcoming event card redirects to the Event Details page."
       - "Design principle: The detail view answers 'How is this educator performing?', 'How do I reach them?', and 'Are they right for this event?'"
       - "Elements: Past Events — chronological list of completed events for this educator, showing event name, date, location, and key outcome metrics (sales, consumer count)."
       - "Design principle: Past event history lets managers assess performance trends beyond aggregate Quick Stats."
@@ -154,4 +153,4 @@ implications:
   - "Backend: Completed Events count must be aggregated from finalized events for the educator."
   - "Backend: Roster endpoint must enforce manager-level scoping — return only educators assigned to the authenticated manager."
   - "Backend: Consider caching Quick Stats as they only change on event finalization, not on every request."
-  - "Architecture: The roster feeds into the educator assignment flow (mm-ui-002) — the assignment UI should reference roster data without requiring a separate API call."
+  - "Architecture: The roster feeds into the educator assignment flow — the assignment UI should reference roster data without requiring a separate API call."

@@ -25,7 +25,7 @@ scope:
     - "5 notification categories with trigger conditions"
     - "Help & Support — FAQ list and contact support fallback"
   out_of_scope:
-    - "User profile and account management (covered in mm-ui-005)"
+    - "User profile and account management"
     - "Organization-level settings (Trial Client Staff responsibility)"
     - "Notification delivery infrastructure (backend concern)"
     - "FAQ content creation (Trial Client Staff responsibility — consumed here)"
@@ -95,8 +95,7 @@ core_content:
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §6.2 — FAQs and Contact Information (support email, phone)"
-      - doc: "IPF"
-        details: "Help Resources §8.3 — Client Staff can create and manage FAQs that appear for Educators and Educator Managers"
+
 
   - section_title: "Logout"
     points:
@@ -120,6 +119,7 @@ assumptions:
   - "Notification history is viewable as a chronological list — implementation detail TBD."
 
 implications:
+  - "Frontend: Navigation header must include a notification bell icon with unread count badge — tapping opens notification history."
   - "Frontend: Notification preferences screen needs toggle components with immediate save (no separate 'Save' button) or explicit save action — pattern TBD."
   - "Frontend: FAQ section needs an expandable/collapsible list component with search filtering."
   - "Frontend: Each notification type should include a brief description of its trigger condition alongside the toggle."

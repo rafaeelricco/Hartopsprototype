@@ -3,7 +3,7 @@
 # =============================================================================
 # NOTE: This model is the authoritative source for event status definitions,
 # state transitions, and routing rules. For screen-level UI workflows
-# (list/calendar views, assignment flow, finalization), see mm-ui-002.
+# (list/calendar views, assignment flow, finalization).
 # =============================================================================
 
 id: "mm-ui-006"
@@ -66,7 +66,7 @@ core_content:
     points:
       - "Trigger: Trial Client Staff creates an event, assigns it to an account master, and sets the event details (products, instructions, goals, compensation)."
       - "Step 1: System identifies the account master's geographic assignment and routes the event to the corresponding Educator Manager."
-      - "Step 2: Manager receives a 'New Events Available' notification (Category 1 in mm-ui-004)."
+      - "Step 2: Manager receives a 'New Events Available' notification (Category 1)."
       - "Step 3: Event appears in the manager's Events List with status 'Unassigned'."
       - "Functionality: Routing is automatic — no manual dispatch or manager acceptance step required."
       - "Functionality: Events arrive fully defined. The manager's role begins at educator assignment, not event configuration."
@@ -168,6 +168,7 @@ assumptions:
   - "Educator acceptance/rejection is tracked in-platform even if initial negotiation uses phone/text in Phase 1."
   - "Events can only be cancelled before they go Live. Once Live, the event must proceed to Completed."
   - "The Cancelled status is terminal — cancelled events cannot be re-activated."
+  - "If an educator fails to check in and does not respond, the manager handles escalation out-of-platform (phone/text) in Phase 1. A formal no-show workflow may be added in later phases."
 
 implications:
   - "Frontend: Event cards in list and calendar views must display the current lifecycle status with visual indicators — color-coded badges or status icons (e.g., orange for Unassigned, yellow for Pending, green for Confirmed, red pulse for Live, blue for Completed, gray lock for Finalized)."
@@ -175,7 +176,7 @@ implications:
   - "Frontend: Status transitions should update the UI in near real-time without requiring page refresh (consider WebSocket or polling)."
   - "Backend: Event lifecycle state machine must enforce valid transitions and reject invalid ones (e.g., cannot go from Unassigned to Finalized)."
   - "Backend: Each status transition must be persisted with timestamp, actor, and reason for audit trail."
-  - "Backend: Status transitions must trigger the appropriate notifications as defined in mm-ui-004."
+  - "Backend: Status transitions must trigger the appropriate notifications."
   - "Backend: Account master geography lookup must be performant — used on every event creation to determine manager routing."
   - "Architecture: Consider event-sourcing pattern for the lifecycle state machine to maintain a complete audit trail of all transitions."
   - "Architecture: The state machine is shared across roles — educator mobile app and Trial Client Staff web app both read event status, but only specific roles can trigger specific transitions."
