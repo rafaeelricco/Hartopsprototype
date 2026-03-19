@@ -64,10 +64,11 @@ function getFirstDayOfMonth(year: number, month: number) {
   return new Date(year, month, 1).getDay();
 }
 
-// Slot label colors
+// Slot label colors (keys must match lowercase data: "morning" | "afternoon" | "evening")
 const SLOT_COLORS: Record<string, { bg: string; text: string }> = {
-  Morning: { bg: "#FEF3C7", text: "#92400E" },
-  Evening: { bg: "#EDE9FE", text: "#5B21B6" },
+  morning: { bg: "#FEF3C7", text: "#92400E" },
+  afternoon: { bg: "#F1F5F9", text: "#475569" },
+  evening: { bg: "#EDE9FE", text: "#5B21B6" },
 };
 
 function InfoCard({
@@ -204,17 +205,25 @@ export function EducatorDetailPage() {
         <div className="bg-white rounded-xl border border-[#E2E8F0] p-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div
-                className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: "#7D152D0F" }}
-              >
-                <span
-                  className="font-semibold"
-                  style={{ fontSize: "0.9375rem", color: "#7D152D" }}
+              {educator.photoUrl ? (
+                <img
+                  src={educator.photoUrl}
+                  alt={educator.name}
+                  className="w-11 h-11 rounded-full object-cover flex-shrink-0"
+                />
+              ) : (
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: "#7D152D0F" }}
                 >
-                  {initials}
-                </span>
-              </div>
+                  <span
+                    className="font-semibold"
+                    style={{ fontSize: "0.9375rem", color: "#7D152D" }}
+                  >
+                    {initials}
+                  </span>
+                </div>
+              )}
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <h2 style={{ fontSize: "1.25rem", color: "#0F172A" }}>
@@ -246,6 +255,9 @@ export function EducatorDetailPage() {
                   >
                     <MapPin size={13} />
                     {educator.homeBase}
+                    {educator.distanceMiles != null && (
+                      <span> · ~{educator.distanceMiles} mi from you</span>
+                    )}
                   </span>
                 </div>
               </div>
@@ -641,7 +653,8 @@ export function EducatorDetailPage() {
                                       lineHeight: "1rem",
                                     }}
                                   >
-                                    {slot}
+                                    {slot.charAt(0).toUpperCase() +
+                                      slot.slice(1)}
                                   </span>
                                 );
                               })}

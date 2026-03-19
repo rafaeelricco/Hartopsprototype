@@ -20,7 +20,12 @@ import {
 import { PageHeader } from "@/app/shared/components/layouts/page-header";
 import { mockEducators } from "./educator-roster-data";
 
-type SortKey = "name" | "avgRating" | "salesPerEvent" | "punctuality";
+type SortKey =
+  | "name"
+  | "avgRating"
+  | "salesPerEvent"
+  | "punctuality"
+  | "totalEvents";
 type SortDir = "asc" | "desc";
 type StatusFilter = "All" | "Active" | "Inactive";
 
@@ -145,7 +150,7 @@ export function EducatorsPage() {
             <SortableHeader label="Name" sortKeyName="name" />
             <span>Contact</span>
             <span>Next Event</span>
-            <span>Evts</span>
+            <SortableHeader label="Completed" sortKeyName="totalEvents" />
             <span>Status</span>
             <SortableHeader label="Rating" sortKeyName="avgRating" />
             <SortableHeader label="Sales" sortKeyName="salesPerEvent" />
@@ -227,12 +232,12 @@ export function EducatorsPage() {
                     )}
                   </span>
 
-                  {/* Events Assigned count */}
+                  {/* Events Completed count */}
                   <span
                     className="text-foreground text-center"
                     style={{ fontSize: "0.875rem" }}
                   >
-                    {edu.eventsAssigned}
+                    {edu.totalEvents}
                   </span>
 
                   {/* Status */}
@@ -240,9 +245,7 @@ export function EducatorsPage() {
                     className={`inline-flex items-center rounded-full border px-2 py-0.5 font-medium w-fit ${statusColors[edu.status] || "bg-muted text-muted-foreground border-border"}`}
                     style={{ fontSize: "0.6875rem" }}
                   >
-                    {edu.status === "Pending Invitation"
-                      ? "Pending"
-                      : edu.status}
+                    {edu.status}
                   </span>
 
                   {/* Avg Rating */}
