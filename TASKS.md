@@ -199,6 +199,69 @@ Expand ops beyond organization/event monitoring into data stewardship.
 
 ---
 
+## 10. Tasks Definition Call 4/4 `🟢 P1`
+
+> Tasks, polishments, and enhancements identified during Definition Call 4/4 (March 20, 2026) and the Enhancement Documents (Account Management, Educator Management, Cancellation Process) shared by Chris.
+
+### Prototype Polishments
+
+- [ ] `🟢 P1` **Manager edit-before-finalize** — Allow educator managers to edit educator notes and free-form questionnaire text before approving/finalizing an event. Needed to fix unprofessional language before submissions reach clients.
+      Source: `Call 4/4 ~00:31:09 – "the free form text. We definitely need opportunity for the manager to be able to change that before approving and submitting so that there isn't any, oh, the customers hate it."`
+
+- [ ] `🟢 P1` **Questionnaire hardcoded answer options** — Add selectable dropdown answers for event questionnaire templates alongside free-form text. Chris will share the specific answer sets.
+      Source: `Call 4/4 ~00:32:17 – "there's some hardcoded stuff that I think would be good to have in there as a selection for the answers"`
+
+- [ ] `🟢 P1` **Educator full address in profile** — Replace "home area" with actual street address in educator profile. Required for accurate drive-distance calculation to event venues (e.g., cross-borough travel in NYC).
+      Source: `Call 4/4 ~00:34:48 – "It would need to be an actual address because what we do is we take their home address to know the drive distance or travel distance to an event"`
+
+- [ ] `🟢 P1` **Admin access to educator manager features** — Admin role should have access to the educator manager assignment view to cover for absent/sick managers.
+      Source: `Call 4/4 ~00:38:39 – "If I'm an admin, an admin should have access to the manager assignments as well because there may be a time where they need like to cover somebody who's out"`
+
+### Cancellation Process
+
+> Detailed flow from the Enhancement Doc: "Manager Event Cancellation Process (Mobile App - HEMS)". Currently entirely manual (phone/text/email) with no in-app support.
+
+- [ ] `🟢 P1` **Mobile: Educator day-of cancel tagging** — Educator can tag an event as cancelled _only on the day of the event_ upon arrival/attempt to arrive. This action forces direct communication (phone call, text, or chat) with the manager before any status change. Educator cannot unilaterally cancel.
+      Source: `Enhancement Doc – Cancellation Process: "Allow for Educator to tag Event as Cancelled with Manager Approval" + "Force direction communication with Manager to confirm via conversation (text, Phone Call, or chat Only)"`
+
+- [ ] `🟢 P1` **Web: Manager formal cancellation approval** — Manager receives a formal approval flow in the web portal for cancellation requests. Captures structured cancellation reason, handles partial educator compensation (travel time/kit pickup), and triggers supplier billing adjustments. Replaces the current email-based manual process.
+      Source: `Enhancement Doc – Cancellation Process: "Manager needs formal approval process for the Canceled Event" + "Billing for Educator process is in place" + "Supplier / Client Billing for cancelled process"`
+
+- [ ] `🟢 P1` **Clean cancelled-event data in reports** — Cancelled events must use structured cancellation reason fields instead of empty surveys with zeros. Reports must clearly distinguish "cancelled" from "failed" events. Campaign reviews should not show blank data for cancellations.
+      Source: `Enhancement Doc – Cancellation Process: "HEMs Application retained cancelled events even in Reporting (shows blanks without any reason for cancelation), Event shows executed and doesn't have any proper tagging for Cancelation"`
+
+### Educator Management Enhancements
+
+- [ ] `🟢 P1` **Educator list sort by geography** — Educator roster must be sortable by neighborhoods/zip codes and by manager geography/territory.
+      Source: `Enhancement Doc – Educator Mgmt: "Sorts by Areas of Geography aligned by Neighborhoods (Needs zip codes or reference Table)" + "Sorts by Manager Geography"`
+
+- [ ] `🟢 P1` **Educator metrics data capture** — Capture per educator: Retail Sales Reported Average, Preferred Brands, Preferred Categories, Check-in Score, Event Completed to End Time Average, Retailer Survey Score, Cancellation Rating.
+      Source: `Enhancement Doc – Educator Mgmt – Acceptance Criteria: Metrics section`
+
+- [ ] `🔵 P2` **Auto-suggestion for educator assignment** — Use address proximity, cancellation rate, preferred category/brand/event type, and average sales rate to auto-rank educators for manager selection. Show short list + access to full list.
+      Source: `Capabilities Matrix – "Educator Scores / Auto Assignment" = Phase 2` + `Enhancement Doc – Educator Mgmt: "Uses Address of Educator and Events to provide closest Educator" + "Highlights Educators with Poor Cancellation Rate or Poor Score"`
+
+### Account Management Enhancements
+
+- [ ] `🟢 P1` **Account metrics & profiling** — Track per-account: Retail Sales avg, Preferred Brands, Preferred Categories, Check-in Score, Event Execution Score, Cancellation Rating. Prepare foundation for event insights and campaign reviews.
+      Source: `Enhancement Doc – Account Mgmt – Acceptance Criteria: Metrics section`
+
+- [ ] `🟢 P1` **Account data linkage keys** — Handle key identifiers for Distributor, Supplier, and Data Provider clients. Prepare VIP Master Account Data setup. Enable geo-coding and address standardization.
+      Source: `Enhancement Doc – Account Mgmt: "Handle Key Identifiers for Distributor, Supplier, Data Provider" + "Handle VIP Master Account Data Setup" + "Geo Coding / Address"`
+
+### Nomenclature & Process
+
+- [ ] `🟢 P1` **Nomenclature updates** — Top-level Hart staff = "Operators" (cross-org view). Org-scoped users = "Organization Members". Three standard org roles: Admin, Educator Manager, Educator. Role labels (e.g., "Educator" vs "Brand Ambassador" vs "Salesperson") configurable per organization.
+      Source: `Call 4/4 ~00:21:49 – Ethan proposed, Chris approved: "we call those operators to distinguish from organization members" + "should be configurable at an organization level"`
+
+- [ ] `🟢 P1` **Capability Matrix / Stakeholder Checklist** — Create a visual checklist of all current HEMS capabilities cross-referenced against the new platform build status. Used for leadership updates and stakeholder sessions. Align with the CSV matrix Chris shared.
+      Source: `Call 4/4 ~00:09:52 – "I think it'd be good to have that lined up just to be prepared so that we're more buttoned up and talking about, okay, here's what we're building out"` + `~00:13:43 – "I just want to start focusing on getting this all documented"`
+
+- [ ] `🟢 P1` **Stakeholder demo prep** — Prepare current prototypes and capabilities matrix for upcoming stakeholder sessions. Anticipate "what's next" questions with roadmap visibility. Chris wants sessions as early as next week.
+      Source: `Call 4/4 ~00:41:56 – "I want to nail down a timing that we can do the stakeholder meeting... show where we're at right now"`
+
+---
+
 ## Progress Summary
 
 | Section                       | Phase | Done   | Partial | Not Started | Total  |
@@ -212,8 +275,9 @@ Expand ops beyond organization/event monitoring into data stewardship.
 | §7 Platform Tiers             | P2    | 0      | 0       | 2           | 2      |
 | §8 Process & Collaboration    | P1    | 0      | 0       | 3           | 3      |
 | §9 At-Risk AI Work            | P3    | 0      | 0       | 2           | 2      |
-| **Total**                     |       | **17** | **2**   | **23**      | **42** |
+| §10 Tasks Definition Call 4/4 | P1/P2 | 0      | 0       | 15          | 15     |
+| **Total**                     |       | **17** | **2**   | **38**      | **57** |
 
-**Phase 1 tasks:** 30 total — 17 done, 2 partial, 11 not started (1 blocked)
-**Phase 2 tasks:** 10 total — all not started
+**Phase 1 tasks:** 44 total — 17 done, 2 partial, 25 not started (1 blocked)
+**Phase 2 tasks:** 11 total — all not started
 **Phase 3 / TBD tasks:** 2 total — all not started
