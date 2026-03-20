@@ -33,6 +33,7 @@ import {
   Megaphone,
   Award,
   Search,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Badge } from "@/app/shared/components/ui/badge";
@@ -519,6 +520,26 @@ export function EventDetailPage() {
     AssignedEducator[]
   >(event?.assignedEducators || []);
   const [draftSelectedIds, setDraftSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // Manager edit-before-finalize state
+  const [editedNotes, setEditedNotes] = useState<string>(
+    event?.educatorNotesFinal || "",
+  );
+  const [editedResponses, setEditedResponses] = useState<
+    Record<string, string>
+  >(() => {
+    const initial: Record<string, string> = {};
+    event?.questionnaireResponsesFinal
+      ?.filter((r) => r.type === "open-text")
+      .forEach((r) => {
+        initial[r.questionId] = r.answer;
+      });
+    return initial;
+  });
+  const [notesEdited, setNotesEdited] = useState(false);
+  const [responsesEdited, setResponsesEdited] = useState<Set<string>>(
     new Set(),
   );
 
@@ -1552,8 +1573,8 @@ export function EventDetailPage() {
               </Card>
             )}
 
-            {/* Educator Notes (final) */}
-            {event.educatorNotesFinal && (
+            {/* Educator Notes (final) — editable before finalize */}
+            {event.educatorNotesFinal != null && (
               <Card className="gap-0">
                 <CardHeader className="px-5 pt-5 pb-3">
                   <div className="flex items-center gap-2">
@@ -1563,18 +1584,171 @@ export function EventDetailPage() {
                     >
                       Educator Notes
                     </CardTitle>
+                    {notesEdited && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-amber-500/10 text-amber-600 border-amber-500/20"
+                        style={{ fontSize: "0.625rem", fontWeight: 500 }}
+                      >
+                        <Pencil className="w-2.5 h-2.5" />
+                        Edited by manager
+                      </span>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="px-5 pb-5">
-                  <p
-                    className="text-foreground"
-                    style={{ fontSize: "0.875rem" }}
-                  >
-                    {event.educatorNotesFinal}
-                  </p>
+                  {event.status === "Completed" &&
+                  !finalized &&
+                  !event.finalizedAt ? (
+                    <textarea
+                      value={editedNotes}
+                      onChange={(e) => {
+                        setEditedNotes(e.target.value);
+                        if (e.target.value !== event.educatorNotesFinal) {
+                          setNotesEdited(true);
+                        } else {
+                          setNotesEdited(false);
+                        }
+                      }}
+                      rows={4}
+                      className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors resize-y"
+                      style={{ fontSize: "0.875rem" }}
+                    />
+                  ) : (
+                    <p
+                      className="text-foreground"
+                      style={{ fontSize: "0.875rem" }}
+                    >
+                      {editedNotes || event.educatorNotesFinal}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             )}
+
+            {/* Questionnaire Responses — editable open-text before finalize */}
+            {event.questionnaireResponsesFinal &&
+              event.questionnaireResponsesFinal.length > 0 && (
+                <Card className="gap-0">
+                  <CardHeader className="px-5 pt-5 pb-3">
+                    <div className="flex items-center gap-2">
+                      <ClipboardList className="w-4 h-4 text-muted-foreground" />
+                      <CardTitle
+                        style={{ fontSize: "0.9375rem", fontWeight: 600 }}
+                      >
+                        Questionnaire Responses
+                      </CardTitle>
+                      <span
+                        className="text-muted-foreground"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
+                        ({event.questionnaireResponsesFinal.length})
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-5 pb-5">
+                    <div className="space-y-4">
+                      {event.questionnaireResponsesFinal.map((response) => {
+                        const isOpenText = response.type === "open-text";
+                        const canEdit =
+                          isOpenText &&
+                          event.status === "Completed" &&
+                          !finalized &&
+                          !event.finalizedAt;
+                        const wasEdited = responsesEdited.has(
+                          response.questionId,
+                        );
+                        return (
+                          <div
+                            key={response.questionId}
+                            className="rounded-lg border border-border p-3 space-y-1.5"
+                          >
+                            <div className="flex items-center gap-2">
+                              <p
+                                className="text-muted-foreground"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {response.questionText}
+                              </p>
+                              <span
+                                className="inline-flex items-center rounded-full border px-1.5 py-0 bg-muted text-muted-foreground border-border flex-shrink-0"
+                                style={{
+                                  fontSize: "0.5625rem",
+                                  fontWeight: 500,
+                                  lineHeight: "1rem",
+                                }}
+                              >
+                                {response.type === "open-text"
+                                  ? "Open Text"
+                                  : response.type === "yes-no"
+                                    ? "Yes / No"
+                                    : response.type === "rating"
+                                      ? "Rating"
+                                      : "Multiple Choice"}
+                              </span>
+                              {wasEdited && (
+                                <span
+                                  className="inline-flex items-center gap-1 rounded-full border px-1.5 py-0 bg-amber-500/10 text-amber-600 border-amber-500/20 flex-shrink-0"
+                                  style={{
+                                    fontSize: "0.5625rem",
+                                    fontWeight: 500,
+                                    lineHeight: "1rem",
+                                  }}
+                                >
+                                  <Pencil className="w-2 h-2" />
+                                  Edited
+                                </span>
+                              )}
+                            </div>
+                            {canEdit ? (
+                              <textarea
+                                value={
+                                  editedResponses[response.questionId] ??
+                                  response.answer
+                                }
+                                onChange={(e) => {
+                                  setEditedResponses((prev) => ({
+                                    ...prev,
+                                    [response.questionId]: e.target.value,
+                                  }));
+                                  if (e.target.value !== response.answer) {
+                                    setResponsesEdited((prev) =>
+                                      new Set(prev).add(response.questionId),
+                                    );
+                                  } else {
+                                    setResponsesEdited((prev) => {
+                                      const next = new Set(prev);
+                                      next.delete(response.questionId);
+                                      return next;
+                                    });
+                                  }
+                                }}
+                                rows={3}
+                                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors resize-y"
+                                style={{ fontSize: "0.8125rem" }}
+                              />
+                            ) : (
+                              <p
+                                className="text-foreground"
+                                style={{ fontSize: "0.8125rem" }}
+                              >
+                                {isOpenText
+                                  ? (editedResponses[response.questionId] ??
+                                    response.answer)
+                                  : response.type === "rating"
+                                    ? `${response.answer} / 5`
+                                    : response.answer}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
             {/* Photo gallery with categories per mm-ui-002 */}
             {allPhotos.length > 0 && (

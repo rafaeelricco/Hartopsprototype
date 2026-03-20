@@ -35,6 +35,13 @@ export interface AssignedEducator {
   assignmentStatus: AssignmentStatus;
 }
 
+export interface QuestionnaireResponse {
+  questionId: string;
+  questionText: string;
+  type: "rating" | "yes-no" | "multiple-choice" | "open-text";
+  answer: string;
+}
+
 export interface EventItem {
   id: string;
   name: string;
@@ -86,6 +93,7 @@ export interface EventItem {
   };
   inventoryComparison?: { preEvent: number; postEvent: number };
   questionnairesCompletedFinal?: number;
+  questionnaireResponsesFinal?: QuestionnaireResponse[];
   educatorNotesFinal?: string;
   photoCategories?: {
     receipts: string[];
@@ -253,6 +261,66 @@ export const mockEvents: EventItem[] = [
     },
     inventoryComparison: { preEvent: 60, postEvent: 42 },
     questionnairesCompletedFinal: 34,
+    questionnaireResponsesFinal: [
+      {
+        questionId: "q-1",
+        questionText: "How was the venue setup?",
+        type: "rating",
+        answer: "4",
+      },
+      {
+        questionId: "q-2",
+        questionText: "Were all required products available at the venue?",
+        type: "yes-no",
+        answer: "Yes",
+      },
+      {
+        questionId: "q-3",
+        questionText: "Estimate the foot traffic during the event",
+        type: "multiple-choice",
+        answer: "High (150-300)",
+      },
+      {
+        questionId: "q-4",
+        questionText: "Describe the consumer demographic",
+        type: "multiple-choice",
+        answer: "26-35",
+      },
+      {
+        questionId: "q-5",
+        questionText:
+          "Were there any competitor promotions active at the venue?",
+        type: "yes-no",
+        answer: "No",
+      },
+      {
+        questionId: "q-6",
+        questionText: "Rate the overall consumer engagement",
+        type: "rating",
+        answer: "5",
+      },
+      {
+        questionId: "q-7",
+        questionText: "Any compliance issues to report?",
+        type: "open-text",
+        answer:
+          "None, everything was good. the store was real nice about letting us set up early and they even helped move some stuff around so we could get the table in a better spot. no issues at all",
+      },
+      {
+        questionId: "q-extra-1",
+        questionText: "Describe consumer feedback on the product",
+        type: "open-text",
+        answer:
+          "People loved the pineapple flavor alot. some peple said it was too sweet but most were into it. a couple guys asked if we had any merch or swag to give away which we didnt have. the malibu original was also popular but pineapple was the winner for sure",
+      },
+      {
+        questionId: "q-extra-2",
+        questionText: "Any additional notes or observations?",
+        type: "open-text",
+        answer:
+          "store manager lisa was super cool and said she wants to do another one next month. she said the display looked great and drew alot of ppl over. i think we should def come back here its a great location",
+      },
+    ],
     educatorNotesFinal:
       "Great event. Pineapple variant was the crowd favorite. Several customers asked about Malibu merch. Store manager offered to extend the activation next month.",
     photoCategories: {
@@ -390,6 +458,66 @@ export const mockEvents: EventItem[] = [
     },
     inventoryComparison: { preEvent: 36, postEvent: 25 },
     questionnairesCompletedFinal: 22,
+    questionnaireResponsesFinal: [
+      {
+        questionId: "q-1",
+        questionText: "How was the venue setup?",
+        type: "rating",
+        answer: "5",
+      },
+      {
+        questionId: "q-2",
+        questionText: "Were all required products available at the venue?",
+        type: "yes-no",
+        answer: "Yes",
+      },
+      {
+        questionId: "q-3",
+        questionText: "Estimate the foot traffic during the event",
+        type: "multiple-choice",
+        answer: "Medium (50-150)",
+      },
+      {
+        questionId: "q-4",
+        questionText: "Describe the consumer demographic",
+        type: "multiple-choice",
+        answer: "36-45",
+      },
+      {
+        questionId: "q-5",
+        questionText:
+          "Were there any competitor promotions active at the venue?",
+        type: "yes-no",
+        answer: "No",
+      },
+      {
+        questionId: "q-6",
+        questionText: "Rate the overall consumer engagement",
+        type: "rating",
+        answer: "5",
+      },
+      {
+        questionId: "q-7",
+        questionText: "Any compliance issues to report?",
+        type: "open-text",
+        answer:
+          "no compliance issues. everything went smooth. venue staff was very professional and accomodating. they had a nice area setup for us already which was great",
+      },
+      {
+        questionId: "q-extra-1",
+        questionText: "Describe consumer feedback on the product",
+        type: "open-text",
+        answer:
+          "the 18 year was def the star of the show. alot of corporate types came through and were super impressed. got a few business cards from ppl interested in buying cases. the 12 year was also solid but ppl really gravitated to the premium stuff. one guy said it was the best scotch tasting hes ever been to lol",
+      },
+      {
+        questionId: "q-extra-2",
+        questionText: "Any additional notes or observations?",
+        type: "open-text",
+        answer:
+          "this is a amazing venue for prestige brands. the crowd is exactly the right demo. i would strongly suggest we do more events here. the eataly / chelsea market traffic really helps bring ppl in",
+      },
+    ],
     educatorNotesFinal:
       "Exceptional crowd. Several corporate buyers interested in bulk orders. The 18-year expression was the top seller. Suggest repeating this venue for the next prestige launch.",
     photoCategories: {

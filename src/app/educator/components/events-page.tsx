@@ -17,6 +17,8 @@ import {
   ShoppingCart,
   Camera,
   Star,
+  Pencil,
+  ClipboardList,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -384,6 +386,36 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
   const [finalized, setFinalized] = useState<Set<string>>(new Set());
   const [showConfirm, setShowConfirm] = useState<string | null>(null);
 
+  // Manager edit-before-finalize state — keyed by event ID
+  const [editedNotesMap, setEditedNotesMap] = useState<Record<string, string>>(
+    () => {
+      const initial: Record<string, string> = {};
+      pendingEvents.forEach((e) => {
+        if (e.educatorNotesFinal) initial[e.id] = e.educatorNotesFinal;
+      });
+      return initial;
+    },
+  );
+  const [editedResponsesMap, setEditedResponsesMap] = useState<
+    Record<string, Record<string, string>>
+  >(() => {
+    const initial: Record<string, Record<string, string>> = {};
+    pendingEvents.forEach((e) => {
+      const inner: Record<string, string> = {};
+      e.questionnaireResponsesFinal
+        ?.filter((r) => r.type === "open-text")
+        .forEach((r) => {
+          inner[r.questionId] = r.answer;
+        });
+      initial[e.id] = inner;
+    });
+    return initial;
+  });
+  const [notesEditedSet, setNotesEditedSet] = useState<Set<string>>(new Set());
+  const [responsesEditedMap, setResponsesEditedMap] = useState<
+    Record<string, Set<string>>
+  >({});
+
   const remaining = pendingEvents.filter((e) => !finalized.has(e.id));
 
   const handleFinalize = (id: string) => {
@@ -614,23 +646,179 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                       </div>
                     )}
 
-                    {/* Educator notes */}
+                    {/* Educator notes — editable before finalize */}
                     {event.educatorNotesFinal && (
                       <div className="rounded-lg border border-border p-3">
-                        <p
-                          className="text-muted-foreground mb-1"
-                          style={{ fontSize: "0.6875rem" }}
-                        >
-                          Educator Notes
-                        </p>
-                        <p
-                          className="text-foreground"
-                          style={{ fontSize: "0.8125rem" }}
-                        >
-                          {event.educatorNotesFinal}
-                        </p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <p
+                            className="text-muted-foreground"
+                            style={{ fontSize: "0.6875rem" }}
+                          >
+                            Educator Notes
+                          </p>
+                          {notesEditedSet.has(event.id) && (
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full border px-1.5 py-0 bg-amber-500/10 text-amber-600 border-amber-500/20"
+                              style={{
+                                fontSize: "0.5625rem",
+                                fontWeight: 500,
+                                lineHeight: "1rem",
+                              }}
+                            >
+                              <Pencil className="w-2 h-2" />
+                              Edited
+                            </span>
+                          )}
+                        </div>
+                        {!isFinalized ? (
+                          <textarea
+                            value={
+                              editedNotesMap[event.id] ??
+                              event.educatorNotesFinal
+                            }
+                            onChange={(e) => {
+                              setEditedNotesMap((prev) => ({
+                                ...prev,
+                                [event.id]: e.target.value,
+                              }));
+                              if (e.target.value !== event.educatorNotesFinal) {
+                                setNotesEditedSet((prev) =>
+                                  new Set(prev).add(event.id),
+                                );
+                              } else {
+                                setNotesEditedSet((prev) => {
+                                  const next = new Set(prev);
+                                  next.delete(event.id);
+                                  return next;
+                                });
+                              }
+                            }}
+                            rows={3}
+                            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors resize-y"
+                            style={{ fontSize: "0.8125rem" }}
+                          />
+                        ) : (
+                          <p
+                            className="text-foreground"
+                            style={{ fontSize: "0.8125rem" }}
+                          >
+                            {editedNotesMap[event.id] ??
+                              event.educatorNotesFinal}
+                          </p>
+                        )}
                       </div>
                     )}
+
+                    {/* Questionnaire open-text responses — editable before finalize */}
+                    {event.questionnaireResponsesFinal &&
+                      event.questionnaireResponsesFinal.filter(
+                        (r) => r.type === "open-text",
+                      ).length > 0 && (
+                        <div className="rounded-lg border border-border p-3 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+                            <p
+                              className="text-muted-foreground"
+                              style={{
+                                fontSize: "0.6875rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              Open-Text Responses
+                            </p>
+                          </div>
+                          {event.questionnaireResponsesFinal
+                            .filter((r) => r.type === "open-text")
+                            .map((response) => {
+                              const eventResponses =
+                                responsesEditedMap[event.id] ?? new Set();
+                              const wasEdited =
+                                eventResponses instanceof Set
+                                  ? eventResponses.has(response.questionId)
+                                  : false;
+                              return (
+                                <div
+                                  key={response.questionId}
+                                  className="space-y-1"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <p
+                                      className="text-muted-foreground"
+                                      style={{ fontSize: "0.625rem" }}
+                                    >
+                                      {response.questionText}
+                                    </p>
+                                    {wasEdited && (
+                                      <span
+                                        className="inline-flex items-center gap-0.5 rounded-full border px-1 py-0 bg-amber-500/10 text-amber-600 border-amber-500/20 flex-shrink-0"
+                                        style={{
+                                          fontSize: "0.5rem",
+                                          fontWeight: 500,
+                                          lineHeight: "0.875rem",
+                                        }}
+                                      >
+                                        <Pencil className="w-1.5 h-1.5" />
+                                        Edited
+                                      </span>
+                                    )}
+                                  </div>
+                                  {!isFinalized ? (
+                                    <textarea
+                                      value={
+                                        editedResponsesMap[event.id]?.[
+                                          response.questionId
+                                        ] ?? response.answer
+                                      }
+                                      onChange={(e) => {
+                                        setEditedResponsesMap((prev) => ({
+                                          ...prev,
+                                          [event.id]: {
+                                            ...(prev[event.id] ?? {}),
+                                            [response.questionId]:
+                                              e.target.value,
+                                          },
+                                        }));
+                                        if (
+                                          e.target.value !== response.answer
+                                        ) {
+                                          setResponsesEditedMap((prev) => ({
+                                            ...prev,
+                                            [event.id]: new Set(
+                                              prev[event.id] ?? [],
+                                            ).add(response.questionId),
+                                          }));
+                                        } else {
+                                          setResponsesEditedMap((prev) => {
+                                            const next = new Set(
+                                              prev[event.id] ?? [],
+                                            );
+                                            next.delete(response.questionId);
+                                            return {
+                                              ...prev,
+                                              [event.id]: next,
+                                            };
+                                          });
+                                        }
+                                      }}
+                                      rows={2}
+                                      className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors resize-y"
+                                      style={{ fontSize: "0.75rem" }}
+                                    />
+                                  ) : (
+                                    <p
+                                      className="text-foreground"
+                                      style={{ fontSize: "0.75rem" }}
+                                    >
+                                      {editedResponsesMap[event.id]?.[
+                                        response.questionId
+                                      ] ?? response.answer}
+                                    </p>
+                                  )}
+                                </div>
+                              );
+                            })}
+                        </div>
+                      )}
 
                     {/* Photo count */}
                     {event.photoCount && event.photoCount > 0 && (
