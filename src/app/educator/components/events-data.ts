@@ -1,6 +1,7 @@
 // Events data for Educator Manager
 // Scoped to the manager's assigned educator set only
 // Status model per mm-ui-006: 7 lifecycle states
+import { mockEducators } from "./educator-roster-data";
 
 export type EventStatus =
   | "Unassigned"
@@ -627,7 +628,66 @@ export const mockEvents: EventItem[] = [
 // --- Query helpers ---
 
 export function getEventById(id: string): EventItem | undefined {
-  return mockEvents.find((e) => e.id === id);
+  const found = mockEvents.find((e) => e.id === id);
+  if (found) return found;
+
+  // Fallback for past events defined in the educator roster
+  if (id.startsWith("past-")) {
+    for (const edu of mockEducators) {
+      const past = edu.pastEvents.find((pe) => pe.id === id);
+      if (past) {
+        return {
+          id: past.id,
+          name: past.name,
+          campaignName: "Archived Campaign",
+          brandName: "Archived Brand",
+          clientName: "Archived Client",
+          date: past.date,
+          time: "12:00 PM – 4:00 PM",
+          duration: "4h",
+          venue: past.venue,
+          venueAddress: "Address on file",
+          accountType: "Retail",
+          eventType: "Tasting",
+          educatorId: edu.id,
+          educatorName: edu.name,
+          assignedEducators: [
+            {
+              educatorId: edu.id,
+              educatorName: edu.name,
+              assignmentStatus: "Accepted",
+            },
+          ],
+          status: "Finalized",
+          products: ["Assorted Products"],
+          instructions: "Archived instructions.",
+          goals: "Archived goals.",
+          finalStats: {
+            totalSamples: past.salesUnits * 4,
+            totalInteractions: past.salesUnits * 6,
+            totalSales: past.salesUnits,
+            rating: past.rating,
+            photosSubmitted: 4,
+            duration: "4h",
+          },
+          inventoryComparison: { preEvent: 30, postEvent: 30 - past.salesUnits },
+          questionnairesCompletedFinal: Math.floor(past.salesUnits * 1.5),
+          educatorNotesFinal: "Event completed successfully. (Archived record)",
+          photoCategories: {
+            receipts: [],
+            socialMedia: [],
+            venue: [],
+          },
+          completedAt: `${past.date}T17:00:00`,
+          finalizedAt: `${past.date}T18:00:00`,
+          photoCount: 0,
+          photoUrls: [],
+        };
+      }
+    }
+  }
+
+  return undefined;
 }
 
 export function getEventsByStatus(status: EventStatus): EventItem[] {
