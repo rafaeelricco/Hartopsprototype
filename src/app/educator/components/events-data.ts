@@ -670,7 +670,10 @@ export function getEventById(id: string): EventItem | undefined {
             photosSubmitted: 4,
             duration: "4h",
           },
-          inventoryComparison: { preEvent: 30, postEvent: 30 - past.salesUnits },
+          inventoryComparison: {
+            preEvent: 30,
+            postEvent: 30 - past.salesUnits,
+          },
           questionnairesCompletedFinal: Math.floor(past.salesUnits * 1.5),
           educatorNotesFinal: "Event completed successfully. (Archived record)",
           photoCategories: {
