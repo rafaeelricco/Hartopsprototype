@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  ClipboardCheck,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -22,6 +23,7 @@ import {
   SelectValue,
 } from "../../shared/components/ui/select";
 import { Input } from "@/app/shared/components/ui/input";
+import { MOCK_DRAFT_EVENTS } from "./draft-events-data";
 
 /* ------------------------------------------------------------------ */
 /* Mock data                                                           */
@@ -494,6 +496,9 @@ export function EventsPage() {
     return d.startsWith("Mar") && parseInt(d.split(" ")[1] || "0") <= 7;
   }).length;
   const liveNow = MOCK_EVENTS.filter((e) => e.status === "Live").length;
+  const pendingDrafts = MOCK_DRAFT_EVENTS.filter(
+    (d) => d.status === "pending",
+  ).length;
 
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
@@ -561,7 +566,7 @@ export function EventsPage() {
       </div>
 
       {/* Summary Stats Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <StatCard
           icon={CalendarDays}
           label="Events Today"
@@ -575,6 +580,17 @@ export function EventsPage() {
           accent={false}
         />
         <StatCard icon={Radio} label="Live Now" value={liveNow} accent={true} />
+        <div
+          className="cursor-pointer transition-transform hover:scale-[1.02]"
+          onClick={() => navigate("/ops/dashboard/draft-events")}
+        >
+          <StatCard
+            icon={ClipboardCheck}
+            label="Pending Drafts"
+            value={pendingDrafts}
+            accent={false}
+          />
+        </div>
       </div>
 
       {/* Filters Row */}

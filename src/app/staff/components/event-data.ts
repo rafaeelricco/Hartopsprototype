@@ -71,7 +71,7 @@ export const OBJECTIVES: Objective[] = [
   },
   {
     id: "competitive-intel",
-    label: "Competitive Intel",
+    label: "Competitive Intelligence",
     description: "Monitor competitor presence, pricing, and market positioning",
   },
   {

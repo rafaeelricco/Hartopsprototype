@@ -10,6 +10,7 @@ import {
   GalleryVerticalEnd,
   Store,
   Users,
+  ClipboardCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -58,6 +59,11 @@ const data = {
       title: "Educators",
       url: "/ops/dashboard/educators",
       icon: Users,
+    },
+    {
+      title: "Draft Events",
+      url: "/ops/dashboard/draft-events",
+      icon: ClipboardCheck,
     },
     {
       title: "Events",

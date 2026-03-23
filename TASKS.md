@@ -141,6 +141,9 @@ Expand ops beyond organization/event monitoring into data stewardship.
 - [ ] `🔵 P2` **Operational analytics in reports** — Educator utilization, cancellation analytics, event fill rate, campaign ROI rollups. Deferred to in-app reporting phase (PowerBI handles P1).
       Source: Derived from scoring/cancellation discussion at `CONTEXT.md 00:54:10` and depletions at `00:04:36`. No single quote — aggregated need.
 
+- [ ] `🔵 P2` **Draft events review pipeline** — Dedicated page in ops for operators to review, edit, and approve/reject draft events before they are pushed live. Draft events may originate from manual/Excel upload or (future) AI email processor. Includes review checklist, missing-field highlighting, and approve/reject flow.
+      Source: `Call 3/4 [00:27:25] – "event requests come in via emails, are fed into forms, and land in a holding table (draft events). The operator then ensures everything is set up correctly, approves it, and sends it off."` + `[00:45:16] – "The operator will then primarily use the draft section to quickly check and finalize events."`
+
 ---
 
 ## 6. Cross-Cutting – Data Schema & Integrations
@@ -270,14 +273,14 @@ Expand ops beyond organization/event monitoring into data stewardship.
 | §2 Staff – Campaign & Event   | P1/P2 | 6      | 0       | 1           | 7      |
 | §3 Staff – Data Foundations   | P1/P2 | 3      | 0       | 2           | 5      |
 | §4 Ops – Educator Mgmt        | P1    | 1      | 1       | 4           | 6      |
-| §5 Ops – Monitoring & Masters | P1/P2 | 0      | 1       | 4           | 5      |
+| §5 Ops – Monitoring & Masters | P1/P2 | 0      | 1       | 5           | 6      |
 | §6 Cross-Cutting              | P1/P2 | 1      | 0       | 3           | 4      |
 | §7 Platform Tiers             | P2    | 0      | 0       | 2           | 2      |
 | §8 Process & Collaboration    | P1    | 0      | 0       | 3           | 3      |
 | §9 At-Risk AI Work            | P3    | 0      | 0       | 2           | 2      |
 | §10 Tasks Definition Call 4/4 | P1/P2 | 1      | 0       | 14          | 15     |
-| **Total**                     |       | **18** | **2**   | **37**      | **57** |
+| **Total**                     |       | **18** | **2**   | **38**      | **58** |
 
-**Phase 1 tasks:** 44 total — 18 done, 2 partial, 24 not started (1 blocked)
+**Phase 1 tasks:** 45 total — 18 done, 2 partial, 25 not started (1 blocked)
 **Phase 2 tasks:** 11 total — all not started
 **Phase 3 / TBD tasks:** 2 total — all not started
