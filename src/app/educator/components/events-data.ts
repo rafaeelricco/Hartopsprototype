@@ -38,8 +38,9 @@ export interface AssignedEducator {
 export interface QuestionnaireResponse {
   questionId: string;
   questionText: string;
-  type: "rating" | "yes-no" | "multiple-choice" | "open-text";
+  type: "rating" | "yes-no" | "multiple-choice" | "open-text" | "dropdown";
   answer: string;
+  options?: string[];
 }
 
 export interface EventItem {
@@ -320,6 +321,46 @@ export const mockEvents: EventItem[] = [
         answer:
           "store manager lisa was super cool and said she wants to do another one next month. she said the display looked great and drew alot of ppl over. i think we should def come back here its a great location",
       },
+      {
+        questionId: "q-dd-1",
+        questionText: "How would you describe the venue type?",
+        type: "dropdown",
+        answer: "Liquor Store",
+        options: [
+          "Bar/Lounge",
+          "Liquor Store",
+          "Grocery/Supermarket",
+          "Restaurant",
+          "Event Venue",
+          "Convenience Store",
+          "Other",
+        ],
+      },
+      {
+        questionId: "q-dd-2",
+        questionText: "What was the primary product interest?",
+        type: "dropdown",
+        answer: "Flavored",
+        options: [
+          "Original",
+          "Flavored",
+          "Premium/Aged",
+          "Mixed/Cocktails",
+          "No clear preference",
+        ],
+      },
+      {
+        questionId: "q-dd-3",
+        questionText: "Overall compliance status",
+        type: "dropdown",
+        answer: "Fully Compliant",
+        options: [
+          "Fully Compliant",
+          "Minor Issues",
+          "Major Issues",
+          "Non-Compliant",
+        ],
+      },
     ],
     educatorNotesFinal:
       "Great event. Pineapple variant was the crowd favorite. Several customers asked about Malibu merch. Store manager offered to extend the activation next month.",
@@ -516,6 +557,46 @@ export const mockEvents: EventItem[] = [
         type: "open-text",
         answer:
           "this is a amazing venue for prestige brands. the crowd is exactly the right demo. i would strongly suggest we do more events here. the eataly / chelsea market traffic really helps bring ppl in",
+      },
+      {
+        questionId: "q-dd-1",
+        questionText: "How would you describe the venue type?",
+        type: "dropdown",
+        answer: "Restaurant",
+        options: [
+          "Bar/Lounge",
+          "Liquor Store",
+          "Grocery/Supermarket",
+          "Restaurant",
+          "Event Venue",
+          "Convenience Store",
+          "Other",
+        ],
+      },
+      {
+        questionId: "q-dd-2",
+        questionText: "What was the primary product interest?",
+        type: "dropdown",
+        answer: "Premium/Aged",
+        options: [
+          "Original",
+          "Flavored",
+          "Premium/Aged",
+          "Mixed/Cocktails",
+          "No clear preference",
+        ],
+      },
+      {
+        questionId: "q-dd-3",
+        questionText: "Overall compliance status",
+        type: "dropdown",
+        answer: "Fully Compliant",
+        options: [
+          "Fully Compliant",
+          "Minor Issues",
+          "Major Issues",
+          "Non-Compliant",
+        ],
       },
     ],
     educatorNotesFinal:

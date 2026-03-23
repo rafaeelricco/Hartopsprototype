@@ -403,7 +403,7 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
     pendingEvents.forEach((e) => {
       const inner: Record<string, string> = {};
       e.questionnaireResponsesFinal
-        ?.filter((r) => r.type === "open-text")
+        ?.filter((r) => r.type === "open-text" || r.type === "dropdown")
         .forEach((r) => {
           inner[r.questionId] = r.answer;
         });
@@ -709,10 +709,10 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                       </div>
                     )}
 
-                    {/* Questionnaire open-text responses — editable before finalize */}
+                    {/* Questionnaire editable responses — open-text & dropdown before finalize */}
                     {event.questionnaireResponsesFinal &&
                       event.questionnaireResponsesFinal.filter(
-                        (r) => r.type === "open-text",
+                        (r) => r.type === "open-text" || r.type === "dropdown",
                       ).length > 0 && (
                         <div className="rounded-lg border border-border p-3 space-y-3">
                           <div className="flex items-center gap-2">
@@ -724,11 +724,14 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                                 fontWeight: 500,
                               }}
                             >
-                              Open-Text Responses
+                              Editable Responses
                             </p>
                           </div>
                           {event.questionnaireResponsesFinal
-                            .filter((r) => r.type === "open-text")
+                            .filter(
+                              (r) =>
+                                r.type === "open-text" || r.type === "dropdown",
+                            )
                             .map((response) => {
                               const eventResponses =
                                 responsesEditedMap[event.id] ?? new Set();
@@ -748,6 +751,18 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                                     >
                                       {response.questionText}
                                     </p>
+                                    <span
+                                      className="inline-flex items-center rounded-full border px-1 py-0 bg-muted text-muted-foreground border-border flex-shrink-0"
+                                      style={{
+                                        fontSize: "0.5rem",
+                                        fontWeight: 500,
+                                        lineHeight: "0.875rem",
+                                      }}
+                                    >
+                                      {response.type === "open-text"
+                                        ? "Open Text"
+                                        : "Dropdown"}
+                                    </span>
                                     {wasEdited && (
                                       <span
                                         className="inline-flex items-center gap-0.5 rounded-full border px-1 py-0 bg-amber-500/10 text-amber-600 border-amber-500/20 flex-shrink-0"
@@ -762,7 +777,8 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                                       </span>
                                     )}
                                   </div>
-                                  {!isFinalized ? (
+                                  {!isFinalized &&
+                                  response.type === "open-text" ? (
                                     <textarea
                                       value={
                                         editedResponsesMap[event.id]?.[
@@ -804,6 +820,54 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                                       className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors resize-y"
                                       style={{ fontSize: "0.75rem" }}
                                     />
+                                  ) : !isFinalized &&
+                                    response.type === "dropdown" ? (
+                                    <select
+                                      value={
+                                        editedResponsesMap[event.id]?.[
+                                          response.questionId
+                                        ] ?? response.answer
+                                      }
+                                      onChange={(e) => {
+                                        setEditedResponsesMap((prev) => ({
+                                          ...prev,
+                                          [event.id]: {
+                                            ...(prev[event.id] ?? {}),
+                                            [response.questionId]:
+                                              e.target.value,
+                                          },
+                                        }));
+                                        if (
+                                          e.target.value !== response.answer
+                                        ) {
+                                          setResponsesEditedMap((prev) => ({
+                                            ...prev,
+                                            [event.id]: new Set(
+                                              prev[event.id] ?? [],
+                                            ).add(response.questionId),
+                                          }));
+                                        } else {
+                                          setResponsesEditedMap((prev) => {
+                                            const next = new Set(
+                                              prev[event.id] ?? [],
+                                            );
+                                            next.delete(response.questionId);
+                                            return {
+                                              ...prev,
+                                              [event.id]: next,
+                                            };
+                                          });
+                                        }
+                                      }}
+                                      className="w-full rounded-md border border-border bg-card px-2.5 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors cursor-pointer"
+                                      style={{ fontSize: "0.75rem" }}
+                                    >
+                                      {response.options?.map((opt) => (
+                                        <option key={opt} value={opt}>
+                                          {opt}
+                                        </option>
+                                      ))}
+                                    </select>
                                   ) : (
                                     <p
                                       className="text-foreground"

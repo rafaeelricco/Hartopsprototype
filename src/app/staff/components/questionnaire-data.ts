@@ -62,6 +62,49 @@ export const DEFAULT_QUESTIONS: QuestionnaireQuestion[] = [
     required: false,
     category: "compliance",
   },
+  {
+    id: "q-dd-1",
+    text: "How would you describe the venue type?",
+    type: "dropdown",
+    options: [
+      "Bar/Lounge",
+      "Liquor Store",
+      "Grocery/Supermarket",
+      "Restaurant",
+      "Event Venue",
+      "Convenience Store",
+      "Other",
+    ],
+    required: true,
+    category: "venue",
+  },
+  {
+    id: "q-dd-2",
+    text: "What was the primary product interest?",
+    type: "dropdown",
+    options: [
+      "Original",
+      "Flavored",
+      "Premium/Aged",
+      "Mixed/Cocktails",
+      "No clear preference",
+    ],
+    required: true,
+    category: "product",
+  },
+  {
+    id: "q-dd-3",
+    text: "Overall compliance status",
+    type: "dropdown",
+    options: [
+      "Fully Compliant",
+      "Minor Issues",
+      "Major Issues",
+      "Non-Compliant",
+    ],
+    required: true,
+    category: "compliance",
+  },
 ];
 
 // ── Campaign-specific questionnaire templates ───────────────────────────────

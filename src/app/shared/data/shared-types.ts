@@ -18,7 +18,7 @@ export type Educator = {
 export type QuestionnaireQuestion = {
   id: string;
   text: string;
-  type: "rating" | "yes-no" | "multiple-choice" | "open-text";
+  type: "rating" | "yes-no" | "multiple-choice" | "open-text" | "dropdown";
   options?: string[];
   required: boolean;
   category: string;
