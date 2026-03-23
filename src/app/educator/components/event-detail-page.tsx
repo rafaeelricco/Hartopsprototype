@@ -767,58 +767,69 @@ export function EventDetailPage() {
                     </button>
                   )}
                 </div>
-                {assignedEducators.map((ae) => (
-                  <div
-                    key={ae.educatorId}
-                    className="flex items-center justify-between p-2 rounded-md border border-border"
-                  >
-                    <div className="space-y-0.5">
-                      <p
-                        className="text-foreground flex items-center gap-2"
-                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                      >
-                        {ae.educatorName}
-                        {ae.assignmentStatus === "Accepted" && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
-                        )}
-                        {ae.assignmentStatus === "Pending" && (
-                          <span
-                            className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
-                            style={{
-                              fontSize: "0.5625rem",
-                              fontWeight: 500,
-                              lineHeight: "1rem",
-                            }}
-                          >
-                            Pending
-                          </span>
-                        )}
-                        {ae.assignmentStatus === "Declined" && (
-                          <span
-                            className="inline-flex items-center rounded-full border px-1.5 py-0 bg-red-500/10 text-red-600 border-red-500/20"
-                            style={{
-                              fontSize: "0.5625rem",
-                              fontWeight: 500,
-                              lineHeight: "1rem",
-                            }}
-                          >
-                            Declined
-                          </span>
-                        )}
-                      </p>
+                {assignedEducators.map((ae) => {
+                  const edu = mockEducators.find((e) => e.id === ae.educatorId);
+                  return (
+                    <div
+                      key={ae.educatorId}
+                      className="flex items-center justify-between p-2 rounded-md border border-border"
+                    >
+                      <div className="space-y-0.5">
+                        <p
+                          className="text-foreground flex items-center gap-2"
+                          style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                        >
+                          {ae.educatorName}
+                          {edu?.distanceMiles != null && (
+                            <span
+                              className="text-muted-foreground"
+                              style={{ fontSize: "0.6875rem" }}
+                            >
+                              ~{edu.distanceMiles} mi
+                            </span>
+                          )}
+                          {ae.assignmentStatus === "Accepted" && (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                          )}
+                          {ae.assignmentStatus === "Pending" && (
+                            <span
+                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                              style={{
+                                fontSize: "0.5625rem",
+                                fontWeight: 500,
+                                lineHeight: "1rem",
+                              }}
+                            >
+                              Pending
+                            </span>
+                          )}
+                          {ae.assignmentStatus === "Declined" && (
+                            <span
+                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-red-500/10 text-red-600 border-red-500/20"
+                              style={{
+                                fontSize: "0.5625rem",
+                                fontWeight: 500,
+                                lineHeight: "1rem",
+                              }}
+                            >
+                              Declined
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      {isPreEvent && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveEducator(ae.educatorId)}
+                          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
-                    {isPreEvent && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleRemoveEducator(ae.educatorId)}
-                        className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           ) : (
@@ -1649,8 +1660,9 @@ export function EventDetailPage() {
                     <div className="space-y-4">
                       {event.questionnaireResponsesFinal.map((response) => {
                         const isOpenText = response.type === "open-text";
+                        const isDropdown = response.type === "dropdown";
                         const canEdit =
-                          isOpenText &&
+                          (isOpenText || isDropdown) &&
                           event.status === "Completed" &&
                           !finalized &&
                           !event.finalizedAt;
@@ -1686,7 +1698,9 @@ export function EventDetailPage() {
                                     ? "Yes / No"
                                     : response.type === "rating"
                                       ? "Rating"
-                                      : "Multiple Choice"}
+                                      : response.type === "dropdown"
+                                        ? "Dropdown"
+                                        : "Multiple Choice"}
                               </span>
                               {wasEdited && (
                                 <span
@@ -1702,7 +1716,7 @@ export function EventDetailPage() {
                                 </span>
                               )}
                             </div>
-                            {canEdit ? (
+                            {canEdit && isOpenText ? (
                               <textarea
                                 value={
                                   editedResponses[response.questionId] ??
@@ -1729,6 +1743,38 @@ export function EventDetailPage() {
                                 className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors resize-y"
                                 style={{ fontSize: "0.8125rem" }}
                               />
+                            ) : canEdit && isDropdown ? (
+                              <select
+                                value={
+                                  editedResponses[response.questionId] ??
+                                  response.answer
+                                }
+                                onChange={(e) => {
+                                  setEditedResponses((prev) => ({
+                                    ...prev,
+                                    [response.questionId]: e.target.value,
+                                  }));
+                                  if (e.target.value !== response.answer) {
+                                    setResponsesEdited((prev) =>
+                                      new Set(prev).add(response.questionId),
+                                    );
+                                  } else {
+                                    setResponsesEdited((prev) => {
+                                      const next = new Set(prev);
+                                      next.delete(response.questionId);
+                                      return next;
+                                    });
+                                  }
+                                }}
+                                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors cursor-pointer"
+                                style={{ fontSize: "0.8125rem" }}
+                              >
+                                {response.options?.map((opt) => (
+                                  <option key={opt} value={opt}>
+                                    {opt}
+                                  </option>
+                                ))}
+                              </select>
                             ) : (
                               <p
                                 className="text-foreground"
@@ -1737,9 +1783,12 @@ export function EventDetailPage() {
                                 {isOpenText
                                   ? (editedResponses[response.questionId] ??
                                     response.answer)
-                                  : response.type === "rating"
-                                    ? `${response.answer} / 5`
-                                    : response.answer}
+                                  : isDropdown
+                                    ? (editedResponses[response.questionId] ??
+                                      response.answer)
+                                    : response.type === "rating"
+                                      ? `${response.answer} / 5`
+                                      : response.answer}
                               </p>
                             )}
                           </div>
