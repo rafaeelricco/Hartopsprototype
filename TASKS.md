@@ -205,16 +205,16 @@ Expand ops beyond organization/event monitoring into data stewardship.
 
 ### Prototype Polishments
 
-- [ ] `🟢 P1` **Manager edit-before-finalize** — Allow educator managers to edit educator notes and free-form questionnaire text before approving/finalizing an event. Needed to fix unprofessional language before submissions reach clients.
+- [x] `🟢 P1` **Manager edit-before-finalize** — Allow educator managers to edit educator notes and free-form questionnaire text before approving/finalizing an event. Needed to fix unprofessional language before submissions reach clients.
       Source: `Call 4/4 ~00:31:09 – "the free form text. We definitely need opportunity for the manager to be able to change that before approving and submitting so that there isn't any, oh, the customers hate it."`
 
-- [ ] `🟢 P1` **Questionnaire hardcoded answer options** — Add selectable dropdown answers for event questionnaire templates alongside free-form text. Chris will share the specific answer sets.
+- [x] `🟢 P1` **Questionnaire hardcoded answer options** — Add selectable dropdown answers for event questionnaire templates alongside free-form text. Chris will share the specific answer sets.
       Source: `Call 4/4 ~00:32:17 – "there's some hardcoded stuff that I think would be good to have in there as a selection for the answers"`
 
-- [ ] `🟢 P1` **Educator full address in profile** — Replace "home area" with actual street address in educator profile. Required for accurate drive-distance calculation to event venues (e.g., cross-borough travel in NYC).
+- [x] `🟢 P1` **Educator full address in profile** — Replace "home area" with actual street address in educator profile. Required for accurate drive-distance calculation to event venues (e.g., cross-borough travel in NYC). Distance display moved to event detail page's assigned educators card for proper context.
       Source: `Call 4/4 ~00:34:48 – "It would need to be an actual address because what we do is we take their home address to know the drive distance or travel distance to an event"`
 
-- [ ] `🟢 P1` **Admin access to educator manager features** — Admin role should have access to the educator manager assignment view to cover for absent/sick managers.
+- [x] `🟢 P1` **Admin access to educator manager features** — Admin role should have access to the educator manager assignment view to cover for absent/sick managers. ✅ Added Educator Assignment section to ops event-detail-page with assignment modal, status badges, and manage/remove actions.
       Source: `Call 4/4 ~00:38:39 – "If I'm an admin, an admin should have access to the manager assignments as well because there may be a time where they need like to cover somebody who's out"`
 
 ### Cancellation Process
@@ -275,9 +275,9 @@ Expand ops beyond organization/event monitoring into data stewardship.
 | §7 Platform Tiers             | P2    | 0      | 0       | 2           | 2      |
 | §8 Process & Collaboration    | P1    | 0      | 0       | 3           | 3      |
 | §9 At-Risk AI Work            | P3    | 0      | 0       | 2           | 2      |
-| §10 Tasks Definition Call 4/4 | P1/P2 | 0      | 0       | 15          | 15     |
-| **Total**                     |       | **17** | **2**   | **38**      | **57** |
+| §10 Tasks Definition Call 4/4 | P1/P2 | 1      | 0       | 14          | 15     |
+| **Total**                     |       | **18** | **2**   | **37**      | **57** |
 
-**Phase 1 tasks:** 44 total — 17 done, 2 partial, 25 not started (1 blocked)
+**Phase 1 tasks:** 44 total — 18 done, 2 partial, 24 not started (1 blocked)
 **Phase 2 tasks:** 11 total — all not started
 **Phase 3 / TBD tasks:** 2 total — all not started

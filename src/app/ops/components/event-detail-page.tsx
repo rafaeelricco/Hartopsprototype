@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import {
   ArrowLeft,
@@ -11,13 +11,27 @@ import {
   Users,
   UserCheck,
   Megaphone,
+  Search,
+  XCircle,
+  Star,
+  CheckCircle2,
 } from "lucide-react";
 import { Badge } from "../../shared/components/ui/badge";
 import { Progress } from "../../shared/components/ui/progress";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Button } from "../../shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
+import { Checkbox } from "../../shared/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "../../shared/components/ui/dialog";
 import { MOCK_EVENTS } from "./events-page";
-import type { EventRecord } from "./events-page";
+import type { EventRecord, AssignedEducatorRecord } from "./events-page";
+import { MOCK_EDUCATORS } from "./educator-data";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -164,9 +178,26 @@ export function EventDetailPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
 
+  // Assignment state
+  const [showAssignment, setShowAssignment] = useState(false);
+  const [assignmentSearch, setAssignmentSearch] = useState("");
+  const [assignedEducators, setAssignedEducators] = useState<
+    AssignedEducatorRecord[]
+  >([]);
+  const [draftSelectedIds, setDraftSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [initRef, setInitRef] = useState<string | null>(null);
+
   const event = MOCK_EVENTS.find((e) => e.id === eventId) as
     | EventRecord
     | undefined;
+
+  // Initialize assigned educators from mock data on first render for this event
+  if (event && initRef !== event.id) {
+    setAssignedEducators(event.assignedEducators);
+    setInitRef(event.id);
+  }
 
   if (!event) {
     return (
@@ -431,6 +462,297 @@ export function EventDetailPage() {
         </Card>
       </section>
 
+      {/* Educator Assignment Section */}
+      <section className="space-y-4">
+        <h2 className="text-base font-semibold text-foreground">
+          Educator Assignment
+        </h2>
+
+        <Card>
+          <CardContent className="p-4">
+            {assignedEducators.length === 0 ? (
+              <div className="text-center py-6">
+                <Users className="size-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  No educators assigned yet.
+                </p>
+                {(event.status === "Upcoming" || event.status === "Live") && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 cursor-pointer"
+                    onClick={() => {
+                      setDraftSelectedIds(new Set());
+                      setAssignmentSearch("");
+                      setShowAssignment(true);
+                    }}
+                  >
+                    <Users className="size-4 mr-1.5" />
+                    Assign Educators
+                  </Button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {assignedEducators.map((ae) => {
+                  return (
+                    <div
+                      key={ae.educatorId}
+                      className="flex items-center justify-between p-2 rounded-md border border-border"
+                    >
+                      <div className="space-y-0.5">
+                        <p
+                          className="text-foreground flex items-center gap-2"
+                          style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                        >
+                          <span
+                            className="text-foreground cursor-pointer hover:underline"
+                            onClick={() =>
+                              navigate(
+                                `/ops/dashboard/educators/${ae.educatorId}`,
+                              )
+                            }
+                          >
+                            {ae.name}
+                          </span>
+                          {ae.status === "Accepted" && (
+                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                          )}
+                          {ae.status === "Pending" && (
+                            <span
+                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                              style={{
+                                fontSize: "0.5625rem",
+                                fontWeight: 500,
+                                lineHeight: "1rem",
+                              }}
+                            >
+                              Pending
+                            </span>
+                          )}
+                          {ae.status === "Declined" && (
+                            <span
+                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-red-500/10 text-red-600 border-red-500/20"
+                              style={{
+                                fontSize: "0.5625rem",
+                                fontWeight: 500,
+                                lineHeight: "1rem",
+                              }}
+                            >
+                              Declined
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      {(event.status === "Upcoming" ||
+                        event.status === "Live") && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setAssignedEducators((prev) =>
+                              prev.filter(
+                                (e) => e.educatorId !== ae.educatorId,
+                              ),
+                            )
+                          }
+                          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {(event.status === "Upcoming" || event.status === "Live") && (
+                  <div className="pt-2 border-t border-border">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer"
+                      style={{ fontSize: "0.8125rem" }}
+                      onClick={() => {
+                        setDraftSelectedIds(
+                          new Set(assignedEducators.map((e) => e.educatorId)),
+                        );
+                        setAssignmentSearch("");
+                        setShowAssignment(true);
+                      }}
+                    >
+                      <Users className="size-4 mr-1.5" />
+                      Manage Educators
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Assignment Dialog */}
+      <Dialog open={showAssignment} onOpenChange={setShowAssignment}>
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5 pb-3 shrink-0 border-b border-border">
+            <DialogTitle style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+              Manage Educators
+            </DialogTitle>
+            <DialogDescription style={{ fontSize: "0.875rem" }}>
+              Select educators to assign them to this event.
+            </DialogDescription>
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                value={assignmentSearch}
+                onChange={(e) => setAssignmentSearch(e.target.value)}
+                placeholder="Search educators by name..."
+                className="pl-9 h-9"
+              />
+            </div>
+          </DialogHeader>
+
+          {/* Educator List */}
+          <div className="flex-1 overflow-y-auto p-5 pb-0 bg-muted/20">
+            <div className="divide-y divide-border rounded-lg border border-border bg-card overflow-hidden">
+              {MOCK_EDUCATORS.filter((e) => e.status === "active")
+                .filter((e) => {
+                  const q = assignmentSearch.toLowerCase().trim();
+                  if (!q) return true;
+                  return (
+                    e.name.toLowerCase().includes(q) ||
+                    e.city.toLowerCase().includes(q) ||
+                    e.specialties.some((s) => s.toLowerCase().includes(q))
+                  );
+                })
+                .map((educator) => {
+                  const isSelected = draftSelectedIds.has(educator.id);
+                  return (
+                    <div
+                      key={educator.id}
+                      className={`p-3.5 transition-colors hover:bg-muted/50 ${
+                        isSelected
+                          ? "bg-primary/5 border-l-2 border-l-primary"
+                          : "border-l-2 border-l-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`edu-${educator.id}`}
+                          checked={isSelected}
+                          className="mt-0.5"
+                          onCheckedChange={(checked) => {
+                            setDraftSelectedIds((prev) => {
+                              const next = new Set(prev);
+                              if (checked) next.add(educator.id);
+                              else next.delete(educator.id);
+                              return next;
+                            });
+                          }}
+                        />
+                        <div className="flex items-center justify-between flex-1 min-w-0">
+                          <div className="space-y-0.5 flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <label
+                                htmlFor={`edu-${educator.id}`}
+                                className="text-foreground cursor-pointer"
+                                style={{
+                                  fontSize: "0.875rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {educator.name}
+                              </label>
+                            </div>
+                            {/* Metrics row */}
+                            <div
+                              className="flex items-center gap-3 text-muted-foreground"
+                              style={{ fontSize: "0.75rem" }}
+                            >
+                              {educator.qualityScore > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Star className="w-3 h-3 text-amber-500" />{" "}
+                                  {educator.qualityScore}
+                                </span>
+                              )}
+                              <span>
+                                {educator.city}, {educator.state}
+                              </span>
+                              <span>{educator.eventsCompleted} events</span>
+                            </div>
+                            {/* Brand certifications row (Specialties in ops context) */}
+                            {educator.specialties.length > 0 && (
+                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {educator.specialties.map((spec) => (
+                                  <span
+                                    key={spec}
+                                    className="inline-flex items-center rounded-full px-1.5 py-0 border bg-muted text-muted-foreground border-border"
+                                    style={{
+                                      fontSize: "0.5625rem",
+                                      fontWeight: 500,
+                                      lineHeight: "1rem",
+                                    }}
+                                  >
+                                    {spec}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-5 border-t border-border shrink-0 bg-muted/10 flex items-center justify-between gap-3 rounded-b-lg">
+            <span className="text-xs text-muted-foreground">
+              {draftSelectedIds.size} educator
+              {draftSelectedIds.size !== 1 ? "s" : ""} selected
+            </span>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowAssignment(false)}
+                className="cursor-pointer"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-[#7D152D] hover:bg-[#7D152D]/90 cursor-pointer"
+                onClick={() => {
+                  const newAssignments: AssignedEducatorRecord[] = [];
+                  draftSelectedIds.forEach((id) => {
+                    const existing = assignedEducators.find(
+                      (e) => e.educatorId === id,
+                    );
+                    if (existing) {
+                      newAssignments.push(existing);
+                    } else {
+                      const edu = MOCK_EDUCATORS.find((e) => e.id === id);
+                      if (edu) {
+                        newAssignments.push({
+                          educatorId: id,
+                          name: edu.name,
+                          status: "Pending",
+                        });
+                      }
+                    }
+                  });
+                  setAssignedEducators(newAssignments);
+                  setShowAssignment(false);
+                }}
+              >
+                Confirm Assignments
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Details Section */}
       <section className="space-y-4">
         <h2 className="text-base font-semibold text-foreground">Details</h2>
@@ -493,8 +815,7 @@ export function EventDetailPage() {
       {/* Footer note */}
       <div className="border-t border-border pt-4">
         <p className="text-xs text-muted-foreground leading-normal">
-          This is a read-only monitoring view. Event creation and editing is
-          managed by the organization's tenant administrators.
+          Admin view — assignment changes are reflected across platforms.
         </p>
       </div>
     </div>

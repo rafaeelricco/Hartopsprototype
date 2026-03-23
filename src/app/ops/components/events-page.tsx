@@ -27,6 +27,12 @@ import { Input } from "@/app/shared/components/ui/input";
 /* Mock data                                                           */
 /* ------------------------------------------------------------------ */
 
+export interface AssignedEducatorRecord {
+  educatorId: string;
+  name: string;
+  status: "Pending" | "Accepted" | "Declined";
+}
+
 export interface EventRecord {
   id: string;
   name: string;
@@ -46,6 +52,7 @@ export interface EventRecord {
   tags: string[];
   createdBy: string;
   createdAt: string;
+  assignedEducators: AssignedEducatorRecord[];
 }
 
 export const MOCK_EVENTS: EventRecord[] = [
@@ -69,6 +76,10 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["fundraiser", "gala", "annual"],
     createdBy: "John Doe",
     createdAt: "Jan 15, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-001", name: "Maria Santos", status: "Accepted" },
+      { educatorId: "EDU-009", name: "Jasmine Williams", status: "Accepted" },
+    ],
   },
   {
     id: "EVT-3002",
@@ -90,6 +101,9 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["fundraiser", "networking", "donors"],
     createdBy: "Sarah Chen",
     createdAt: "Feb 1, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-002", name: "James Mitchell", status: "Accepted" },
+    ],
   },
   {
     id: "EVT-3003",
@@ -111,6 +125,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["webinar", "wellness", "healthcare"],
     createdBy: "Maria Lopez",
     createdAt: "Feb 10, 2026",
+    assignedEducators: [],
   },
   {
     id: "EVT-3004",
@@ -132,6 +147,10 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["conference", "tech", "AI"],
     createdBy: "Alex Kim",
     createdAt: "Jan 20, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
+      { educatorId: "EDU-006", name: "Marcus Taylor", status: "Pending" },
+    ],
   },
   {
     id: "EVT-3005",
@@ -153,6 +172,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["board", "strategy", "quarterly"],
     createdBy: "James Wright",
     createdAt: "Feb 15, 2026",
+    assignedEducators: [],
   },
   {
     id: "EVT-3006",
@@ -174,6 +194,9 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["showcase", "retail", "innovation"],
     createdBy: "Diana Ross",
     createdAt: "Feb 5, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-003", name: "Ashley Chen", status: "Pending" },
+    ],
   },
   {
     id: "EVT-3007",
@@ -195,6 +218,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["workshop", "education", "K-12"],
     createdBy: "Ryan Patel",
     createdAt: "Feb 20, 2026",
+    assignedEducators: [],
   },
   {
     id: "EVT-3008",
@@ -216,6 +240,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["investor", "clean-energy", "venture"],
     createdBy: "Emily Thornton",
     createdAt: "Feb 25, 2026",
+    assignedEducators: [],
   },
   {
     id: "EVT-3009",
@@ -237,6 +262,10 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["mixer", "networking"],
     createdBy: "Maria Lopez",
     createdAt: "Jan 30, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-007", name: "Lauren Nguyen", status: "Accepted" },
+      { educatorId: "EDU-010", name: "Kevin O'Brien", status: "Accepted" },
+    ],
   },
   {
     id: "EVT-3010",
@@ -258,6 +287,9 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["community", "outreach", "family"],
     createdBy: "Alex Kim",
     createdAt: "Jan 25, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
+    ],
   },
   {
     id: "EVT-3011",
@@ -279,6 +311,10 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["fundraiser", "dinner", "winter"],
     createdBy: "John Doe",
     createdAt: "Jan 5, 2026",
+    assignedEducators: [
+      { educatorId: "EDU-001", name: "Maria Santos", status: "Accepted" },
+      { educatorId: "EDU-012", name: "Tyler Robinson", status: "Accepted" },
+    ],
   },
   {
     id: "EVT-3012",
@@ -300,6 +336,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["seminar", "finance", "education"],
     createdBy: "Sarah Chen",
     createdAt: "Jan 10, 2026",
+    assignedEducators: [],
   },
   {
     id: "EVT-3013",
@@ -321,6 +358,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["reception", "appreciation", "partners"],
     createdBy: "Diana Ross",
     createdAt: "Jan 12, 2026",
+    assignedEducators: [],
   },
   {
     id: "EVT-3014",
@@ -342,6 +380,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["kickoff", "town-hall", "annual"],
     createdBy: "John Doe",
     createdAt: "Dec 20, 2025",
+    assignedEducators: [],
   },
   {
     id: "EVT-3015",
@@ -363,6 +402,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["panel", "customers", "discussion"],
     createdBy: "Emily Thornton",
     createdAt: "Dec 15, 2025",
+    assignedEducators: [],
   },
   {
     id: "EVT-3016",
@@ -384,6 +424,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     tags: ["brunch", "donors", "recognition"],
     createdBy: "Ryan Patel",
     createdAt: "Feb 28, 2026",
+    assignedEducators: [],
   },
 ];
 
