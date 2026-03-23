@@ -36,7 +36,9 @@ export interface DraftEventRecord {
   venueType: string;
 }
 
-function makeChecklist(overrides?: Partial<Record<string, boolean>>): ReviewChecklistItem[] {
+function makeChecklist(
+  overrides?: Partial<Record<string, boolean>>,
+): ReviewChecklistItem[] {
   const items: { id: string; label: string }[] = [
     { id: "account", label: "Account exists in Account Master" },
     { id: "date", label: "Date and time confirmed with client" },
@@ -63,7 +65,8 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "9:00 PM",
     location: "Murray's Tavern, 123 W Broadway, New York, NY",
     capacity: 50,
-    description: "Off-premise sampling event at Murray's Tavern for St. Patrick's week campaign. Jameson Original and Cold Brew.",
+    description:
+      "Off-premise sampling event at Murray's Tavern for St. Patrick's week campaign. Jameson Original and Cold Brew.",
     source: "Email",
     submittedAt: "Mar 21, 2026 10:14 AM",
     submittedBy: "Tom Bradley",
@@ -71,7 +74,11 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     missingFields: [],
     notes: "Client confirmed 2 hours setup time before event start.",
     status: "pending",
-    reviewChecklist: makeChecklist({ account: true, date: true, products: true }),
+    reviewChecklist: makeChecklist({
+      account: true,
+      date: true,
+      products: true,
+    }),
     products: ["Jameson Original", "Jameson Cold Brew"],
     venueType: "Bar / Tavern",
   },
@@ -87,15 +94,21 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "7:00 PM",
     location: "BevMo #412, 8901 Pico Blvd, Los Angeles, CA",
     capacity: 80,
-    description: "In-store demo and tasting for Absolut Vodka summer flavors launch.",
+    description:
+      "In-store demo and tasting for Absolut Vodka summer flavors launch.",
     source: "Excel Upload",
     submittedAt: "Mar 20, 2026 3:45 PM",
     submittedBy: "Bulk Upload – Sarah Chen",
     submittedByEmail: "sarah.chen@vanguardllc.com",
     missingFields: ["educator"],
-    notes: "Part of batch upload (12 events). Educator assignment pending — LA market.",
+    notes:
+      "Part of batch upload (12 events). Educator assignment pending — LA market.",
     status: "pending",
-    reviewChecklist: makeChecklist({ account: true, date: true, products: true }),
+    reviewChecklist: makeChecklist({
+      account: true,
+      date: true,
+      products: true,
+    }),
     products: ["Absolut Original", "Absolut Watermelon", "Absolut Mango"],
     venueType: "Retail / Off-Premise",
   },
@@ -111,13 +124,15 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "10:00 PM",
     location: "The Capital Grille, 155 E 42nd St, New York, NY",
     capacity: 30,
-    description: "Exclusive cocktail dinner pairing Hendrick's Gin with 4-course meal. White tablecloth event.",
+    description:
+      "Exclusive cocktail dinner pairing Hendrick's Gin with 4-course meal. White tablecloth event.",
     source: "Email",
     submittedAt: "Mar 22, 2026 9:30 AM",
     submittedBy: "Margaret Liu",
     submittedByEmail: "margaret.liu@william-grant.com",
     missingFields: ["budget"],
-    notes: "Client wants premium educator with cocktail certification. Budget TBD — awaiting approval from brand manager.",
+    notes:
+      "Client wants premium educator with cocktail certification. Budget TBD — awaiting approval from brand manager.",
     status: "pending",
     reviewChecklist: makeChecklist({ account: true, date: true }),
     products: ["Hendrick's Gin", "Hendrick's Neptunia"],
@@ -135,15 +150,23 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "5:00 PM",
     location: "Total Wine & More, 234 5th Ave, New York, NY",
     capacity: 100,
-    description: "Weekend in-store demo for Espolòn Blanco and Reposado at Total Wine flagship.",
+    description:
+      "Weekend in-store demo for Espolòn Blanco and Reposado at Total Wine flagship.",
     source: "Email",
     submittedAt: "Mar 22, 2026 2:15 PM",
     submittedBy: "Carlos Mendez",
     submittedByEmail: "carlos.mendez@campari.com",
     missingFields: [],
-    notes: "Repeat event from last month. Same setup. Educator Maria Santos requested by client.",
+    notes:
+      "Repeat event from last month. Same setup. Educator Maria Santos requested by client.",
     status: "pending",
-    reviewChecklist: makeChecklist({ account: true, date: true, products: true, educator: true, budget: true }),
+    reviewChecklist: makeChecklist({
+      account: true,
+      date: true,
+      products: true,
+      educator: true,
+      budget: true,
+    }),
     products: ["Espolòn Blanco", "Espolòn Reposado"],
     venueType: "Retail / Off-Premise",
   },
@@ -159,13 +182,15 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "11:00 PM",
     location: "Barclays Center, 620 Atlantic Ave, Brooklyn, NY",
     capacity: 200,
-    description: "VIP lounge activation during Brooklyn Nets game. Pour bar service with Grey Goose cocktails.",
+    description:
+      "VIP lounge activation during Brooklyn Nets game. Pour bar service with Grey Goose cocktails.",
     source: "Manual",
     submittedAt: "Mar 23, 2026 8:00 AM",
     submittedBy: "Admin Hart",
     submittedByEmail: "admin@hartops.com",
     missingFields: ["products", "budget"],
-    notes: "One-off event — no campaign. Need 4 educators minimum. Premium event rates apply.",
+    notes:
+      "One-off event — no campaign. Need 4 educators minimum. Premium event rates apply.",
     status: "pending",
     reviewChecklist: makeChecklist({ account: true, date: true }),
     products: [],
@@ -183,16 +208,28 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "6:00 PM",
     location: "Whole Foods, 10 Columbus Circle, New York, NY",
     capacity: 60,
-    description: "In-store bourbon tasting and education event. Focus on Maker's Mark 46 and Private Select.",
+    description:
+      "In-store bourbon tasting and education event. Focus on Maker's Mark 46 and Private Select.",
     source: "Excel Upload",
     submittedAt: "Mar 20, 2026 3:45 PM",
     submittedBy: "Bulk Upload – Sarah Chen",
     submittedByEmail: "sarah.chen@vanguardllc.com",
     missingFields: [],
-    notes: "Part of batch upload (12 events). All fields verified. Ready for review.",
+    notes:
+      "Part of batch upload (12 events). All fields verified. Ready for review.",
     status: "pending",
-    reviewChecklist: makeChecklist({ account: true, date: true, products: true, educator: true, budget: true }),
-    products: ["Maker's Mark Original", "Maker's Mark 46", "Maker's Mark Private Select"],
+    reviewChecklist: makeChecklist({
+      account: true,
+      date: true,
+      products: true,
+      educator: true,
+      budget: true,
+    }),
+    products: [
+      "Maker's Mark Original",
+      "Maker's Mark 46",
+      "Maker's Mark Private Select",
+    ],
     venueType: "Retail / Off-Premise",
   },
   {
@@ -207,15 +244,21 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "8:00 PM",
     location: "Zoom (Online)",
     capacity: 40,
-    description: "Virtual cocktail-making class showcasing Campari and Aperol spritz recipes for trade accounts.",
+    description:
+      "Virtual cocktail-making class showcasing Campari and Aperol spritz recipes for trade accounts.",
     source: "Email",
     submittedAt: "Mar 21, 2026 4:50 PM",
     submittedBy: "Nina Rossi",
     submittedByEmail: "nina.rossi@camparigroup.com",
     missingFields: ["educator"],
-    notes: "Need educator with virtual event experience. Client will ship kits to attendees.",
+    notes:
+      "Need educator with virtual event experience. Client will ship kits to attendees.",
     status: "pending",
-    reviewChecklist: makeChecklist({ date: true, products: true, budget: true }),
+    reviewChecklist: makeChecklist({
+      date: true,
+      products: true,
+      budget: true,
+    }),
     products: ["Campari", "Aperol"],
     venueType: "Virtual",
   },
@@ -231,13 +274,15 @@ export const MOCK_DRAFT_EVENTS: DraftEventRecord[] = [
     endTime: "9:00 PM",
     location: "The Oak Room, 768 5th Ave, New York, NY",
     capacity: 45,
-    description: "Pre-Kentucky Derby cocktail event featuring Woodford Reserve signature mint julep and old fashioned.",
+    description:
+      "Pre-Kentucky Derby cocktail event featuring Woodford Reserve signature mint julep and old fashioned.",
     source: "Email",
     submittedAt: "Mar 23, 2026 11:20 AM",
     submittedBy: "David Park",
     submittedByEmail: "david.park@brown-forman.com",
     missingFields: ["account", "date"],
-    notes: "Venue not yet confirmed — pending contract. Tentative date. Do NOT approve until venue lock.",
+    notes:
+      "Venue not yet confirmed — pending contract. Tentative date. Do NOT approve until venue lock.",
     status: "pending",
     reviewChecklist: makeChecklist(),
     products: ["Woodford Reserve Bourbon", "Woodford Reserve Rye"],

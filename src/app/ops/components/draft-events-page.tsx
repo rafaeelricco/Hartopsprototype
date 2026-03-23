@@ -226,7 +226,10 @@ export function DraftEventsPage() {
   /* ---- Actions ---- */
   const handleApproveClick = (draftId: string) => {
     const draft = drafts.find((d) => d.id === draftId);
-    if (draft && (draft.source === "Email" || draft.source === "Excel Upload")) {
+    if (
+      draft &&
+      (draft.source === "Email" || draft.source === "Excel Upload")
+    ) {
       setApproveWarningId(draftId);
     } else {
       confirmApprove(draftId);
@@ -235,7 +238,9 @@ export function DraftEventsPage() {
 
   const confirmApprove = (draftId: string) => {
     setDrafts((prev) =>
-      prev.map((d) => (d.id === draftId ? { ...d, status: "approved" as const } : d)),
+      prev.map((d) =>
+        d.id === draftId ? { ...d, status: "approved" as const } : d,
+      ),
     );
     setApproveWarningId(null);
     setExpandedId(null);
@@ -486,8 +491,7 @@ export function DraftEventsPage() {
                               style={{ fontSize: "0.75rem" }}
                             >
                               {draft.id}
-                              {draft.campaignName &&
-                                ` · ${draft.campaignName}`}
+                              {draft.campaignName && ` · ${draft.campaignName}`}
                             </span>
                           </div>
                         </td>
@@ -742,58 +746,67 @@ export function DraftEventsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {approveWarningId && (() => {
-            const d = drafts.find((x) => x.id === approveWarningId);
-            if (!d) return null;
-            return (
-              <div className="space-y-4 mt-2">
-                {/* Event summary */}
-                <Card>
-                  <CardContent className="p-4 space-y-1">
-                    <p className="text-sm font-medium text-foreground">{d.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {d.date} · {d.startTime} – {d.endTime}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{d.location}</p>
-                    <p className="text-xs text-muted-foreground">{d.organization}</p>
-                  </CardContent>
-                </Card>
+          {approveWarningId &&
+            (() => {
+              const d = drafts.find((x) => x.id === approveWarningId);
+              if (!d) return null;
+              return (
+                <div className="space-y-4 mt-2">
+                  {/* Event summary */}
+                  <Card>
+                    <CardContent className="p-4 space-y-1">
+                      <p className="text-sm font-medium text-foreground">
+                        {d.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {d.date} · {d.startTime} – {d.endTime}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {d.location}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {d.organization}
+                      </p>
+                    </CardContent>
+                  </Card>
 
-                {/* Warning banner */}
-                <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <Sparkles className="size-5 text-amber-600 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-amber-800">
-                      AI-Generated Content Warning
-                    </p>
-                    <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                      This event was generated from an external source
-                      ({d.source === "Email" ? "AI-parsed email" : "Excel bulk upload"}).
-                      Please confirm all fields have been reviewed and corrected
-                      before approving.
-                    </p>
+                  {/* Warning banner */}
+                  <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                    <Sparkles className="size-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-amber-800">
+                        AI-Generated Content Warning
+                      </p>
+                      <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                        This event was generated from an external source (
+                        {d.source === "Email"
+                          ? "AI-parsed email"
+                          : "Excel bulk upload"}
+                        ). Please confirm all fields have been reviewed and
+                        corrected before approving.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setApproveWarningId(null)}
+                      className="cursor-pointer"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="bg-[#7D152D] hover:bg-[#7D152D]/90 cursor-pointer"
+                      onClick={() => confirmApprove(approveWarningId)}
+                    >
+                      <CheckCircle2 className="size-4 mr-1.5" />
+                      Confirm & Approve
+                    </Button>
                   </div>
                 </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setApproveWarningId(null)}
-                    className="cursor-pointer"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="bg-[#7D152D] hover:bg-[#7D152D]/90 cursor-pointer"
-                    onClick={() => confirmApprove(approveWarningId)}
-                  >
-                    <CheckCircle2 className="size-4 mr-1.5" />
-                    Confirm & Approve
-                  </Button>
-                </div>
-              </div>
-            );
-          })()}
+              );
+            })()}
         </DialogContent>
       </Dialog>
     </div>
@@ -826,7 +839,8 @@ function ReviewPanel({
   const [newCheckItem, setNewCheckItem] = useState("");
   const [newProduct, setNewProduct] = useState("");
 
-  const isExternalSource = draft.source === "Email" || draft.source === "Excel Upload";
+  const isExternalSource =
+    draft.source === "Email" || draft.source === "Excel Upload";
 
   return (
     <div className="bg-muted/20 border-b border-border px-6 py-5 space-y-5">
@@ -836,8 +850,12 @@ function ReviewPanel({
           <Sparkles className="size-4 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 leading-relaxed">
             This draft was generated from{" "}
-            <strong>{draft.source === "Email" ? "AI-parsed email" : "Excel bulk upload"}</strong>.
-            Review and correct all fields before approving.
+            <strong>
+              {draft.source === "Email"
+                ? "AI-parsed email"
+                : "Excel bulk upload"}
+            </strong>
+            . Review and correct all fields before approving.
           </p>
         </div>
       )}
@@ -857,7 +875,9 @@ function ReviewPanel({
             <CardContent className="p-4 space-y-4">
               {/* Event Name */}
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground">Event Name</Label>
+                <Label className="text-xs text-muted-foreground">
+                  Event Name
+                </Label>
                 {isActionable ? (
                   <Input
                     value={draft.name}
@@ -891,7 +911,9 @@ function ReviewPanel({
                   {isActionable ? (
                     <Input
                       value={draft.startTime}
-                      onChange={(e) => onUpdateField("startTime", e.target.value)}
+                      onChange={(e) =>
+                        onUpdateField("startTime", e.target.value)
+                      }
                       className="text-sm"
                       placeholder="6:00 PM"
                     />
@@ -945,12 +967,16 @@ function ReviewPanel({
                     </SelectTrigger>
                     <SelectContent>
                       {ORGANIZATIONS.map((o) => (
-                        <SelectItem key={o} value={o}>{o}</SelectItem>
+                        <SelectItem key={o} value={o}>
+                          {o}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="text-sm text-foreground">{draft.organization}</p>
+                  <p className="text-sm text-foreground">
+                    {draft.organization}
+                  </p>
                 )}
               </div>
 
@@ -962,7 +988,9 @@ function ReviewPanel({
                 {isActionable ? (
                   <Input
                     value={draft.campaignName}
-                    onChange={(e) => onUpdateField("campaignName", e.target.value)}
+                    onChange={(e) =>
+                      onUpdateField("campaignName", e.target.value)
+                    }
                     className="text-sm"
                     placeholder="Link to a campaign..."
                   />
@@ -988,7 +1016,9 @@ function ReviewPanel({
                     </SelectTrigger>
                     <SelectContent>
                       {VENUE_TYPES.map((v) => (
-                        <SelectItem key={v} value={v}>{v}</SelectItem>
+                        <SelectItem key={v} value={v}>
+                          {v}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -1071,7 +1101,9 @@ function ReviewPanel({
           {/* Description */}
           <Card>
             <CardContent className="p-4 space-y-1">
-              <Label className="text-xs text-muted-foreground">Description</Label>
+              <Label className="text-xs text-muted-foreground">
+                Description
+              </Label>
               {isActionable ? (
                 <textarea
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-h-[80px] resize-y"
