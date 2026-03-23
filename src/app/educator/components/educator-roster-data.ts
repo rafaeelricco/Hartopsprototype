@@ -18,6 +18,12 @@ export interface Educator {
   nextEvent: { id: string; name: string; date: string } | null;
   photoUrl: string | null;
   homeBase: string;
+  homeAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
   brandCertifications: string[];
   upcomingEvents: {
     id: string;
@@ -96,6 +102,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Manhattan & SoHo, NY",
+    homeAddress: {
+      street: "142 Spring St, Apt 3A",
+      city: "New York",
+      state: "NY",
+      zip: "10012",
+    },
     brandCertifications: ["Absolut", "Malibu", "Kahlua"],
     upcomingEvents: [
       {
@@ -172,6 +184,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Hoboken & Jersey City, NJ",
+    homeAddress: {
+      street: "518 Washington St, Unit 2",
+      city: "Hoboken",
+      state: "NJ",
+      zip: "07030",
+    },
     brandCertifications: ["Jameson", "Glenlivet"],
     upcomingEvents: [
       {
@@ -232,6 +250,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Brooklyn & Queens, NY",
+    homeAddress: {
+      street: "87 Atlantic Ave, Apt 5C",
+      city: "Brooklyn",
+      state: "NY",
+      zip: "11201",
+    },
     brandCertifications: ["Beefeater", "Absolut"],
     upcomingEvents: [
       {
@@ -285,6 +309,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Midtown & Upper East Side, NY",
+    homeAddress: {
+      street: "301 E 79th St, Apt 14D",
+      city: "New York",
+      state: "NY",
+      zip: "10075",
+    },
     brandCertifications: ["Avion", "Absolut", "Jameson", "Malibu"],
     upcomingEvents: [
       {
@@ -361,6 +391,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Newark & North Jersey, NJ",
+    homeAddress: {
+      street: "65 Park Pl, Apt 8",
+      city: "Newark",
+      state: "NJ",
+      zip: "07102",
+    },
     brandCertifications: ["Kahlua", "Malibu"],
     upcomingEvents: [
       {
@@ -421,6 +457,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Williamsburg & Greenpoint, NY",
+    homeAddress: {
+      street: "221 Bedford Ave, Apt 2F",
+      city: "Brooklyn",
+      state: "NY",
+      zip: "11211",
+    },
     brandCertifications: ["Glenlivet", "Jameson", "Beefeater"],
     upcomingEvents: [
       {
@@ -486,6 +528,12 @@ export const mockEducators: Educator[] = [
     nextEvent: null,
     photoUrl: null,
     homeBase: "Paterson & Passaic, NJ",
+    homeAddress: {
+      street: "340 Main St, Suite 1B",
+      city: "Paterson",
+      state: "NJ",
+      zip: "07505",
+    },
     brandCertifications: ["Absolut", "Kahlua"],
     upcomingEvents: [],
     pastEvents: [
@@ -531,6 +579,12 @@ export const mockEducators: Educator[] = [
     },
     photoUrl: null,
     homeBase: "Morristown & Morris County, NJ",
+    homeAddress: {
+      street: "12 Elm St",
+      city: "Morristown",
+      state: "NJ",
+      zip: "07960",
+    },
     brandCertifications: ["Avion", "Glenlivet"],
     upcomingEvents: [
       {
@@ -580,6 +634,12 @@ export const mockEducators: Educator[] = [
     nextEvent: null,
     photoUrl: null,
     homeBase: "Lower East Side & East Village, NY",
+    homeAddress: {
+      street: "198 Rivington St, Apt 6A",
+      city: "New York",
+      state: "NY",
+      zip: "10002",
+    },
     brandCertifications: [],
     upcomingEvents: [],
     pastEvents: [],

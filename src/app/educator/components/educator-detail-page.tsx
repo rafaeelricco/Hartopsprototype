@@ -308,11 +308,18 @@ export function EducatorDetailPage() {
             }
           />
 
-          {/* Home Base */}
+          {/* Home Address */}
           <InfoCard
             icon={MapPin}
-            label="Home Base / Area"
-            value={educator.homeBase}
+            label="Home Address"
+            value={
+              <span>
+                {educator.homeAddress.street}
+                <br />
+                {educator.homeAddress.city}, {educator.homeAddress.state}{" "}
+                {educator.homeAddress.zip}
+              </span>
+            }
           />
 
           {/* Avg Rating */}
