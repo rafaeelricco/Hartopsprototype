@@ -60,11 +60,11 @@ const data = {
       url: "/ops/dashboard/educators",
       icon: Users,
     },
-    {
-      title: "Draft Events",
-      url: "/ops/dashboard/draft-events",
-      icon: ClipboardCheck,
-    },
+    // {
+    //   title: "Draft Events",
+    //   url: "/ops/dashboard/draft-events",
+    //   icon: ClipboardCheck,
+    // },
     {
       title: "Events",
       url: "/ops/dashboard/events",
