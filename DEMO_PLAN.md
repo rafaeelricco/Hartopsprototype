@@ -25,11 +25,12 @@ The demo should tell a story: **"Here is how your day-to-day process works today
 
 **What to show:**
 
-- Create a campaign on the Staff platform (selecting supplier, channel, geography)
-- Create an Activity Template within the campaign
-- Show how selecting the template pre-fills the Create Event workflow
+- Create an event on the Staff platform — walk through the full creation workflow
 - **During event creation, show the Intelligent Report Preview** that appears when selecting objectives — how the system can project expected outcomes (brand awareness score, sales drive, education driver). Frame as the foundation for prescriptive analytics
+- Show the event detail page with all collected information and status
+- Create a campaign (selecting supplier, channel, geography) — show how events roll up under campaigns
 - Show campaign detail page with centralized view of all events (drafts, active, completed)
+- Create an Activity Template within the campaign — demonstrate how selecting the template pre-fills the Create Event workflow for high-volume operations
 
 **Rationale from meetings:**
 
