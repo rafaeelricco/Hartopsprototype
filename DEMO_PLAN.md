@@ -19,7 +19,7 @@ The demo should tell a story: **"Here is how your day-to-day process works today
 
 ## Recommended Demo Flows (Priority Order)
 
-### Flow 1: Campaign Creation + Activity Templates
+### Flow 1: Event Creation + Campaign Creation + Usage of Activity Templates
 
 **Why show this:** This is the highest-impact feature for stakeholders who deal with massive event volumes. It directly addresses the #1 pain point — managing tens to hundreds of events under campaigns instead of one-by-one manual input.
 
@@ -28,6 +28,7 @@ The demo should tell a story: **"Here is how your day-to-day process works today
 - Create a campaign on the Staff platform (selecting supplier, channel, geography)
 - Create an Activity Template within the campaign
 - Show how selecting the template pre-fills the Create Event workflow
+- **During event creation, show the Intelligent Report Preview** that appears when selecting objectives — how the system can project expected outcomes (brand awareness score, sales drive, education driver). Frame as the foundation for prescriptive analytics
 - Show campaign detail page with centralized view of all events (drafts, active, completed)
 
 **Rationale from meetings:**
@@ -38,36 +39,17 @@ The demo should tell a story: **"Here is how your day-to-day process works today
 
 > **Source — Call 3/4 [00:34:52]:** Christopher confirmed that the maximum number of events an operator might input at once is "in the hundreds, and this is currently done manually one by one."
 
-**Validation question for stakeholders:** Does the campaign hierarchy (Campaign > Activities > Events) match how you think about organizing your work today?
+> **Source — Call 1/4 [00:38:42]:** Christopher: "I love this. It's going to be very interesting to flip the script on the way everyone thinks because the business currently is just around executions. It's not about being prescriptive of the best executions and where and timing."
+
+> **Source — Call 1/4 [00:40:02]:** "If we could be analytically persuasive and show the value [...] this is perfect."
+
+> **Source — Call 1/4 [00:42:01]:** On AI integration: "Now the AI can learn more about the types of accounts [...] and be more prescriptive: 'we're doing this campaign and we think you should do these accounts on these days.'"
+
+**Validation question for stakeholders:** Does the campaign hierarchy (Campaign > Activities > Events) match how you think about organizing your work today? What metrics matter most to you when evaluating campaign/event success?
 
 ---
 
-### Flow 2: Event Request to Draft Pipeline (Bulk Event Handling)
-
-**Why show this:** This is the current biggest operational bottleneck. Christopher described a flow where email requests get manually typed into Hems one by one. The new system introduces a draft "corral" where events land for review before being pushed live.
-
-**What to show:**
-
-- The draft events section (events awaiting approval)
-- How an operator reviews, edits, and approves draft events
-- How approved events flow into the main event management
-- Mention the AI email processor (launching separately) that will feed into this draft queue
-
-**Rationale from meetings:**
-
-> **Source — Call 3/4 [00:27:25]:** Christopher explained the current process: "event requests come in via emails, are fed into forms, and land in a holding table (draft events). The operator then ensures everything is set up correctly, approves it, and sends it off."
-
-> **Source — Call 3/4 [00:32:45]:** "Since Hems lacks campaigns, the operator copies an existing event, changes the date, time, and account, and sends it off."
-
-> **Source — Call 3/4 [00:44:08]:** Christopher revealed the AI solution: "This AI is designed to answer emails, look for all required fields in the event request, and communicate back if information is missing. Once all information is confirmed, the AI fills out a form electronically and places it into the holding ground/draft section."
-
-> **Source — Call 3/4 [00:45:16]:** "The operator will then primarily use the draft section to quickly check and finalize events, knowing the email conversation has already been approved."
-
-**Validation question for stakeholders:** This is the new pipeline: email requests come in, get processed (eventually by AI), land as drafts, and you review/approve. Does this match the workflow you'd want?
-
----
-
-### Flow 3: Educator Assignment (Distance + Availability)
+### Flow 2: Educator Assignment (Distance + Availability)
 
 **Why show this:** Christopher emphasized this is the most time-consuming step in the current process and "getting it right will benefit everything else." This flow directly impacts the educator managers (close to the stakeholders being invited).
 
@@ -91,7 +73,7 @@ The demo should tell a story: **"Here is how your day-to-day process works today
 
 ---
 
-### Flow 4: Event Finalization Queue (Manager Review)
+### Flow 3: Event Finalization Queue (Manager Review)
 
 **Why show this:** Christopher specifically asked for the ability to edit educator notes and questionnaire responses before approving. This is a quality control step that stakeholders will recognize as critical.
 
@@ -112,7 +94,7 @@ The demo should tell a story: **"Here is how your day-to-day process works today
 
 ---
 
-### Flow 5: Educator Mobile App (Full Event Lifecycle)
+### Flow 4: Educator Mobile App (Full Event Lifecycle)
 
 **Why show this:** This is the day-to-day tool for the people doing the actual work. Stakeholders close to managers and educators will want to see how it simplifies the field experience.
 
