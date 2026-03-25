@@ -18,16 +18,16 @@ Luis flagged post-meeting that the multi-tenant model is more complex than assum
 
 ## Open Questions / Decisions to Be Made
 
-- **Shared educator pool across organisations** — Luis's Slack flag. Trial clients may draw on Hart's educators rather than bringing their own. Architecture likely handles this but needs explicit review. *Owner: Ethan + Luis*
-- **Downstream client layer** — Some agencies may manage their own clients through the platform, creating an extra hierarchy level (Agency → Agency's Client → Events). Needs scoping. *Owner: Joe + Chris*
-- **Educator score visibility** — Consensus to show educators their own ratings in the mobile app (like Uber). Open question is what inputs feed the score (account surveys, punctuality, sales conversion, category expertise) and what's Phase 1 vs. Phase 2+. *Owner: Chris + Leah*
-- **Account master integration** — Location field must pull from Hart's account master (license numbers, distributor account numbers). Trial clients use Hart's list. How is this data imported/maintained? *Owner: Chris*
-- **Evaluation forms + sample pickup tracking** — Chris flagged as missing from prototype. Leah taking offline. Needs scoping before implementation. *Owner: Chris + Leah*
-- **Receipt collection verification** — Leah flagged alongside evaluation forms. Same offline discussion. *Owner: Chris + Leah*
-- **Educator rating accuracy** — Stephanie noted venues rarely fill out the post-event email survey, making current scores unreliable. Worth investigating whether the new platform can improve response rates or supplement with other signals. *Owner: Stephanie + Chris*
-- **OCM photo compliance (Phase 2+)** — 1,000 OCM promotions/year require geotagged photos printed on the image, matching reference setups. Currently uses external app. Joe noted it's technically feasible but likely Phase 2+. *Owner: Joe (roadmap placement)*
-- **Social media photo capture with filters** — Stephanie requested. Distinct from mandatory product/setup photos. Needs scoping as a campaign-level configuration. *Owner: Stephanie + Chris*
-- **Bonus tracking logic** — "Sell 12 bottles, get $25 bonus." Needs to live at campaign level. Not yet in prototype. *Owner: Chris*
+- **Shared educator pool across organisations** — Luis's Slack flag. Trial clients may draw on Hart's educators rather than bringing their own. Architecture likely handles this but needs explicit review. _Owner: Ethan + Luis_
+- **Downstream client layer** — Some agencies may manage their own clients through the platform, creating an extra hierarchy level (Agency → Agency's Client → Events). Needs scoping. _Owner: Joe + Chris_
+- **Educator score visibility** — Consensus to show educators their own ratings in the mobile app (like Uber). Open question is what inputs feed the score (account surveys, punctuality, sales conversion, category expertise) and what's Phase 1 vs. Phase 2+. _Owner: Chris + Leah_
+- **Account master integration** — Location field must pull from Hart's account master (license numbers, distributor account numbers). Trial clients use Hart's list. How is this data imported/maintained? _Owner: Chris_
+- **Evaluation forms + sample pickup tracking** — Chris flagged as missing from prototype. Leah taking offline. Needs scoping before implementation. _Owner: Chris + Leah_
+- **Receipt collection verification** — Leah flagged alongside evaluation forms. Same offline discussion. _Owner: Chris + Leah_
+- **Educator rating accuracy** — Stephanie noted venues rarely fill out the post-event email survey, making current scores unreliable. Worth investigating whether the new platform can improve response rates or supplement with other signals. _Owner: Stephanie + Chris_
+- **OCM photo compliance (Phase 2+)** — 1,000 OCM promotions/year require geotagged photos printed on the image, matching reference setups. Currently uses external app. Joe noted it's technically feasible but likely Phase 2+. _Owner: Joe (roadmap placement)_
+- **Social media photo capture with filters** — Stephanie requested. Distinct from mandatory product/setup photos. Needs scoping as a campaign-level configuration. _Owner: Stephanie + Chris_
+- **Bonus tracking logic** — "Sell 12 bottles, get $25 bonus." Needs to live at campaign level. Not yet in prototype. _Owner: Chris_
 
 ---
 
@@ -35,23 +35,23 @@ Luis flagged post-meeting that the multi-tenant model is more complex than assum
 
 ### New Features
 
-- **Territory-based filtering (Educator Manager)** — Managers need to filter events by geography (borough, state) and venue type (on-premise, off-premise). Not in current prototype. *Relates to: MM8 (Educator Manager Experience) — add filtering/views section.*
-- **Finalization queue (Educator Manager)** — Batch approval of completed events. Demonstrated in prototype. *Relates to: MM8 — add post-event approval workflow.*
-- **Reference image matching for photo compliance** — AI comparison of educator-uploaded photo against a reference setup image, blocking progress if mismatch. Phase 2+ feature. *Relates to: `educator-mobile-experience.yaml` section 5_8 (AI-powered assistance) — add as future capability.*
-- **Social media content capture** — Campaign-configurable task requiring a "hero image" from the educator, with optional filter/enhancement. Distinct from compliance photos. *Relates to: `educator-mobile-experience.yaml` section 5_5 (task types) — add as optional task module.*
-- **Bonus logic** — Campaign-level sales thresholds triggering bonus compensation. *Relates to: new concept needed in MM6 (Campaign/Event Configuration) or whichever model holds compensation rules.*
-- **Shared educator pool** — Educators belonging to Hart but assignable to events from other organisations on the platform. *Relates to: MM1 (Platform Architecture) and MM3 (Multi-Tenancy) — hierarchy needs a "shared resource" concept.*
-- **Downstream client management** — Agencies on the platform may manage their own clients, adding a hierarchy layer. *Relates to: MM1 (Platform Architecture) and MM3 (Multi-Tenancy) — organisation hierarchy needs review.*
+- **Territory-based filtering (Educator Manager)** — Managers need to filter events by geography (borough, state) and venue type (on-premise, off-premise). Not in current prototype. _Relates to: MM8 (Educator Manager Experience) — add filtering/views section._
+- **Finalization queue (Educator Manager)** — Batch approval of completed events. Demonstrated in prototype. _Relates to: MM8 — add post-event approval workflow._
+- **Reference image matching for photo compliance** — AI comparison of educator-uploaded photo against a reference setup image, blocking progress if mismatch. Phase 2+ feature. _Relates to: `educator-mobile-experience.yaml` section 5_8 (AI-powered assistance) — add as future capability._
+- **Social media content capture** — Campaign-configurable task requiring a "hero image" from the educator, with optional filter/enhancement. Distinct from compliance photos. _Relates to: `educator-mobile-experience.yaml` section 5_5 (task types) — add as optional task module._
+- **Bonus logic** — Campaign-level sales thresholds triggering bonus compensation. _Relates to: new concept needed in MM6 (Campaign/Event Configuration) or whichever model holds compensation rules._
+- **Shared educator pool** — Educators belonging to Hart but assignable to events from other organisations on the platform. _Relates to: MM1 (Platform Architecture) and MM3 (Multi-Tenancy) — hierarchy needs a "shared resource" concept._
+- **Downstream client management** — Agencies on the platform may manage their own clients, adding a hierarchy layer. _Relates to: MM1 (Platform Architecture) and MM3 (Multi-Tenancy) — organisation hierarchy needs review._
 
 ### Feature Updates
 
-- **Location field (Event Creation)** — Must connect to account master with license numbers and distributor IDs, not just Google Places autocomplete. *Relates to: MM6 (Campaign/Event Configuration) — location is a pick-list from account master, not free text.*
-- **Activity templates** — Confirmed working as designed. Templates pre-fill event creation. Leah confirmed the mental model: campaign = box, activities and events roll into campaign. *No change needed.*
-- **Educator assignment scoring** — Prototype showed distance. Chris confirmed score and category preference weighting are planned. Underlying data exists but is currently in offline spreadsheets. *Relates to: MM8 (Educator Manager Experience) — assignment logic section needs scoring inputs (distance, performance score, category expertise, punctuality).*
-- **Event timer and punctuality flags** — Timer tracks attendance duration. Hart wants conditional flags visible **on the educator's own screen in real-time**: yellow for late check-in, red for early departure. Flags also feed into educator score and are visible to managers. *Relates to: `educator-mobile-experience.yaml` section 5_9 (checkout) — add real-time flag visibility to educator view, not just manager view; MM8 — add flag visibility for managers.*
-- **Task mandatory/optional designation** — Confirmed as planned. Some tasks block checkout, others are optional. Campaign-level configuration. *Relates to: `educator-mobile-experience.yaml` section 5_5 — already modelled but confirm mandatory gate is explicit.*
-- **Compensation visibility** — Educators see per-event compensation in the mobile app. Hart confirmed this is the right level (per-event, not pay-period). *Relates to: `educator-mobile-experience.yaml` — confirm compensation is event-scoped.*
-- **In-app photo capture** — Photos taken within the app, not from phone gallery. Eliminates the current two-step workflow. Hart confirmed this is a significant improvement. *Relates to: `educator-mobile-experience.yaml` section 5_7 (venue survey/photos) — already modelled, no change needed.*
+- **Location field (Event Creation)** — Must connect to account master with license numbers and distributor IDs, not just Google Places autocomplete. _Relates to: MM6 (Campaign/Event Configuration) — location is a pick-list from account master, not free text._
+- **Activity templates** — Confirmed working as designed. Templates pre-fill event creation. Leah confirmed the mental model: campaign = box, activities and events roll into campaign. _No change needed._
+- **Educator assignment scoring** — Prototype showed distance. Chris confirmed score and category preference weighting are planned. Underlying data exists but is currently in offline spreadsheets. _Relates to: MM8 (Educator Manager Experience) — assignment logic section needs scoring inputs (distance, performance score, category expertise, punctuality)._
+- **Event timer and punctuality flags** — Timer tracks attendance duration. Hart wants conditional flags visible **on the educator's own screen in real-time**: yellow for late check-in, red for early departure. Flags also feed into educator score and are visible to managers. _Relates to: `educator-mobile-experience.yaml` section 5_9 (checkout) — add real-time flag visibility to educator view, not just manager view; MM8 — add flag visibility for managers._
+- **Task mandatory/optional designation** — Confirmed as planned. Some tasks block checkout, others are optional. Campaign-level configuration. _Relates to: `educator-mobile-experience.yaml` section 5_5 — already modelled but confirm mandatory gate is explicit._
+- **Compensation visibility** — Educators see per-event compensation in the mobile app. Hart confirmed this is the right level (per-event, not pay-period). _Relates to: `educator-mobile-experience.yaml` — confirm compensation is event-scoped._
+- **In-app photo capture** — Photos taken within the app, not from phone gallery. Eliminates the current two-step workflow. Hart confirmed this is a significant improvement. _Relates to: `educator-mobile-experience.yaml` section 5_7 (venue survey/photos) — already modelled, no change needed._
 
 ---
 
