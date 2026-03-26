@@ -265,6 +265,28 @@ Expand ops beyond organization/event monitoring into data stewardship.
 
 ---
 
+## 11. Prototype Review – Quick Wins `🟢 P1`
+
+> Tasks identified during the HEMs Prototype Review call (March 24, 2026) — stakeholder feedback translated into focused, low-risk UI/UX improvements.
+
+- [ ] `🟢 P1` **Educator score/rating in mobile app** — Display the educator's own `avgRating` (numeric + star visual) on the educator mobile dashboard and profile screen. Score data already exists in `educator-roster-data.ts` and is shown to managers; surface it to the educator themselves for transparency and self-improvement.
+      Source: `Prototype Review 00:33:36 – "if you're a 2.7, you know you got to up your game. If you're a five, you know you're doing great. I think it would incentivize them to improve their performance."`
+
+- [ ] `🟢 P1` **Sales target & bonus display in tracking** — In the Sales Volume Tracker (educator mobile event flow), add a visible target (e.g., "Target: 6 bottles") and optional bonus threshold (e.g., "Bonus at: 12 bottles") with a progress bar or % indicator. Add `target` and `bonusThreshold` fields to the `sales-volume` data module in `event-data.ts`.
+      Source: `Prototype Review 00:43:48 – "expectation is six bottles. If you want the bonus, you sell 12 bottles."` + `Stephanie: "it would encourage them to reach at least a certain amount of units sold."`
+
+- [ ] `🟢 P1` **Samples pickup & evaluations checkboxes** — In the manager finalization flow (Approve & Finalize queue in `events-page.tsx`), add pre-approval checkboxes: `☐ Samples Picked Up`, `☐ Evaluations Received`. These confirm physical items were collected before the event can be approved.
+      Source: `Prototype Review 00:29:04 – Chris: "evaluations and samples pickups because that's also part of this process here for the managers to ensure that the samples and the evaluation form is picked up."`
+
+- [ ] `🟢 P1` **Late check-in / early check-out visual flags** — On the educator manager's event detail view, display conditional badges: 🟨 *Late Check-in* (checked in > threshold after scheduled start) / 🟥 *Early Check-out* (checked out before scheduled end). Add `scheduledStart`, `actualCheckIn`, `scheduledEnd`, `actualCheckOut` mock timestamps to event data. Feeds into educator scoring.
+      Source: `Prototype Review 00:39:32 – "If I check in at 3:20, maybe a yellow flag pops up … I leave at 4:45, a red flag pops up. I love those conditionals."` + `Joe: "that can feed into the scoring mechanism as well."`
+
+- [ ] `🟢 P1` **Nomenclature audit & updates** — Full audit and update of user-facing labels across all platforms: (1) Top-level Hart staff → "Operators" (cross-org view), (2) Org-scoped users → "Organization Members", (3) "Sales Tracking" → "Survey" where applicable. Covers sidebar labels, page titles, breadcrumbs across `ops/`, `staff/`, `educator/` components.
+      → Extends §10 nomenclature item with actionable scope.
+      Source: `Prototype Review 00:16:11 – Chris: "I think we need to rename it to survey as opposed to sales tracking."` + `Call 4/4 ~00:21:49 – "we call those operators to distinguish from organization members."`
+
+---
+
 ## Progress Summary
 
 | Section                       | Phase | Done   | Partial | Not Started | Total  |
@@ -279,8 +301,9 @@ Expand ops beyond organization/event monitoring into data stewardship.
 | §8 Process & Collaboration    | P1    | 0      | 0       | 3           | 3      |
 | §9 At-Risk AI Work            | P3    | 0      | 0       | 2           | 2      |
 | §10 Tasks Definition Call 4/4 | P1/P2 | 1      | 0       | 14          | 15     |
-| **Total**                     |       | **18** | **2**   | **38**      | **58** |
+| §11 Prototype Review Wins     | P1    | 0      | 0       | 5           | 5      |
+| **Total**                     |       | **18** | **2**   | **43**      | **63** |
 
-**Phase 1 tasks:** 45 total — 18 done, 2 partial, 25 not started (1 blocked)
+**Phase 1 tasks:** 50 total — 18 done, 2 partial, 30 not started (1 blocked)
 **Phase 2 tasks:** 11 total — all not started
 **Phase 3 / TBD tasks:** 2 total — all not started
