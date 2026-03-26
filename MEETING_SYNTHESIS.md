@@ -89,8 +89,8 @@ Luis flagged post-meeting that the multi-tenant model is more complex than assum
 
 ### Rafael Ricco
 
-- [ ] Add territory-based filtering to educator manager prototype (borough, state, venue type).
-- [ ] Add educator score display to assignment list (distance + score + category weighting).
+- [x] Add territory-based filtering to educator manager prototype (borough, state, venue type).
+- [x] Add educator score display to assignment list (distance + score + category weighting).
 - [ ] Add configurable pre-event equipment/materials checklist to educator mobile app (confirm required items like mixers, tablecloths, ice buckets before check-in; optionally block check-in until confirmed). Campaign/activity-level configuration.
 - [ ] Add educator-visible rating/score display to mobile app profile section (score composition TBD — account surveys, punctuality, sales conversion, category expertise). Phase 1 vs. Phase 2+ inputs to be defined by Chris + Leah.
 - [ ] Add real-time punctuality flags to educator mobile app (yellow flag on late check-in, red flag on early checkout — visible to the educator during the event, not just managers).
