@@ -62,6 +62,9 @@ import { Checkbox } from "@/app/shared/components/ui/checkbox";
 import {
   getEventById,
   isUpcoming,
+  getPunctualityFlags,
+  getLateMinutes,
+  getEarlyMinutes,
   type EventStatus,
   type EventItem,
   type CancellationReason,
@@ -609,6 +612,9 @@ export function EventDetailPage() {
       : event.status;
   const badge = phaseBadge[currentPhase];
   const isPreEvent = isUpcoming(currentPhase);
+  const punctualityFlags = getPunctualityFlags(event);
+  const lateMin = getLateMinutes(event);
+  const earlyMin = getEarlyMinutes(event);
 
   const handleFinalize = () => {
     setFinalized(true);
@@ -698,6 +704,23 @@ export function EventDetailPage() {
           >
             {event.eventType}
           </Badge>
+          {/* Punctuality flags */}
+          {punctualityFlags.includes("late-checkin") && lateMin && (
+            <Badge
+              variant="secondary"
+              className="text-xs bg-yellow-500/10 text-yellow-700 border-yellow-500/30"
+            >
+              🟨 Late Check-in ({lateMin}m)
+            </Badge>
+          )}
+          {punctualityFlags.includes("early-checkout") && earlyMin && (
+            <Badge
+              variant="secondary"
+              className="text-xs bg-red-500/10 text-red-600 border-red-500/30"
+            >
+              🟥 Early Check-out ({earlyMin}m early)
+            </Badge>
+          )}
         </div>
         <h1
           className="text-foreground"
@@ -1404,6 +1427,50 @@ export function EventDetailPage() {
               </CardContent>
             </Card>
           )}
+          {/* Late Check-in alert */}
+          {punctualityFlags.includes("late-checkin") && lateMin && (
+            <Card className="gap-0 border-yellow-500/40 bg-yellow-500/5">
+              <CardContent className="px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center size-9 rounded-full bg-yellow-500/10">
+                    <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div>
+                    <p
+                      className="text-yellow-700"
+                      style={{ fontWeight: 600, fontSize: "0.875rem" }}
+                    >
+                      Late Check-In — Educator arrived {lateMin} minutes after
+                      scheduled start
+                    </p>
+                    <p
+                      className="text-yellow-600/70"
+                      style={{ fontSize: "0.8125rem" }}
+                    >
+                      Scheduled:{" "}
+                      {event.scheduledStart &&
+                        new Date(event.scheduledStart).toLocaleTimeString(
+                          "en-US",
+                          {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          },
+                        )}{" "}
+                      · Arrived:{" "}
+                      {event.actualCheckIn &&
+                        new Date(event.actualCheckIn).toLocaleTimeString(
+                          "en-US",
+                          {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          },
+                        )}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-7">
             {/* 1. Check-In */}
@@ -1565,6 +1632,89 @@ export function EventDetailPage() {
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Punctuality flags in final stats */}
+            {(punctualityFlags.includes("late-checkin") ||
+              punctualityFlags.includes("early-checkout")) && (
+              <div className="flex flex-wrap gap-3">
+                {punctualityFlags.includes("late-checkin") && lateMin && (
+                  <Card className="gap-0 border-yellow-500/30 bg-yellow-500/5 flex-1 min-w-[200px]">
+                    <CardContent className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                        <div>
+                          <p
+                            className="text-yellow-700"
+                            style={{ fontSize: "0.8125rem", fontWeight: 600 }}
+                          >
+                            Late Check-in — {lateMin}m
+                          </p>
+                          <p
+                            className="text-muted-foreground"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            Scheduled:{" "}
+                            {event.scheduledStart &&
+                              new Date(
+                                event.scheduledStart,
+                              ).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}{" "}
+                            · Arrived:{" "}
+                            {event.actualCheckIn &&
+                              new Date(
+                                event.actualCheckIn,
+                              ).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                {punctualityFlags.includes("early-checkout") && earlyMin && (
+                  <Card className="gap-0 border-red-500/30 bg-red-500/5 flex-1 min-w-[200px]">
+                    <CardContent className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-red-500" />
+                        <div>
+                          <p
+                            className="text-red-600"
+                            style={{ fontSize: "0.8125rem", fontWeight: 600 }}
+                          >
+                            Early Check-out — {earlyMin}m early
+                          </p>
+                          <p
+                            className="text-muted-foreground"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            Scheduled end:{" "}
+                            {event.scheduledEnd &&
+                              new Date(
+                                event.scheduledEnd,
+                              ).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}{" "}
+                            · Left:{" "}
+                            {event.actualCheckOut &&
+                              new Date(
+                                event.actualCheckOut,
+                              ).toLocaleTimeString("en-US", {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             )}
 
             {/* Stats grid (expanded per mm-ui-002) */}

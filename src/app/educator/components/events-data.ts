@@ -88,6 +88,11 @@ export interface EventItem {
   // Live event fields
   checkInStatus?: "checked-in" | "pending" | "failed";
   checkInTime?: string;
+  // Punctuality tracking (ISO timestamps)
+  scheduledStart?: string;
+  actualCheckIn?: string;
+  scheduledEnd?: string;
+  actualCheckOut?: string;
   liveMetrics?: {
     samplesDistributed: number;
     consumerInteractions: number;
@@ -142,6 +147,53 @@ export function getStatusDisplayGroup(status: EventStatus): StatusDisplayGroup {
   if (status === "Live") return "Live";
   if (status === "Cancelled") return "Cancelled";
   return "Completed"; // Completed + Finalized
+}
+
+// --- Punctuality helpers ---
+
+/** Threshold in minutes — check-in later than this triggers Late flag */
+export const LATE_CHECKIN_THRESHOLD_MIN = 10;
+
+export type PunctualityFlag = "late-checkin" | "early-checkout";
+
+/** Returns active punctuality flags for an event */
+export function getPunctualityFlags(event: EventItem): PunctualityFlag[] {
+  const flags: PunctualityFlag[] = [];
+  if (event.scheduledStart && event.actualCheckIn) {
+    const diffMin =
+      (new Date(event.actualCheckIn).getTime() -
+        new Date(event.scheduledStart).getTime()) /
+      60000;
+    if (diffMin > LATE_CHECKIN_THRESHOLD_MIN) flags.push("late-checkin");
+  }
+  if (event.scheduledEnd && event.actualCheckOut) {
+    const diffMin =
+      (new Date(event.scheduledEnd).getTime() -
+        new Date(event.actualCheckOut).getTime()) /
+      60000;
+    if (diffMin > 0) flags.push("early-checkout");
+  }
+  return flags;
+}
+
+/** Minutes late for check-in (null if on-time or missing data) */
+export function getLateMinutes(event: EventItem): number | null {
+  if (!event.scheduledStart || !event.actualCheckIn) return null;
+  const diff =
+    (new Date(event.actualCheckIn).getTime() -
+      new Date(event.scheduledStart).getTime()) /
+    60000;
+  return diff > LATE_CHECKIN_THRESHOLD_MIN ? Math.round(diff) : null;
+}
+
+/** Minutes early for check-out (null if stayed full time or missing data) */
+export function getEarlyMinutes(event: EventItem): number | null {
+  if (!event.scheduledEnd || !event.actualCheckOut) return null;
+  const diff =
+    (new Date(event.scheduledEnd).getTime() -
+      new Date(event.actualCheckOut).getTime()) /
+    60000;
+  return diff > 0 ? Math.round(diff) : null;
 }
 
 // --- Mock data ---
@@ -228,6 +280,10 @@ export const mockEvents: EventItem[] = [
     storeContactEmail: "mike.r@totalwine.com",
     checkInStatus: "checked-in",
     checkInTime: "3:52 PM",
+    // Punctuality: late check-in (22 min late, scheduled 4 PM)
+    scheduledStart: "2026-03-20T16:00:00",
+    actualCheckIn: "2026-03-20T16:22:00",
+    scheduledEnd: "2026-03-20T20:00:00",
     liveMetrics: {
       samplesDistributed: 34,
       consumerInteractions: 28,
@@ -278,6 +334,11 @@ export const mockEvents: EventItem[] = [
     storeContactEmail: "lisa.t@bevmo.com",
     checkInStatus: "checked-in",
     checkInTime: "11:48 AM",
+    // Punctuality: on time (arrived 12 min early)
+    scheduledStart: "2026-03-19T12:00:00",
+    actualCheckIn: "2026-03-19T11:48:00",
+    scheduledEnd: "2026-03-19T16:00:00",
+    actualCheckOut: "2026-03-19T16:15:00",
     finalStats: {
       totalSamples: 112,
       totalInteractions: 89,
@@ -528,6 +589,11 @@ export const mockEvents: EventItem[] = [
     storeContactPhone: "212-555-0399",
     checkInStatus: "checked-in",
     checkInTime: "2:45 PM",
+    // Punctuality: early check-out (1h 50m early)
+    scheduledStart: "2026-03-18T15:00:00",
+    actualCheckIn: "2026-03-18T14:45:00",
+    scheduledEnd: "2026-03-18T19:00:00",
+    actualCheckOut: "2026-03-18T17:10:00",
     finalStats: {
       totalSamples: 45,
       totalInteractions: 38,
@@ -712,6 +778,10 @@ export const mockEvents: EventItem[] = [
     storeContactPhone: "212-555-0188",
     storeContactEmail: "alex.k@astorwines.com",
     checkInStatus: "failed",
+    // Punctuality: late check-in (18 min late)
+    scheduledStart: "2026-03-20T17:00:00",
+    actualCheckIn: "2026-03-20T17:18:00",
+    scheduledEnd: "2026-03-20T21:00:00",
     liveMetrics: {
       samplesDistributed: 18,
       consumerInteractions: 15,
@@ -811,6 +881,11 @@ export const mockEvents: EventItem[] = [
     storeContactPhone: "212-555-0621",
     checkInStatus: "checked-in",
     checkInTime: "12:45 PM",
+    // Punctuality: on time (arrived 15 min early)
+    scheduledStart: "2026-03-15T13:00:00",
+    actualCheckIn: "2026-03-15T12:45:00",
+    scheduledEnd: "2026-03-15T17:00:00",
+    actualCheckOut: "2026-03-15T17:05:00",
     finalStats: {
       totalSamples: 72,
       totalInteractions: 58,

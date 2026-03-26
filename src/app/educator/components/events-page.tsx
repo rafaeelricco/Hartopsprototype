@@ -34,6 +34,7 @@ import {
 import {
   mockEvents,
   getStatusDisplayGroup,
+  getPunctualityFlags,
   type EventStatus,
   type StatusDisplayGroup,
   type EventItem,
@@ -371,6 +372,22 @@ function EventNameCell({ event }: { event: EventItem }) {
       {event.status === "Cancelled" && (
         <Ban className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
       )}
+      {getPunctualityFlags(event).includes("late-checkin") && (
+        <span
+          className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+        >
+          Late
+        </span>
+      )}
+      {getPunctualityFlags(event).includes("early-checkout") && (
+        <span
+          className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-red-500/10 text-red-600 border-red-500/20"
+          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+        >
+          Early Out
+        </span>
+      )}
     </div>
   );
 }
@@ -514,6 +531,22 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                       >
                         {event.name}
                       </p>
+                      {getPunctualityFlags(event).includes("late-checkin") && (
+                        <span
+                          className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+                        >
+                          Late
+                        </span>
+                      )}
+                      {getPunctualityFlags(event).includes("early-checkout") && (
+                        <span
+                          className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-red-500/10 text-red-600 border-red-500/20"
+                          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+                        >
+                          Early Out
+                        </span>
+                      )}
                       <div
                         className="flex items-center gap-3 text-muted-foreground mt-0.5"
                         style={{ fontSize: "0.75rem" }}
