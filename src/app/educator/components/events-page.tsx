@@ -22,6 +22,7 @@ import {
   Filter,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
+import { Checkbox } from "@/app/shared/components/ui/checkbox";
 import { Input } from "@/app/shared/components/ui/input";
 import {
   Card,
@@ -416,6 +417,8 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
   const [responsesEditedMap, setResponsesEditedMap] = useState<
     Record<string, Set<string>>
   >({});
+  // Pre-approval checks state — keyed by event ID → set of checked IDs
+  const [checksMap, setChecksMap] = useState<Record<string, Set<string>>>({});
 
   const remaining = pendingEvents.filter((e) => !finalized.has(e.id));
 
@@ -906,6 +909,65 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                       </p>
                     )}
 
+                    {/* Pre-Approval Checklist */}
+                    {event.preApprovalChecks &&
+                      event.preApprovalChecks.length > 0 && (
+                        <div className="rounded-lg border border-border p-3 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <ClipboardList className="w-3.5 h-3.5 text-muted-foreground" />
+                            <p
+                              className="text-muted-foreground"
+                              style={{
+                                fontSize: "0.6875rem",
+                                fontWeight: 500,
+                              }}
+                            >
+                              Pre-Approval Checklist
+                            </p>
+                          </div>
+                          {event.preApprovalChecks.map((check) => {
+                            const isChecked =
+                              checksMap[event.id]?.has(check.id) ?? false;
+                            return (
+                              <div
+                                key={check.id}
+                                className="flex items-center gap-2"
+                              >
+                                <Checkbox
+                                  id={`${event.id}-${check.id}`}
+                                  checked={isChecked}
+                                  onCheckedChange={(checked) => {
+                                    setChecksMap((prev) => {
+                                      const next = new Set(
+                                        prev[event.id] ?? [],
+                                      );
+                                      if (checked) {
+                                        next.add(check.id);
+                                      } else {
+                                        next.delete(check.id);
+                                      }
+                                      return { ...prev, [event.id]: next };
+                                    });
+                                  }}
+                                />
+                                <label
+                                  htmlFor={`${event.id}-${check.id}`}
+                                  className="text-foreground cursor-pointer select-none"
+                                  style={{ fontSize: "0.8125rem" }}
+                                >
+                                  {check.label}
+                                  {check.required && (
+                                    <span className="text-red-500 ml-0.5">
+                                      *
+                                    </span>
+                                  )}
+                                </label>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
                     {/* Finalize CTA */}
                     {showConfirm === event.id ? (
                       <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 space-y-3">
@@ -953,12 +1015,36 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                         >
                           View full detail →
                         </Link>
-                        <Button
-                          onClick={() => setShowConfirm(event.id)}
-                          className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
-                        >
-                          Approve & Finalize
-                        </Button>
+                        {(() => {
+                          const requiredChecks =
+                            event.preApprovalChecks?.filter(
+                              (c) => c.required,
+                            ) ?? [];
+                          const allChecked =
+                            requiredChecks.length === 0 ||
+                            requiredChecks.every((c) =>
+                              checksMap[event.id]?.has(c.id),
+                            );
+                          return (
+                            <div className="flex flex-col items-end gap-1">
+                              <Button
+                                onClick={() => setShowConfirm(event.id)}
+                                className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
+                                disabled={!allChecked}
+                              >
+                                Approve & Finalize
+                              </Button>
+                              {!allChecked && (
+                                <p
+                                  className="text-muted-foreground"
+                                  style={{ fontSize: "0.6875rem" }}
+                                >
+                                  Complete all required checks to finalize
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>

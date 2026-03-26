@@ -580,6 +580,8 @@ export function EventDetailPage() {
   const [responsesEdited, setResponsesEdited] = useState<Set<string>>(
     new Set(),
   );
+  // Pre-approval checks state
+  const [approvalChecks, setApprovalChecks] = useState<Set<string>>(new Set());
 
   if (!event) {
     return (
@@ -1979,6 +1981,75 @@ export function EventDetailPage() {
               </div>
             )}
 
+            {/* Pre-Approval Checklist */}
+            {event.preApprovalChecks &&
+              event.preApprovalChecks.length > 0 &&
+              (event.status === "Completed" ||
+                currentPhase === "Finalized") && (
+                <Card className="gap-0">
+                  <CardHeader className="px-5 pt-5 pb-3">
+                    <div className="flex items-center gap-2">
+                      <ClipboardList className="w-4 h-4 text-muted-foreground" />
+                      <CardTitle
+                        style={{ fontSize: "0.9375rem", fontWeight: 600 }}
+                      >
+                        Pre-Approval Checklist
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="px-5 pb-5">
+                    <div className="space-y-2.5">
+                      {event.preApprovalChecks.map((check) => {
+                        const isFinalizedView =
+                          finalized || !!event.finalizedAt;
+                        const isChecked = isFinalizedView
+                          ? true
+                          : approvalChecks.has(check.id);
+                        return (
+                          <div
+                            key={check.id}
+                            className="flex items-center gap-2.5"
+                          >
+                            <Checkbox
+                              id={`detail-${check.id}`}
+                              checked={isChecked}
+                              disabled={isFinalizedView}
+                              onCheckedChange={(checked) => {
+                                setApprovalChecks((prev) => {
+                                  const next = new Set(prev);
+                                  if (checked) {
+                                    next.add(check.id);
+                                  } else {
+                                    next.delete(check.id);
+                                  }
+                                  return next;
+                                });
+                              }}
+                            />
+                            <label
+                              htmlFor={`detail-${check.id}`}
+                              className={`cursor-pointer select-none ${
+                                isFinalizedView
+                                  ? "text-muted-foreground"
+                                  : "text-foreground"
+                              }`}
+                              style={{ fontSize: "0.875rem" }}
+                            >
+                              {check.label}
+                              {check.required && !isFinalizedView && (
+                                <span className="text-red-500 ml-0.5">
+                                  *
+                                </span>
+                              )}
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
             {/* Approve & Finalize */}
             {!finalized &&
               !event.finalizedAt &&
@@ -2026,29 +2097,44 @@ export function EventDetailPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p
-                            className="text-foreground"
-                            style={{ fontWeight: 600 }}
-                          >
-                            Ready for Review
-                          </p>
-                          <p
-                            className="text-muted-foreground"
-                            style={{ fontSize: "0.875rem" }}
-                          >
-                            Review the stats above and finalize this event to
-                            unlock reporting.
-                          </p>
-                        </div>
-                        <Button
-                          onClick={() => setShowFinalizeConfirm(true)}
-                          className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
-                        >
-                          Approve & Finalize
-                        </Button>
-                      </div>
+                      (() => {
+                        const requiredChecks =
+                          event.preApprovalChecks?.filter(
+                            (c) => c.required,
+                          ) ?? [];
+                        const allChecked =
+                          requiredChecks.length === 0 ||
+                          requiredChecks.every((c) =>
+                            approvalChecks.has(c.id),
+                          );
+                        return (
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p
+                                className="text-foreground"
+                                style={{ fontWeight: 600 }}
+                              >
+                                Ready for Review
+                              </p>
+                              <p
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.875rem" }}
+                              >
+                                {allChecked
+                                  ? "Review the stats above and finalize this event to unlock reporting."
+                                  : "Complete all required pre-approval checks to finalize."}
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => setShowFinalizeConfirm(true)}
+                              className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white"
+                              disabled={!allChecked}
+                            >
+                              Approve & Finalize
+                            </Button>
+                          </div>
+                        );
+                      })()
                     )}
                   </CardContent>
                 </Card>

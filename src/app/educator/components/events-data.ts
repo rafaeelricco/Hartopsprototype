@@ -49,6 +49,12 @@ export interface QuestionnaireResponse {
   options?: string[];
 }
 
+export interface PreApprovalCheck {
+  id: string;
+  label: string;
+  required: boolean;
+}
+
 export interface EventItem {
   id: string;
   name: string;
@@ -112,6 +118,8 @@ export interface EventItem {
   };
   completedAt?: string;
   finalizedAt?: string | null;
+  // Pre-approval checks (manager confirms before finalizing)
+  preApprovalChecks?: PreApprovalCheck[];
   // Cancellation
   cancellationReason?: CancellationReason;
   cancelledAt?: string;
@@ -394,6 +402,10 @@ export const mockEvents: EventItem[] = [
     },
     completedAt: "2026-03-19T16:15:00",
     finalizedAt: null,
+    preApprovalChecks: [
+      { id: "samples-pickup", label: "Samples Picked Up", required: true },
+      { id: "evaluations-received", label: "Evaluations Received", required: true },
+    ],
     photoCount: 8,
     photoUrls: [
       "/placeholder-photo-1.jpg",
@@ -650,6 +662,10 @@ export const mockEvents: EventItem[] = [
     },
     completedAt: "2026-03-18T19:10:00",
     finalizedAt: null,
+    preApprovalChecks: [
+      { id: "samples-pickup", label: "Samples Picked Up", required: true },
+      { id: "evaluations-received", label: "Evaluations Received", required: true },
+    ],
     photoCount: 12,
     photoUrls: [
       "/placeholder-photo-1.jpg",
@@ -824,6 +840,10 @@ export const mockEvents: EventItem[] = [
     },
     completedAt: "2026-03-15T17:05:00",
     finalizedAt: "2026-03-16T09:30:00",
+    preApprovalChecks: [
+      { id: "samples-pickup", label: "Samples Picked Up", required: true },
+      { id: "evaluations-received", label: "Evaluations Received", required: true },
+    ],
     photoCount: 10,
     photoUrls: [
       "/placeholder-photo-1.jpg",

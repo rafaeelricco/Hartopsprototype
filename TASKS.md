@@ -269,10 +269,10 @@ Expand ops beyond organization/event monitoring into data stewardship.
 
 > Tasks identified during the HEMs Prototype Review call (March 24, 2026) — stakeholder feedback translated into focused, low-risk UI/UX improvements.
 
-- [ ] `🟢 P1` **Educator score/rating in mobile app** — Display the educator's own `avgRating` (numeric + star visual) on the educator mobile dashboard and profile screen. Score data already exists in `educator-roster-data.ts` and is shown to managers; surface it to the educator themselves for transparency and self-improvement.
+- [X] `🟢 P1` **Educator score/rating in mobile app** — Display the educator's own `avgRating` (numeric + star visual) on the educator mobile dashboard and profile screen. Score data already exists in `educator-roster-data.ts` and is shown to managers; surface it to the educator themselves for transparency and self-improvement.
       Source: `Prototype Review 00:33:36 – "if you're a 2.7, you know you got to up your game. If you're a five, you know you're doing great. I think it would incentivize them to improve their performance."`
 
-- [ ] `🟢 P1` **Sales target & bonus display in tracking** — In the Sales Volume Tracker (educator mobile event flow), add a visible target (e.g., "Target: 6 bottles") and optional bonus threshold (e.g., "Bonus at: 12 bottles") with a progress bar or % indicator. Add `target` and `bonusThreshold` fields to the `sales-volume` data module in `event-data.ts`.
+- [X] `🟢 P1` **Sales target & bonus display in tracking** — In the Sales Volume Tracker (educator mobile event flow), add a visible target (e.g., "Target: 6 bottles") and optional bonus threshold (e.g., "Bonus at: 12 bottles") with a progress bar or % indicator. Add `target` and `bonusThreshold` fields to the `sales-volume` data module in `event-data.ts`.
       Source: `Prototype Review 00:43:48 – "expectation is six bottles. If you want the bonus, you sell 12 bottles."` + `Stephanie: "it would encourage them to reach at least a certain amount of units sold."`
 
 - [ ] `🟢 P1` **Samples pickup & evaluations checkboxes** — In the manager finalization flow (Approve & Finalize queue in `events-page.tsx`), add pre-approval checkboxes: `☐ Samples Picked Up`, `☐ Evaluations Received`. These confirm physical items were collected before the event can be approved.
