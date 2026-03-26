@@ -1,9 +1,9 @@
 # =============================================================================
-# UI & FEATURE MENTAL MODEL — Hart Ops Organizations Management
+# UI & FEATURE MENTAL MODEL — Operators Organizations Management
 # =============================================================================
 
 id: "mm-ui-003"
-title: "Hart Ops Organizations Management"
+title: "Operators Organizations Management"
 status: "draft"
 
 dependencies:
@@ -13,10 +13,10 @@ dependencies:
     - "TBD — to be filled manually"
 
 context: |
-  Organizations are the core tenant unit of the platform. Hart Ops creates and manages
+  Organizations are the core organizational unit of the platform. Operators creates and manages
   these entities through a searchable list and a 3-step onboarding wizard designed for
   trial clients. The Organization Detail page provides read-only drill-down for monitoring
-  tenant health. As a Hart Ops administrator, I need to onboard new trial client
+  org health. As a Operators administrator, I need to onboard new trial client
   organizations efficiently and monitor their activity without modifying their data.
 
 scope:
@@ -27,25 +27,25 @@ scope:
     - "Validations and edge cases for the wizard"
   out_of_scope:
     - "Organization editing or deletion (not specified in source)"
-    - "Trial client staff actions within their own organization (see mm-ui for Trial Client Staff)"
-    - "Cross-org event monitoring (see mm-ui-004)"
-    - "Campaign creation or management from Hart Ops side"
+    - "Trial client staff actions within their own organization (see mm-ui for Organization Admin)"
+    - "Cross-org event monitoring"
+    - "Campaign creation or management from Operators side"
 
 key_concepts:
   - term: "Organization"
-    definition: "A tenant on the platform representing a trial client company. Each organization is an isolated entity with its own campaigns, events, users, and data. Created exclusively by Hart Ops."
+    definition: "An organization on the platform representing a trial client company. Each organization is an isolated entity with its own campaigns, events, users, and data. Created exclusively by Operators."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Context"
   - term: "Add Organization Wizard"
     definition: "A 3-step guided flow (Details → Users → Review) for onboarding new trial client organizations onto the platform."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Add Organization Wizard"
   - term: "Domain Blacklisting"
     definition: "Validation rule that prevents invitation emails from disposable or blacklisted email domains during the Users step of the wizard."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Step 2 (Users)"
 
 core_content:
@@ -56,7 +56,7 @@ core_content:
       - "Entry Point: 'Organizations' item in the sidebar navigation."
       - "Functionality: Clicking an organization card navigates to its detail page."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Shared Layout"
 
   - section_title: "Add Organization Wizard — Step 1 (Details)"
@@ -68,17 +68,17 @@ core_content:
       - "Functionality: Company Name must be unique across the platform."
       - "Functionality: Incomplete step prevents navigation to next step."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Step 1 (Details)"
 
   - section_title: "Add Organization Wizard — Step 2 (Users)"
     points:
-      - "Elements: Email input field to invite the initial Trial Client Staff user."
+      - "Elements: Email input field to invite the initial Organization Admin user."
       - "Functionality: Email format validation enforced."
       - "Functionality: Domain blacklisting rejects disposable email providers."
       - "Design principle: Only one initial user is invited during onboarding — the trial client manages their own team afterward."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Step 2 (Users)"
 
   - section_title: "Add Organization Wizard — Step 3 (Review)"
@@ -87,7 +87,7 @@ core_content:
       - "Functionality: User reviews details and finalizes — triggers organization creation and invitation email."
       - "Functionality: Back navigation allows editing previous steps without data loss."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Step 3 (Review)"
 
   - section_title: "Organization Detail Page"
@@ -95,10 +95,10 @@ core_content:
       - "Entry Point: Clicking an organization card in the list view."
       - "Elements: Organization header with company details and status."
       - "Elements: Sub-tabs — Overview, Campaigns, Events, Team."
-      - "Functionality: Read-only drill-down view — Hart Ops monitors tenant health but does not modify tenant data."
-      - "Design principle: The detail page answers 'How is this specific tenant doing?' without requiring Hart Ops to switch context to the tenant's own interface."
+      - "Functionality: Read-only drill-down view — Operators monitors org health but does not modify org data."
+      - "Design principle: The detail page answers 'How is this specific org doing?' without requiring Operators to switch context to the org's own interface."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§3 Organizations Management — Detail Page"
 
 assumptions:

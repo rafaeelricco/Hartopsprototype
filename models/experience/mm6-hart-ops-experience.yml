@@ -1,5 +1,5 @@
 id: "mm6"
-title: "Hart Ops Experience"
+title: "Operators Experience"
 status: "approved"
 
 dependencies:
@@ -9,21 +9,21 @@ dependencies:
     - "mm7"
 
 context: |
-  Hart Ops is the superadmin layer — Hart's window into whether the SaaS model works.
+  Operators is the superadmin layer — Hart's window into whether the SaaS model works.
   It is a small surface (one web role, roughly 8 screens) but carries high strategic
-  importance: this is where Hart monitors platform health, onboards tenant organizations,
+  importance: this is where Hart monitors platform health, onboards organizations,
   and sees cross-org data quality.
 
 scope:
   in_scope:
-    - "Hart Ops authentication and navigation"
+    - "Operators authentication and navigation"
     - "Platform dashboard (multi-tenant 'omni view')"
     - "Organization onboarding and management (3-step wizard)"
     - "Cross-org event monitoring"
     - "Platform-level reporting and data quality oversight"
     - "Settings and team management"
   out_of_scope:
-    - "Trial client operator experience (see Trial Client Staff Experience)"
+    - "Trial client operator experience (see Organization Admin Experience)"
     - "Educator Manager web experience (see Educator Manager Experience)"
     - "Educator mobile experience (see Educator Mobile Experience)"
     - "Phase 1 feature boundaries and delivery scope (see Phase 1 Scope)"
@@ -31,10 +31,10 @@ scope:
 
 key_concepts:
   - term: "Organization"
-    definition: "A tenant on the platform — a trial client company. Hart Ops creates and manages these. Each is an isolated entity with its own campaigns, events, users, and data."
+    definition: "An organization on the platform — a trial client company. Operators creates and manages these. Each is an isolated entity with its own campaigns, events, users, and data."
     sources:
       - doc: "Briefing Document"
-        details: "Tenant definition"
+        details: "Organization definition"
       - doc: "Functionality PDF"
         details: "§4"
   - term: "Data Quality Score"
@@ -42,8 +42,8 @@ key_concepts:
     sources:
       - doc: "Functionality PDF"
         details: "§6.2"
-  - term: "Hart Ops user"
-    definition: "A platform administrator employed by Hart. Cannot self-register; first account seeded by Ambar, subsequent users invited by existing Hart Ops staff."
+  - term: "Operators user"
+    definition: "A platform administrator employed by Hart. Cannot self-register; first account seeded by Ambar, subsequent users invited by existing Operators staff."
     sources:
       - doc: "Functionality PDF"
         details: "§1.1, §7.2"
@@ -77,7 +77,7 @@ core_content:
   - section_title: "Events (Cross-Org Overview)"
     points:
       - "Summary stats bar (Today, This Week, Live Now) and filterable list."
-      - "Cross-tenant visibility — the 'omni view' for monitoring all organizations simultaneously."
+      - "Cross-org visibility — the 'omni view' for monitoring all organizations simultaneously."
     sources:
       - doc: "Functionality PDF"
         details: "§5"
@@ -92,17 +92,17 @@ core_content:
   - section_title: "Settings"
     points:
       - "Account: profile management, password updates."
-      - "Team Management: invite and manage Hart Ops users (separate from org team management)."
+      - "Team Management: invite and manage Operators users (separate from org team management)."
     sources:
       - doc: "Functionality PDF"
         details: "§7.1, §7.2"
 
 assumptions:
-  - "The first Hart Ops account is seeded by Ambar directly into the backend."
-  - "All Hart Ops users see all organizations (no org-level access control within this role)."
-  - "Hart Ops access to organization data is read-only (monitor, don't modify tenant settings)."
+  - "The first Operators account is seeded by Ambar directly into the backend."
+  - "All Operators users see all organizations (no org-level access control within this role)."
+  - "Operators access to organization data is read-only (monitor, don't modify org settings)."
   - "Utilization metrics serve as a proxy for profitability in Phase 1."
-  - "Onboarding remains a manual Hart Ops task (no self-service signup in Phase 1)."
+  - "Onboarding remains a manual Operators task (no self-service signup in Phase 1)."
 
 implications:
   - "The 'omni view' architecture must be designed for growth even with only two trial clients initially."

@@ -32,8 +32,8 @@ scope:
   out_of_scope:
     - "Authentication and Sign In flow"
     - "Detailed campaign or event drill-down views"
-    - "Report generation and export functionality (covered in mm-ui-005)"
-    - "Settings and configuration screens (covered in mm-ui-006)"
+    - "Report generation and export functionality"
+    - "Settings and configuration screens"
 
 key_concepts:
   - term: "Stat Cards"

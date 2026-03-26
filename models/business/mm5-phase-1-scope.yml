@@ -66,8 +66,8 @@ core_content:
         details: "~42:04"
   - section_title: "User Roles & Platform Surfaces"
     points:
-      - "Hart Ops (Web/Superadmin): Onboard orgs, monitor cross-org events, platform reporting."
-      - "Trial Client Staff (Web): Create campaigns & events, configure data collection, manage brand assets, view reports."
+      - "Operators (Web/Superadmin): Onboard orgs, monitor cross-org events, platform reporting."
+      - "Organization Admin (Web): Create campaigns & events, configure data collection, manage brand assets, view reports."
       - "Educator Manager (Web): Assign educators, monitor live execution, approve & finalize events."
       - "Educator (Mobile iOS+Android): Execute events — check in, collect data, capture photos, check out."
     sources:
@@ -88,7 +88,7 @@ core_content:
         details: "Feature specification"
   - section_title: "Explicitly Deferred Items"
     points:
-      - "Educator scheduling negotiation — accept/decline/reschedule (stays on phone/text). Note: availability entry is now in-app via the Availability tab."
+      - "Educator scheduling (accept/decline/reschedule) is done outside of the app in Phase 1. Note: Educator availability is a self-serve feature for Educators, and their reported availability can be seen by Educator Managers."
       - "Hart's own migration (Phase 2)."
       - "Self-service campaign intake (still via email/phone)."
       - "Billing and payment processing (Phase 3)."
@@ -96,6 +96,10 @@ core_content:
       - "Data marketplace (Phase 4)."
       - "Vertical expansion (architecture prepared, not active)."
       - "Advanced AI image recognition — multi-brand classification (separately funded). Note: basic product detection UI within venue survey photos is implemented in Phase 1 (ImageRecognitionOverlay with bounding boxes, currently simulated)."
+      # DISCUSSION — Scope Check: AI Product Detection
+      # Description: Determine if the basic product detection UI simulated in the venue survey photos should remain in Phase 1 or be deferred to a later phase.
+      # Rationale: We want to avoid Phase 1 scope bloat. The note about "basic product detection UI" being in Phase 1 is the concern.
+      # Ethan's comment: "This is really going in Phase 1? I mean...I know this is easy-ish, but it feels like we're adding a *lot* of 'easy-ish' things that, taken together, represent a huge scope bloat, just because someone said how cool something would be in a meeting."
       - "Geofenced consumer profiling (Phase 4)."
       - "Educator Performance/Training/Earnings tabs (nav future-proofed)."
       - "Passive Counting, Product Feedback, and QR Code data collection cards (architecture supports future addition)."
@@ -130,7 +134,7 @@ core_content:
 
 assumptions:
   - "The two trial clients are Pernod Ricard affiliates (specific complexity profile)."
-  - "Educator scheduling negotiation (accept/decline/reschedule) stays outside the platform in Phase 1, but availability entry is now in-app."
+  - "Educator scheduling (accept/decline/reschedule) is done outside the platform in Phase 1. Educator availability is a self-serve feature maintained in-app."
   - "Compensation fields are purely for data entry in Phase 1 (payroll deferred)."
   - "Trial clients use the platform for free during the pilot."
   - "Hart's internal team will not use the platform in Phase 1."

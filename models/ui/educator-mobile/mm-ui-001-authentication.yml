@@ -100,11 +100,11 @@ core_content:
   - section_title: "Settings Permission Management"
     points:
       - "Entry Point: Educator navigates to Settings and views the Permissions section."
-      - "Elements: Each permission row shows its current status (Enabled/Disabled) with a toggle."
-      - "Functionality: Mandatory permissions (Geolocation, Notifications, Camera) display a lock icon and 'Required' badge — their toggles are non-interactive."
-      - "Functionality: Attempting to tap a mandatory permission toggle opens a blocking explanation modal explaining why the permission cannot be disabled."
-      - "Functionality: Only biometrics can be toggled post-onboarding — toggling off falls back to email/password authentication."
-      - "Design principle: Mandatory permissions are enforced at both onboarding AND in settings — there is no way to disable them without uninstalling the app."
+      - "Elements: Each permission row shows its current status (Enabled/Disabled) as read-only — the app reports permission state but cannot change it."
+      - "Functionality: Mandatory permissions (Geolocation, Notifications, Camera) display a 'Required' badge and current status."
+      - "Functionality: If a mandatory permission is disabled, tapping the row opens an explanation modal with a 'Go to Settings' button that deep-links to the device's OS Settings app where the user can re-enable it."
+      - "Functionality: Only biometrics can be toggled within the app — toggling off falls back to email/password authentication."
+      - "Design principle: The app cannot programmatically toggle OS-level permissions — it can only report status and direct the user to the OS Settings app."
     sources:
       - doc: "Implementation"
         details: "settings-screen.tsx — mandatory permission lock icon and explanation modal"
@@ -112,7 +112,7 @@ core_content:
 assumptions:
   - "Deep link technology handles both iOS Universal Links and Android App Links."
   - "The App Store redirect preserves the activation context so the deep link resolves after installation."
-  - "Password strength requirements match the platform-wide policy (same as Hart Ops and Client Staff)."
+  - "Password strength requirements match the platform-wide policy (same as Operators and Client Staff)."
   - "Biometric enrollment uses the device's native biometric API (LocalAuthentication on iOS, BiometricPrompt on Android)."
   - "Mandatory permissions (Location, Notifications, Camera) cannot be denied — the app blocks onboarding until granted. Only biometric denial is allowed, with email/password fallback."
   - "Session tokens are issued upon successful authentication and cached securely on-device."

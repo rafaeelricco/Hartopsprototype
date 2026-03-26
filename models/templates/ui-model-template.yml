@@ -18,7 +18,7 @@ dependencies:
 
 context: |
   THE WHY: Explain the problem this screen solves and the primary User Story.
-  Example: "As a Hart Ops Manager, I need to create events in bulk to reduce
+  Example: "As a Operators Manager, I need to create events in bulk to reduce
   time spent on repetitive administrative tasks."
 
 scope:
@@ -59,7 +59,7 @@ core_content:
   - section_title: "Business Rules in UI"
     points:
       - "Validation: Do not allow past dates for new events."
-      - "Permissions: Only users with 'Hart Ops' profile can see this button."
+      - "Permissions: Only users with 'Operators' profile can see this button."
 
 assumptions:
   - "The user has a stable connection (or the system must have offline-sync)."

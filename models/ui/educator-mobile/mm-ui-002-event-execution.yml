@@ -38,7 +38,7 @@ scope:
     - "Passive counting card (not yet implemented)"
     - "Product feedback card (not yet implemented)"
     - "QR code card (not yet implemented)"
-    - "Smart notifications (covered in mm-ui-003)"
+    - "Smart notifications"
     - "Brand education content (accessible from dashboard but content management is a separate concern)"
 
 key_concepts:
@@ -74,6 +74,11 @@ key_concepts:
     sources:
       - doc: "SaaS Platform Functional Specification.md"
         details: "Section III Educators (Mobile App), Section 3.4 Check-out"
+  - term: "Photo-Based Presence Verification"
+    definition: "A fallback mechanism for when GPS-based geolocation is unreliable or unavailable. The educator captures timestamped, geotagged photos (e.g., storefront, venue signage, setup area) that serve as proof of physical presence. These photos are submitted for review by the educator manager, who approves or rejects the check-in/check-out. This ensures educators are not penalized for device or environmental GPS failures."
+    sources:
+      - doc: "Chris, Ethan — Definition Call 1/4"
+        details: "Chris confirmed photos are the primary presence proof; Ethan flagged backup need when geolocation is unreliable"
 
 core_content:
   - section_title: "Check-in Flow"
@@ -81,12 +86,23 @@ core_content:
       - "Entry Point: Educator taps 'Check In' on an event card when within proximity of the venue."
       - "Functionality: App verifies educator's GPS location is within 500 feet of the event venue coordinates."
       - "Functionality: On successful geolocation verification, the event timer starts and the task checklist becomes active."
-      - "Edge Case: If the educator is outside the 500ft radius, a 'Too far from venue' error is displayed."
-      - "Functionality: The 'Too far' error includes an option to request a manual override from the educator manager."
-      - "Design principle: Geofenced check-in is the primary proof that the event is physically happening — it prevents remote data fabrication."
+      - "Edge Case: If the educator is outside the 500ft radius, a 'Too far from venue' error is displayed with two options: (1) 'Retry' to re-check GPS, (2) 'Request Override' to escalate to the educator manager."
+      - "Functionality: Override Request — educator taps 'Request Override', optionally attaches a note (e.g., 'GPS showing wrong location, I'm at the front door'), and submits. The request is sent to the educator manager as a Category 4 notification."
+      - "Functionality: While the override request is pending, the educator sees a 'Waiting for Manager Approval' screen with the request status, a 'Retry GPS' option to re-attempt geolocation, and a live status indicator (waiting, approved, denied)."
+      - "Functionality: Manager receives the override request with event context — event name, venue, educator name, reported GPS coordinates vs. venue coordinates, distance delta, and any educator note. Manager can Approve or Deny."
+      - "Functionality: On manager approval — educator receives a push notification, the check-in completes, event timer starts, and the override is logged as a 'Manual Override' check-in type for reporting."
+      - "Functionality: On manager denial — educator receives a push notification with the denial. The educator can retry GPS or submit a photo-based verification as an alternative."
+      - "Functionality: If the manager does not respond within a configurable timeout (default: 15 minutes), the educator is prompted to fall back to photo-based presence verification."
+      - "Edge Case: If GPS is unavailable, timed out, or the device cannot determine location, the app offers a 'Verify with Photos' alternative instead of blocking the educator."
+      - "Functionality: Photo verification flow — educator captures 1–3 photos (e.g., storefront with visible address/signage, setup area, venue entrance). Photos are auto-timestamped and geotagged when partial GPS is available."
+      - "Functionality: Photo-based check-ins are submitted to the educator manager for approval. The educator can proceed with event tasks in a 'pending verification' state while awaiting approval."
+      - "Functionality: Educator manager reviews submitted photos and approves or rejects the check-in. If rejected, the event is flagged and the educator is notified."
+      - "Design principle: Geofenced check-in is the primary proof that the event is physically happening — photo verification is a fallback, not a replacement. It prevents educators from being penalized for device or environmental GPS failures."
     sources:
       - doc: "SaaS Platform Functional Specification.md"
         details: "Section III Educators (Mobile App), Section 3.3 Live Event — Check-in"
+      - doc: "Chris, Ethan — Definition Call 1/4"
+        details: "Chris confirmed photos as presence proof; Ethan flagged backup need for unreliable geolocation"
 
   - section_title: "Live Event Interface"
     points:
@@ -153,6 +169,9 @@ core_content:
       - "Functionality: Check-out button is disabled until all mandatory tasks in the checklist are completed."
       - "Elements: Visible checklist of remaining incomplete tasks when check-out is attempted prematurely."
       - "Functionality: Three-phase check-out process — (1) Summary: EventDataSummary component displays all collected data including per-product sales counts (TrackedProduct[]) and venue survey data (VenueSurveyData). (2) Verifying: geolocation confirmation that the educator is still within 500 feet of the venue. (3) Success: confirmation screen with event completion status."
+      - "Edge Case: If GPS is unavailable at check-out, the same photo-based presence verification fallback applies — educator captures timestamped photos for manager review."
+      - "Edge Case: If GPS is available at check-out but the educator is outside the 500ft radius (e.g., stepped outside or GPS drifted), the same override request flow applies — educator can retry, request manager override, or fall back to photo verification."
+      - "Functionality: If the educator checked in via photo verification or manual override, the check-out defaults to the same method for consistency."
       - "Elements: Teal-branded checkout header with event metadata pills (duration, total consumers, total sales)."
       - "Design principle: Task completion gating ensures data quality — educators cannot leave without fulfilling all required data collection. The summary phase gives educators confidence that their work was captured correctly."
     sources:
@@ -163,20 +182,33 @@ core_content:
 
 assumptions:
   - "The 500-foot geofence radius is configurable per event or globally — source specifies 500ft as the default."
-  - "Manual override requests for geofence failures are routed to the educator manager, not the client."
+  - "Manual override requests for geofence 'too far' failures are routed to the educator manager via a Category 4 notification — the same channel used for failed check-in alerts."
+  - "Override requests include GPS diagnostic context (reported coordinates, venue coordinates, distance delta) to help managers make informed approval decisions."
+  - "Override request timeout defaults to 15 minutes — after which the educator is prompted to use photo-based verification instead of continuing to wait."
   - "Products in the sales tracking card are pre-loaded from the campaign configuration — educators cannot add products manually."
   - "Venue type (on-premise / off-premise) is set at the event level and drives UI label variations in sales tracking and photo category suggestions in venue survey."
   - "The consumer profiling card steps and options are configured per client campaign — the 4-step flow described is the standard template."
   - "Auto-increment after profiling means each completed flow counts as one consumer interaction — no separate save action."
   - "The venue survey AI product detection overlay is simulated in the current implementation — UI patterns and types (DetectedProduct, ConfirmedProduct) are in place for future AI backend integration."
   - "The task checklist contents are determined by the client's event configuration, not the educator."
+  - "Photo-based presence verification is a fallback, not a replacement — geolocation remains the primary check-in/check-out mechanism."
+  - "Photos submitted for presence verification are reviewed and approved by the educator manager, not automatically accepted."
+  - "Educators can begin event tasks in a 'pending verification' state while awaiting manager approval of photo-based check-in."
 
 implications:
   - "Frontend: Geolocation must be continuously available during event execution — not just at check-in/check-out moments."
+  - "Frontend: The check-in flow must detect GPS unavailability/timeout and offer the photo verification fallback gracefully — not as an error, but as an alternative path."
+  - "Frontend: Photo capture for presence verification must auto-attach timestamps; geotags are included when partial GPS is available."
   - "Frontend: Consumer profiling card must support rapid sequential entry — transitions between steps should be instantaneous with no loading states."
   - "Frontend: Sales tracking card must pre-load campaign products at event start — the product list drives the entire UI. Venue type drives label variations."
   - "Frontend: Venue survey is the most complex component (~48KB) — multi-phase flow requires careful state management across camera, confirm, and review phases."
   - "Frontend: Check-out button state must reactively update as tasks are completed — requires real-time checklist tracking. EventDataSummary must render per-product sales data and venue survey results."
   - "Backend: Geofence validation should happen server-side as well as client-side to prevent GPS spoofing."
+  - "Backend: Photo-based check-ins must be flagged for manager review — a separate approval queue is needed in the educator manager experience."
+  - "Backend: Events checked in via photo verification should be distinguishable in reporting to track GPS reliability patterns."
   - "Backend: Campaign product data must be available at event assignment time so the sales tracking card can pre-populate."
   - "Backend: Event data submissions must be idempotent to handle retry scenarios from offline sync."
+  - "Frontend: The 'Too far from venue' error must present Retry and Request Override as equally accessible options — the override path should not be buried or feel like an error escalation."
+  - "Frontend: The override pending screen must show live status updates (waiting, approved, denied) and maintain the Retry GPS option as an escape hatch."
+  - "Backend: Override requests must include GPS diagnostic data (educator coordinates, venue coordinates, calculated distance) for manager context."
+  - "Backend: Override approvals/denials must be logged with the check-in record — events with manual overrides are distinguishable in reporting alongside photo-verified and GPS-verified check-ins."

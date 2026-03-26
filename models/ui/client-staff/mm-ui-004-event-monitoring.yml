@@ -26,8 +26,8 @@ scope:
     - "Event Detail Lifecycle — three phases"
     - "Weekend clustering visibility in Calendar View"
   out_of_scope:
-    - "Event creation wizard (covered in mm-ui-003)"
-    - "Report generation and export (covered in mm-ui-005)"
+    - "Event creation wizard"
+    - "Report generation and export"
     - "Educator assignment and scheduling"
     - "Event cancellation or rescheduling workflows"
 

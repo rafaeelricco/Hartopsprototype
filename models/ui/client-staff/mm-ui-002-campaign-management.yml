@@ -24,8 +24,8 @@ scope:
     - "Campaign form fields and validations"
     - "Duplicate name edge case handling"
   out_of_scope:
-    - "Event creation within a campaign (covered in mm-ui-003)"
-    - "Campaign performance reporting (covered in mm-ui-005)"
+    - "Event creation within a campaign"
+    - "Campaign performance reporting"
     - "Campaign deletion or archival workflows"
     - "Campaign editing after creation"
 

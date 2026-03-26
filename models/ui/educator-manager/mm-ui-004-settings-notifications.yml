@@ -26,9 +26,9 @@ scope:
     - "Help & Support — FAQ list and contact support fallback"
   out_of_scope:
     - "User profile and account management"
-    - "Organization-level settings (Trial Client Staff responsibility)"
+    - "Organization-level settings (Organization Admin responsibility)"
     - "Notification delivery infrastructure (backend concern)"
-    - "FAQ content creation (Trial Client Staff responsibility — consumed here)"
+    - "FAQ content creation (Organization Admin responsibility — consumed here)"
     - "Push notification permission prompts (OS-level concern)"
 
 key_concepts:
@@ -38,7 +38,7 @@ key_concepts:
       - doc: "PDF-EM"
         details: "Educator Managers §6.1"
   - term: "Help & Support"
-    definition: "A section that consumes FAQ content managed by Trial Client Staff. Provides self-service answers with a contact support fallback for issues not covered by FAQs."
+    definition: "A section that consumes FAQ content managed by Organization Admin. Provides self-service answers with a contact support fallback for issues not covered by FAQs."
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §6.2"
@@ -56,7 +56,7 @@ core_content:
       - "Elements: 'Enable Email Notifications' toggle — controls whether notification categories are also delivered via email."
       - "Functionality: Per-category toggles allow managers to enable or disable specific notification types."
       - "Functionality: All categories default to enabled on account activation."
-      - "Functionality: Notification delivery supports both in-app and email channels. Email notifications include the specific trigger details for each category."
+      - "Functionality: Notification delivery uses a channel-agnostic notification service. Business logic emits a notification; the delivery layer routes to enabled channels (in-app, email, future: push). Channel configuration is a user preference, not a concern of the notification-emitting code."
       - "Design principle: Granular control prevents notification fatigue while ensuring critical alerts are not missed."
       - "Functionality: 'Enable Email Notifications' is a global toggle. When enabled, all individually-enabled notification categories are also delivered via email. When disabled, only in-app delivery is used."
     sources:
@@ -65,7 +65,7 @@ core_content:
 
   - section_title: "Notification Types Detail"
     points:
-      - "Elements: Category 1 — New Events Available. Trigger: Trial Client Staff creates an event within the manager's geographic scope, routing it to the manager for educator assignment."
+      - "Elements: Category 1 — New Events Available. Trigger: Organization Admin creates an event within the manager's geographic scope, routing it to the manager for educator assignment."
       - "Elements: Category 2 — Unstaffed Events Warning. Trigger: An event is 7 days away with no educator assigned. This is the primary signal for managers to act on availability gaps before they become critical."
       - "Elements: Category 3 — Event Starting Soon. Trigger: An assigned event starts in 1 hour."
       - "Elements: Category 4 — Failed Educator Check-In. Trigger: Educator has not completed geolocated check-in by event start time."
@@ -90,11 +90,12 @@ core_content:
       - "Elements: FAQ list displaying questions and expandable answers (collapsible accordion)."
       - "Elements: Search or filter input to find relevant FAQ entries."
       - "Elements: Contact Information — support email (with mailto: link) and support phone number."
-      - "Functionality: FAQ content is managed by Trial Client Staff — displayed here as read-only."
+      - "Functionality: FAQ content is managed by Organization Admin — displayed here as read-only."
       - "Functionality: FAQs are the same content set pushed to field educators, providing consistency across roles."
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §6.2 — FAQs and Contact Information (support email, phone)"
+
 
   - section_title: "Logout"
     points:
@@ -110,7 +111,7 @@ assumptions:
   - "Notification delivery supports in-app and email. Push notifications are assumed but not explicitly specified in the source material for this role."
   - "The 7-day unstaffed warning triggers once per event, not daily."
   - "Failed check-in notification triggers at event start time, not before."
-  - "FAQ content syncs from the Trial Client Staff-managed help resources — no manual curation by managers."
+  - "FAQ content syncs from the Organization Admin-managed help resources — no manual curation by managers."
   - "'Contact Support' links to an email or external support system — specifics TBD."
   - "Notification preferences are stored per-manager and persist across sessions."
   - "The effectiveness of the Unstaffed Events Warning (Category 2) depends on educators maintaining their availability in-app. The manager notification system's value degrades if educator availability data is stale. Pinging educators to update availability is a mobile-app concern, but managers benefit directly from fresh availability data."
@@ -124,6 +125,7 @@ implications:
   - "Frontend: Each notification type should include a brief description of its trigger condition alongside the toggle."
   - "Backend: Notification preferences API must support per-category, per-manager storage and retrieval."
   - "Backend: Notification trigger engine must evaluate 5 distinct conditions and respect manager preferences before dispatching."
-  - "Backend: FAQ content endpoint must serve the same content managed by Trial Client Staff in the Brand Assets settings."
+  - "Backend: FAQ content endpoint must serve the same content managed by Organization Admin in the Brand Assets settings."
   - "Architecture: Notification reliability is operationally critical — consider delivery confirmation and retry mechanisms."
   - "Architecture: The notification system is a shared service across roles — Educator Manager preferences are one consumer of a broader notification infrastructure."
+  - "Architecture: Notification emission must be decoupled from delivery channels — business code calls notificationService.send(notification), not individual channel APIs. Channel routing is handled by the notification infrastructure based on user preferences."

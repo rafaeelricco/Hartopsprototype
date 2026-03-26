@@ -1,9 +1,9 @@
 # =============================================================================
-# UI & FEATURE MENTAL MODEL — Hart Ops Platform Reports & Data Quality
+# UI & FEATURE MENTAL MODEL — Operators Platform Reports & Data Quality
 # =============================================================================
 
 id: "mm-ui-005"
-title: "Hart Ops Platform Reports & Data Quality"
+title: "Operators Platform Reports & Data Quality"
 status: "draft"
 
 dependencies:
@@ -16,7 +16,7 @@ context: |
   Reports and Data Quality provide evidence of whether the SaaS model is working. The Data
   Quality Score is Hart's primary KPI — a platform-wide percentage measuring completeness of
   photos, questions, and inventory data. This screen answers the strategic question: "Is
-  the data coming in good enough to prove value to clients?" As a Hart Ops administrator,
+  the data coming in good enough to prove value to clients?" As a Operators administrator,
   I need to see platform-wide performance metrics and identify organizations with poor
   data quality so I can drive the quality feedback loop.
 
@@ -27,26 +27,26 @@ scope:
     - "PDF and Excel export functionality"
     - "Quality feedback loop identification mechanism"
   out_of_scope:
-    - "Organization-level internal reports (tenant-side responsibility)"
+    - "Organization-level internal reports (org-side responsibility)"
     - "Financial or revenue reporting (not specified in source)"
     - "Data quality remediation workflows (what happens after identifying poor quality)"
     - "Educator-level quality metrics detail (see Educator Mobile Experience)"
 
 key_concepts:
   - term: "Data Quality Score"
-    definition: "A platform-wide percentage calculated by aggregating completeness of three data dimensions — Photos, Questions, and Inventory — across all events and organizations. The primary KPI for Hart Ops."
+    definition: "A platform-wide percentage calculated by aggregating completeness of three data dimensions — Photos, Questions, and Inventory — across all events and organizations. The primary KPI for Operators."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§5 Platform Reports & Data Quality — Data Quality Score"
   - term: "Trend Indicator"
     definition: "A visual element on the Data Quality overview showing whether an organization's quality score is improving, declining, or stable over time."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§5 Platform Reports & Data Quality — Data Quality Score"
   - term: "Top Performers"
     definition: "Ranked tables in the Reports Dashboard showing the highest-performing Clients, Campaigns, and Educators across the platform."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§5 Platform Reports & Data Quality — Reports Dashboard"
 
 core_content:
@@ -58,7 +58,7 @@ core_content:
       - "Functionality: Platform-wide stats available for export as PDF or Excel."
       - "Design principle: Reports provide the evidence layer — they must be clear enough to share with stakeholders without additional explanation."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§5 Platform Reports & Data Quality — Reports Dashboard"
 
   - section_title: "Data Quality Score"
@@ -69,17 +69,17 @@ core_content:
       - "Functionality: Score is calculated platform-wide and then broken down per organization and per campaign."
       - "Functionality: Score loads on landing — no user action required to see the primary metric."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§5 Platform Reports & Data Quality — Data Quality Score"
 
   - section_title: "Quality Feedback Loop"
     points:
       - "Functionality: Data Quality Score is the primary mechanism for Hart to identify poor-quality submissions at scale."
-      - "Functionality: Per-organization trend indicators enable Hart Ops to spot declining quality before it becomes systemic."
+      - "Functionality: Per-organization trend indicators enable Operators to spot declining quality before it becomes systemic."
       - "Design principle: The score is not just a metric — it is an actionable trigger. Low scores should draw attention and prompt investigation."
       - "Assumption: The feedback loop's 'action' step (contacting the org, requiring resubmission) happens outside this screen."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§5 Platform Reports & Data Quality — Data Quality Score — Rationale"
 
 assumptions:

@@ -29,13 +29,13 @@ scope:
   in_scope:
     - "Event status definitions (7 states)"
     - "State transition rules with triggers and guard conditions"
-    - "Event intake and routing from Trial Client Staff to Educator Manager"
+    - "Event intake and routing from Organization Admin to Educator Manager"
     - "UI behavior per state (visible elements, available actions)"
     - "Notification mapping per state transition"
     - "Multi-educator state handling"
     - "Cancellation branches (educator cancel vs event cancel)"
   out_of_scope:
-    - "Event creation workflow (Trial Client Staff responsibility)"
+    - "Event creation workflow (Organization Admin responsibility)"
     - "Educator mobile app data entry flows"
     - "Report generation downstream of finalization"
     - "Campaign management"
@@ -64,7 +64,7 @@ key_concepts:
 core_content:
   - section_title: "Event Intake & Routing"
     points:
-      - "Trigger: Trial Client Staff creates an event, assigns it to an account master, and sets the event details (products, instructions, goals, compensation)."
+      - "Trigger: Organization Admin creates an event, assigns it to an account master, and sets the event details (products, instructions, goals, compensation)."
       - "Step 1: System identifies the account master's geographic assignment and routes the event to the corresponding Educator Manager."
       - "Step 2: Manager receives a 'New Events Available' notification (Category 1)."
       - "Step 3: Event appears in the manager's Events List with status 'Unassigned'."
@@ -88,7 +88,7 @@ core_content:
       - "Status: Confirmed — Educator has accepted the assignment. Event is fully staffed. Appears in 'Upcoming' list with 'Confirmed' badge. Available actions: Reassign, Cancel Educator."
       - "Status: Live — Event's scheduled start time has arrived. Auto-triggered by system clock. Live data streaming from educator's mobile app. Appears in 'Live Events' list. Manager monitors in read-only mode. Available action: none (monitoring only)."
       - "Status: Completed — Event has ended. Educator has checked out or event duration has elapsed. Educator's 24-hour post-event editing window begins. Appears in 'Completed' list. Available action: Approve & Finalize."
-      - "Status: Finalized — Manager clicked 'Approve & Finalize'. Irreversible. Event locked for all actors (manager, educator, Trial Client Staff). Educator's editing window terminated immediately. Data pipeline proceeds to reporting. Appears in 'Completed' list with 'Finalized' badge. No further actions available."
+      - "Status: Finalized — Manager clicked 'Approve & Finalize'. Irreversible. Event locked for all actors (manager, educator, Organization Admin). Educator's editing window terminated immediately. Data pipeline proceeds to reporting. Appears in 'Completed' list with 'Finalized' badge. No further actions available."
       - "Status: Cancelled — Event itself cancelled (retailer cancellation, weather, or other external factor). Terminal state distinct from educator cancellation. Removed from active lists. No further actions available."
     sources:
       - doc: "PDF-EM"
@@ -102,7 +102,7 @@ core_content:
 
   - section_title: "State Transitions"
     points:
-      - "Transition: [New] → Unassigned. Trigger: Trial Client Staff creates event within manager's geographic scope. Manager action: none (automatic routing). Notification: Category 1 — New Events Available."
+      - "Transition: [New] → Unassigned. Trigger: Organization Admin creates event within manager's geographic scope. Manager action: none (automatic routing). Notification: Category 1 — New Events Available."
       - "Transition: Unassigned → Assigned (Pending). Trigger: Manager selects and assigns an educator. Manager action: Assign Educator. Notification: Push notification sent to educator as suggested opportunity."
       - "Transition: Assigned (Pending) → Confirmed. Trigger: Educator accepts assignment in mobile app. Manager action: none (automatic). Notification: none (status badge updates in near real-time)."
       - "Transition: Assigned (Pending) → Unassigned. Trigger: Educator declines assignment in mobile app. Manager action: none (automatic revert). Notification: Decline notification to manager; event re-appears on 'Events Requiring Attention' dashboard card."
@@ -179,4 +179,4 @@ implications:
   - "Backend: Status transitions must trigger the appropriate notifications."
   - "Backend: Account master geography lookup must be performant — used on every event creation to determine manager routing."
   - "Architecture: Consider event-sourcing pattern for the lifecycle state machine to maintain a complete audit trail of all transitions."
-  - "Architecture: The state machine is shared across roles — educator mobile app and Trial Client Staff web app both read event status, but only specific roles can trigger specific transitions."
+  - "Architecture: The state machine is shared across roles — educator mobile app and Organization Admin web app both read event status, but only specific roles can trigger specific transitions."

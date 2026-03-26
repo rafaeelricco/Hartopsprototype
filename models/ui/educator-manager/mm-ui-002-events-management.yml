@@ -17,7 +17,7 @@ dependencies:
 
 context: |
   Educator Managers do not create events — they receive assigned events from
-  Trial Client Staff and manage them through their lifecycle: staffing educators
+  Organization Admin and manage them through their lifecycle: staffing educators
   before the event, monitoring live execution during the event, and finalizing
   the record after the event. Cancellations and reassignments are a normal part
   of operations (weather, illness, retailer cancellations) and require a defined
@@ -38,11 +38,11 @@ scope:
     - "Post-Event Review and Finalization workflow"
     - "Speed-to-Finalize workflow for weekend event clusters"
   out_of_scope:
-    - "Event creation (Trial Client Staff responsibility)"
-    - "Campaign management (Trial Client Staff responsibility)"
+    - "Event creation (Organization Admin responsibility)"
+    - "Campaign management (Organization Admin responsibility)"
     - "Educator mobile app data entry (see Educator Mobile Experience)"
     - "Report generation and analytics (downstream of finalization)"
-    - "Out-of-platform scheduling negotiation (phone/text)"
+    - "Out-of-platform scheduling (phone/text)"
 
 key_concepts:
   - term: "Event Finalization"
@@ -70,7 +70,7 @@ key_concepts:
       - doc: "DEMO"
         details: "~00:33:48"
   - term: "Account Master"
-    definition: "A structured venue/location entity maintained by Hart Ops. Events are tied to account masters, not free-text addresses. Account masters carry geographic assignment, channel type (on-premise/off-premise), chain membership, and distributor identifiers. The account master's geography determines which Educator Manager receives the event."
+    definition: "A structured venue/location entity maintained by Operators. Events are tied to account masters, not free-text addresses. Account masters carry geographic assignment, channel type (on-premise/off-premise), chain membership, and distributor identifiers. The account master's geography determines which Educator Manager receives the event."
     sources:
       - doc: "DC2"
         details: "~00:04:49 — account hierarchy with geography, channel, chain categorization"
@@ -78,7 +78,7 @@ key_concepts:
 core_content:
   - section_title: "Event Intake & Routing"
     points:
-      - "Summary: Events arrive fully defined from Trial Client Staff, auto-populate in the manager's list based on account geography, and are ready for educator assignment. No accept/acknowledge step required."
+      - "Summary: Events arrive fully defined from Organization Admin, auto-populate in the manager's list based on account geography, and are ready for educator assignment. No accept/acknowledge step required."
       - "Design principle: Events arrive ready for educator assignment. The manager's primary action on intake is staffing, not configuration."
     sources:
       - doc: "DC1"
@@ -113,7 +113,7 @@ core_content:
     points:
       - "Entry Point: Clicking an Upcoming event from the Events List or Calendar."
       - "Elements: Event Name, Location, date/time, and assigned educator (always visible)."
-      - "Elements: Product Section — product images and details set by Trial Client Staff (read-only)."
+      - "Elements: Product Section — product images and details set by Organization Admin (read-only)."
       - "Elements: Event Instructions — setup details, parking info, WiFi credentials (read-only)."
       - "Elements: Event Kit/Materials — pickup details and list of materials required (read-only)."
       - "Elements: Event Goals — number of samples, sales targets, focus area (read-only)."
@@ -121,7 +121,7 @@ core_content:
       - "Elements: Contact Info — Educator Manager contact details AND Store/Bar manager contact details (name, phone with tel link, email with mailto link)."
       - "Elements: Educator Assignment section with CTA to assign or reassign an educator."
       - "Elements: Educator availability reference panel showing the selected educator's in-app availability."
-      - "Functionality: Manager cannot edit event details (products, instructions, goals) — read-only from Trial Client Staff."
+      - "Functionality: Manager cannot edit event details (products, instructions, goals) — read-only from Organization Admin."
       - "Design principle: Pre-event focus is entirely on staffing — ensuring the right educator is confirmed for the event."
     sources:
       - doc: "PDF-EM"
@@ -145,7 +145,7 @@ core_content:
       - "Functionality: If educator is already assigned — display educator name, photo, contact info, and 'Reassign' button."
       - "Functionality: Educators are not employees — assignment is a suggestion they can accept or reject. Final confirmation may still require out-of-platform contact in Phase 1."
       - "Functionality: Reassignment replaces the current educator and notifies both the outgoing and incoming educator."
-      - "Functionality: Availability reference reduces but does not eliminate phone/text coordination — full scheduling negotiation remains external in Phase 1."
+      - "Functionality: Availability reference reduces but does not eliminate phone/text coordination — full scheduling remains external in Phase 1."
       - "Step 5: After manager confirms assignment, system sends the event as a suggested opportunity to the educator via mobile app notification."
       - "Functionality: Event displays educator assignment status — Pending Acceptance (awaiting educator response), Accepted (educator confirmed), Declined (educator rejected)."
       - "Functionality: If educator declines, manager receives a notification and the event returns to 'Unassigned' status, re-appearing on the dashboard 'Events Requiring Attention' card."
@@ -216,7 +216,7 @@ core_content:
       - "Elements: Photo gallery of event photos submitted by the educator."
       - "Elements: 'Approve & Finalize' CTA button — prominent, high-contrast styling."
       - "Functionality: Finalization is irreversible — no undo mechanism in Phase 1."
-      - "Functionality: Finalization locks the event record for all actors (manager, educator, Trial Client Staff)."
+      - "Functionality: Finalization locks the event record for all actors (manager, educator, Organization Admin)."
       - "Functionality: Finalization terminates the educator's 24-hour post-event editing window immediately."
       - "Functionality: Speed-to-Finalize — events cluster on weekends; managers need efficient batch review on Monday."
       - "Elements: Pre & post event inventory comparison — shows starting vs ending inventory levels side by side."
@@ -256,12 +256,12 @@ assumptions:
   - "The transition from Upcoming to Live happens automatically when the event's scheduled date/time arrives."
   - "Live Data Feed phase shows partial/incoming data in near real-time."
   - "Finalization is irreversible — no undo mechanism in Phase 1."
-  - "Managers see only events assigned to their scoped set of educators, not all tenant events."
+  - "Managers see only events assigned to their scoped set of educators, not all org events."
   - "The 24-hour educator editing window countdown starts at event completion, not at finalization."
   - "Cancellation reasons are categorized (weather, illness, car accident, retailer-initiated, other) for scoring accuracy."
   - "Educator acceptance/rejection of assignments is tracked in-platform with status indicators (Pending/Accepted/Declined), though initial negotiation may still involve phone/text coordination in Phase 1."
   - "Events are routed to managers based on account geography — the account master's geographic assignment determines which manager receives the event notification."
-  - "Event details are fully defined (solidified) by Trial Client Staff before the event is sent to the manager for educator assignment."
+  - "Event details are fully defined (solidified) by Organization Admin before the event is sent to the manager for educator assignment."
   - "Educator scoring is an aggregate metric derived from: event completion rate, punctuality, cancellation history, sales performance, and ratings. Exact formula TBD."
   # NOTE: Duplicate assumptions about geography routing and educator acceptance removed (already covered in lines above).
   - "Educator employment classification: The platform models the educator relationship as contractor-like (suggested opportunities, accept/reject) regardless of legal classification."

@@ -25,9 +25,9 @@ scope:
     - "Photo Proof Gallery for venue intelligence"
     - "Export functionality — PDF and CSV formats"
   out_of_scope:
-    - "Dashboard-level stat cards (covered in mm-ui-001)"
-    - "Individual event report detail view (covered in mm-ui-004)"
-    - "Report configuration during event creation (covered in mm-ui-003)"
+    - "Dashboard-level stat cards"
+    - "Individual event report detail view"
+    - "Report configuration during event creation"
     - "Custom report builder or ad-hoc query tools"
 
 key_concepts:

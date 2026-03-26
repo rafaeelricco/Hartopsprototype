@@ -17,7 +17,7 @@ dependencies:
     - "mm-ui-006"
 
 context: |
-  Educator Managers are granted platform access by Trial Client Staff or Hart Ops
+  Educator Managers are granted platform access by Organization Admin or Operators
   staff — they cannot self-register. Once authenticated, they land on an
   action-oriented dashboard that answers "What needs my attention right now?"
   As an Educator Manager, I need a dashboard that immediately surfaces events
@@ -26,14 +26,14 @@ context: |
 
 scope:
   in_scope:
-    - "Invitation activation flow triggered by Trial Client Staff"
+    - "Invitation activation flow triggered by Organization Admin"
     - "Sign In with email and password"
     - "Forgot Password and reset flow"
     - "Shared authentication layout"
     - "Side navigation structure"
     - "Dashboard as default landing page with 3 stat cards"
   out_of_scope:
-    - "Self-registration — access is controlled via invitation by Trial Client Staff or Hart Ops"
+    - "Self-registration — access is controlled via invitation by Organization Admin or Operators"
     - "MFA/2FA"
     - "Session management and token refresh mechanics"
     - "Event detail views"
@@ -43,7 +43,7 @@ scope:
 
 key_concepts:
   - term: "Invitation Activation"
-    definition: "A one-time URL sent via email by Trial Client Staff that allows a new Educator Manager to set their password and activate their account. The manager cannot self-register."
+    definition: "A one-time URL sent via email by Organization Admin that allows a new Educator Manager to set their password and activate their account. The manager cannot self-register."
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §1.1"
@@ -54,7 +54,7 @@ key_concepts:
       - doc: "PDF-EM"
         details: "Educator Managers §3"
   - term: "Scoped Data View"
-    definition: "Educator Managers see only their assigned educators and events, not entire tenant data. This scoping applies to all dashboard metrics and navigation targets."
+    definition: "Educator Managers see only their assigned educators and events, not entire org data. This scoping applies to all dashboard metrics and navigation targets."
     sources:
       - doc: "MM8"
         details: "Implications — Scoped data views"
@@ -73,7 +73,7 @@ core_content:
 
   - section_title: "Invitation Activation Flow"
     points:
-      - "Entry Point: Trial Client Staff or Hart Ops staff sends an invitation email containing an activation link."
+      - "Entry Point: Organization Admin or Operators staff sends an invitation email containing an activation link."
       - "Step 1: Manager clicks activation link → Activation screen loads with password creation form."
       - "Step 2: Manager sets password → System validates password complexity → Redirect to Sign In."
       - "Validation: Expired activation link displays a 'Contact your administrator' error message."
@@ -141,12 +141,12 @@ core_content:
         details: "~00:25:09 — availability gaps surfaced to managers so they can act on unstaffed slots"
 
 assumptions:
-  - "Educator Managers cannot self-register — must be invited by Trial Client Staff."
+  - "Educator Managers cannot self-register — must be invited by Organization Admin."
   - "Password complexity rules match other platform roles (minimum 8 characters, 1 uppercase, 1 number, 1 special character)."
   - "Activation link expiration duration will be defined during implementation."
   - "Session tokens are issued upon successful sign-in (mechanism not specified in source)."
   - "Rate limiting on sign-in attempts is expected but not explicitly defined in source material."
-  - "Dashboard data is scoped to the manager's assigned slice — not aggregated across the entire tenant."
+  - "Dashboard data is scoped to the manager's assigned slice — not aggregated across the entire org."
   - "Default stat card values are zero for newly activated managers with no assigned events."
   - "Educator Manager Sign In does not include a 'Remember Me' option in Phase 1 — Operating Staff Sign In does (PDF-OS §1.2). Consider adding for parity in future phases."
 
@@ -160,4 +160,4 @@ implications:
   - "Backend: Activation and reset tokens must be single-use with server-side expiration tracking."
   - "Backend: Authentication must distinguish between 'invalid credentials' and 'inactive account' states."
   - "Backend: Dashboard API must support manager-scoped queries — filtering by the authenticated manager's assigned educators and events."
-  - "Architecture: Scoped data views require tenant-and-manager-level filtering at the API layer, not just the frontend."
+  - "Architecture: Scoped data views require org-and-manager-level filtering at the API layer, not just the frontend."

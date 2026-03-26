@@ -28,7 +28,7 @@ models/
 - UI model IDs are scoped to their role directory: `ui/client-staff/mm-ui-001-dashboard-navigation.yml`, `ui/hart-ops/mm-ui-001-authentication.yml`, etc.
 - `depends_on` means "read before this model".
 - `feeds_into` means "read after this model".
-- Hart Ops UI models use the standard header:
+- Operators UI models use the standard header:
 
 ```yaml
 # =============================================================================
@@ -38,7 +38,7 @@ models/
 
 ## Dependency Graph
 
-Solid lines below come from explicit `depends_on` or `feeds_into` relationships in the files. Dotted lines indicate the parent experience model that gives a UI stream its context. Some Hart Ops and client-staff UI dependencies are still marked `TBD` in the source files and are therefore not shown as solid edges.
+Solid lines below come from explicit `depends_on` or `feeds_into` relationships in the files. Dotted lines indicate the parent experience model that gives a UI stream its context. Some Operators and client-staff UI dependencies are still marked `TBD` in the source files and are therefore not shown as solid edges.
 
 ```mermaid
 graph TD
@@ -46,8 +46,8 @@ graph TD
   mm2 --> mm3["mm3 Current Campaign Operations"]
   mm3 --> mm4["mm4 Vision and Transformation Strategy"]
   mm4 --> mm5["mm5 Phase 1 Scope"]
-  mm5 --> mm6["mm6 Hart Ops Experience"]
-  mm6 --> mm7["mm7 Trial Client Staff Experience"]
+  mm5 --> mm6["mm6 Operators Experience"]
+  mm6 --> mm7["mm7 Organization Admin Experience"]
   mm7 --> mm8["mm8 Educator Manager Experience"]
   mm8 --> mm9["mm9 Educator Mobile Experience"]
   mm5 --> mm9
@@ -74,6 +74,8 @@ graph TD
     mgr2["mm-ui-002 Events Management"]
     mgr3["mm-ui-003 Educator Roster"]
     mgr4["mm-ui-004 Settings Notifications"]
+    mgr5["mm-ui-005 Account Management"]
+    mgr6["mm-ui-006 Event Lifecycle State Machine"]
   end
 
   subgraph EducatorMobile["ui/educator-mobile"]
@@ -112,10 +114,17 @@ graph TD
   mm8 -. context .-> mgr2
   mm8 -. context .-> mgr3
   mm8 -. context .-> mgr4
+  mm8 -. context .-> mgr5
+  mm8 -. context .-> mgr6
   mgr1 --> mgr2
   mgr1 --> mgr3
   mgr1 --> mgr4
   mgr3 --> mgr2
+  mgr1 --> mgr5
+  mgr5 --> mgr1
+  mgr1 --> mgr6
+  mgr2 --> mgr6
+  mgr6 --> mgr2
 
   em1 --> em2
   em2 --> em3

@@ -13,8 +13,8 @@ dependencies:
 
 context: |
   Educator Managers need self-service access to their own profile information
-  and password management. This is a minimal settings surface — managers are
-  coordinators, not administrators, so account management is limited to personal
+  and password management. This is a minimal settings surface — account management
+  is limited to personal
   profile data and credential updates. As an Educator Manager, I need to update
   my contact information and change my password so my team can reach me and my
   account stays secure.
@@ -27,13 +27,13 @@ scope:
   out_of_scope:
     - "Notification preferences"
     - "Help & Support"
-    - "Team management or inviting other users (Trial Client Staff responsibility)"
-    - "Organization-level settings (Trial Client Staff responsibility)"
-    - "Role or permission changes (Hart Ops responsibility)"
+    - "Team management or inviting other users (Organization Admin responsibility)"
+    - "Organization-level settings (Organization Admin responsibility)"
+    - "Role or permission changes (Operators responsibility)"
 
 key_concepts:
   - term: "Self-Service Profile"
-    definition: "Educator Managers can edit their own contact information (name, email, phone, photo) without requiring Hart Ops or Trial Client Staff intervention. This is the only area where the manager has write access to account data."
+    definition: "Educator Managers can edit their own contact information (name, email, phone, photo) without requiring Operators or Organization Admin intervention. This is the only area where the manager has write access to account data."
     sources:
       - doc: "PDF-EM"
         details: "Educator Managers §6.1 — Profile photo upload, Name, Email address, Phone Number (can be edited)"

@@ -1,5 +1,5 @@
 id: "mm7"
-title: "Trial Client Staff Experience"
+title: "Organization Admin Experience"
 status: "approved"
 
 dependencies:
@@ -26,7 +26,7 @@ scope:
     - "Brand Assets (product library + questionnaire templates)"
     - "Team management and help resources"
   out_of_scope:
-    - "Hart Ops platform administration (see Hart Ops Experience)"
+    - "Operators platform administration (see Operators Experience)"
     - "Educator Manager coordination (see Educator Manager Experience)"
     - "Educator mobile app experience (see Educator Mobile Experience)"
     - "Business model and industry context (see Business Model, Business Environment)"
@@ -59,7 +59,7 @@ key_concepts:
 core_content:
   - section_title: "Onboarding and Authentication"
     points:
-      - "Invitation-only via Hart Ops. After activation, redirects to sign-in page."
+      - "Invitation-only via Operators. After activation, redirects to sign-in page."
       - "Sign-in includes: Organization selector, email, password, company logo."
     sources:
       - doc: "Functionality PDF"
@@ -111,7 +111,7 @@ assumptions:
   - "The platform can reliably translate high-level business goals into concrete event execution steps."
   - "Campaign creation is intentionally simple (name + description only) — value lies in event configuration."
   - "Events might need to span multiple campaigns (flagged in Briefing Document)."
-  - "Educator availability entry is now in-platform (via the mobile Availability tab); scheduling negotiation remains external."
+  - "Educator availability entry is now in-platform (via the mobile Availability tab); scheduling remains external."
 
 implications:
   - "The event creation wizard is the single most complex and differentiating workflow."

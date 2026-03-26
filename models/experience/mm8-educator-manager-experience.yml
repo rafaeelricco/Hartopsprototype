@@ -9,10 +9,10 @@ dependencies:
     - "mm9"
 
 context: |
-  Educator Managers are the coordination layer between Trial Client Staff and field
+  Educator Managers are the coordination layer between Organization Admin and field
   educators. They do not create events or campaigns — they receive assigned events,
   ensure educators are staffed, monitor live execution, and finalize completed events.
-  Scheduling negotiation (accepting, declining, rescheduling) still happens outside the
+  Scheduling (accepting, declining, rescheduling) still happens outside the
   platform via phone and text, but educators now maintain availability in-app via the
   Availability tab, reducing the "phone tag" cycle for initial availability checks.
 
@@ -24,8 +24,8 @@ scope:
     - "Educator roster management and performance stats"
     - "Notification preferences and settings"
   out_of_scope:
-    - "Trial client operator experience (see Trial Client Staff Experience)"
-    - "Hart Ops platform administration (see Hart Ops Experience)"
+    - "Trial client operator experience (see Organization Admin Experience)"
+    - "Operators platform administration (see Operators Experience)"
     - "Educator mobile app experience (see Educator Mobile Experience)"
     - "Phase 1 feature boundaries (see Phase 1 Scope)"
     - "Out-of-platform scheduling coordination (phone/text between managers and educators)"
@@ -46,7 +46,7 @@ key_concepts:
       - doc: "Chris, Demo Meeting"
         details: "~01:09:06"
   - term: "Digital Availability"
-    definition: "Educators maintain day-level and time-slot-level availability via the mobile app's Availability tab. This is now implemented, reducing reliance on phone/text for initial availability checks. Full scheduling negotiation (accept/decline/reschedule) remains external."
+    definition: "Educators maintain day-level and time-slot-level availability via the mobile app's Availability tab. This is now implemented, reducing reliance on phone/text for initial availability checks. Full scheduling (accept/decline/reschedule) remains external."
     sources:
       - doc: "Chris, Intro Meeting"
         details: "~00:33:48"
@@ -54,7 +54,7 @@ key_concepts:
 core_content:
   - section_title: "Authentication and Navigation"
     points:
-      - "Invitation-only via email link from Trial Client Staff."
+      - "Invitation-only via email link from Organization Admin."
       - "Side navigation: Dashboard (default), Events, Educators, Settings."
       - "Navigation designed to be future-proof (Analytics, Training sections anticipated)."
     sources:
@@ -89,21 +89,21 @@ core_content:
   - section_title: "Settings and Notifications"
     points:
       - "Most granular notification set: new events, unstaffed (7 days), starting in 1 hour, failed check-in, ready for review."
-      - "Help & Support: consumes FAQs managed by Trial Client Staff."
+      - "Help & Support: consumes FAQs managed by Organization Admin."
     sources:
       - doc: "Functionality PDF"
         details: "Educator Managers §6.1, §6.2"
 
 assumptions:
-  - "Educator Managers cannot self-register — must be invited by Trial Client Staff."
-  - "Scheduling negotiation (accept/decline/reschedule) stays outside the platform in Phase 1, but educators now enter availability in-app."
+  - "Educator Managers cannot self-register — must be invited by Organization Admin."
+  - "Scheduling (accept/decline/reschedule) stays outside the platform in Phase 1, but educators now enter availability in-app."
   - "Managers require a 'Speed-to-Finalize' workflow (events cluster on weekends)."
   - "Finalization is irreversible — no undo mechanism in Phase 1."
-  - "Managers see only their scoped slice (their educators and events, not entire tenant data)."
+  - "Managers see only their scoped slice (their educators and events, not entire org data)."
 
 implications:
   - "Finalization is the bottleneck of the data pipeline — reporting depends on managers closing events."
-  - "Scoped data views require distinct Information Architecture with strict tenant-and-manager-level scoping."
+  - "Scoped data views require distinct Information Architecture with strict org-and-manager-level scoping."
   - "The platform-vs-phone boundary is a Phase 1 design choice — architecture must support later in-app messaging."
-  - "Managers are coordinators, not administrators (limited Edit Educator capability)."
+  - "Managers have limited editing capability: they can update educator contact details (phone, email), assign educators to events, and finalize events. They cannot modify educator profiles, status, certifications, or account settings."
   - "Notification reliability is the primary driver of platform engagement."

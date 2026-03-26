@@ -29,9 +29,9 @@ scope:
     - "Post-event review and 24-hour editing window"
     - "Offline mode"
   out_of_scope:
-    - "Trial client staff event configuration (see Trial Client Staff Experience)"
+    - "Trial client staff event configuration (see Organization Admin Experience)"
     - "Educator Manager coordination and finalization (see Educator Manager Experience)"
-    - "Hart Ops platform administration (see Hart Ops Experience)"
+    - "Operators platform administration (see Operators Experience)"
     - "Business model and transformation strategy (see Business Model)"
     - "Phase 1 delivery scope (see Phase 1 Scope)"
 
@@ -78,7 +78,7 @@ core_content:
   - section_title: "Availability & Calendar"
     points:
       - "Primary tab with calendar-based availability management."
-      - "Educators toggle day-level and time-slot-level (Morning/Afternoon/Evening) availability."
+      - "Educators toggle day-level availability and specify hour ranges when they are available."
       - "Visual indicators: teal dots for available days, burgundy dots for days with assigned events."
       - "Contextual reminder notifications nudge educators to keep availability up to date."
       - "Weekly summary in header shows at-a-glance availability status."
@@ -129,8 +129,8 @@ core_content:
         details: "~27:19, ~10:42"
   - section_title: "Sales Tracking, Venue Survey, and Brand Education"
     points:
-      - "Sales Tracking: manual product-level counter with campaign-preloaded products (CampaignProduct[]). Tap-to-count per product with venue-specific labels (on-premise = 'drinks served', off-premise = 'bottles sold'). No AI/AR/camera — purely manual. Campaign origin banner shows product source."
-      - "Venue Survey (renamed from Venue Intelligence): structured multi-phase flow replacing simple photo capture. Camera phase with 8 photo categories (shelf, backbar, cooler, menu, cold-box, window, display, other). AI-assisted product detection overlay with bounding boxes. Account profile tracking (displays, cold boxes, coolers, windows, confirmed products with facings/prices). Voice-note integration. Quick capture with deferred review."
+      - "Sales Tracking: manual product-level counter with campaign-preloaded products. Tap-to-count per product with venue-specific labels (on-premise = 'drinks served', off-premise = 'bottles sold'). No AI/AR/camera — purely manual. Campaign origin banner shows product source."
+      - "Venue Survey (renamed from Venue Intelligence): structured multi-phase flow replacing simple photo capture. Camera phase with configurable photo categories (e.g., shelf, display, menu — categories are org-configurable to support different industries). AI-assisted product detection overlay with bounding boxes. Account profile tracking (configurable venue attributes and confirmed products with facings/prices). Voice-note integration. Quick capture with deferred review."
       - "Brand Education: per-brand collapsible content sections (serving instructions, brand scripts, setup info, product info). Multi-brand tab navigation. Accessible from both pre-event details and live event dashboard."
       - "Product Feedback: not yet implemented (flavor sliders, A/B comparison planned for future)."
     sources:
@@ -151,7 +151,7 @@ core_content:
         details: "venue-intelligence-card.tsx, image-recognition-overlay.tsx, useSmartNotifications hook"
   - section_title: "Brand Education"
     points:
-      - "Per-brand collapsible content sections: serving instructions, brand scripts, setup information, product info (BrandEducationContent type with BrandEducationItem[] items)."
+      - "Per-brand collapsible content sections (org-configurable — e.g., serving instructions, brand scripts, setup information, product info). Section types are not hardcoded."
       - "Multi-brand tab navigation when the event includes multiple brands."
       - "Dual entry points: accessible from both pre-event details screen (preparation context) and live event dashboard (Brand Guide quick-access button)."
       - "Content is read-only — determined by the campaign's brandEducation configuration on EventInfo."

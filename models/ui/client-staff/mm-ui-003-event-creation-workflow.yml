@@ -28,10 +28,10 @@ scope:
     - "Step 4: Advanced Customization modules"
     - "Objective-to-Data-Module mapping logic"
   out_of_scope:
-    - "Event monitoring and lifecycle after creation (covered in mm-ui-004)"
+    - "Event monitoring and lifecycle after creation"
     - "Educator mobile app experience"
-    - "Report generation post-event (covered in mm-ui-005)"
-    - "Campaign selection prior to event creation (covered in mm-ui-002)"
+    - "Report generation post-event"
+    - "Campaign selection prior to event creation"
 
 key_concepts:
   - term: "Report-First Approach"

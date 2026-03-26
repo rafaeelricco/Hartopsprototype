@@ -1,9 +1,9 @@
 # =============================================================================
-# UI & FEATURE MENTAL MODEL — Hart Ops Navigation & Sidebar
+# UI & FEATURE MENTAL MODEL — Operators Navigation & Sidebar
 # =============================================================================
 
 id: "mm-ui-002"
-title: "Hart Ops Navigation & Sidebar"
+title: "Operators Navigation & Sidebar"
 status: "draft"
 
 dependencies:
@@ -13,10 +13,10 @@ dependencies:
     - "TBD — to be filled manually"
 
 context: |
-  The sidebar is Hart Ops' strategic command center — each navigation item maps to a
-  strategic question: "How are my tenants doing?" (Organizations), "What's happening now?"
+  The sidebar is Operators' strategic command center — each navigation item maps to a
+  strategic question: "How are my orgs doing?" (Organizations), "What's happening now?"
   (Events). The Dashboard is the default landing page, designed to deliver situational
-  awareness in seconds. As a Hart Ops administrator, I need a persistent navigation
+  awareness in seconds. As a Operators administrator, I need a persistent navigation
   structure so I can quickly switch between platform monitoring concerns.
 
 scope:
@@ -25,21 +25,21 @@ scope:
     - "Navigation items and their mapping to platform sections"
     - "Dashboard landing page with stat cards and growth chart"
   out_of_scope:
-    - "Detail pages for Organizations (see mm-ui-003)"
-    - "Cross-org event monitoring detail (see mm-ui-004)"
-    - "Reports and data quality detail (see mm-ui-005)"
+    - "Detail pages for Organizations"
+    - "Cross-org event monitoring detail"
+    - "Reports and data quality detail"
     - "Responsive/mobile sidebar behavior (not specified in source)"
 
 key_concepts:
   - term: "Stat Card"
     definition: "A compact visual tile on the Dashboard that displays a single key metric with its label and value. Five stat cards provide at-a-glance platform health."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§2 Navigation & Sidebar — Dashboard"
   - term: "Platform Growth Chart"
     definition: "A chart on the Dashboard visualizing platform growth trends over time. Specific chart type and data granularity not detailed in source."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§2 Navigation & Sidebar — Dashboard"
 
 core_content:
@@ -50,7 +50,7 @@ core_content:
       - "Elements: Main content area occupies the remaining horizontal space to the right of the sidebar."
       - "Design principle: The sidebar is always visible — no hamburger menu or collapsible state specified for desktop."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§2 Navigation & Sidebar — Shared Layout"
 
   - section_title: "Navigation Items"
@@ -62,7 +62,7 @@ core_content:
       - "Functionality: Settings — links to team management and profile screens."
       - "Design principle: Each nav item maps to a strategic question Hart needs answered — navigation is organized by concern, not by data entity."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§2 Navigation & Sidebar"
 
   - section_title: "Dashboard Landing Page"
@@ -70,9 +70,9 @@ core_content:
       - "Elements: Five stat cards — Total Orgs, Active Events, Top Orgs, Recent Events, Platform Growth chart."
       - "Functionality: Dashboard loads as the default page after successful authentication."
       - "Functionality: Stat cards display real-time or near-real-time platform metrics."
-      - "Design principle: Situational awareness in seconds — a Hart Ops user should understand platform state immediately upon login without clicking into any section."
+      - "Design principle: Situational awareness in seconds — a Operators user should understand platform state immediately upon login without clicking into any section."
     sources:
-      - doc: "Hart Ops Super Admin Spec"
+      - doc: "Operators Super Admin Spec"
         details: "§2 Navigation & Sidebar — Dashboard"
 
 assumptions:
@@ -86,5 +86,5 @@ implications:
   - "Frontend: Sidebar must be a persistent layout shell component that wraps all authenticated routes."
   - "Frontend: Dashboard requires five distinct stat card components — some display single values, others display ranked lists or charts."
   - "Frontend: The Platform Growth chart requires a charting library or component."
-  - "Backend: Dashboard API must aggregate metrics across all organizations efficiently — this is a cross-tenant query."
+  - "Backend: Dashboard API must aggregate metrics across all organizations efficiently — this is a cross-org query."
   - "Backend: 'Top Orgs' ranking criteria needs definition (by event count? by data quality? by activity?)."
