@@ -4,10 +4,10 @@ This directory holds the source design system artifacts for the Hart Ops project
 
 ## File Map
 
-| File               | Purpose                                                                                                    | Primary Audience                 |
-| :----------------- | :--------------------------------------------------------------------------------------------------------- | :------------------------------- |
-| `tokens.json`      | Machine-readable design tokens for colors, typography, spacing, components, images, and platform metadata. | Developers, scripts, AI agents   |
-| `design-system.md` | Human-readable design system reference covering visual rules, component guidance, and usage constraints.   | Designers, developers, AI agents |
+| File | Purpose | Primary Audience |
+| :--- | :------ | :--------------- |
+| `tokens.json` | Machine-readable design tokens for colors, typography, spacing, components, images, and platform metadata. | Developers, scripts, AI agents |
+| `design-system.md` | Human-readable design system reference covering visual rules, component guidance, and usage constraints. | Designers, developers, AI agents |
 
 ## Usage Guide
 

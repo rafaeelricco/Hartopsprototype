@@ -17,10 +17,8 @@ Mar 24, 2026
 **Joe Green:** Um, so we can get started.  
 **Stephanie Karamanoglou:** Mhm.  
 **Joe Green:** Um, before we we get into anything, we can just do a quick um quick round of of introduction so everyone knows um who's who and who we're speaking to. Um so yeah, we can go first. I'll kick things off. Um so my name is Joe Green. Um I'm one of the product leads at Amber. So working with um Chris uh very closely mapping out all the kind of features and functionalities and  
-**Larry Golus:** Just like
-
- 
-
+**Larry Golus:** Just like  
+   
  
 
 ### 00:00:51
@@ -31,10 +29,8 @@ Mar 24, 2026
 **Joe Green:** Um, so hand over to this  
 **Luis Galeas:** Hello. Hi, I'm uh Lewis. I'm the founder and the CEO of Amber. I have a very very technical background but a very commercially uh inclined background as well. Uh I did software engineering for 15 years. Uh have a background in physics. Uh and now I've uh I lead the company. Um and uh about the company, you know, we build quality software uh at record uh speed. Uh rough  
 **Rafael Ricco:** Yes. So hello everyone. My name is Rafael. I'm senior software engineer at Dumbar and I have been working with Louis almost year I guess something around 10 months and here I'm contributing with uh creating designs uh front ends back ends uh AI integrations everything related with the implementation and yes that's it I guess. Um, gentlemen Ethan.  
-**Ethan Brown:** Thanks. Uh I'm the lead engineer on this project and uh I am primarily focused on back
-
- 
-
+**Ethan Brown:** Thanks. Uh I'm the lead engineer on this project and uh I am primarily focused on back  
+   
  
 
 ### 00:01:58
@@ -59,10 +55,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** I'm I'm Stephanie Caramonagloo. I'm the new CMO.  
 **Leah Guidarelli:** go.  
 **Joe Green:** go.  
-**Stephanie Karamanoglou:** I just joined the company about three weeks ago. Uh so I'm very I'm still getting acquainted with um uh everyone's let's say what we're doing now with the new uh roll out of uh the platform.
-
- 
-
+**Stephanie Karamanoglou:** I just joined the company about three weeks ago. Uh so I'm very I'm still getting acquainted with um uh everyone's let's say what we're doing now with the new uh roll out of uh the platform.  
+   
  
 
 ### 00:03:10
@@ -71,10 +65,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** So I'm excited to hear uh from you guys what it is um is going on. more like an introduction. Uh yeah, and and I was speaking with Chris uh recently about, you know, the point everyone is now in terms of uh roll out and timelines and uh just new functionality that'll be enabled on the on the platform.  
 **Joe Green:** Awesome.  
 **Stephanie Karamanoglou:** Uh so I'm excited to learn more.  
-**Larry Golus:** I'm uh Larry Goolas. Been here with the company 32 years. Um date myself uh when there was no technology at all and we first started in the business. Uh and an educator wanted to get in touch with us. Uh myself and my partner had to carry around uh rolls of quarters. Um there were no cell phones, they only had pay phones and beepers. And uh that's how we started a long long long time ago. And as time went on and technology and uh the great things that uh makes our business run better, to give us a great chance to keep growing like we've been growing for the last 35 years Keat's been here.
-
- 
-
+**Larry Golus:** I'm uh Larry Goolas. Been here with the company 32 years. Um date myself uh when there was no technology at all and we first started in the business. Uh and an educator wanted to get in touch with us. Uh myself and my partner had to carry around uh rolls of quarters. Um there were no cell phones, they only had pay phones and beepers. And uh that's how we started a long long long time ago. And as time went on and technology and uh the great things that uh makes our business run better, to give us a great chance to keep growing like we've been growing for the last 35 years Keat's been here.  
+   
  
 
 ### 00:04:17
@@ -82,19 +74,15 @@ Mar 24, 2026
    
 **Joe Green:** Awesome.  
 **Larry Golus:** Uh looking forward to seeing what you guys have for us today.  
-**Joe Green:** Um yeah, I mean would love to hear the uh the story of uh what's happened over the last 30 years, but we'll we'll save that one for another time. Um but yes, so um we'll get started. As I say, Chris will I'm sure join um as soon as he can. Um, so what we're going to do today, um, we're gonna I'm gonna do a quick recap of, um, the I mean, I'm assuming, you know, you guys have a have a very high level view of the the project. So, we're just going to quickly do an overview of, um, what we're like focusing on for for phase one. There's obviously a few different iterations, and we'll get to the vision state in, you know, phase three, phase four, and beyond. But for phase one, just to recap a line on what we're aiming to deliver towards um where we are today in that in that process and um kind of how you can expect to be working with us uh over the coming months as we uh start to implement and roll out what we've created in phase one.
-
- 
-
+**Joe Green:** Um yeah, I mean would love to hear the uh the story of uh what's happened over the last 30 years, but we'll we'll save that one for another time. Um but yes, so um we'll get started. As I say, Chris will I'm sure join um as soon as he can. Um, so what we're going to do today, um, we're gonna I'm gonna do a quick recap of, um, the I mean, I'm assuming, you know, you guys have a have a very high level view of the the project. So, we're just going to quickly do an overview of, um, what we're like focusing on for for phase one. There's obviously a few different iterations, and we'll get to the vision state in, you know, phase three, phase four, and beyond. But for phase one, just to recap a line on what we're aiming to deliver towards um where we are today in that in that process and um kind of how you can expect to be working with us uh over the coming months as we uh start to implement and roll out what we've created in phase one.  
+   
  
 
 ### 00:05:29
 
    
-**Joe Green:** So, bit of scene saying and then I'm going to hand over to Raphael who's going to do some um some demos to talk through to show you and talk through some of the core flows we've been looking at. Um these are uh you know early stage prototypes. So we know you know from a brand and UI perspective they're certainly not perfect. The there's going to be um gaps in terms of features and functionalities um that you know we are very aware of. But uh at the moment we've been focusing on what those core journeys look like and um what's kind of most valuable um and uh um solving for the biggest needs essentially or the biggest problems that uh the users are having. So um hopefully uh that will come across when when you when you see them. Um but this is kind of first session get your thoughts get you up to speed and then moving forward we'll have uh I think some more focus sessions uh with all of you and then some other uh you know educators etc as well to to get some more kind of specific feedback on specific areas of the platform.
-
- 
-
+**Joe Green:** So, bit of scene saying and then I'm going to hand over to Raphael who's going to do some um some demos to talk through to show you and talk through some of the core flows we've been looking at. Um these are uh you know early stage prototypes. So we know you know from a brand and UI perspective they're certainly not perfect. The there's going to be um gaps in terms of features and functionalities um that you know we are very aware of. But uh at the moment we've been focusing on what those core journeys look like and um what's kind of most valuable um and uh um solving for the biggest needs essentially or the biggest problems that uh the users are having. So um hopefully uh that will come across when when you when you see them. Um but this is kind of first session get your thoughts get you up to speed and then moving forward we'll have uh I think some more focus sessions uh with all of you and then some other uh you know educators etc as well to to get some more kind of specific feedback on specific areas of the platform.  
+   
  
 
 ### 00:06:29
@@ -110,56 +98,44 @@ Mar 24, 2026
 **Luis Galeas:** Yeah, there he  
 **Joe Green:** cool. Hey Chris, sorry.  
 **Leah Guidarelli:** is.  
-**Joe Green:** We're just just doing a bit of scene setting um for the guys before we get into the demo.
-
- 
-
+**Joe Green:** We're just just doing a bit of scene setting um for the guys before we get into the demo.  
+   
  
 
 ### 00:07:34
 
    
-**Joe Green:** Um cool. So yeah, uh we want to test that with a couple of trial clients. And the the reason we do that in the the is to validate um that Hart's model can work as a configurable product. And the way we're going to help prove that model is creating a web platform for campaign and event management. So all uh creating events, configuring, editing, um assigning staff, reviewing results etc. All uh event related tasks. Um creating a mobile app for event execution. So educators can uh capture various data points um uh at the at the events themselves with um a variety of like AI assistance, offline support and some some kind of focused uh features that are required. uh piloting with those two uh those two trial clients um to make sure to validate that different organizations can configure the platform to their own campaign needs and the different types of events and items etc. Uh and then an important one at the bottom there um helping to preview and uh uh get intelligent data collection on the events and off the back of the events that um heart and also the uh organizations can use in a tangible and a valuable way.
-
- 
-
+**Joe Green:** Um cool. So yeah, uh we want to test that with a couple of trial clients. And the the reason we do that in the the is to validate um that Hart's model can work as a configurable product. And the way we're going to help prove that model is creating a web platform for campaign and event management. So all uh creating events, configuring, editing, um assigning staff, reviewing results etc. All uh event related tasks. Um creating a mobile app for event execution. So educators can uh capture various data points um uh at the at the events themselves with um a variety of like AI assistance, offline support and some some kind of focused uh features that are required. uh piloting with those two uh those two trial clients um to make sure to validate that different organizations can configure the platform to their own campaign needs and the different types of events and items etc. Uh and then an important one at the bottom there um helping to preview and uh uh get intelligent data collection on the events and off the back of the events that um heart and also the uh organizations can use in a tangible and a valuable way.  
+   
  
 
 ### 00:08:43
 
    
-**Joe Green:** Um as a recap of of where we are today. So this is kind of an overview of the um to deliver that phase one. These are the the four different um steps that we will go through. Discovery we've we've already completed. Um definition is is where we are today. We're kind of at the at the end of uh definition towards the end of definition. So that's where we've been um really defining the scope, the functionality, starting to uh develop the uh user interface design through prototypes which you'll see shortly. Uh and then get into some technical planning as well to really understand how the system needs to work and how we need to architect it. So next up we'll have uh implementation. quite self-explanatory, but building out the uh the the system uh testing uh various environments, making sure that the uh any integrations or uh key features are working as requested. Then evaluate is where we do kind of final uh user acceptance testing with you guys. Um satisfaction assessments and then preparing for production.
-
- 
-
+**Joe Green:** Um as a recap of of where we are today. So this is kind of an overview of the um to deliver that phase one. These are the the four different um steps that we will go through. Discovery we've we've already completed. Um definition is is where we are today. We're kind of at the at the end of uh definition towards the end of definition. So that's where we've been um really defining the scope, the functionality, starting to uh develop the uh user interface design through prototypes which you'll see shortly. Uh and then get into some technical planning as well to really understand how the system needs to work and how we need to architect it. So next up we'll have uh implementation. quite self-explanatory, but building out the uh the the system uh testing uh various environments, making sure that the uh any integrations or uh key features are working as requested. Then evaluate is where we do kind of final uh user acceptance testing with you guys. Um satisfaction assessments and then preparing for production.  
+   
  
 
 ### 00:09:45
 
    
-**Joe Green:** And then hopefully once that's all gone smoothly, we'll then look at phase two planning and and next steps there. Um to say where we are today, we're kind of at the end of definition. Um so we're we're wrapping up the prototypes uh which uh yes we'll show you shortly in terms of um kind of working model and what you can expect uh moving forward particularly around implementation. So we like to work in um short and visible cycles. So you're going to see progress uh frequently have the opportunity to give regular input. Um so you should always know where where things stand. um what that kind of means from you from requirement um is hopefully access to to the right people which I think we can talk about at the end of today but uh you know who's best to speak to about which areas of the app uh or the platform um with hopefully some timely feedback just to help us um you know work quickly and make updates quickly um and also action decisions where needed. Um so how we kind of deliver that uh in a more practical way uh is we'll go through defining objects together where need objectives sorry together where needed.
-
- 
-
+**Joe Green:** And then hopefully once that's all gone smoothly, we'll then look at phase two planning and and next steps there. Um to say where we are today, we're kind of at the end of definition. Um so we're we're wrapping up the prototypes uh which uh yes we'll show you shortly in terms of um kind of working model and what you can expect uh moving forward particularly around implementation. So we like to work in um short and visible cycles. So you're going to see progress uh frequently have the opportunity to give regular input. Um so you should always know where where things stand. um what that kind of means from you from requirement um is hopefully access to to the right people which I think we can talk about at the end of today but uh you know who's best to speak to about which areas of the app uh or the platform um with hopefully some timely feedback just to help us um you know work quickly and make updates quickly um and also action decisions where needed. Um so how we kind of deliver that uh in a more practical way uh is we'll go through defining objects together where need objectives sorry together where needed.  
+   
  
 
 ### 00:10:51
 
    
-**Joe Green:** So uh defining what the goals are um so we can uh track who's defined them um what the purpose is and we can track that right through to code when we implement and and track back to what we need to deliver. Um shaping features with uh yourselves and then the other stakeholders. So each feature is quite self-contained when we um uh when we scope them out and and discuss them with you which means that you know we can focus uh on reviewing working features and not abstract abstract scopes or or or or asking you to review the entire platform which is you know it's a big ask and there's lots of questions and it's uh lots of things to review. Um and then in order to deliver that um you know we're setting boundaries with with AI. So uh keeping architecture and problems small uh and well defined so we can uh work within those constraints which as Lewis mentioned is how we're able to deliver things uh very fast without sacrificing any quality. Um cool. Any any questions or any um anything to to to mention before we get into the demo?
-
- 
-
+**Joe Green:** So uh defining what the goals are um so we can uh track who's defined them um what the purpose is and we can track that right through to code when we implement and and track back to what we need to deliver. Um shaping features with uh yourselves and then the other stakeholders. So each feature is quite self-contained when we um uh when we scope them out and and discuss them with you which means that you know we can focus uh on reviewing working features and not abstract abstract scopes or or or or asking you to review the entire platform which is you know it's a big ask and there's lots of questions and it's uh lots of things to review. Um and then in order to deliver that um you know we're setting boundaries with with AI. So uh keeping architecture and problems small uh and well defined so we can uh work within those constraints which as Lewis mentioned is how we're able to deliver things uh very fast without sacrificing any quality. Um cool. Any any questions or any um anything to to to mention before we get into the demo?  
+   
  
 
 ### 00:12:00
 
    
 **Joe Green:** Cool. Um, yeah, I'm going to hand over to Raphael, but just to quickly uh outline some of the things we're going to go through. Um, we'll we'll we're conscious of time. I've tried to as quickly as I can, but we'll we'll try and zip through them. Um, looking at everything kind of around event and campaign creation and activity templates. Um, how educator assignment works and how we visualize that. Um, finalizing events and closing events. the educator mobile app and then some um reporting and management um processes uh off the back of that as well. Um we'll as say we'll see how we get we go for time. We can we can um also uh put these into Loom walkthroughs as well, video walkthroughs to share with you afterwards. But um that's the aim today anyway. Um and that's enough of me uh talking for uh one meeting. So I will um hand over to Raphael to to share a screen and start going through the prototypes.  
-**Leah Guidarelli:** Great.
-
- 
-
+**Leah Guidarelli:** Great.  
+   
  
 
 ### 00:12:58
@@ -180,19 +156,15 @@ Mar 24, 2026
 **Joe Green:** Don't know if you've um you've used that, but we we're also we can be quite flexible if it's helpful for us to input into any tooling you're using um to like share updates.  
 **Stephanie Karamanoglou:** I know I'm flexible with that as well.  
 **Joe Green:** Okay, cool.  
-**Rafael Ricco:** Cool. So, let's just start with uh the staff sides. The the platform has three three fronts. The ops super admin and the staff side and educator mobile app. That's the final product.
-
- 
-
+**Rafael Ricco:** Cool. So, let's just start with uh the staff sides. The the platform has three three fronts. The ops super admin and the staff side and educator mobile app. That's the final product.  
+   
  
 
 ### 00:14:10
 
    
-**Rafael Ricco:** And um okay let's start with event creation, campaign creation and features around that. So remember that is a prototype and uh everything here is what is that? So everything is is simulated uh mock data and things like that. So first uh in the operation staff the staff side we could navigate to to the campaign section that we could click in this button and start fill this forms to create the the the campaign giving a name description suppliers distributors and so on. And then uh create the campaign at the end of this workflow. And after create the uh one campaign we could we could see we will have something like this. That's a a campaign details page. Let's uh summarize the name of the campaign details event under this uh specific campaign. Uh the data of created uh of creation of this campaign also uh campaign context that that's uh a good information to have. And also at the bottom we have um all campaigns here. We could access our campaigns all events here.
-
- 
-
+**Rafael Ricco:** And um okay let's start with event creation, campaign creation and features around that. So remember that is a prototype and uh everything here is what is that? So everything is is simulated uh mock data and things like that. So first uh in the operation staff the staff side we could navigate to to the campaign section that we could click in this button and start fill this forms to create the the the campaign giving a name description suppliers distributors and so on. And then uh create the campaign at the end of this workflow. And after create the uh one campaign we could we could see we will have something like this. That's a a campaign details page. Let's uh summarize the name of the campaign details event under this uh specific campaign. Uh the data of created uh of creation of this campaign also uh campaign context that that's uh a good information to have. And also at the bottom we have um all campaigns here. We could access our campaigns all events here.  
+   
  
 
 ### 00:15:31
@@ -201,10 +173,8 @@ Mar 24, 2026
 **Rafael Ricco:** and also uh the we could access through the events here and see details about the the events as well. So let me go back here. And one important thing to mention here is uh the activities feature that we could create an a specific activity and that activity will could be used as a template for create uh new events uh prefilling the the event creation workflow using that uh this the information from the template. Uh let me demonstrate. Uh first let's go to the create event workflow that we could select. The first step is select the a campaign we want to create the event and then fill uh informations here. Uh my event okay my location of whatever here. So duration 1 hour.  
 **Leah Guidarelli:** Sorry, can I just ask a question? Um, so on the location, is that tied to an account list?  
 **Rafael Ricco:** Yeah.  
-**Leah Guidarelli:** Is it Google driven? What is where the location? What how is that populated? Because I know you physically typed it and nothing like a list didn't pop.
-
- 
-
+**Leah Guidarelli:** Is it Google driven? What is where the location? What how is that populated? Because I know you physically typed it and nothing like a list didn't pop.  
+   
  
 
 ### 00:16:51
@@ -225,10 +195,8 @@ Mar 24, 2026
 **Luis Galeas:** Just so that we write it down for later.  
 **Leah Guidarelli:** yeah. Okay. So, I didn't know if we'd do that then.  
 **Rafael Ricco:** So,  
-**Leah Guidarelli:** So, yeah. So, um we we have to um for our billing and things like that, the location must have like the liquor license, the account number of the distributor um on it, too.
-
- 
-
+**Leah Guidarelli:** So, yeah. So, um we we have to um for our billing and things like that, the location must have like the liquor license, the account number of the distributor um on it, too.  
+   
  
 
 ### 00:17:39
@@ -245,10 +213,8 @@ Mar 24, 2026
 **Chris:** So that all the the data and all the information around the account is tied to that event, the license number, the identifiers and all  
 **Luis Galeas:** Yeah. And and if I can follow up a little bit uh there,  
 **Chris:** that.  
-**Luis Galeas:** sorry Rafael, not to derel too much, but if if I can ask, so with the two customers that you plan to for them to start using this, would they have their own list that they would be bringing?
-
- 
-
+**Luis Galeas:** sorry Rafael, not to derel too much, but if if I can ask, so with the two customers that you plan to for them to start using this, would they have their own list that they would be bringing?  
+   
  
 
 ### 00:18:46
@@ -269,10 +235,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Sorry.  
 **Rafael Ricco:** No worries L.  
 **Leah Guidarelli:** Yeah.  
-**Rafael Ricco:** Thank you. Okay. So after fill the informations here we could proceed to objectives that a section we could select the goals for this uh event and we could see a preview of the report and we could for example select uh specific sections here and could see the the report preview in real time about okay so what will what this report will contain at uh at the end of this uh event and okay so after that and also we could see the educator view that's a simulation about what the what the educator will see in the app for when they they access the the event itself.
-
- 
-
+**Rafael Ricco:** Thank you. Okay. So after fill the informations here we could proceed to objectives that a section we could select the goals for this uh event and we could see a preview of the report and we could for example select uh specific sections here and could see the the report preview in real time about okay so what will what this report will contain at uh at the end of this uh event and okay so after that and also we could see the educator view that's a simulation about what the what the educator will see in the app for when they they access the the event itself.  
+   
  
 
 ### 00:19:54
@@ -284,10 +248,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Mhm.  
 **Chris:** and I want don't want to take their thunder away but they have some other other views as to how we can book events as well.  
 **Leah Guidarelli:** Great.  
-**Rafael Ricco:** Cool. So uh the the last step is uh select uh advanc set customizations in that case is uh additional modules that could be will be contained in the event and then create the event itself. So here we have the page of the event. The event before the event was created.
-
- 
-
+**Rafael Ricco:** Cool. So uh the the last step is uh select uh advanc set customizations in that case is uh additional modules that could be will be contained in the event and then create the event itself. So here we have the page of the event. The event before the event was created.  
+   
  
 
 ### 00:21:07
@@ -297,10 +259,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Okay.  
 **Rafael Ricco:** case. So for the staff side um I think that's it.  
 **Leah Guidarelli:** Great. So that the campaigns um sorry did I interrupt somebody?  
-**Rafael Ricco:** Um
-
- 
-
+**Rafael Ricco:** Um  
+   
  
 
 ### 00:22:31
@@ -324,10 +284,8 @@ Mar 24, 2026
 **Rafael Ricco:** So,  
 **Leah Guidarelli:** Great.  
 **Rafael Ricco:** um let's go to educator manager side that is uh similar we have a similar with the staff platform. We have a dashboard that we that the educator manager could could see a overview of metrics and events happen events upcoming and completed events educator performances upcoming events all all stuff related and but the most  
-**Leah Guidarelli:** What the
-
- 
-
+**Leah Guidarelli:** What the  
+   
  
 
 ### 00:23:39
@@ -341,10 +299,8 @@ Mar 24, 2026
 **Chris:** distance and score.  
 **Leah Guidarelli:** Yeah.  
 **Chris:** So that whole whole whole list will will show who's closest and prioritize by score. Or if we want to start weighing this by say category preference. If we know someone's good at at in this case vodka,  
-**Hart Agency NYC:** Oh
-
- 
-
+**Hart Agency NYC:** Oh  
+   
  
 
 ### 00:24:55
@@ -361,10 +317,8 @@ Mar 24, 2026
 **Leah Guidarelli:** obviously it's a nice little thing, but um yeah, no, I like the distance thing. You know, that's geography wise that's a really good um tool for sure.  
 **Hart Agency NYC:** Distance is good,  
 **Leah Guidarelli:** Um  
-**Hart Agency NYC:** Leah. And calibration isn't good. have calibration on the people. It's offline though. It's on a spreadsheet on share.
-
- 
-
+**Hart Agency NYC:** Leah. And calibration isn't good. have calibration on the people. It's offline though. It's on a spreadsheet on share.  
+   
  
 
 ### 00:25:42
@@ -382,20 +336,16 @@ Mar 24, 2026
 **Leah Guidarelli:** Mhm.  
 **Rafael Ricco:** Cool. So uh in that case in the ed for the educator manager view they has uh the event could have a different a couple different states. For example, uh we see here the initial event initial state that's unassigned and then we have um the pending assigning and also the confirm it event.  
 **Leah Guidarelli:** Mhm.  
-**Rafael Ricco:** Okay, so we have one educator confirm it and another uh status live event. the event is happening and uh here we could see educator nodes uh other informations regard in regard of this event and also the fine the completed completed events.
-
- 
-
+**Rafael Ricco:** Okay, so we have one educator confirm it and another uh status live event. the event is happening and uh here we could see educator nodes uh other informations regard in regard of this event and also the fine the completed completed events.  
+   
  
 
 ### 00:27:00
 
    
 **Rafael Ricco:** We could see um much more informations here. We could see uh a lot of informations of the event, final stats and educator notes, questionaaries and all everything related to the event. Also event photos and and then approve and finalize this event. Um and also we could export the data or downloads everything we could uh we could do here. So  
-**Leah Guidarelli:** And now you can funk you can um sorry Joe to you can sort like so as a manager I could sort and only look at queens or I could look at you know off- premise or just on premise. Can I can I sort my views to to drill and only see certain things? Um because it's territorydriven for the manager who schedules. So we need to have functionality to be able to um you know I only want to see Brooklyn and Queens or I only want to see Texas or whatever. But is we'll we'll need that. I don't see where that is. But like I said, I'm not seeing the whole thing.
-
- 
-
+**Leah Guidarelli:** And now you can funk you can um sorry Joe to you can sort like so as a manager I could sort and only look at queens or I could look at you know off- premise or just on premise. Can I can I sort my views to to drill and only see certain things? Um because it's territorydriven for the manager who schedules. So we need to have functionality to be able to um you know I only want to see Brooklyn and Queens or I only want to see Texas or whatever. But is we'll we'll need that. I don't see where that is. But like I said, I'm not seeing the whole thing.  
+   
  
 
 ### 00:28:12
@@ -417,10 +367,8 @@ Mar 24, 2026
 **Joe Green:** sure  
 **Rafael Ricco:** Yes.  
 **Hart Agency NYC:** Okay.  
-**Rafael Ricco:** That's a that's educator manager view.
-
- 
-
+**Rafael Ricco:** That's a that's educator manager view.  
+   
  
 
 ### 00:29:04
@@ -441,10 +389,8 @@ Mar 24, 2026
 **Leah Guidarelli:** So, I I know this is first look and all that. So, I was writing notes as of offline discussion. So,  
 **Chris:** sure that's perfect.  
 **Leah Guidarelli:** but vis visibly Yeah. Right now it's Yeah.  
-**Chris:** Yeah, that's perfect.
-
- 
-
+**Chris:** Yeah, that's perfect.  
+   
  
 
 ### 00:29:58
@@ -458,10 +404,8 @@ Mar 24, 2026
 **Hart Agency NYC:** Oh,  
 **Rafael Ricco:** um after the events be finalized,  
 **Leah Guidarelli:** Yep.  
-**Rafael Ricco:** we could see uh this feature that's a finalization queue. We could see uh events needs to be approved and we could approve uh here. It's not it's a a more easy way to to approve I spe a lot of events instead of navigate see the details page of each one and click and approve and here we could approve and then approve and everything was approved here that's that's a it's a kill that we we could approve a lot of events more easily. So that's important to to present as well. So okay. So let's go to educator section that we could see um the educator profile. Here we have a page of um educator details. We can see all details about the this educator upcoming events assigned with this educator past events and also the availability calendar that this is defined by the educator in in the educator mobile app.
-
- 
-
+**Rafael Ricco:** we could see uh this feature that's a finalization queue. We could see uh events needs to be approved and we could approve uh here. It's not it's a a more easy way to to approve I spe a lot of events instead of navigate see the details page of each one and click and approve and here we could approve and then approve and everything was approved here that's that's a it's a kill that we we could approve a lot of events more easily. So that's important to to present as well. So okay. So let's go to educator section that we could see um the educator profile. Here we have a page of um educator details. We can see all details about the this educator upcoming events assigned with this educator past events and also the availability calendar that this is defined by the educator in in the educator mobile app.  
+   
  
 
 ### 00:31:25
@@ -484,10 +428,8 @@ Mar 24, 2026
 **Ethan Brown:** Yeah.  
 **Rafael Ricco:** Thank you. Yeah, that that's that's probably that that's better. Thank you. So, okay. So, uh here they they could see the upcoming events,  
 **Hart Agency NYC:** Okay.  
-**Rafael Ricco:** the past events.
-
- 
-
+**Rafael Ricco:** the past events.  
+   
  
 
 ### 00:32:22
@@ -505,10 +447,8 @@ Mar 24, 2026
 **Hart Agency NYC:** Yep.  
 **Leah Guidarelli:** if they're seeing it,  
 **Hart Agency NYC:** Should should um should they  
-**Leah Guidarelli:** they're going to want to see the live what they're getting paid.
-
- 
-
+**Leah Guidarelli:** they're going to want to see the live what they're getting paid.  
+   
  
 
 ### 00:33:36
@@ -532,10 +472,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** So, I think it's a good idea.  
 **Hart Agency NYC:** Yeah. That's what I think. Yeah.  
 **Stephanie Karamanoglou:** Uh  
-**Luis Galeas:** What does that rating depend on and what should what does it depend on today and what
-
- 
-
+**Luis Galeas:** What does that rating depend on and what should what does it depend on today and what  
+   
  
 
 ### 00:34:14
@@ -557,10 +495,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Don't send him  
 **Hart Agency NYC:** They give him two. So,  
 **Leah Guidarelli:** here.  
-**Hart Agency NYC:** it's an aggregate of all the reviews that they get. Joe might be a 3.8 or something or other. So, that's how we kind of know what feedback they get, which is they work independently.
-
- 
-
+**Hart Agency NYC:** it's an aggregate of all the reviews that they get. Joe might be a 3.8 or something or other. So, that's how we kind of know what feedback they get, which is they work independently.  
+   
  
 
 ### 00:35:09
@@ -587,10 +523,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Right.  
 **Stephanie Karamanoglou:** So the rating is not very accurate.  
 **Luis Galeas:** yeah and can I uh extend a follow up there?  
-**Leah Guidarelli:** Right.
-
- 
-
+**Leah Guidarelli:** Right.  
+   
  
 
 ### 00:35:53
@@ -604,10 +538,8 @@ Mar 24, 2026
 **Luis Galeas:** I see. And right now, do you when you say you uh collect this from them, do you do so via email or do they in the email is there a link where they go and fill something up  
 **Leah Guidarelli:** Yep. Yeah. So, what happens is if we have um if we have their contact info, um it's so as soon as the educator checks out,  
 **Luis Galeas:** Or  
-**Leah Guidarelli:** the survey link gets sent to that email of the account and it's just a five question quick little survey just like you know when you you get Instacart or whatever how they send you the survey. You know, I do it too. I say no, I don't want to do it.
-
- 
-
+**Leah Guidarelli:** the survey link gets sent to that email of the account and it's just a five question quick little survey just like you know when you you get Instacart or whatever how they send you the survey. You know, I do it too. I say no, I don't want to do it.  
+   
  
 
 ### 00:36:53
@@ -632,10 +564,8 @@ Mar 24, 2026
 **Hart Agency NYC:** Yeah.  
 **Luis Galeas:** Got it. Yeah, makes sense.  
 **Joe Green:** Thank you.  
-**Luis Galeas:** Understood. Cool.
-
- 
-
+**Luis Galeas:** Understood. Cool.  
+   
  
 
 ### 00:37:31
@@ -649,10 +579,8 @@ Mar 24, 2026
 **Chris:** just just so context because Raphael's just what Raphael is showing you is like an app within the app where the educator can have their phone down on the table and as people are sampling profile who sampling what the response is on their phone by just doing one taps. That way they're not typing, they're not writing anything down. As people come up, it gives them it gives them like a flow where they can just capture all that very  
 **Rafael Ricco:** Yes, precisely.  
 **Chris:** easily.  
-**Rafael Ricco:** Thank you for the Yes, that's a right context for this u feature. It's just they just tap and a few questions and do this uh how many times they need to do.
-
- 
-
+**Rafael Ricco:** Thank you for the Yes, that's a right context for this u feature. It's just they just tap and a few questions and do this uh how many times they need to do.  
+   
  
 
 ### 00:38:52
@@ -689,10 +617,8 @@ Mar 24, 2026
 **Chris:** working.  
 **Leah Guidarelli:** It's Yeah, we right now we do clock in,  
 **Hart Agency NYC:** I love  
-**Stephanie Karamanoglou:** And and
-
- 
-
+**Stephanie Karamanoglou:** And and  
+   
  
 
 ### 00:39:32
@@ -719,10 +645,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** Yeah.  
 **Hart Agency NYC:** Yeah.  
 **Joe Green:** then Yeah.  
-**Hart Agency NYC:** If you're late all the time, that's okay because we're going to pay you by the hour.
-
- 
-
+**Hart Agency NYC:** If you're late all the time, that's okay because we're going to pay you by the hour.  
+   
  
 
 ### 00:40:14
@@ -738,10 +662,8 @@ Mar 24, 2026
 **Hart Agency NYC:** We have special questions, right? So, if a supplier says, "I want you like Beluga wants you to take a picture of this." We could add that in as an ad hoc or is it standardized?  
 **Joe Green:** Yeah, I think well I'd imagine there'd be an element of of tasks or uh features that are standardized and then we'd probably give them the ability to then set their own uh tasks and then also  
 **Leah Guidarelli:** Yes.  
-**Joe Green:** they can choose which ones are uh like hard requirements like maybe some of them they're not too fussed about.
-
- 
-
+**Joe Green:** they can choose which ones are uh like hard requirements like maybe some of them they're not too fussed about.  
+   
  
 
 ### 00:41:13
@@ -757,10 +679,8 @@ Mar 24, 2026
 **Leah Guidarelli:** I one we need standardized, but then two we need to be able to to tweak cuz like some suppliers, you know, like they want different questions and all that. So, if we can do it by campaign and whatnot would be great. And then, you know, um like for the summer brand activation, if it's on print, you know, we definitely have to have like the receipt thing has to be a mandatory task or thing. So yeah, this is this is great that this can be customized. They know the tasks and I like that you said these are a mustave.  
 **Hart Agency NYC:** Yeah.  
 **Leah Guidarelli:** You have to do them or you can't get through this and the rest could be nice. So um I this this is moving in the right direction for  
-**Hart Agency NYC:** And OCM would be a good one to have,
-
- 
-
+**Hart Agency NYC:** And OCM would be a good one to have,  
+   
  
 
 ### 00:42:02
@@ -790,10 +710,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** And I also have a question in terms of sales tracking. Is there like a section where you could put uh target like sales target as well?  
 **Rafael Ricco:** Yes, that is the next section I I will dive into.  
 **Stephanie Karamanoglou:** Okay.  
-**Rafael Ricco:** Um so that sales tracking is basically they could increase the
-
- 
-
+**Rafael Ricco:** Um so that sales tracking is basically they could increase the  
+   
  
 
 ### 00:42:41
@@ -814,10 +732,8 @@ Mar 24, 2026
 **Leah Guidarelli:** that's fine.  
 **Joe Green:** But would you want the set the educators to also be like I guess it's a good reference point,  
 **Stephanie Karamanoglou:** I  
-**Joe Green:** right? Like you need to sell this much. Um, and they can kind of track over time how they're
-
- 
-
+**Joe Green:** right? Like you need to sell this much. Um, and they can kind of track over time how they're  
+   
  
 
 ### 00:43:48
@@ -839,10 +755,8 @@ Mar 24, 2026
 **Hart Agency NYC:** If you want the bonus, you sell 12 bottles or  
 **Leah Guidarelli:** Right.  
 **Stephanie Karamanoglou:** Yeah.  
-**Hart Agency NYC:** something.
-
- 
-
+**Hart Agency NYC:** something.  
+   
  
 
 ### 00:44:32
@@ -860,10 +774,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Yes.  
 **Larry Golus:** Yes.  
 **Joe Green:** Yeah, we can have a we can have a look into that. Um for sure.  
-**Leah Guidarelli:** And with that, you know, I just thought of it.
-
- 
-
+**Leah Guidarelli:** And with that, you know, I just thought of it.  
+   
  
 
 ### 00:45:35
@@ -871,10 +783,8 @@ Mar 24, 2026
    
 **Leah Guidarelli:** Um,  
 **Larry Golus:** Perfect.  
-**Leah Guidarelli:** so this goes back to the original customizing campaign. So when we talk about OCM, this is like this one program and then we everybody else is fine. Everyone else can be normal, right? The OCM has is which is you know the the Italian government they have these certain speci specifications of the photos and they all have to be geotagged and they need to be printed on the bottom of the photo. So when we implemented it into hems as it stands today, it went on every photo and they look terrible when we're trying to do presentations. So we'd be able to customize and say for this particular um campaign, the reunion OCM, these will be geotagged and they print on the photo or they're they're showing on the geo tag on the photo because right now we have to use an outside app and then we have to upload. It's it's really difficult. So, um, is that something that you can do where you a campaign has its own strict kind of guidelines and you know, like we said, it needs to match this photo pretty darn close otherwise it rejects because we don't get paid from them unless it matches 100%.
-
- 
-
+**Leah Guidarelli:** so this goes back to the original customizing campaign. So when we talk about OCM, this is like this one program and then we everybody else is fine. Everyone else can be normal, right? The OCM has is which is you know the the Italian government they have these certain speci specifications of the photos and they all have to be geotagged and they need to be printed on the bottom of the photo. So when we implemented it into hems as it stands today, it went on every photo and they look terrible when we're trying to do presentations. So we'd be able to customize and say for this particular um campaign, the reunion OCM, these will be geotagged and they print on the photo or they're they're showing on the geo tag on the photo because right now we have to use an outside app and then we have to upload. It's it's really difficult. So, um, is that something that you can do where you a campaign has its own strict kind of guidelines and you know, like we said, it needs to match this photo pretty darn close otherwise it rejects because we don't get paid from them unless it matches 100%.  
+   
  
 
 ### 00:46:49
@@ -890,10 +800,8 @@ Mar 24, 2026
 **Hart Agency NYC:** Heat.  
 **Leah Guidarelli:** Okay.  
 **Joe Green:** doable.  
-**Larry Golus:** but like if we said we showed them the tech, you know, what we need for a setup, make sure that the either southern or empire or R\&D permits there, the over 21 table tents there, mixes.
-
- 
-
+**Larry Golus:** but like if we said we showed them the tech, you know, what we need for a setup, make sure that the either southern or empire or R\&D permits there, the over 21 table tents there, mixes.  
+   
  
 
 ### 00:47:42
@@ -906,10 +814,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** So just getting back to um the I I mean I'm not sure if you can do that  
 **Rafael Ricco:** Where's  
 **Stephanie Karamanoglou:** with an entire table setup and the individual but I know in terms of uh like for example when you do when you when you have some kind of ID verification ation and you're using like um some kind of mugsh shot uh front face like the there is a  
-**Joe Green:** Yeah. Yeah.
-
- 
-
+**Joe Green:** Yeah. Yeah.  
+   
  
 
 ### 00:48:39
@@ -925,10 +831,8 @@ Mar 24, 2026
 **Joe Green:** Yeah. Interesting.  
 **Leah Guidarelli:** So,  
 **Joe Green:** Yeah.  
-**Stephanie Karamanoglou:** I mean obviously not the filter option for everything because we don't want Yeah,
-
- 
-
+**Stephanie Karamanoglou:** I mean obviously not the filter option for everything because we don't want Yeah,  
+   
  
 
 ### 00:49:37
@@ -954,10 +858,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** Um All right.  
 **Rafael Ricco:** So,  
 **Stephanie Karamanoglou:** Yeah, I was just going to say I have no other question.  
-**Rafael Ricco:** okay. Okay. So, cool. Uh let's see the the venue survey. That's a that's a section uh we could take photo in uh in batch a lot of Oh my god.
-
- 
-
+**Rafael Ricco:** okay. Okay. So, cool. Uh let's see the the venue survey. That's a that's a section uh we could take photo in uh in batch a lot of Oh my god.  
+   
  
 
 ### 00:50:36
@@ -967,10 +869,8 @@ Mar 24, 2026
 **Leah Guidarelli:** phone  
 **Rafael Ricco:** mobile views. Yeah.  
 **Leah Guidarelli:** view.  
-**Rafael Ricco:** So here in this example the educator could uh take the picture they they could uh they also take uh for example if they are in the place that the internet connection is not so good they could take a lot of picture all picture um will be saved offline and they could save and they could review later or save and re they could save and review later. That's the primary action they could take and also they could add more photos or they could uh review now they could reveal the all photos they take. Uh here it's the it's a example for the review page. Uh they will see for example the picture uh the detected products and also they could um prefill here uh a few informations and regard the products uh the price spacing um uh how many products they uh they sell and available in in the picture. They could hold and take notes and they they could save the the data and this data will be sent will be sended for the educator manager to reveal and that's that is the section for um the quick capture and okay so
-
- 
-
+**Rafael Ricco:** So here in this example the educator could uh take the picture they they could uh they also take uh for example if they are in the place that the internet connection is not so good they could take a lot of picture all picture um will be saved offline and they could save and they could review later or save and re they could save and review later. That's the primary action they could take and also they could add more photos or they could uh review now they could reveal the all photos they take. Uh here it's the it's a example for the review page. Uh they will see for example the picture uh the detected products and also they could um prefill here uh a few informations and regard the products uh the price spacing um uh how many products they uh they sell and available in in the picture. They could hold and take notes and they they could save the the data and this data will be sent will be sended for the educator manager to reveal and that's that is the section for um the quick capture and okay so  
+   
  
 
 ### 00:52:10
@@ -985,10 +885,8 @@ Mar 24, 2026
 **Rafael Ricco:** In that case they are saving in the in the app in the phone of the  
 **Stephanie Karamanoglou:** Good.  
 **Rafael Ricco:** educator mobile.  
-**Leah Guidarelli:** No. What I mean I I guess let me just explain because like what happens is they take all these pictures and they're on their personal phone, right? Which is whatever they're in their in their photo gallery and then they have to move them into heads. So when when in this what you're showing me, it looked like they were taking it within the app and they're sitting there and then getting popped into the boxes so they wouldn't have to then do that second step of moving everything over.
-
- 
-
+**Leah Guidarelli:** No. What I mean I I guess let me just explain because like what happens is they take all these pictures and they're on their personal phone, right? Which is whatever they're in their in their photo gallery and then they have to move them into heads. So when when in this what you're showing me, it looked like they were taking it within the app and they're sitting there and then getting popped into the boxes so they wouldn't have to then do that second step of moving everything over.  
+   
  
 
 ### 00:53:22
@@ -1004,10 +902,8 @@ Mar 24, 2026
 **Leah Guidarelli:** Okay.  
 **Rafael Ricco:** So let's save um all tasks completed. They could proceed. Also let me explain the the brand guide that is a section that is a section the  
 **Leah Guidarelli:** Yeah, that's great.  
-**Rafael Ricco:** educator manage could attach uh documents like uh setup instructions brand script is that uh okay so how you need to serve the serving this um this uh this thing and also the the educator uh could see and read here everything here uh about every different product here. So yeah then and then they could proceed to check out. Uh that's uh a in the check the check out we could see the the performance goals and uh the customer profiling all data resume it summarize it here about the what
-
- 
-
+**Rafael Ricco:** educator manage could attach uh documents like uh setup instructions brand script is that uh okay so how you need to serve the serving this um this uh this thing and also the the educator uh could see and read here everything here uh about every different product here. So yeah then and then they could proceed to check out. Uh that's uh a in the check the check out we could see the the performance goals and uh the customer profiling all data resume it summarize it here about the what  
+   
  
 
 ### 00:54:31
@@ -1031,10 +927,8 @@ Mar 24, 2026
 **Joe Green:** course.  
 **Leah Guidarelli:** which Christopher, you already know, and and we'll get there, but but right now,  
 **Joe Green:** Yeah.  
-**Leah Guidarelli:** unfortunately, our customers see all those little weird buttons we have and all that stuff.
-
- 
-
+**Leah Guidarelli:** unfortunately, our customers see all those little weird buttons we have and all that stuff.  
+   
  
 
 ### 00:55:38
@@ -1050,10 +944,8 @@ Mar 24, 2026
 **Leah Guidarelli:** that  
 **Stephanie Karamanoglou:** for uh heart employees. It's not for the customer, right? They're both using the same  
 **Chris:** Same.  
-**Luis Galeas:** So yeah, so it's it's worth clarifying uh some I mean even internally you know sometimes we struggle with define like remembering uh remembering this uh uh this terminology or who who's who. So the idea here right is that uh today with your uh affiliates or your trial clients right they are effectively doing what you at heart are doing right and what you're doing is you're empowering with this SAS platform to do what you do and then Hart would eventually be able to uh use that uh as if it were a client of the platform but there are also administrators that administrator the platform at a global level that can essentially have an overview of all the organizations and those would be of course hard people as well.
-
- 
-
+**Luis Galeas:** So yeah, so it's it's worth clarifying uh some I mean even internally you know sometimes we struggle with define like remembering uh remembering this uh uh this terminology or who who's who. So the idea here right is that uh today with your uh affiliates or your trial clients right they are effectively doing what you at heart are doing right and what you're doing is you're empowering with this SAS platform to do what you do and then Hart would eventually be able to uh use that uh as if it were a client of the platform but there are also administrators that administrator the platform at a global level that can essentially have an overview of all the organizations and those would be of course hard people as well.  
+   
  
 
 ### 00:57:03
@@ -1070,10 +962,8 @@ Mar 24, 2026
 **Ethan Brown:** When you say customer, who are you referring to? Which which  
 **Stephanie Karamanoglou:** So I'm referring to the suppliers So the people that we are the  
 **Ethan Brown:** customer?  
-**Stephanie Karamanoglou:** companies that we're managing the events for.
-
- 
-
+**Stephanie Karamanoglou:** companies that we're managing the events for.  
+   
  
 
 ### 00:58:01
@@ -1086,10 +976,8 @@ Mar 24, 2026
 **Stephanie Karamanoglou:** Okay. I see. So yeah. So that's different. All right.  
 **Joe Green:** I think yeah the the distinction is you know they they all access through the the web app. Um and like from a architect architecture perspective we would describe them all as like types of operators. Um and then there would be like a subtype. So heart for example can have access to everything but an educator manager through the same app but they maybe have a more restricted view. So there's certain things that they just wouldn't be able to see, but from a um a user perspective, like the underlying uh architecture,  
 **Leah Guidarelli:** Perfect.  
-**Joe Green:** they are logging into the same app and could have the same permissions. We're just adjusting what it is they can see, if that makes sense.
-
- 
-
+**Joe Green:** they are logging into the same app and could have the same permissions. We're just adjusting what it is they can see, if that makes sense.  
+   
  
 
 ### 00:58:54
@@ -1107,10 +995,8 @@ Mar 24, 2026
 **Luis Galeas:** So um the the unit that you need for this to work is actually to deploy them uh all uh together.  
 **Stephanie Karamanoglou:** Yeah,  
 **Leah Guidarelli:** Yeah.  
-**Luis Galeas:** Uh now what that me what that means in terms of you know uh the uh road map uh
-
- 
-
+**Luis Galeas:** Uh now what that me what that means in terms of you know uh the uh road map uh  
+   
  
 
 ### 00:59:55
@@ -1120,10 +1006,8 @@ Mar 24, 2026
 **Luis Galeas:** going forward right is that at the beginning you wouldn't move all of heart's operations today uh to this right you would start with the true trial clients that you have you would put them in here uh and then that's what we would do in this first phase in the second phase the goal would be to move heart itself as if it were a client of its own platform uh and then after that uh once that's that's phase two then phase Three would be getting more clients uh in besides the two original clients and heart. Uh and the fourth phase would be to take all the data that we've collected and expose it as a data institute so that other people can uh consume and benefit from it. And of course you can uh capitalize on that.  
 **Joe Green:** Awesome.  
 **Stephanie Karamanoglou:** Okay.  
-**Joe Green:** Um, cool. I know we're at time. We've gone a little bit over. Um, I think a few of us have got to jump on uh onto another call. Hopefully.
-
- 
-
+**Joe Green:** Um, cool. I know we're at time. We've gone a little bit over. Um, I think a few of us have got to jump on uh onto another call. Hopefully.  
+   
  
 
 ### 01:00:56
@@ -1142,10 +1026,8 @@ Mar 24, 2026
 **Joe Green:** we'll try and share stuff in like uh in kind of more bite-sized uh links.  
 **Leah Guidarelli:** Yeah,  
 **Joe Green:** So,  
-**Leah Guidarelli:** I like that though.
-
- 
-
+**Leah Guidarelli:** I like that though.  
+   
  
 
 ### 01:01:39
@@ -1178,12 +1060,10 @@ Mar 24, 2026
 **Luis Galeas:** folks.  
 **Joe Green:** thank you very much, guys. Yeah, it was a was a pleasure.  
 **Chris:** Thank you.  
-**Joe Green:** And we we'll speak to you soon.
-
- 
-
+**Joe Green:** And we we'll speak to you soon.  
+   
  
 
 ### Transcription ended after 01:03:04
 
-_This editable transcript was computer generated and might contain errors. People can also change the text after it was created._
+*This editable transcript was computer generated and might contain errors. People can also change the text after it was created.*
