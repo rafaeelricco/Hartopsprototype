@@ -566,7 +566,7 @@ export function EventsPage() {
       </div>
 
       {/* Summary Stats Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <StatCard
           icon={CalendarDays}
           label="Events Today"
@@ -591,7 +591,7 @@ export function EventsPage() {
             accent={false}
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-3">
