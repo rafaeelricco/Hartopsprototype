@@ -399,9 +399,47 @@ function hasSchedulingConflict(educator: Educator, event: EventItem): boolean {
   return educator.upcomingEvents.some((ue) => ue.date === event.date);
 }
 
-function getCompositeScore(educator: Educator): number {
-  const distancePenalty = (educator.distanceMiles ?? 50) / 100;
-  return educator.avgRating - distancePenalty + educator.punctuality / 200;
+function getScoreBreakdown(
+  educator: Educator,
+  event?: EventItem,
+): {
+  ratingScore: number;
+  salesScore: number;
+  punctualityScore: number;
+  distancePenalty: number;
+  brandBonus: number;
+  total: number;
+} {
+  const ratingScore = Math.round((educator.avgRating / 5) * 40);
+  const salesScore = Math.round(Math.min(educator.salesPerEvent / 20, 1) * 25);
+  const punctualityScore = Math.round((educator.punctuality / 100) * 20);
+  const distancePenalty = Math.round(
+    Math.min((educator.distanceMiles ?? 50) / 50, 1) * 10,
+  );
+  const brandBonus =
+    event && educator.brandCertifications.includes(event.brandName) ? 5 : 0;
+  const total = Math.min(
+    ratingScore + salesScore + punctualityScore - distancePenalty + brandBonus,
+    100,
+  );
+  return {
+    ratingScore,
+    salesScore,
+    punctualityScore,
+    distancePenalty,
+    brandBonus,
+    total,
+  };
+}
+
+function getCompositeScore(educator: Educator, event?: EventItem): number {
+  return getScoreBreakdown(educator, event).total;
+}
+
+function getScoreColor(score: number): string {
+  if (score >= 80) return "bg-green-500/10 text-green-600 border-green-500/20";
+  if (score >= 60) return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+  return "bg-red-500/10 text-red-600 border-red-500/20";
 }
 
 function rankEducators(educators: Educator[], event: EventItem): Educator[] {
@@ -409,7 +447,7 @@ function rankEducators(educators: Educator[], event: EventItem): Educator[] {
     const aConflict = hasSchedulingConflict(a, event);
     const bConflict = hasSchedulingConflict(b, event);
     if (aConflict !== bConflict) return aConflict ? 1 : -1;
-    return getCompositeScore(b) - getCompositeScore(a);
+    return getCompositeScore(b, event) - getCompositeScore(a, event);
   });
 }
 
@@ -1061,6 +1099,8 @@ export function EventDetailPage() {
                 );
                 const isExpanded = expandedEducator === edu.id;
                 const isSelected = draftSelectedIds.has(edu.id);
+                const score = getCompositeScore(edu, event);
+                const breakdown = getScoreBreakdown(edu, event);
                 return (
                   <div
                     key={edu.id}
@@ -1134,6 +1174,18 @@ export function EventDetailPage() {
                                 Conflict
                               </span>
                             )}
+                            {/* Composite score badge */}
+                            <span
+                              className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0 border font-semibold ${getScoreColor(score)} ${conflict ? "opacity-60" : ""}`}
+                              style={{
+                                fontSize: "0.625rem",
+                                fontWeight: 600,
+                                lineHeight: "1.125rem",
+                              }}
+                              title={`Score: ${score}/100`}
+                            >
+                              ★ {score}
+                            </span>
                           </div>
                           {/* Metrics row */}
                           <div
@@ -1192,13 +1244,42 @@ export function EventDetailPage() {
                         </div>
                       </div>
                     </div>
-                    {/* G1: Expandable availability calendar strip */}
+                    {/* G1: Expandable availability calendar strip + score breakdown */}
                     {isExpanded && (
-                      <div className="mt-2 ml-8">
+                      <div className="mt-2 ml-8 space-y-2">
                         <AvailabilityStrip
                           educator={edu}
                           eventDate={event.date}
                         />
+                        {/* Score breakdown */}
+                        <div className="rounded-lg border border-border bg-muted/30 p-2.5">
+                          <p
+                            className="text-muted-foreground mb-1.5 flex items-center gap-1"
+                            style={{ fontSize: "0.6875rem", fontWeight: 500 }}
+                          >
+                            <Star className="w-3 h-3 text-amber-400" /> Score
+                            Breakdown
+                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span
+                              className={`inline-flex items-center rounded-full px-2 py-0.5 border font-semibold ${getScoreColor(breakdown.total)}`}
+                              style={{ fontSize: "0.75rem" }}
+                            >
+                              {breakdown.total}/100
+                            </span>
+                            <span
+                              className="text-muted-foreground"
+                              style={{ fontSize: "0.625rem" }}
+                            >
+                              Rating {breakdown.ratingScore} + Sales{" "}
+                              {breakdown.salesScore} + Punctuality{" "}
+                              {breakdown.punctualityScore} − Distance{" "}
+                              {breakdown.distancePenalty}
+                              {breakdown.brandBonus > 0 &&
+                                ` + Brand ${breakdown.brandBonus}`}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

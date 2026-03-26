@@ -14,6 +14,12 @@ export type EventStatus =
 
 export type EventType = "Tasting" | "Demo" | "Activation" | "Promo";
 export type AccountType = "Retail" | "Wholesale" | "Pop-up";
+export type VenueType =
+  | "Retail"
+  | "Bar/Restaurant"
+  | "Pop-up"
+  | "Grocery"
+  | "Event Space";
 export type CancellationReason =
   | "Weather"
   | "Illness"
@@ -54,6 +60,9 @@ export interface EventItem {
   duration: string;
   venue: string;
   venueAddress: string;
+  borough?: string;
+  state: string;
+  venueType: VenueType;
   accountType: AccountType;
   eventType: EventType;
   educatorId: string | null;
@@ -141,6 +150,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Whole Foods Market, SoHo",
     venueAddress: "95 E Houston St, New York, NY 10002",
+    borough: "Manhattan",
+    state: "NY",
+    venueType: "Grocery",
     accountType: "Retail",
     eventType: "Tasting",
     educatorId: null,
@@ -182,6 +194,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Total Wine & More, Jersey City",
     venueAddress: "90 Mall Dr W, Jersey City, NJ 07310",
+    borough: "Jersey City",
+    state: "NJ",
+    venueType: "Retail",
     accountType: "Retail",
     eventType: "Promo",
     educatorId: "edu-2",
@@ -236,6 +251,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "BevMo!, Hoboken",
     venueAddress: "200 Washington St, Hoboken, NJ 07030",
+    borough: "Hoboken",
+    state: "NJ",
+    venueType: "Retail",
     accountType: "Retail",
     eventType: "Activation",
     educatorId: "edu-3",
@@ -399,6 +417,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Trader Joe's, Williamsburg",
     venueAddress: "400 Grand St, Brooklyn, NY 11211",
+    borough: "Brooklyn",
+    state: "NY",
+    venueType: "Grocery",
     accountType: "Retail",
     eventType: "Demo",
     educatorId: null,
@@ -436,6 +457,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Costco, Hackensack",
     venueAddress: "50 S River St, Hackensack, NJ 07601",
+    borough: "Hackensack",
+    state: "NJ",
+    venueType: "Retail",
     accountType: "Wholesale",
     eventType: "Activation",
     educatorId: "edu-5",
@@ -474,6 +498,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Wine.com Pop-up, Chelsea",
     venueAddress: "75 9th Ave, New York, NY 10011",
+    borough: "Manhattan",
+    state: "NY",
+    venueType: "Pop-up",
     accountType: "Pop-up",
     eventType: "Tasting",
     educatorId: "edu-4",
@@ -650,6 +677,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Astor Wines & Spirits, NoHo",
     venueAddress: "399 Lafayette St, New York, NY 10003",
+    borough: "Manhattan",
+    state: "NY",
+    venueType: "Retail",
     accountType: "Retail",
     eventType: "Tasting",
     educatorId: "edu-6",
@@ -698,6 +728,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Spec's Wines, Union Square",
     venueAddress: "33 Union Square W, New York, NY 10003",
+    borough: "Manhattan",
+    state: "NY",
+    venueType: "Retail",
     accountType: "Retail",
     eventType: "Activation",
     educatorId: "edu-7",
@@ -741,6 +774,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Eataly, Flatiron",
     venueAddress: "200 5th Ave, New York, NY 10010",
+    borough: "Manhattan",
+    state: "NY",
+    venueType: "Bar/Restaurant",
     accountType: "Retail",
     eventType: "Activation",
     educatorId: "edu-1",
@@ -814,6 +850,9 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Liquor Barn, Newark",
     venueAddress: "50 Market St, Newark, NJ 07102",
+    borough: "Newark",
+    state: "NJ",
+    venueType: "Retail",
     accountType: "Retail",
     eventType: "Tasting",
     educatorId: null,
@@ -856,6 +895,8 @@ export function getEventById(id: string): EventItem | undefined {
           duration: "4h",
           venue: past.venue,
           venueAddress: "Address on file",
+          state: "NY",
+          venueType: "Retail",
           accountType: "Retail",
           eventType: "Tasting",
           educatorId: edu.id,

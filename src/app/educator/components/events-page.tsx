@@ -19,6 +19,7 @@ import {
   Star,
   Pencil,
   ClipboardList,
+  Filter,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -982,7 +983,34 @@ export function EventsPage() {
   const [calYear, setCalYear] = useState(2026);
   const [calMonth, setCalMonth] = useState(2); // March
 
+  // Territory filters
+  const [filterBorough, setFilterBorough] = useState<string>("All");
+  const [filterState, setFilterState] = useState<string>("All");
+  const [filterVenueType, setFilterVenueType] = useState<string>("All");
+
+  // Derive unique filter options from event data
+  const boroughOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(mockEvents.map((e) => e.borough).filter(Boolean) as string[]),
+      ).sort(),
+    [],
+  );
+  const stateOptions = useMemo(
+    () => Array.from(new Set(mockEvents.map((e) => e.state))).sort(),
+    [],
+  );
+  const venueTypeOptions = useMemo(
+    () => Array.from(new Set(mockEvents.map((e) => e.venueType))).sort(),
+    [],
+  );
+
   const isFinalizationMode = searchParams.get("mode") === "finalize";
+
+  const hasActiveFilters =
+    filterBorough !== "All" ||
+    filterState !== "All" ||
+    filterVenueType !== "All";
 
   const filteredEvents = sortEvents(
     mockEvents
@@ -994,6 +1022,11 @@ export function EventsPage() {
           e.venue.toLowerCase().includes(search.toLowerCase()) ||
           e.brandName.toLowerCase().includes(search.toLowerCase()) ||
           (e.educatorName || "").toLowerCase().includes(search.toLowerCase()),
+      )
+      .filter((e) => filterBorough === "All" || e.borough === filterBorough)
+      .filter((e) => filterState === "All" || e.state === filterState)
+      .filter(
+        (e) => filterVenueType === "All" || e.venueType === filterVenueType,
       ),
     sortBy,
   );
@@ -1151,6 +1184,69 @@ export function EventsPage() {
                 : "Educator"}
           </span>
         </Button>
+      </div>
+
+      {/* Territory Filters Row */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div
+          className="flex items-center gap-1.5 text-muted-foreground"
+          style={{ fontSize: "0.75rem" }}
+        >
+          <Filter className="w-3.5 h-3.5" />
+          <span className="font-medium">Territory</span>
+        </div>
+        <select
+          value={filterBorough}
+          onChange={(e) => setFilterBorough(e.target.value)}
+          className="rounded-lg border border-border bg-card px-3 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors cursor-pointer"
+          style={{ fontSize: "0.8125rem" }}
+        >
+          <option value="All">All Boroughs</option>
+          {boroughOptions.map((b) => (
+            <option key={b} value={b}>
+              {b}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filterState}
+          onChange={(e) => setFilterState(e.target.value)}
+          className="rounded-lg border border-border bg-card px-3 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors cursor-pointer"
+          style={{ fontSize: "0.8125rem" }}
+        >
+          <option value="All">All States</option>
+          {stateOptions.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filterVenueType}
+          onChange={(e) => setFilterVenueType(e.target.value)}
+          className="rounded-lg border border-border bg-card px-3 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors cursor-pointer"
+          style={{ fontSize: "0.8125rem" }}
+        >
+          <option value="All">All Venue Types</option>
+          {venueTypeOptions.map((v) => (
+            <option key={v} value={v}>
+              {v}
+            </option>
+          ))}
+        </select>
+        {hasActiveFilters && (
+          <button
+            onClick={() => {
+              setFilterBorough("All");
+              setFilterState("All");
+              setFilterVenueType("All");
+            }}
+            className="text-primary hover:opacity-80 transition-opacity cursor-pointer font-medium"
+            style={{ fontSize: "0.75rem" }}
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
       {/* Content */}
