@@ -1,9 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
-  Users,
   Search,
-  Star,
   MapPin,
   TrendingUp,
   TrendingDown,
@@ -12,8 +10,6 @@ import {
   ChevronRight,
   X,
   ArrowUpDown,
-  Shield,
-  Clock,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -94,20 +90,7 @@ export function EducatorsPage() {
   const [specialtyFilter, setSpecialtyFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  /* ---- Computed stats ---- */
-  const totalEducators = MOCK_EDUCATORS.length;
-  const activeCount = MOCK_EDUCATORS.filter(
-    (e) => e.status === "active",
-  ).length;
-  const pendingCount = MOCK_EDUCATORS.filter(
-    (e) => e.status === "pending",
-  ).length;
-  const scoredEducators = MOCK_EDUCATORS.filter((e) => e.qualityScore > 0);
-  const avgQualityScore =
-    scoredEducators.length > 0
-      ? scoredEducators.reduce((sum, e) => sum + e.qualityScore, 0) /
-        scoredEducators.length
-      : 0;
+
 
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
@@ -510,43 +493,4 @@ export function EducatorsPage() {
 /* Stat Card                                                           */
 /* ------------------------------------------------------------------ */
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: number;
-  accent: boolean;
-}) {
-  return (
-    <Card className="gap-0">
-      <CardContent className="p-4 flex items-center gap-3">
-        <div
-          className={`flex items-center justify-center size-10 rounded-lg ${
-            accent ? "bg-[#7D152D]/10" : "bg-muted"
-          }`}
-        >
-          <Icon
-            className={`size-5 ${
-              accent ? "text-[#7D152D]" : "text-muted-foreground"
-            }`}
-          />
-        </div>
-        <div>
-          <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-            {label}
-          </p>
-          <p
-            className={accent ? "text-[#7D152D]" : "text-foreground"}
-            style={{ fontSize: "1.5rem", fontWeight: 600, lineHeight: 1.2 }}
-          >
-            {value}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+

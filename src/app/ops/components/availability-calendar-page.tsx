@@ -8,7 +8,7 @@ import {
   CloudSun,
   Moon,
   Users,
-  CalendarCheck,
+
   Filter,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
@@ -92,29 +92,7 @@ const SLOT_META: Record<
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: number;
-  accent: string;
-}) {
-  return (
-    <div className="bg-white rounded-xl border border-[#E2E8F0] px-5 py-4">
-      <p
-        className="text-[#94A3B8] mb-1"
-        style={{ fontSize: "0.75rem", fontWeight: 500 }}
-      >
-        {label}
-      </p>
-      <p style={{ fontSize: "1.5rem", fontWeight: 700, color: accent }}>
-        {value}
-      </p>
-    </div>
-  );
-}
+
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -146,26 +124,7 @@ export function AvailabilityCalendarPage() {
     return list;
   }, [statusFilter, search]);
 
-  // Stats
-  const stats = useMemo(() => {
-    let availableToday = 0;
-    let fullyAvailableWeek = 0;
 
-    for (const educator of mockEducators.filter(
-      (e) => e.status === "Active",
-    )) {
-      const hasToday = educator.availability.some((a) => a.date === todayKey);
-      if (hasToday) availableToday++;
-
-      const weekKeys = new Set(weekDays.map(toISODate));
-      const educatorDays = new Set(
-        educator.availability.filter((a) => weekKeys.has(a.date)).map((a) => a.date),
-      );
-      if (educatorDays.size >= 5) fullyAvailableWeek++;
-    }
-
-    return { availableToday, fullyAvailableWeek };
-  }, [weekDays, todayKey]);
 
   const prevWeek = () => {
     const d = new Date(weekAnchor);
@@ -426,7 +385,7 @@ export function AvailabilityCalendarPage() {
                   </button>
 
                   {/* Day cells */}
-                  {weekDays.map((day, dayIdx) => {
+                  {weekDays.map((day, _dayIdx) => {
                     const dateStr = toISODate(day);
                     const isToday = dateStr === todayKey;
                     const slots = getSlots(educator, dateStr);

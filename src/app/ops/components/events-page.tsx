@@ -1,16 +1,12 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
-  CalendarDays,
   Search,
-  Clock,
   Building2,
-  Radio,
   ArrowUpDown,
   ChevronLeft,
   ChevronRight,
   X,
-  ClipboardCheck,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -23,7 +19,7 @@ import {
   SelectValue,
 } from "../../shared/components/ui/select";
 import { Input } from "@/app/shared/components/ui/input";
-import { MOCK_DRAFT_EVENTS } from "./draft-events-data";
+
 
 /* ------------------------------------------------------------------ */
 /* Mock data                                                           */
@@ -487,18 +483,7 @@ export function EventsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  /* ---- Computed stats ---- */
-  const today = "Mar 4, 2026";
-  const eventsToday = MOCK_EVENTS.filter((e) => e.date === today).length;
-  const eventsThisWeek = MOCK_EVENTS.filter((e) => {
-    // Simple: count events from Mar 1–7
-    const d = e.date;
-    return d.startsWith("Mar") && parseInt(d.split(" ")[1] || "0") <= 7;
-  }).length;
-  const liveNow = MOCK_EVENTS.filter((e) => e.status === "Live").length;
-  const pendingDrafts = MOCK_DRAFT_EVENTS.filter(
-    (d) => d.status === "pending",
-  ).length;
+
 
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
@@ -865,47 +850,3 @@ export function EventsPage() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Stat Card                                                           */
-/* ------------------------------------------------------------------ */
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: number;
-  accent: boolean;
-}) {
-  return (
-    <Card className="gap-0">
-      <CardContent className="p-4 flex items-center gap-3">
-        <div
-          className={`flex items-center justify-center size-10 rounded-lg ${
-            accent ? "bg-[#7D152D]/10" : "bg-muted"
-          }`}
-        >
-          <Icon
-            className={`size-5 ${
-              accent ? "text-[#7D152D]" : "text-muted-foreground"
-            }`}
-          />
-        </div>
-        <div>
-          <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-            {label}
-          </p>
-          <p
-            className={accent ? "text-[#7D152D]" : "text-foreground"}
-            style={{ fontSize: "1.5rem", fontWeight: 600, lineHeight: 1.2 }}
-          >
-            {value}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

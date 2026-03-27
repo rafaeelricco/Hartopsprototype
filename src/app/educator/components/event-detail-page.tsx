@@ -34,6 +34,8 @@ import {
   Award,
   Search,
   Pencil,
+  RotateCcw,
+  Undo2,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Badge } from "@/app/shared/components/ui/badge";
@@ -69,6 +71,7 @@ import {
   type EventItem,
   type CancellationReason,
   type AssignedEducator,
+  type AssignmentStatus,
 } from "./events-data";
 import { mockEducators, type Educator } from "./educator-roster-data";
 import {
@@ -449,14 +452,7 @@ function getScoreColor(score: number): string {
   return "bg-red-500/10 text-red-600 border-red-500/20";
 }
 
-function rankEducators(educators: Educator[], event: EventItem): Educator[] {
-  return [...educators].sort((a, b) => {
-    const aConflict = hasSchedulingConflict(a, event);
-    const bConflict = hasSchedulingConflict(b, event);
-    if (aConflict !== bConflict) return aConflict ? 1 : -1;
-    return getCompositeScore(b, event) - getCompositeScore(a, event);
-  });
-}
+
 
 /* --- Availability Strip (compact 7-day view for assignment panel, G1) --- */
 
@@ -650,6 +646,10 @@ export function EventDetailPage() {
             educatorId: id,
             educatorName: edu.name,
             assignmentStatus: "Pending",
+            offeredAt: new Date().toISOString(),
+            expiresAt: new Date(
+              Date.now() + 48 * 60 * 60 * 1000,
+            ).toISOString(),
           });
         }
       }
@@ -668,6 +668,61 @@ export function EventDetailPage() {
       prev.filter((e) => e.educatorId !== educatorId),
     );
     setActionFeedback(`${educatorToRemove?.educatorName} removed from event.`);
+    setTimeout(() => setActionFeedback(null), 3000);
+  };
+
+  const handleWithdrawOffer = (educatorId: string) => {
+    const edu = assignedEducators.find((e) => e.educatorId === educatorId);
+    setAssignedEducators((prev) =>
+      prev.map((ae) =>
+        ae.educatorId === educatorId
+          ? { ...ae, assignmentStatus: "Withdrawn" as AssignmentStatus }
+          : ae,
+      ),
+    );
+    setActionFeedback(`Offer withdrawn for ${edu?.educatorName}.`);
+    setTimeout(() => setActionFeedback(null), 3000);
+  };
+
+  const handleResendOffer = (educatorId: string) => {
+    const edu = assignedEducators.find((e) => e.educatorId === educatorId);
+    setAssignedEducators((prev) =>
+      prev.map((ae) => {
+        if (ae.educatorId !== educatorId) return ae;
+        const { respondedAt, declineReason, ...rest } = ae;
+        return {
+          ...rest,
+          assignmentStatus: "Pending" as AssignmentStatus,
+          offeredAt: new Date().toISOString(),
+        };
+      }),
+    );
+    setActionFeedback(`Offer resent to ${edu?.educatorName}.`);
+    setTimeout(() => setActionFeedback(null), 3000);
+  };
+
+  const handleSimulateResponse = (
+    educatorId: string,
+    response: "Accepted" | "Declined",
+  ) => {
+    const edu = assignedEducators.find((e) => e.educatorId === educatorId);
+    setAssignedEducators((prev) =>
+      prev.map((ae) =>
+        ae.educatorId === educatorId
+          ? {
+              ...ae,
+              assignmentStatus: response,
+              respondedAt: new Date().toISOString(),
+              ...(response === "Declined"
+                ? { declineReason: "Schedule conflict" }
+                : {}),
+            }
+          : ae,
+      ),
+    );
+    setActionFeedback(
+      `${edu?.educatorName} ${response === "Accepted" ? "accepted" : "declined"} the offer.`,
+    );
     setTimeout(() => setActionFeedback(null), 3000);
   };
 
@@ -820,10 +875,10 @@ export function EventDetailPage() {
             value={event.venue}
             subValue={event.venueAddress}
           />
-          {/* Multi-educator cards (G6, G7 per mm-ui-002 §4) */}
+          {/* Multi-educator cards — Offer Status Panel */}
           {assignedEducators.length > 0 ? (
             <Card className="gap-0 md:col-span-1">
-              <CardContent className="p-4 space-y-2">
+              <CardContent className="p-4 space-y-3">
                 <div
                   className="flex items-center justify-between text-muted-foreground"
                   style={{ fontSize: "0.75rem" }}
@@ -843,67 +898,220 @@ export function EventDetailPage() {
                 </div>
                 {assignedEducators.map((ae) => {
                   const edu = mockEducators.find((e) => e.id === ae.educatorId);
+                  const timeAgo = ae.offeredAt
+                    ? (() => {
+                        const diff =
+                          Date.now() - new Date(ae.offeredAt).getTime();
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        if (hours < 1) return "Just now";
+                        if (hours < 24) return `${hours}h ago`;
+                        return `${Math.floor(hours / 24)}d ago`;
+                      })()
+                    : null;
+
                   return (
                     <div
                       key={ae.educatorId}
-                      className="flex items-center justify-between p-2 rounded-md border border-border"
+                      className="rounded-lg border border-border overflow-hidden"
                     >
-                      <div className="space-y-0.5">
-                        <p
-                          className="text-foreground flex items-center gap-2"
-                          style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                        >
-                          {ae.educatorName}
-                          {edu?.distanceMiles != null && (
-                            <span
-                              className="text-muted-foreground"
-                              style={{ fontSize: "0.6875rem" }}
+                      <div className="flex items-center justify-between p-3">
+                        <div className="space-y-1 min-w-0">
+                          <p
+                            className="text-foreground flex items-center gap-2"
+                            style={{ fontSize: "0.875rem", fontWeight: 500 }}
+                          >
+                            {ae.educatorName}
+                            {edu?.distanceMiles != null && (
+                              <span
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.6875rem" }}
+                              >
+                                ~{edu.distanceMiles} mi
+                              </span>
+                            )}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            {/* Status badge */}
+                            {ae.assignmentStatus === "Accepted" && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                style={{
+                                  fontSize: "0.625rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                <CheckCircle2 className="w-3 h-3" />
+                                Accepted
+                              </span>
+                            )}
+                            {ae.assignmentStatus === "Pending" && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                                style={{
+                                  fontSize: "0.625rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                <Clock className="w-3 h-3" />
+                                Awaiting Response
+                              </span>
+                            )}
+                            {ae.assignmentStatus === "Declined" && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-red-500/10 text-red-600 border-red-500/20"
+                                style={{
+                                  fontSize: "0.625rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                <XCircle className="w-3 h-3" />
+                                Declined
+                              </span>
+                            )}
+                            {ae.assignmentStatus === "Withdrawn" && (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 bg-muted text-muted-foreground border-border"
+                                style={{
+                                  fontSize: "0.625rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                <Undo2 className="w-3 h-3" />
+                                Withdrawn
+                              </span>
+                            )}
+                            {/* Timestamp */}
+                            {ae.respondedAt && (
+                              <span
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.625rem" }}
+                              >
+                                {(() => {
+                                  const diff =
+                                    Date.now() -
+                                    new Date(ae.respondedAt).getTime();
+                                  const hours = Math.floor(
+                                    diff / (1000 * 60 * 60),
+                                  );
+                                  if (hours < 1) return "Just now";
+                                  if (hours < 24) return `${hours}h ago`;
+                                  return `${Math.floor(hours / 24)}d ago`;
+                                })()}
+                              </span>
+                            )}
+                            {ae.assignmentStatus === "Pending" && timeAgo && (
+                              <span
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.625rem" }}
+                              >
+                                Sent {timeAgo}
+                              </span>
+                            )}
+                          </div>
+                          {/* Decline reason */}
+                          {ae.assignmentStatus === "Declined" &&
+                            ae.declineReason && (
+                              <p
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.6875rem" }}
+                              >
+                                Reason: {ae.declineReason}
+                              </p>
+                            )}
+                        </div>
+
+                        {/* Action buttons */}
+                        {isPreEvent && (
+                          <div className="flex items-center gap-1 shrink-0 ml-2">
+                            {ae.assignmentStatus === "Pending" && (
+                              <>
+                                {/* Simulate Response (prototype) */}
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleSimulateResponse(
+                                      ae.educatorId,
+                                      "Accepted",
+                                    )
+                                  }
+                                  className="h-7 px-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 cursor-pointer"
+                                  title="Simulate Accept"
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleSimulateResponse(
+                                      ae.educatorId,
+                                      "Declined",
+                                    )
+                                  }
+                                  className="h-7 px-2 text-red-500 hover:text-red-600 hover:bg-red-500/10 cursor-pointer"
+                                  title="Simulate Decline"
+                                >
+                                  <XCircle className="w-3.5 h-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleWithdrawOffer(ae.educatorId)
+                                  }
+                                  className="h-7 px-2 text-muted-foreground hover:text-foreground cursor-pointer"
+                                  title="Withdraw Offer"
+                                >
+                                  <Undo2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </>
+                            )}
+                            {(ae.assignmentStatus === "Declined" ||
+                              ae.assignmentStatus === "Withdrawn") && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleResendOffer(ae.educatorId)
+                                }
+                                className="h-7 px-2 text-primary hover:text-primary/80 hover:bg-primary/10 cursor-pointer"
+                                title="Resend Offer"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                handleRemoveEducator(ae.educatorId)
+                              }
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
                             >
-                              ~{edu.distanceMiles} mi
-                            </span>
-                          )}
-                          {ae.assignmentStatus === "Accepted" && (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
-                          )}
-                          {ae.assignmentStatus === "Pending" && (
-                            <span
-                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
-                              style={{
-                                fontSize: "0.5625rem",
-                                fontWeight: 500,
-                                lineHeight: "1rem",
-                              }}
-                            >
-                              Pending
-                            </span>
-                          )}
-                          {ae.assignmentStatus === "Declined" && (
-                            <span
-                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-red-500/10 text-red-600 border-red-500/20"
-                              style={{
-                                fontSize: "0.5625rem",
-                                fontWeight: 500,
-                                lineHeight: "1rem",
-                              }}
-                            >
-                              Declined
-                            </span>
-                          )}
-                        </p>
+                              <XCircle className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
-                      {isPreEvent && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveEducator(ae.educatorId)}
-                          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive cursor-pointer"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </Button>
-                      )}
                     </div>
                   );
                 })}
+                {/* Prototype helper label */}
+                {isPreEvent &&
+                  assignedEducators.some(
+                    (ae) => ae.assignmentStatus === "Pending",
+                  ) && (
+                    <p
+                      className="text-muted-foreground text-center pt-1"
+                      style={{ fontSize: "0.625rem" }}
+                    >
+                      Use{" "}
+                      <CheckCircle2 className="inline w-3 h-3 text-emerald-600" />{" "}
+                      <XCircle className="inline w-3 h-3 text-red-500" /> to
+                      simulate educator responses
+                    </p>
+                  )}
               </CardContent>
             </Card>
           ) : (

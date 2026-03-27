@@ -165,6 +165,21 @@ export const eventsTrend = [
 ];
 
 // Top educators by performance
+// Pending offers summary
+export interface PendingOffersSummary {
+  totalPendingOffers: number;
+  awaitingResponse: number;
+  acceptedToday: number;
+  declinedToday: number;
+}
+
+export const pendingOffersSummary: PendingOffersSummary = {
+  totalPendingOffers: 5,
+  awaitingResponse: 3,
+  acceptedToday: 1,
+  declinedToday: 1,
+};
+
 export const topEducators: TopEducator[] = [
   { name: "Sarah Chen", eventsThisMonth: 14, avgRating: 4.9, trend: "up" },
   { name: "Emily Park", eventsThisMonth: 12, avgRating: 4.8, trend: "up" },

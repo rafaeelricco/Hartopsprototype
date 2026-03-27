@@ -33,12 +33,33 @@ export type StatusDisplayGroup =
   | "Completed"
   | "Cancelled";
 
-export type AssignmentStatus = "Pending" | "Accepted" | "Declined";
+export type AssignmentStatus = "Pending" | "Accepted" | "Declined" | "Withdrawn";
 
 export interface AssignedEducator {
   educatorId: string;
   educatorName: string;
   assignmentStatus: AssignmentStatus;
+  offeredAt?: string;
+  respondedAt?: string;
+  declineReason?: string;
+  expiresAt?: string;
+}
+
+export function computeEventStatusFromAssignments(
+  educators: AssignedEducator[],
+): EventStatus {
+  if (educators.length === 0) return "Unassigned";
+  const hasAccepted = educators.some(
+    (e) => e.assignmentStatus === "Accepted",
+  );
+  const allDeclinedOrWithdrawn = educators.every(
+    (e) =>
+      e.assignmentStatus === "Declined" ||
+      e.assignmentStatus === "Withdrawn",
+  );
+  if (hasAccepted) return "Confirmed";
+  if (allDeclinedOrWithdrawn) return "Unassigned";
+  return "Pending";
 }
 
 export interface QuestionnaireResponse {
@@ -272,6 +293,8 @@ export const mockEvents: EventItem[] = [
         educatorId: "edu-2",
         educatorName: "Sarah Chen",
         assignmentStatus: "Accepted",
+        offeredAt: "2026-03-17T09:00:00Z",
+        respondedAt: "2026-03-17T10:15:00Z",
       },
     ],
     status: "Live",
@@ -554,11 +577,15 @@ export const mockEvents: EventItem[] = [
         educatorId: "edu-5",
         educatorName: "Maria Santos",
         assignmentStatus: "Accepted",
+        offeredAt: "2026-03-19T08:00:00Z",
+        respondedAt: "2026-03-19T09:30:00Z",
       },
       {
         educatorId: "edu-8",
         educatorName: "Lisa Thompson",
         assignmentStatus: "Pending",
+        offeredAt: "2026-03-19T08:00:00Z",
+        expiresAt: "2026-03-20T20:00:00Z",
       },
     ],
     status: "Confirmed",
@@ -844,6 +871,16 @@ export const mockEvents: EventItem[] = [
         educatorId: "edu-7",
         educatorName: "Carlos Mendez",
         assignmentStatus: "Pending",
+        offeredAt: "2026-03-20T14:00:00Z",
+        expiresAt: "2026-03-21T20:00:00Z",
+      },
+      {
+        educatorId: "edu-3",
+        educatorName: "Emily Park",
+        assignmentStatus: "Declined",
+        offeredAt: "2026-03-20T14:00:00Z",
+        respondedAt: "2026-03-20T16:45:00Z",
+        declineReason: "Schedule conflict",
       },
     ],
     status: "Pending",

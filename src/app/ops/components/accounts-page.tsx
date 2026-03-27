@@ -1,13 +1,11 @@
 import React, { useState, useMemo, useCallback } from "react";
 import {
-  Building2,
   MapPin,
   Search,
   X,
   ChevronLeft,
   ChevronRight,
   ArrowUpDown,
-  Store,
   Phone,
   Plus,
 } from "lucide-react";
@@ -81,17 +79,7 @@ export function AccountsPage() {
     forceUpdate((n) => n + 1);
   }, []);
 
-  /* ---- Computed stats ---- */
-  const totalAccounts = MOCK_ACCOUNTS.length;
-  const activeAccounts = MOCK_ACCOUNTS.filter(
-    (a) => a.status.toLowerCase() === "active",
-  ).length;
-  const onPremise = MOCK_ACCOUNTS.filter(
-    (a) => a.type.toLowerCase() === "on-premise",
-  ).length;
-  const offPremise = MOCK_ACCOUNTS.filter(
-    (a) => a.type.toLowerCase() === "off-premise",
-  ).length;
+
 
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
@@ -590,46 +578,7 @@ export function AccountsPage() {
 /* Stat Card                                                           */
 /* ------------------------------------------------------------------ */
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: number | string;
-  accent: boolean;
-}) {
-  return (
-    <Card className="gap-0">
-      <CardContent className="p-4 flex items-center gap-3">
-        <div
-          className={`flex items-center justify-center size-10 rounded-lg ${
-            accent ? "bg-[#7D152D]/10" : "bg-muted"
-          }`}
-        >
-          <Icon
-            className={`size-5 ${
-              accent ? "text-[#7D152D]" : "text-muted-foreground"
-            }`}
-          />
-        </div>
-        <div>
-          <p className="text-muted-foreground" style={{ fontSize: "0.75rem" }}>
-            {label}
-          </p>
-          <p
-            className={accent ? "text-[#7D152D]" : "text-foreground"}
-            style={{ fontSize: "1.5rem", fontWeight: 600, lineHeight: 1.2 }}
-          >
-            {value}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+
 
 /* ------------------------------------------------------------------ */
 /* Profile Tile (drawer label-value pair)                               */

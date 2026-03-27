@@ -328,6 +328,12 @@ function EducatorCell({ event }: { event: EventItem }) {
         >
           <Clock className="w-2.5 h-2.5 mr-0.5" />
           Pending
+          {event.assignedEducators && event.assignedEducators.length > 0 && (
+            <span className="ml-0.5">
+              ({event.assignedEducators.filter((ae) => ae.assignmentStatus !== "Pending" && ae.assignmentStatus !== "Withdrawn").length}/
+              {event.assignedEducators.length})
+            </span>
+          )}
         </span>
       )}
       {event.status === "Confirmed" && (

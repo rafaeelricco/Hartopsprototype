@@ -18,11 +18,9 @@ import {
   EyeOff,
   LogOut,
   Loader2,
-  Save,
   Camera,
   Pencil,
   Check,
-  X,
 } from "lucide-react";
 import { Input } from "@/app/shared/components/ui/input";
 import { Switch } from "@/app/shared/components/ui/switch";

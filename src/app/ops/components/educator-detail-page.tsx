@@ -13,7 +13,6 @@ import {
   TrendingUp,
   Gauge,
 } from "lucide-react";
-import { Badge } from "../../shared/components/ui/badge";
 import { MOCK_EDUCATORS } from "./educator-data";
 
 /* ------------------------------------------------------------------ */
@@ -240,7 +239,8 @@ export function EducatorDetailPage() {
   const recentEvents =
     RECENT_EVENTS_BY_EDUCATOR[educator.id] ?? getDefaultEvents(educator.id);
 
-  const status = statusStyles[educator.status] ?? statusStyles["inactive"];
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const status = (statusStyles[educator.status] ?? statusStyles["inactive"])!;
 
   return (
     <div className="p-6 space-y-6 font-[Inter]">
