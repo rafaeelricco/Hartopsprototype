@@ -313,7 +313,7 @@ export function AccountsPage() {
       </div>
 
       {/* Summary Stats Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           icon={Building2}
           label="Total Accounts"
@@ -332,7 +332,7 @@ export function AccountsPage() {
           value={`${onPremise} / ${offPremise}`}
           accent={true}
         />
-      </div>
+      </div> */}
 
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-3">

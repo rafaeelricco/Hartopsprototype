@@ -176,7 +176,7 @@ export function EducatorsPage() {
       </div>
 
       {/* Summary Stats Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <StatCard
           icon={Users}
           label="Total Educators"
@@ -201,7 +201,7 @@ export function EducatorsPage() {
           value={Number(avgQualityScore.toFixed(1))}
           accent={false}
         />
-      </div>
+      </div> */}
 
       {/* Filters Row */}
       <div className="flex flex-wrap items-center gap-3">

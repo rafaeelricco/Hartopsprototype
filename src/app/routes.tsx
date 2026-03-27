@@ -19,6 +19,7 @@ import { AccountsPage } from "./ops/components/accounts-page";
 import { EducatorsPage } from "./ops/components/educators-page";
 import { EducatorDetailPage } from "./ops/components/educator-detail-page";
 import { DraftEventsPage } from "./ops/components/draft-events-page";
+import { AvailabilityCalendarPage } from "./ops/components/availability-calendar-page";
 import { HelpPage } from "./ops/components/help-page";
 import { TermsOfServicePage } from "./ops/components/terms-of-service";
 import { PrivacyPolicyPage } from "./ops/components/privacy-policy";
@@ -78,6 +79,7 @@ export const router = createBrowserRouter([
       { path: "accounts", Component: AccountsPage },
       { path: "educators", Component: EducatorsPage },
       { path: "educators/:id", Component: EducatorDetailPage },
+      { path: "availability", Component: AvailabilityCalendarPage },
       { path: "draft-events", Component: DraftEventsPage },
       { path: "help", Component: HelpPage },
       { path: "*", Component: NotFound },

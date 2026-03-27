@@ -11,6 +11,7 @@ import {
   Store,
   Users,
   ClipboardCheck,
+  CalendarCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -59,6 +60,11 @@ const data = {
       title: "Educators",
       url: "/ops/dashboard/educators",
       icon: Users,
+    },
+    {
+      title: "Availability",
+      url: "/ops/dashboard/availability",
+      icon: CalendarCheck,
     },
     // {
     //   title: "Draft Events",
