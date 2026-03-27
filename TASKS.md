@@ -127,7 +127,7 @@ Educator management is core to Hart operations — largest area. Includes roster
   - **Phase 2:** Reliability scoring from cancellations, certifications, on-time rate. Mobile data capture points feeding into this foundation.
     Source: `Call 1/4 00:54:10 – "it needs to be part of a scoring process with the educators."` + `Enhancement Doc – Educator Mgmt – Metrics section` + `Call 1/4 01:09:02 – "there was an educator rating which we're not really utilizing yet."`
 
-- [ ] `🟢 P1` **Educator availability calendar** — Calendar view by day/week. Highest-priority educator feature. Chris: "the big thing that needs to be front and center."
+- [x] `🟢 P1` **Educator availability calendar** — Calendar view by day/week. Highest-priority educator feature. Chris: "the big thing that needs to be front and center."
       → See §1 "Availability/calendar" for educator-facing mobile view.
       Source: `Call 1/4 00:23:52 – "The big thing that needs to be front and center is availability and having a calendar functionality."`
 
@@ -258,14 +258,14 @@ Expand ops beyond organization/event monitoring into data stewardship.
 | --------------------------------------- | --------- | ------ | ------- | ----------- | ------ |
 | §1 Mobile App – Educator                | P1/P2     | 10     | 0       | 2           | 12     |
 | §2 Staff – Campaigns, Events & Reports  | P1/P2     | 10     | 0       | 3           | 13     |
-| §3 Ops – Educator & Assignment Mgmt     | P1/P2     | 6      | 1       | 8           | 15     |
+| §3 Ops – Educator & Assignment Mgmt     | P1/P2     | 7      | 1       | 7           | 15     |
 | §4 Ops – Monitoring, Accounts & Masters | P1/P2     | 0      | 1       | 8           | 9      |
 | §5 Cross-Cutting                        | P1/P2     | 1      | 0       | 4           | 5      |
 | §6 Process & Collaboration              | P1        | 0      | 0       | 3           | 3      |
 | §7 Platform Tiers                       | P2        | 0      | 0       | 2           | 2      |
 | §8 Future / AI Work                     | P2/P3/TBD | 0      | 0       | 4           | 4      |
-| **Total**                               |           | **27** | **2**   | **34**      | **63** |
+| **Total**                               |           | **28** | **2**   | **33**      | **63** |
 
-**Phase 1 tasks:** 47 total — 27 done, 2 partial, 18 not started (1 blocked)
+**Phase 1 tasks:** 47 total — 28 done, 2 partial, 17 not started (1 blocked)
 **Phase 2 tasks:** 12 total — all not started
 **Phase 3 / TBD tasks:** 4 total — all not started
