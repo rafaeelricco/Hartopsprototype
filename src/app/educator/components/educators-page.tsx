@@ -9,6 +9,7 @@ import {
   Mail,
   Phone,
   CalendarDays,
+  Gauge,
 } from "lucide-react";
 import { Input } from "@/app/shared/components/ui/input";
 import {
@@ -19,13 +20,15 @@ import {
 } from "@/app/shared/components/ui/tooltip";
 import { PageHeader } from "@/app/shared/components/layouts/page-header";
 import { mockEducators } from "./educator-roster-data";
+import { getScoreColor, getTrendArrow, getTrendColor } from "./educator-scoring";
 
 type SortKey =
   | "name"
   | "avgRating"
   | "salesPerEvent"
   | "punctuality"
-  | "totalEvents";
+  | "totalEvents"
+  | "qualityScore";
 type SortDir = "asc" | "desc";
 type StatusFilter = "All" | "Active" | "Inactive";
 
@@ -35,7 +38,7 @@ const statusColors: Record<string, string> = {
   "Pending Invitation": "bg-amber-500/10 text-amber-500 border-amber-500/20",
 };
 
-const gridCols = "grid-cols-[1fr_70px_140px_50px_90px_90px_90px_80px]";
+const gridCols = "grid-cols-[1fr_70px_140px_50px_90px_100px_90px_90px_80px]";
 
 export function EducatorsPage() {
   const navigate = useNavigate();
@@ -152,6 +155,7 @@ export function EducatorsPage() {
             <span>Next Event</span>
             <SortableHeader label="Completed" sortKeyName="totalEvents" />
             <span>Status</span>
+            <SortableHeader label="Quality" sortKeyName="qualityScore" />
             <SortableHeader label="Rating" sortKeyName="avgRating" />
             <SortableHeader label="Sales" sortKeyName="salesPerEvent" />
             <SortableHeader label="On-Time" sortKeyName="punctuality" />
@@ -247,6 +251,31 @@ export function EducatorsPage() {
                   >
                     {edu.status}
                   </span>
+
+                  {/* Quality Score */}
+                  {(() => {
+                    if (!edu.qualityScore) return (
+                      <span className="text-muted-foreground" style={{ fontSize: "0.875rem" }}>\u2014</span>
+                    );
+                    const colors = getScoreColor(edu.qualityScore);
+                    const trendDelta = edu.trends.qualityScore;
+                    return (
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-semibold ${colors.bg} ${colors.text} ${colors.border}`}
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          <Gauge className="w-3 h-3" />
+                          {edu.qualityScore}
+                        </span>
+                        {trendDelta !== 0 && (
+                          <span className={`${getTrendColor(trendDelta)}`} style={{ fontSize: "0.625rem", fontWeight: 600 }}>
+                            {getTrendArrow(trendDelta)}
+                          </span>
+                        )}
+                      </span>
+                    );
+                  })()}
 
                   {/* Avg Rating */}
                   <span
