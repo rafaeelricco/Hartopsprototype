@@ -131,7 +131,7 @@ Educator management is core to Hart operations — largest area. Includes roster
       → See §1 "Availability/calendar" for educator-facing mobile view.
       Source: `Call 1/4 00:23:52 – "The big thing that needs to be front and center is availability and having a calendar functionality."`
 
-- [ ] `🟢 P1` **Geography-based educator-event matching** — Match by proximity (home address vs venue), availability, skill set. Surface ranked list for manager selection.
+- [x] `🟢 P1` **Geography-based educator-event matching** — Match by proximity (home address vs venue), availability, skill set. Surface ranked list for manager selection.
       Source: `Call 1/4 00:52:05 – "we try to put the educators that from their home address close to the event so they don't have to drive two three hours away."`
 
 - [ ] `🟢 P1` **Assignment offer flow** — Educators are contractors. Show pending offers, accepted/declined. Chris: "a suggestion saying hey we have this opportunity."

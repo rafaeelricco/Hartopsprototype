@@ -23,6 +23,8 @@ export interface Educator {
     city: string;
     state: string;
     zip: string;
+    lat?: number;
+    lng?: number;
   };
   brandCertifications: string[];
   upcomingEvents: {
@@ -124,6 +126,8 @@ export const mockEducators: Educator[] = [
       city: "New York",
       state: "NY",
       zip: "10012",
+      lat: 40.7230,
+      lng: -73.9998,
     },
     brandCertifications: ["Absolut", "Malibu", "Kahlua"],
     upcomingEvents: [
@@ -214,6 +218,8 @@ export const mockEducators: Educator[] = [
       city: "Hoboken",
       state: "NJ",
       zip: "07030",
+      lat: 40.7440,
+      lng: -74.0280,
     },
     brandCertifications: ["Jameson", "Glenlivet"],
     upcomingEvents: [
@@ -288,6 +294,8 @@ export const mockEducators: Educator[] = [
       city: "Brooklyn",
       state: "NY",
       zip: "11201",
+      lat: 40.6862,
+      lng: -73.9770,
     },
     brandCertifications: ["Beefeater", "Absolut"],
     upcomingEvents: [
@@ -355,6 +363,8 @@ export const mockEducators: Educator[] = [
       city: "New York",
       state: "NY",
       zip: "10075",
+      lat: 40.7734,
+      lng: -73.9560,
     },
     brandCertifications: ["Avion", "Absolut", "Jameson", "Malibu"],
     upcomingEvents: [
@@ -445,6 +455,8 @@ export const mockEducators: Educator[] = [
       city: "Newark",
       state: "NJ",
       zip: "07102",
+      lat: 40.7357,
+      lng: -74.1724,
     },
     brandCertifications: ["Kahlua", "Malibu"],
     upcomingEvents: [
@@ -519,6 +531,8 @@ export const mockEducators: Educator[] = [
       city: "Brooklyn",
       state: "NY",
       zip: "11211",
+      lat: 40.7143,
+      lng: -73.9614,
     },
     brandCertifications: ["Glenlivet", "Jameson", "Beefeater"],
     upcomingEvents: [
@@ -598,6 +612,8 @@ export const mockEducators: Educator[] = [
       city: "Paterson",
       state: "NJ",
       zip: "07505",
+      lat: 40.9168,
+      lng: -74.1718,
     },
     brandCertifications: ["Absolut", "Kahlua"],
     upcomingEvents: [],
@@ -657,6 +673,8 @@ export const mockEducators: Educator[] = [
       city: "Morristown",
       state: "NJ",
       zip: "07960",
+      lat: 40.7968,
+      lng: -74.4815,
     },
     brandCertifications: ["Avion", "Glenlivet"],
     upcomingEvents: [
@@ -720,6 +738,8 @@ export const mockEducators: Educator[] = [
       city: "New York",
       state: "NY",
       zip: "10002",
+      lat: 40.7195,
+      lng: -73.9831,
     },
     brandCertifications: [],
     upcomingEvents: [],

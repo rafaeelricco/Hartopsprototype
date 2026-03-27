@@ -66,6 +66,8 @@ export interface EventItem {
   duration: string;
   venue: string;
   venueAddress: string;
+  venueLat?: number;
+  venueLng?: number;
   borough?: string;
   state: string;
   venueType: VenueType;
@@ -210,6 +212,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Whole Foods Market, SoHo",
     venueAddress: "95 E Houston St, New York, NY 10002",
+    venueLat: 40.7243,
+    venueLng: -73.9937,
     borough: "Manhattan",
     state: "NY",
     venueType: "Grocery",
@@ -254,6 +258,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Total Wine & More, Jersey City",
     venueAddress: "90 Mall Dr W, Jersey City, NJ 07310",
+    venueLat: 40.7281,
+    venueLng: -74.0776,
     borough: "Jersey City",
     state: "NJ",
     venueType: "Retail",
@@ -315,6 +321,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "BevMo!, Hoboken",
     venueAddress: "200 Washington St, Hoboken, NJ 07030",
+    venueLat: 40.7445,
+    venueLng: -74.0275,
     borough: "Hoboken",
     state: "NJ",
     venueType: "Retail",
@@ -490,6 +498,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Trader Joe's, Williamsburg",
     venueAddress: "400 Grand St, Brooklyn, NY 11211",
+    venueLat: 40.7121,
+    venueLng: -73.9563,
     borough: "Brooklyn",
     state: "NY",
     venueType: "Grocery",
@@ -530,6 +540,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Costco, Hackensack",
     venueAddress: "50 S River St, Hackensack, NJ 07601",
+    venueLat: 40.8838,
+    venueLng: -74.0430,
     borough: "Hackensack",
     state: "NJ",
     venueType: "Retail",
@@ -571,6 +583,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Wine.com Pop-up, Chelsea",
     venueAddress: "75 9th Ave, New York, NY 10011",
+    venueLat: 40.7420,
+    venueLng: -74.0048,
     borough: "Manhattan",
     state: "NY",
     venueType: "Pop-up",
@@ -759,6 +773,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Astor Wines & Spirits, NoHo",
     venueAddress: "399 Lafayette St, New York, NY 10003",
+    venueLat: 40.7263,
+    venueLng: -73.9927,
     borough: "Manhattan",
     state: "NY",
     venueType: "Retail",
@@ -814,6 +830,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Spec's Wines, Union Square",
     venueAddress: "33 Union Square W, New York, NY 10003",
+    venueLat: 40.7362,
+    venueLng: -73.9903,
     borough: "Manhattan",
     state: "NY",
     venueType: "Retail",
@@ -860,6 +878,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Eataly, Flatiron",
     venueAddress: "200 5th Ave, New York, NY 10010",
+    venueLat: 40.7413,
+    venueLng: -73.9898,
     borough: "Manhattan",
     state: "NY",
     venueType: "Bar/Restaurant",
@@ -945,6 +965,8 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Liquor Barn, Newark",
     venueAddress: "50 Market St, Newark, NJ 07102",
+    venueLat: 40.7352,
+    venueLng: -74.1687,
     borough: "Newark",
     state: "NJ",
     venueType: "Retail",
