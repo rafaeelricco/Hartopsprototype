@@ -35,10 +35,10 @@
 - [x] `🟢 P1` **Sales target & bonus display in tracking** — In the Sales Volume Tracker, add visible target and optional bonus threshold with progress bar. Add `target` and `bonusThreshold` fields to the `sales-volume` data module.
       Source: `Prototype Review 00:43:48 – "expectation is six bottles. If you want the bonus, you sell 12 bottles."`
 
-- [ ] `🟢 P1` **Mandatory photo upload enforcement** — Educators cannot progress through event tasks without uploading required photos. Disabled "Next" button until all mandatory photo slots are filled.
+- [x] `🟢 P1` **Mandatory photo upload enforcement** — Educators cannot progress through event tasks without uploading required photos. Disabled "Next" button until all mandatory photo slots are filled.
       Source: `Prototype Review 00:28:12 – Larry: "Is there a way there could be a conditional or some kind of system that they can't progress without putting that photo in?"`
 
-- [ ] `🟢 P1` **Per-event compensation visible in educator app** — Display clear per-event compensation amount (rate, hours, total) on event detail view. Not aggregated by pay period — scoped to individual events.
+- [x] `🟢 P1` **Per-event compensation visible in educator app** — Display clear per-event compensation amount (rate, hours, total) on event detail view. Not aggregated by pay period — scoped to individual events.
       Source: `Prototype Review 00:32:22 – Larry: "Does compensation work via our pay periods or does it tie back to every event?"` + `Leah: "I would want it every event."`
 
 - [ ] `🔵 P2` Educator certification / pre-qualification per brand used in assignment priority.
@@ -86,7 +86,7 @@ Campaign creation, event management, data foundations, and reporting.
       → See §1 "Sales tracking as simple product counter" for mobile UI.
       Source: `Call 1/4 00:21:55 – "I would just want to be able to click off how many I think I sold during the event."`
 
-- [ ] `🟢 P1` **Reports prototype — Staff & Ops basic reporting views** — Mimic current HEMS reports in prototype. **Staff:** campaign-level and cross-campaign analytics, time period selectors, performance trend charts, campaign comparison tables, PDF/CSV export. **Ops:** platform-wide stats, data quality score, growth charts, time-range filter + export. Complex analytics deferred to PowerBI for first 8 weeks; in-app dashboards deferred to P2.
+- [x] `🟢 P1` **Reports prototype — Staff & Ops basic reporting views** — Mimic current HEMS reports in prototype. **Staff:** campaign-level and cross-campaign analytics, time period selectors, performance trend charts, campaign comparison tables, PDF/CSV export. **Ops:** platform-wide stats, data quality score, growth charts, time-range filter + export. Complex analytics deferred to PowerBI for first 8 weeks; in-app dashboards deferred to P2.
       Source: `Briefing Doc – "Campaign-level and cross-campaign analytics with time period selectors, performance trend charts, campaign comparison tables, and exportable reports."` + `Call 2/4 00:44:15 – Chris: "I punted the reporting into PowerBI for the first eight weeks."` + `Call 3/4 00:13:50 – Chris: "for the MVP the team should mimic the reports available in the current application."`
 
 - [ ] `🔵 P2` **"What if" adjustment suggestions** — When projections are weak, suggest what to change. Depends on real account/event history data.
@@ -256,16 +256,16 @@ Expand ops beyond organization/event monitoring into data stewardship.
 
 | Section                                 | Phase     | Done   | Partial | Not Started | Total  |
 | --------------------------------------- | --------- | ------ | ------- | ----------- | ------ |
-| §1 Mobile App – Educator                | P1/P2     | 8      | 0       | 4           | 12     |
-| §2 Staff – Campaigns, Events & Reports  | P1/P2     | 9      | 0       | 4           | 13     |
+| §1 Mobile App – Educator                | P1/P2     | 10     | 0       | 2           | 12     |
+| §2 Staff – Campaigns, Events & Reports  | P1/P2     | 10     | 0       | 3           | 13     |
 | §3 Ops – Educator & Assignment Mgmt     | P1/P2     | 6      | 1       | 8           | 15     |
 | §4 Ops – Monitoring, Accounts & Masters | P1/P2     | 0      | 1       | 8           | 9      |
 | §5 Cross-Cutting                        | P1/P2     | 1      | 0       | 4           | 5      |
 | §6 Process & Collaboration              | P1        | 0      | 0       | 3           | 3      |
 | §7 Platform Tiers                       | P2        | 0      | 0       | 2           | 2      |
 | §8 Future / AI Work                     | P2/P3/TBD | 0      | 0       | 4           | 4      |
-| **Total**                               |           | **24** | **2**   | **37**      | **63** |
+| **Total**                               |           | **27** | **2**   | **34**      | **63** |
 
-**Phase 1 tasks:** 47 total — 24 done, 2 partial, 21 not started (1 blocked)
+**Phase 1 tasks:** 47 total — 27 done, 2 partial, 18 not started (1 blocked)
 **Phase 2 tasks:** 12 total — all not started
 **Phase 3 / TBD tasks:** 4 total — all not started
