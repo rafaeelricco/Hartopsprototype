@@ -122,7 +122,7 @@ Educator management is core to Hart operations — largest area. Includes roster
 - [x] `🟢 P1` **Late check-in / early check-out visual flags** — Conditional badges: 🟨 _Late Check-in_ / 🟥 _Early Check-out_ on manager's event detail. Feeds into educator scoring.
       Source: `Prototype Review 00:39:32 – "If I check in at 3:20, maybe a yellow flag pops up… I leave at 4:45, a red flag pops up."`
 
-- [~] `🟢 P1` **Educator scoring & metrics** — Quality score display in `educators-page.tsx` with color coding and trend tracking. **Partial:** UI displays scores but data capture flow incomplete.
+- [x] `🟢 P1` **Educator scoring & metrics** — Quality score display in `educators-page.tsx` with color coding and trend tracking. Performance Scorecard in `educator-detail-page.tsx` with 6 P1 metrics, SVG ring indicator, progress bars, and trend arrows. Scoring utility in `educator-scoring.ts`.
   - **Metrics to capture per educator (P1):** Retail Sales Reported Average, Preferred Brands/Categories, Check-in Score, Event Completed to End Time Average, Retailer Survey Score, Cancellation Rating.
   - **Phase 2:** Reliability scoring from cancellations, certifications, on-time rate. Mobile data capture points feeding into this foundation.
     Source: `Call 1/4 00:54:10 – "it needs to be part of a scoring process with the educators."` + `Enhancement Doc – Educator Mgmt – Metrics section` + `Call 1/4 01:09:02 – "there was an educator rating which we're not really utilizing yet."`
