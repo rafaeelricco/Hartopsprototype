@@ -134,10 +134,10 @@ Educator management is core to Hart operations — largest area. Includes roster
 - [x] `🟢 P1` **Geography-based educator-event matching** — Match by proximity (home address vs venue), availability, skill set. Surface ranked list for manager selection.
       Source: `Call 1/4 00:52:05 – "we try to put the educators that from their home address close to the event so they don't have to drive two three hours away."`
 
-- [ ] `🟢 P1` **Assignment offer flow** — Educators are contractors. Show pending offers, accepted/declined. Chris: "a suggestion saying hey we have this opportunity."
+- [x] `🟢 P1` **Assignment offer flow** — Educators are contractors. Show pending offers, accepted/declined. Chris: "a suggestion saying hey we have this opportunity."
       Source: `Call 1/4 00:52:05 – "it's basically a suggestion saying hey we have this opportunity. Do you accept it or not?"`
 
-- [ ] `🟢 P1` **Educator list sort by geography** — Roster sortable by neighborhoods/zip codes and by manager geography/territory.
+- [x] `🟢 P1` **Educator list sort by geography** — Roster sortable by neighborhoods/zip codes and by manager geography/territory.
       Source: `Enhancement Doc – Educator Mgmt: "Sorts by Areas of Geography aligned by Neighborhoods"`
 
 - [ ] `🟢 P1` **Mobile: Educator day-of cancel tagging** — Educator can tag event as cancelled _only on day of event_. Forces direct communication (call/text/chat) with manager before status change. Educator cannot unilaterally cancel.
