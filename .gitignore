@@ -40,6 +40,7 @@ Desktop.ini
 
 # Testing
 coverage/
+.playwright-mcp
 
 # TypeScript
 *.tsbuildinfo
