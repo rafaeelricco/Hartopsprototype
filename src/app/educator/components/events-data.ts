@@ -151,6 +151,12 @@ export interface EventItem {
   // Cancellation
   cancellationReason?: CancellationReason;
   cancelledAt?: string;
+  // Cancellation request from educator (day-of cancel tagging)
+  cancellationRequestStatus?: "none" | "pending-manager-approval" | "approved" | "rejected";
+  cancellationRequestReason?: CancellationReason;
+  cancellationRequestDetail?: string;
+  cancellationCommunicationMethod?: "call" | "text" | "chat";
+  cancellationRequestedAt?: string;
 }
 
 // --- Status helpers ---
@@ -598,6 +604,11 @@ export const mockEvents: EventItem[] = [
     compensation: { rate: "$40/hr", notes: "Wholesale venue premium rate" },
     storeContactName: "Dave P.",
     storeContactPhone: "201-555-0477",
+    // Demo: educator requested cancellation
+    cancellationRequestStatus: "pending-manager-approval",
+    cancellationRequestReason: "Weather",
+    cancellationCommunicationMethod: "call",
+    cancellationRequestedAt: "2026-03-21T09:15:00Z",
   },
   {
     id: "evt-106",

@@ -394,6 +394,15 @@ function EventNameCell({ event }: { event: EventItem }) {
           Early Out
         </span>
       )}
+      {event.cancellationRequestStatus === "pending-manager-approval" && (
+        <span
+          className="inline-flex items-center gap-1 rounded-full border px-1.5 py-0 flex-shrink-0 bg-amber-500/10 text-amber-600 border-amber-500/20"
+          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+        >
+          <AlertTriangle className="w-2.5 h-2.5" />
+          Cancel Requested
+        </span>
+      )}
     </div>
   );
 }
