@@ -701,31 +701,6 @@ export function EventDetailPage() {
     setTimeout(() => setActionFeedback(null), 3000);
   };
 
-  const handleSimulateResponse = (
-    educatorId: string,
-    response: "Accepted" | "Declined",
-  ) => {
-    const edu = assignedEducators.find((e) => e.educatorId === educatorId);
-    setAssignedEducators((prev) =>
-      prev.map((ae) =>
-        ae.educatorId === educatorId
-          ? {
-              ...ae,
-              assignmentStatus: response,
-              respondedAt: new Date().toISOString(),
-              ...(response === "Declined"
-                ? { declineReason: "Schedule conflict" }
-                : {}),
-            }
-          : ae,
-      ),
-    );
-    setActionFeedback(
-      `${edu?.educatorName} ${response === "Accepted" ? "accepted" : "declined"} the offer.`,
-    );
-    setTimeout(() => setActionFeedback(null), 3000);
-  };
-
   // Photo gallery helpers
   const allPhotos = event.photoUrls || [];
   const categorizedPhotos = event.photoCategories;
@@ -1024,48 +999,17 @@ export function EventDetailPage() {
                         {isPreEvent && (
                           <div className="flex items-center gap-1 shrink-0 ml-2">
                             {ae.assignmentStatus === "Pending" && (
-                              <>
-                                {/* Simulate Response (prototype) */}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleSimulateResponse(
-                                      ae.educatorId,
-                                      "Accepted",
-                                    )
-                                  }
-                                  className="h-7 px-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10 cursor-pointer"
-                                  title="Simulate Accept"
-                                >
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleSimulateResponse(
-                                      ae.educatorId,
-                                      "Declined",
-                                    )
-                                  }
-                                  className="h-7 px-2 text-red-500 hover:text-red-600 hover:bg-red-500/10 cursor-pointer"
-                                  title="Simulate Decline"
-                                >
-                                  <XCircle className="w-3.5 h-3.5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleWithdrawOffer(ae.educatorId)
-                                  }
-                                  className="h-7 px-2 text-muted-foreground hover:text-foreground cursor-pointer"
-                                  title="Withdraw Offer"
-                                >
-                                  <Undo2 className="w-3.5 h-3.5" />
-                                </Button>
-                              </>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleWithdrawOffer(ae.educatorId)
+                                }
+                                className="h-7 px-2 text-muted-foreground hover:text-foreground cursor-pointer"
+                                title="Withdraw Offer"
+                              >
+                                <Undo2 className="w-3.5 h-3.5" />
+                              </Button>
                             )}
                             {(ae.assignmentStatus === "Declined" ||
                               ae.assignmentStatus === "Withdrawn") && (
@@ -1097,21 +1041,6 @@ export function EventDetailPage() {
                     </div>
                   );
                 })}
-                {/* Prototype helper label */}
-                {isPreEvent &&
-                  assignedEducators.some(
-                    (ae) => ae.assignmentStatus === "Pending",
-                  ) && (
-                    <p
-                      className="text-muted-foreground text-center pt-1"
-                      style={{ fontSize: "0.625rem" }}
-                    >
-                      Use{" "}
-                      <CheckCircle2 className="inline w-3 h-3 text-emerald-600" />{" "}
-                      <XCircle className="inline w-3 h-3 text-red-500" /> to
-                      simulate educator responses
-                    </p>
-                  )}
               </CardContent>
             </Card>
           ) : (
