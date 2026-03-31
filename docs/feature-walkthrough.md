@@ -11,6 +11,8 @@ This document demonstrates all new features added to the Hart Ops prototype, cov
 
 ### 1. Educator Availability Calendar
 
+**Implemented:** March 27, 2026 · `cfe95e7`
+
 A centralized weekly calendar view showing all educators' availability at a glance. Operations managers can quickly identify scheduling gaps and plan assignments.
 
 **Key features:**
@@ -29,6 +31,8 @@ A centralized weekly calendar view showing all educators' availability at a glan
 
 ### 2. Ops Educators Roster
 
+**Implemented:** March 27, 2026 · `890c637`, `2c3c1b9`
+
 A sortable, filterable educator roster view for operations administrators. Displays quality scores with trend indicators, status badges, specialties, and event completion counts.
 
 **Key features:**
@@ -45,6 +49,8 @@ A sortable, filterable educator roster view for operations administrators. Displ
 ---
 
 ### 3. Educator Detail — Performance Scorecard
+
+**Implemented:** March 27, 2026 · `890c637` (detail redesign), `2c3c1b9` (quality scoring)
 
 Redesigned educator detail page featuring a custom profile header and a dedicated Performance Scorecard section. The scorecard calculates a composite Quality Score (0–100) from weighted metrics.
 
@@ -66,6 +72,8 @@ Redesigned educator detail page featuring a custom profile header and a dedicate
 
 ### 4. Ops Events — Cross-Organization Omni View
 
+**Implemented:** March 26, 2026 · `9f597eb`
+
 A cross-organization event monitoring table providing the operations team with a single view of all events across all client organizations.
 
 **Key features:**
@@ -85,6 +93,8 @@ A cross-organization event monitoring table providing the operations team with a
 
 ### 5. Educator Manager Dashboard & Offer Status Tracking
 
+**Implemented:** March 27, 2026 · `fafd108`
+
 A comprehensive dashboard for educator managers showing key metrics, pending offers, event trends, and items requiring attention.
 
 **Key features:**
@@ -103,6 +113,8 @@ A comprehensive dashboard for educator managers showing key metrics, pending off
 ---
 
 ### 6. Events Page — List View (7-State Lifecycle)
+
+**Implemented:** March 26–31, 2026 · `4dd8101` (punctuality), `d5df704` (cancellation tracking), `fafd108` (offer status)
 
 Events management with a 7-state lifecycle tracking system (Unassigned → Pending → Confirmed → Live → Completed → Finalized, with Cancelled branch).
 
@@ -126,6 +138,8 @@ Events management with a 7-state lifecycle tracking system (Unassigned → Pendi
 
 ### 7. Events Page — Calendar View
 
+**Implemented:** March 26, 2026 · `9f597eb`
+
 Monthly calendar visualization of all events with status-colored dots, providing a visual overview of event distribution across the month.
 
 **Key features:**
@@ -143,6 +157,8 @@ Monthly calendar visualization of all events with status-colored dots, providing
 ---
 
 ### 8. Event Detail — Lifecycle Indicator & Assignment
+
+**Implemented:** March 26, 2026 · `38ea39c` (pre-approval checklist), `4dd8101` (punctuality flags)
 
 Comprehensive event detail page with a visual 6-step lifecycle progress indicator and full event metadata.
 
@@ -162,6 +178,8 @@ Comprehensive event detail page with a visual 6-step lifecycle progress indicato
 ---
 
 ### 9. Geography-First Educator Matching
+
+**Implemented:** March 27, 2026 · `4cde1a8`
 
 When assigning educators to events, the system ranks available educators by proximity to the venue using Haversine distance calculation.
 
@@ -185,6 +203,8 @@ When assigning educators to events, the system ranks available educators by prox
 
 ### 10. Event Detail — Educator Assignment & Offer Tracking
 
+**Implemented:** March 27, 2026 · `fafd108` (offer tracking), March 31, 2026 · `d5df704` (cancellation requests)
+
 For events in Confirmed/Pending status, the assignment panel shows each assigned educator with their distance, offer status, and response timeline.
 
 **Key features:**
@@ -201,6 +221,8 @@ For events in Confirmed/Pending status, the assignment panel shows each assigned
 ---
 
 ### 11. Educator Roster (Manager View)
+
+**Implemented:** March 27, 2026 · `2c3c1b9` (scoring), `890c637` (redesign)
 
 The educator manager's roster view showing all assigned educators with performance metrics, quality scores, and upcoming events.
 
@@ -221,6 +243,8 @@ The educator manager's roster view showing all assigned educators with performan
 ---
 
 ### 12. Educator Detail — Profile, Scorecard & Availability
+
+**Implemented:** March 27, 2026 · `2c3c1b9` (scoring), `cfe95e7` (availability calendar), `890c637` (profile redesign)
 
 Detailed educator profile page with comprehensive metrics, performance scorecard, event history, and an integrated availability calendar.
 
@@ -247,6 +271,8 @@ Detailed educator profile page with comprehensive metrics, performance scorecard
 
 ### 13. Completed Event — Post-Event Data & Finalization
 
+**Implemented:** March 26, 2026 · `38ea39c` (pre-approval checklist), `4dd8101` (punctuality tracking)
+
 For completed events, the detail page shows comprehensive post-event data including final stats, questionnaire responses, photos, and a finalization workflow.
 
 **Key features:**
@@ -267,14 +293,14 @@ For completed events, the detail page shows comprehensive post-event data includ
 
 ## Summary of New Features
 
-| Feature | Platform | Commit(s) |
-|---------|----------|-----------|
-| Educator Availability Calendar | Ops | `cfe95e7` |
-| Educator Performance Scorecards & Quality Scoring | Ops, Educator | `2c3c1b9`, `7a8df77` |
-| Educator Detail Page Redesign | Ops | `890c637` |
-| Educator Dashboard & Offer Status Tracking | Educator Manager | `fafd108` |
-| Geography-First Educator Matching | Educator Manager | `4cde1a8` |
-| Educator Cancellation Request Tracking | Educator Manager | `d5df704` |
-| Punctuality Flags (Late Check-in / Early Checkout) | Educator Manager | `4dd8101` |
-| Pre-Approval Checklist for Event Finalization | Educator Manager | `38ea39c` |
-| 7-State Event Lifecycle (State Machine) | Educator Manager | Multiple |
+| Feature | Platform | Date | Commit(s) |
+|---------|----------|------|-----------|
+| Educator Availability Calendar | Ops | Mar 27 | `cfe95e7` |
+| Educator Performance Scorecards & Quality Scoring | Ops, Educator | Mar 27 | `2c3c1b9`, `7a8df77` |
+| Educator Detail Page Redesign | Ops | Mar 27 | `890c637` |
+| Educator Dashboard & Offer Status Tracking | Educator Manager | Mar 27 | `fafd108` |
+| Geography-First Educator Matching | Educator Manager | Mar 27 | `4cde1a8` |
+| Educator Cancellation Request Tracking | Educator Manager | Mar 31 | `d5df704` |
+| Punctuality Flags (Late Check-in / Early Checkout) | Educator Manager | Mar 26 | `4dd8101` |
+| Pre-Approval Checklist for Event Finalization | Educator Manager | Mar 26 | `38ea39c` |
+| 7-State Event Lifecycle (State Machine) | Educator Manager | Mar 26–27 | Multiple |
