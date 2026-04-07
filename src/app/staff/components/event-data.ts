@@ -3,6 +3,12 @@
 // for MM-UI-003 Event Creation Workflow.
 // =============================================================================
 
+export interface AssignedEducatorRecord {
+  educatorId: string;
+  name: string;
+  status: "Pending" | "Accepted" | "Declined";
+}
+
 export interface EventItem {
   id: string;
   campaignId: string;
@@ -10,14 +16,19 @@ export interface EventItem {
   accountId?: string | undefined;
   name: string;
   location: string;
+  state: string;
+  city: string;
   date: string;
   duration: string;
-  venueType: "off-premises" | "on-premises" | "special";
+  venueType: "off-premises" | "on-premises" | "special" | "cannabis";
   objectives: string[];
   dataModules: string[];
   advancedModules: string[];
   status: "draft" | "scheduled" | "active" | "completed";
+  assignmentStatus: "unassigned" | "assigned" | "pending";
+  assignedEducators?: AssignedEducatorRecord[];
   linkedProductIds?: string[] | undefined;
+  regionId?: string | undefined;
   createdAt: string;
 }
 
@@ -38,6 +49,11 @@ export const VENUE_TYPES = [
     value: "special" as const,
     label: "Special",
     description: "Festivals, pop-ups, private events",
+  },
+  {
+    value: "cannabis" as const,
+    label: "Cannabis",
+    description: "Dispensaries, cannabis lounges, 420-friendly venues",
   },
 ];
 
@@ -317,6 +333,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-1",
     name: "Downtown Chicago Sampling",
     location: "Binny's Beverage Depot, Chicago IL",
+    state: "IL",
+    city: "Chicago",
+    regionId: "reg-chicago",
     date: "2026-02-15",
     duration: "3 hours",
     venueType: "off-premises",
@@ -331,6 +350,11 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["shelf-analysis"],
     status: "completed",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-001", name: "Maria Santos", status: "Accepted" },
+      { educatorId: "EDU-003", name: "Ashley Chen", status: "Accepted" },
+    ],
     createdAt: "2026-01-20",
   },
   {
@@ -338,6 +362,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-1",
     name: "Miami Beach Pop-Up",
     location: "South Beach Boardwalk, Miami FL",
+    state: "FL",
+    city: "Miami",
+    regionId: "reg-lower-fl",
     date: "2026-03-01",
     duration: "4 hours",
     venueType: "special",
@@ -352,6 +379,11 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["foot-traffic"],
     status: "scheduled",
+    assignmentStatus: "pending",
+    assignedEducators: [
+      { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
+      { educatorId: "EDU-007", name: "Lauren Nguyen", status: "Pending" },
+    ],
     createdAt: "2026-02-05",
   },
   {
@@ -359,6 +391,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-1",
     name: "Austin Bar Crawl Activation",
     location: "Rainey Street District, Austin TX",
+    state: "TX",
+    city: "Austin",
+    regionId: "reg-austin",
     date: "2026-03-15",
     duration: "Full day (8h)",
     venueType: "on-premises",
@@ -373,6 +408,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["menu-analysis"],
     status: "draft",
+    assignmentStatus: "unassigned",
     createdAt: "2026-02-20",
   },
   // camp-2: Q1 Retail Activation (24 events — show 2)
@@ -381,6 +417,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-2",
     name: "Whole Foods Tasting — SF",
     location: "Whole Foods Market, San Francisco CA",
+    state: "CA",
+    city: "San Francisco",
+    regionId: "reg-sf",
     date: "2026-01-20",
     duration: "2 hours",
     venueType: "off-premises",
@@ -395,6 +434,10 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["shelf-analysis", "inventory-audit"],
     status: "completed",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
+    ],
     createdAt: "2026-01-10",
   },
   {
@@ -402,6 +445,8 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-2",
     name: "Total Wine Demo — Denver",
     location: "Total Wine & More, Denver CO",
+    state: "CO",
+    city: "Denver",
     date: "2026-02-14",
     duration: "3 hours",
     venueType: "off-premises",
@@ -416,6 +461,11 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["shelf-analysis"],
     status: "active",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-002", name: "James Mitchell", status: "Accepted" },
+      { educatorId: "EDU-006", name: "Marcus Taylor", status: "Accepted" },
+    ],
     createdAt: "2026-01-25",
   },
   // camp-3: Music Festival Sponsorship (6 events — show 2)
@@ -424,6 +474,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-3",
     name: "Coachella Brand Booth",
     location: "Empire Polo Club, Indio CA",
+    state: "CA",
+    city: "Indio",
+    regionId: "reg-la",
     date: "2026-04-10",
     duration: "Full day (8h)",
     venueType: "special",
@@ -441,6 +494,10 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["foot-traffic", "weather-impact"],
     status: "scheduled",
+    assignmentStatus: "pending",
+    assignedEducators: [
+      { educatorId: "EDU-009", name: "Jasmine Williams", status: "Pending" },
+    ],
     createdAt: "2025-12-28",
   },
   {
@@ -448,6 +505,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-3",
     name: "Lollapalooza VIP Lounge",
     location: "Grant Park, Chicago IL",
+    state: "IL",
+    city: "Chicago",
+    regionId: "reg-chicago",
     date: "2026-07-31",
     duration: "Full day (8h)",
     venueType: "special",
@@ -462,6 +522,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["foot-traffic"],
     status: "draft",
+    assignmentStatus: "unassigned",
     createdAt: "2026-01-15",
   },
   // camp-5: Campus Ambassador Program (12 events — show 2)
@@ -470,6 +531,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-5",
     name: "UCLA Welcome Week Activation",
     location: "UCLA Campus, Los Angeles CA",
+    state: "CA",
+    city: "Los Angeles",
+    regionId: "reg-la",
     date: "2026-03-25",
     duration: "Half day (5h)",
     venueType: "special",
@@ -487,6 +551,10 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: [],
     status: "scheduled",
+    assignmentStatus: "pending",
+    assignedEducators: [
+      { educatorId: "EDU-008", name: "Sofia Rodriguez", status: "Pending" },
+    ],
     createdAt: "2026-02-15",
   },
   {
@@ -494,6 +562,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-5",
     name: "UT Austin Spring Fest",
     location: "University of Texas, Austin TX",
+    state: "TX",
+    city: "Austin",
+    regionId: "reg-austin",
     date: "2026-04-05",
     duration: "4 hours",
     venueType: "special",
@@ -508,6 +579,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["foot-traffic"],
     status: "draft",
+    assignmentStatus: "unassigned",
     createdAt: "2026-02-20",
   },
   // camp-8: Craft Cocktail Roadshow (9 events — show 2)
@@ -516,6 +588,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-8",
     name: "NYC Speakeasy Night",
     location: "Please Don't Tell, New York NY",
+    state: "NY",
+    city: "New York",
+    regionId: "reg-manhattan",
     date: "2026-02-20",
     duration: "3 hours",
     venueType: "on-premises",
@@ -533,6 +608,10 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["menu-analysis"],
     status: "completed",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-001", name: "Maria Santos", status: "Accepted" },
+    ],
     createdAt: "2026-02-05",
   },
   {
@@ -540,6 +619,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-8",
     name: "LA Rooftop Mixology",
     location: "The Highlight Room, Los Angeles CA",
+    state: "CA",
+    city: "Los Angeles",
+    regionId: "reg-la",
     date: "2026-03-10",
     duration: "3 hours",
     venueType: "on-premises",
@@ -554,6 +636,10 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["menu-analysis", "weather-impact"],
     status: "scheduled",
+    assignmentStatus: "pending",
+    assignedEducators: [
+      { educatorId: "EDU-010", name: "Nina Patel", status: "Pending" },
+    ],
     createdAt: "2026-02-18",
   },
   // ── Weekend-clustered events (March 2026) for calendar density demo ────
@@ -562,6 +648,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-1",
     name: "Brooklyn Brewery Tasting",
     location: "Brooklyn Brewery, Brooklyn NY",
+    state: "NY",
+    city: "Brooklyn",
+    regionId: "reg-brooklyn",
     date: "2026-03-07",
     duration: "3 hours",
     venueType: "on-premises",
@@ -576,6 +665,10 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["menu-analysis"],
     status: "active",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-002", name: "James Mitchell", status: "Accepted" },
+    ],
     createdAt: "2026-02-25",
   },
   {
@@ -583,6 +676,8 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-2",
     name: "Trader Joe's Demo — Portland",
     location: "Trader Joe's, Portland OR",
+    state: "OR",
+    city: "Portland",
     date: "2026-03-07",
     duration: "2 hours",
     venueType: "off-premises",
@@ -597,6 +692,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["shelf-analysis"],
     status: "scheduled",
+    assignmentStatus: "unassigned",
     createdAt: "2026-02-26",
   },
   {
@@ -604,6 +700,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-1",
     name: "San Diego Waterfront Sampling",
     location: "Seaport Village, San Diego CA",
+    state: "CA",
+    city: "San Diego",
+    regionId: "reg-la",
     date: "2026-03-08",
     duration: "4 hours",
     venueType: "special",
@@ -621,6 +720,7 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["foot-traffic", "weather-impact"],
     status: "active",
+    assignmentStatus: "pending",
     createdAt: "2026-02-27",
   },
   {
@@ -628,6 +728,8 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-8",
     name: "Nashville Honky-Tonk Mixology",
     location: "Acme Feed & Seed, Nashville TN",
+    state: "TN",
+    city: "Nashville",
     date: "2026-03-14",
     duration: "3 hours",
     venueType: "on-premises",
@@ -645,6 +747,12 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["menu-analysis"],
     status: "scheduled",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-003", name: "Ashley Chen", status: "Accepted" },
+      { educatorId: "EDU-012", name: "Tyler Robinson", status: "Pending" },
+      { educatorId: "EDU-010", name: "Kevin O'Brien", status: "Accepted" },
+    ],
     createdAt: "2026-03-01",
   },
   {
@@ -652,6 +760,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     campaignId: "camp-5",
     name: "USC Game Day Activation",
     location: "USC Campus, Los Angeles CA",
+    state: "CA",
+    city: "Los Angeles",
+    regionId: "reg-la",
     date: "2026-03-14",
     duration: "Half day (5h)",
     venueType: "special",
@@ -669,6 +780,66 @@ export const INITIAL_EVENTS: EventItem[] = [
     ],
     advancedModules: ["foot-traffic"],
     status: "draft",
+    assignmentStatus: "unassigned",
     createdAt: "2026-03-02",
+  },
+  // ── Cannabis venue type events ────────────────────────────────────────
+  {
+    id: "evt-17",
+    campaignId: "camp-2",
+    name: "Denver Dispensary Demo",
+    location: "Green Dragon, Denver CO",
+    state: "CO",
+    city: "Denver",
+    date: "2026-03-20",
+    duration: "3 hours",
+    venueType: "cannabis",
+    objectives: ["drive-sales", "product-education", "market-research"],
+    dataModules: [
+      "sales-volume",
+      "conversion-metrics",
+      "revenue-summary",
+      "knowledge-assess",
+      "qa-log",
+      "training-completion",
+      "survey-responses",
+      "demographics",
+      "trend-analysis",
+    ],
+    advancedModules: ["shelf-analysis", "inventory-audit"],
+    status: "scheduled",
+    assignmentStatus: "assigned",
+    assignedEducators: [
+      { educatorId: "EDU-006", name: "Marcus Taylor", status: "Accepted" },
+    ],
+    createdAt: "2026-03-05",
+  },
+  {
+    id: "evt-18",
+    campaignId: "camp-8",
+    name: "LA Cannabis Lounge Tasting",
+    location: "The Artist Tree, Los Angeles CA",
+    state: "CA",
+    city: "Los Angeles",
+    regionId: "reg-la",
+    date: "2026-04-02",
+    duration: "3 hours",
+    venueType: "cannabis",
+    objectives: ["brand-awareness", "consumer-engagement"],
+    dataModules: [
+      "brand-visibility",
+      "impressions",
+      "photo-docs",
+      "engagement-metrics",
+      "consumer-feedback",
+      "social-mentions",
+    ],
+    advancedModules: ["menu-analysis"],
+    status: "active",
+    assignmentStatus: "pending",
+    assignedEducators: [
+      { educatorId: "EDU-010", name: "Nina Patel", status: "Pending" },
+    ],
+    createdAt: "2026-03-15",
   },
 ];

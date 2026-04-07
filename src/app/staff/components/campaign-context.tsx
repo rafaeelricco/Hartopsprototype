@@ -47,7 +47,17 @@ interface CampaignContextValue {
   updateEventFields: (
     eventId: string,
     fields: Partial<
-      Pick<EventItem, "name" | "location" | "date" | "duration" | "venueType">
+      Pick<
+        EventItem,
+        | "name"
+        | "location"
+        | "state"
+        | "city"
+        | "date"
+        | "duration"
+        | "venueType"
+        | "assignmentStatus"
+      >
     >,
   ) => void;
   existingCampaignNames: string[];
@@ -205,7 +215,17 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
   function updateEventFields(
     eventId: string,
     fields: Partial<
-      Pick<EventItem, "name" | "location" | "date" | "duration" | "venueType">
+      Pick<
+        EventItem,
+        | "name"
+        | "location"
+        | "state"
+        | "city"
+        | "date"
+        | "duration"
+        | "venueType"
+        | "assignmentStatus"
+      >
     >,
   ) {
     setEvents((prev) =>

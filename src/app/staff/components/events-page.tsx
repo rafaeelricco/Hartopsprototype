@@ -1,10 +1,11 @@
 // =============================================================================
 // Event Monitoring — MM-UI-004
 // Dual-view events page: List View (tabular, default) + Calendar View toggle.
-// Supports filtering by status, campaign, search, and sorting by date.
+// Supports filtering by status, campaign, assignment, search, and sorting by date.
+// Includes inline educator quick-assign from the list view.
 // =============================================================================
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router";
 import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
@@ -17,11 +18,24 @@ import {
   ArrowUpDown,
   Filter,
   Plus,
+  UserPlus,
+  Pencil,
+  Star,
 } from "lucide-react";
 import { useCampaignContext } from "./campaign-context";
-import { type EventItem } from "./event-data";
+import { type EventItem, type AssignedEducatorRecord } from "./event-data";
+import { INITIAL_REGIONS } from "./settings-data";
+import { MOCK_EDUCATORS } from "../../ops/components/educator-data";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/app/shared/components/ui/dialog";
+import { Checkbox } from "@/app/shared/components/ui/checkbox";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -45,14 +59,6 @@ const STATUS_META: Record<
   },
 };
 
-const PHASE_META: Record<string, { label: string; color: string; bg: string }> =
-  {
-    draft: { label: "Editable", color: "#64748B", bg: "#F1F5F9" },
-    scheduled: { label: "Editable", color: "#1D4ED8", bg: "#EFF6FF" },
-    active: { label: "Live Feed", color: "#0F766E", bg: "#ECFDF5" },
-    completed: { label: "Locked", color: "#B91C1C", bg: "#FEF2F2" },
-  };
-
 const STATUS_FILTERS: (EventItem["status"] | "all")[] = [
   "all",
   "draft",
@@ -60,6 +66,8 @@ const STATUS_FILTERS: (EventItem["status"] | "all")[] = [
   "active",
   "completed",
 ];
+
+type AssignmentFilterValue = "all" | "assigned" | "unassigned" | "pending";
 
 type SortDir = "asc" | "desc";
 type ViewMode = "list" | "calendar";
@@ -75,6 +83,17 @@ function shortGeo(location: string): string {
   return location.length > 16 ? location.slice(0, 14) + "…" : location;
 }
 
+/** Format educator names for display: "Maria S. +2" */
+function getAssignmentLabel(educators: AssignedEducatorRecord[]): string {
+  if (educators.length === 0) return "Unassigned";
+  const lead = educators[0]!;
+  const parts = lead.name.split(" ");
+  const short =
+    parts.length >= 2 ? `${parts[0]} ${parts[1]![0]}.` : lead.name;
+  if (educators.length === 1) return short;
+  return `${short} +${educators.length - 1}`;
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 
 export function EventsPage() {
@@ -87,6 +106,9 @@ export function EventsPage() {
     "all",
   );
   const [campaignFilter, setCampaignFilter] = useState<string>("all");
+  const [assignmentFilter, setAssignmentFilter] =
+    useState<AssignmentFilterValue>("all");
+  const [regionFilter, setRegionFilter] = useState<string>("all");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   // Calendar state
@@ -94,6 +116,76 @@ export function EventsPage() {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
+
+  // ── Assignment state ────────────────────────────────────────────────────
+  const [showAssignment, setShowAssignment] = useState(false);
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [assignmentSearch, setAssignmentSearch] = useState("");
+  const [draftSelectedIds, setDraftSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [localAssignments, setLocalAssignments] = useState<
+    Record<string, AssignedEducatorRecord[]>
+  >({});
+
+  /** Resolve assignments for an event: local overrides first, then mock data */
+  const getAssignments = useCallback(
+    (event: EventItem): AssignedEducatorRecord[] => {
+      const local = localAssignments[event.id];
+      if (local) return local;
+      return event.assignedEducators ?? [];
+    },
+    [localAssignments],
+  );
+
+  /** Open the assignment dialog for a given event */
+  const handleOpenAssignment = useCallback(
+    (eventId: string) => {
+      const event = events.find((e) => e.id === eventId);
+      if (!event) return;
+      setActiveEventId(eventId);
+      const current = localAssignments[eventId] ?? event.assignedEducators ?? [];
+      setDraftSelectedIds(new Set(current.map((e) => e.educatorId)));
+      setAssignmentSearch("");
+      setShowAssignment(true);
+    },
+    [events, localAssignments],
+  );
+
+  /** Confirm assignment selections */
+  const handleConfirmAssignments = useCallback(() => {
+    if (!activeEventId) return;
+    const event = events.find((e) => e.id === activeEventId);
+    if (!event) return;
+
+    const existing =
+      localAssignments[activeEventId] ?? event.assignedEducators ?? [];
+    const existingMap = new Map(existing.map((e) => [e.educatorId, e]));
+
+    const newAssignments: AssignedEducatorRecord[] = [];
+    for (const eduId of draftSelectedIds) {
+      const prev = existingMap.get(eduId);
+      if (prev) {
+        newAssignments.push(prev);
+      } else {
+        const educator = MOCK_EDUCATORS.find((e) => e.id === eduId);
+        if (educator) {
+          newAssignments.push({
+            educatorId: educator.id,
+            name: educator.name,
+            status: "Pending",
+          });
+        }
+      }
+    }
+
+    setLocalAssignments((prev) => ({
+      ...prev,
+      [activeEventId]: newAssignments,
+    }));
+    setShowAssignment(false);
+    setActiveEventId(null);
+  }, [activeEventId, events, localAssignments, draftSelectedIds]);
 
   // Unique campaigns that have events
   const campaignsWithEvents = useMemo(() => {
@@ -110,6 +202,19 @@ export function EventsPage() {
     if (campaignFilter !== "all") {
       result = result.filter((e) => e.campaignId === campaignFilter);
     }
+    if (assignmentFilter !== "all") {
+      result = result.filter((e) => {
+        const educators = getAssignments(e);
+        if (assignmentFilter === "unassigned") return educators.length === 0;
+        if (assignmentFilter === "assigned") return educators.length > 0;
+        if (assignmentFilter === "pending")
+          return educators.some((ed) => ed.status === "Pending");
+        return true;
+      });
+    }
+    if (regionFilter !== "all") {
+      result = result.filter((e) => e.regionId === regionFilter);
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -119,7 +224,7 @@ export function EventsPage() {
       );
     }
     return result;
-  }, [events, statusFilter, campaignFilter, search]);
+  }, [events, statusFilter, campaignFilter, assignmentFilter, regionFilter, search, getAssignments]);
 
   // Sorted list (for list view)
   const sorted = useMemo(() => {
@@ -257,6 +362,48 @@ export function EventsPage() {
           />
         </div>
 
+        {/* Assignment filter */}
+        <div className="relative">
+          <select
+            value={assignmentFilter}
+            onChange={(e) =>
+              setAssignmentFilter(e.target.value as AssignmentFilterValue)
+            }
+            className="appearance-none pl-3.5 pr-8 py-2.5 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 transition-colors"
+            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+          >
+            <option value="all">All Assignments</option>
+            <option value="assigned">Assigned</option>
+            <option value="unassigned">Unassigned</option>
+            <option value="pending">Pending</option>
+          </select>
+          <Filter
+            size={13}
+            className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]"
+          />
+        </div>
+
+        {/* Region filter */}
+        <div className="relative">
+          <select
+            value={regionFilter}
+            onChange={(e) => setRegionFilter(e.target.value)}
+            className="appearance-none pl-3.5 pr-8 py-2.5 rounded-lg border border-[#E2E8F0] bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#7D152D]/30 transition-colors"
+            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+          >
+            <option value="all">All Regions</option>
+            {INITIAL_REGIONS.filter((r) => r.isActive).map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+          <MapPin
+            size={13}
+            className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#94A3B8]"
+          />
+        </div>
+
         {/* Sort (list view only) */}
         {view === "list" && (
           <Button
@@ -280,7 +427,12 @@ export function EventsPage() {
 
       {/* ── View content ─────────────────────────────────────────────── */}
       {view === "list" ? (
-        <EventTableView events={sorted} getCampaign={getCampaign} />
+        <EventTableView
+          events={sorted}
+          getCampaign={getCampaign}
+          getAssignments={getAssignments}
+          onOpenAssignment={handleOpenAssignment}
+        />
       ) : (
         <EventCalendarView
           eventsByDate={eventsByDate}
@@ -288,6 +440,159 @@ export function EventsPage() {
           setCalMonth={setCalMonth}
         />
       )}
+
+      {/* ── Assignment Dialog ──────────────────────────────────────────── */}
+      <Dialog open={showAssignment} onOpenChange={setShowAssignment}>
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5 pb-3 shrink-0 border-b border-[#E2E8F0]">
+            <DialogTitle style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+              {(() => {
+                const ev = events.find((e) => e.id === activeEventId);
+                if (!ev) return "Manage Educators";
+                const current = getAssignments(ev);
+                return current.length === 0
+                  ? "Assign Educators"
+                  : "Reassign Educators";
+              })()}
+            </DialogTitle>
+            <DialogDescription style={{ fontSize: "0.875rem" }}>
+              {(() => {
+                const ev = events.find((e) => e.id === activeEventId);
+                return ev
+                  ? `${ev.name} · ${new Date(ev.date + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} · ${ev.location}`
+                  : "Select educators to assign to this event.";
+              })()}
+            </DialogDescription>
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#94A3B8]" />
+              <Input
+                value={assignmentSearch}
+                onChange={(e) => setAssignmentSearch(e.target.value)}
+                placeholder="Search educators by name, location, or specialty..."
+                className="pl-9 h-9"
+              />
+            </div>
+          </DialogHeader>
+
+          {/* Educator List */}
+          <div className="flex-1 overflow-y-auto p-5 pb-0 bg-[#FAFBFC]">
+            <div className="divide-y divide-[#E2E8F0] rounded-lg border border-[#E2E8F0] bg-white overflow-hidden">
+              {MOCK_EDUCATORS.filter((e) => e.status === "active")
+                .filter((e) => {
+                  const q = assignmentSearch.toLowerCase().trim();
+                  if (!q) return true;
+                  return (
+                    e.name.toLowerCase().includes(q) ||
+                    e.city.toLowerCase().includes(q) ||
+                    e.specialties.some((s) => s.toLowerCase().includes(q))
+                  );
+                })
+                .map((educator) => {
+                  const isSelected = draftSelectedIds.has(educator.id);
+                  return (
+                    <div
+                      key={educator.id}
+                      className={`p-3.5 transition-colors hover:bg-[#FAFBFC] ${
+                        isSelected
+                          ? "bg-[#7D152D]/5 border-l-2 border-l-[#7D152D]"
+                          : "border-l-2 border-l-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`staff-edu-${educator.id}`}
+                          checked={isSelected}
+                          className="mt-0.5"
+                          onCheckedChange={(checked) => {
+                            setDraftSelectedIds((prev) => {
+                              const next = new Set(prev);
+                              if (checked) next.add(educator.id);
+                              else next.delete(educator.id);
+                              return next;
+                            });
+                          }}
+                        />
+                        <div className="flex items-center justify-between flex-1 min-w-0">
+                          <div className="space-y-0.5 flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <label
+                                htmlFor={`staff-edu-${educator.id}`}
+                                className="text-[#0F172A] cursor-pointer"
+                                style={{
+                                  fontSize: "0.875rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {educator.name}
+                              </label>
+                            </div>
+                            <div
+                              className="flex items-center gap-3 text-[#94A3B8]"
+                              style={{ fontSize: "0.75rem" }}
+                            >
+                              {educator.qualityScore > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Star className="w-3 h-3 text-amber-500" />{" "}
+                                  {educator.qualityScore}
+                                </span>
+                              )}
+                              <span>
+                                {educator.city}, {educator.state}
+                              </span>
+                              <span>{educator.eventsCompleted} events</span>
+                            </div>
+                            {educator.specialties.length > 0 && (
+                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {educator.specialties.map((spec) => (
+                                  <span
+                                    key={spec}
+                                    className="inline-flex items-center rounded-full px-1.5 py-0 border bg-[#F1F5F9] text-[#64748B] border-[#E2E8F0]"
+                                    style={{
+                                      fontSize: "0.5625rem",
+                                      fontWeight: 500,
+                                      lineHeight: "1rem",
+                                    }}
+                                  >
+                                    {spec}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between px-5 py-4 border-t border-[#E2E8F0] shrink-0">
+            <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+              {draftSelectedIds.size} educator
+              {draftSelectedIds.size !== 1 ? "s" : ""} selected
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowAssignment(false)}
+                className="cursor-pointer"
+                style={{ fontSize: "0.8125rem" }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmAssignments}
+                className="text-white cursor-pointer"
+                style={{ background: "#7D152D", fontSize: "0.8125rem" }}
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -299,9 +604,13 @@ export function EventsPage() {
 function EventTableView({
   events,
   getCampaign,
+  getAssignments,
+  onOpenAssignment,
 }: {
   events: EventItem[];
   getCampaign: (id: string) => { name: string } | undefined;
+  getAssignments: (event: EventItem) => AssignedEducatorRecord[];
+  onOpenAssignment: (eventId: string) => void;
 }) {
   if (events.length === 0) {
     return (
@@ -321,7 +630,7 @@ function EventTableView({
     <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
       <div className="overflow-x-auto">
         <table
-          className="w-full min-w-[780px]"
+          className="w-full min-w-[860px]"
           style={{ borderCollapse: "separate", borderSpacing: 0 }}
         >
           <thead>
@@ -332,7 +641,7 @@ function EventTableView({
                 "Location",
                 "Date",
                 "Status",
-                "Phase",
+                "Educators",
                 "Modules",
                 "",
               ].map((h) => (
@@ -353,8 +662,11 @@ function EventTableView({
           <tbody>
             {events.map((event) => {
               const st = STATUS_META[event.status] ?? STATUS_META["draft"];
-              const ph = PHASE_META[event.status] ?? PHASE_META["draft"];
               const campaign = getCampaign(event.campaignId);
+              const educators = getAssignments(event);
+              const hasPending = educators.some((e) => e.status === "Pending");
+              const canAssign = event.status !== "completed";
+
               return (
                 <tr
                   key={event.id}
@@ -401,6 +713,23 @@ function EventTableView({
                       />
                       {event.location}
                     </span>
+                    {(() => {
+                      const region = event.regionId
+                        ? INITIAL_REGIONS.find((r) => r.id === event.regionId)
+                        : undefined;
+                      return region ? (
+                        <span
+                          className="flex items-center gap-1 mt-0.5 ml-[15px]"
+                          style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full inline-block flex-shrink-0"
+                            style={{ backgroundColor: region.color }}
+                          />
+                          {region.name}
+                        </span>
+                      ) : null;
+                    })()}
                   </td>
                   {/* Date */}
                   <td className="px-4 py-3.5 whitespace-nowrap">
@@ -432,18 +761,61 @@ function EventTableView({
                       {st!.label}
                     </span>
                   </td>
-                  {/* Phase */}
+                  {/* Educators */}
                   <td className="px-4 py-3.5">
-                    <span
-                      className="inline-block px-2 py-0.5 rounded-md whitespace-nowrap"
-                      style={{
-                        fontSize: "0.6875rem",
-                        background: ph!.bg,
-                        color: ph!.color,
-                      }}
-                    >
-                      {ph!.label}
-                    </span>
+                    <div className="flex items-center gap-1.5 min-w-[140px]">
+                      {educators.length === 0 ? (
+                        <span
+                          className="text-[#94A3B8]"
+                          style={{ fontSize: "0.75rem" }}
+                        >
+                          Unassigned
+                        </span>
+                      ) : (
+                        <>
+                          <span
+                            className="text-[#0F172A]"
+                            style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                          >
+                            {getAssignmentLabel(educators)}
+                          </span>
+                          {hasPending && (
+                            <span
+                              className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                              style={{
+                                fontSize: "0.5625rem",
+                                fontWeight: 500,
+                                lineHeight: "1rem",
+                              }}
+                            >
+                              Pending
+                            </span>
+                          )}
+                        </>
+                      )}
+                      {canAssign && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-[#94A3B8] hover:text-[#7D152D] cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity ml-auto"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenAssignment(event.id);
+                          }}
+                          title={
+                            educators.length === 0
+                              ? "Assign educators"
+                              : "Reassign educators"
+                          }
+                        >
+                          {educators.length === 0 ? (
+                            <UserPlus className="size-4" />
+                          ) : (
+                            <Pencil className="size-3.5" />
+                          )}
+                        </Button>
+                      )}
+                    </div>
                   </td>
                   {/* Modules */}
                   <td className="px-4 py-3.5 text-center">

@@ -42,6 +42,8 @@ import {
 } from "./event-data";
 import { useCampaignContext } from "./campaign-context";
 import { type Campaign } from "./campaign-data";
+import { LocationCombobox } from "./location-combobox";
+import { INITIAL_REGIONS } from "./settings-data";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -49,9 +51,11 @@ type WizardData = {
   campaignId: string;
   name: string;
   location: string;
+  accountId: string;
+  regionId: string;
   date: string;
   duration: string;
-  venueType: "" | "off-premises" | "on-premises" | "special";
+  venueType: "" | "off-premises" | "on-premises" | "special" | "cannabis";
   objectives: string[];
   advancedModules: string[];
 };
@@ -60,6 +64,8 @@ const INITIAL_DATA: WizardData = {
   campaignId: "",
   name: "",
   location: "",
+  accountId: "",
+  regionId: "",
   date: "",
   duration: "",
   venueType: "",
@@ -205,6 +211,11 @@ export function CreateEventPage() {
       ...(preselectedActivity ? { activityId: preselectedActivity.id } : {}),
       name: data.name.trim(),
       location: data.location.trim(),
+      state: "",
+      city: "",
+      assignmentStatus: "unassigned" as const,
+      ...(data.accountId ? { accountId: data.accountId } : {}),
+      ...(data.regionId ? { regionId: data.regionId } : {}),
       date: data.date,
       duration: data.duration,
       venueType: data.venueType as EventItem["venueType"],
@@ -231,6 +242,19 @@ export function CreateEventPage() {
       return next;
     });
   }, []);
+
+  const onLocationSelect = useCallback(
+    (location: string, accountId: string) => {
+      setData((d) => ({ ...d, location, accountId }));
+      setErrors((e) => {
+        if (!e.location) return e;
+        const next = { ...e };
+        delete next.location;
+        return next;
+      });
+    },
+    [],
+  );
 
   function toggleObjective(id: string) {
     setData((d) => ({
@@ -370,7 +394,12 @@ export function CreateEventPage() {
           />
         )}
         {step === 2 && (
-          <StepBasics data={data} errors={errors} updateField={updateField} />
+          <StepBasics
+            data={data}
+            errors={errors}
+            updateField={updateField}
+            onLocationSelect={onLocationSelect}
+          />
         )}
         {step === 3 && (
           <div className="flex flex-col">
@@ -639,10 +668,12 @@ function StepBasics({
   data,
   errors,
   updateField,
+  onLocationSelect,
 }: {
   data: WizardData;
   errors: Partial<Record<keyof WizardData | "objectives", string>>;
   updateField: (field: keyof WizardData, value: string) => void;
+  onLocationSelect: (location: string, accountId: string) => void;
 }) {
   return (
     <div>
@@ -679,14 +710,12 @@ function StepBasics({
           error={errors.location}
           icon={<MapPin size={15} style={{ color: "#94A3B8" }} />}
         >
-          <Input
-            type="text"
+          <LocationCombobox
             value={data.location}
-            onChange={(e) => updateField("location", e.target.value)}
-            placeholder="e.g. Binny's Beverage Depot, Chicago IL"
+            accountId={data.accountId}
+            onSelect={onLocationSelect}
             className={inputClass(errors.location)}
             style={inputStyle}
-            maxLength={200}
           />
         </FieldWrapper>
 
@@ -726,6 +755,26 @@ function StepBasics({
           </select>
         </FieldWrapper>
       </div>
+
+      {/* Region */}
+      <FieldWrapper
+        label="Region"
+        icon={<MapPin size={15} style={{ color: "#94A3B8" }} />}
+      >
+        <select
+          value={data.regionId}
+          onChange={(e) => updateField("regionId", e.target.value)}
+          className={inputClass(undefined)}
+          style={inputStyle}
+        >
+          <option value="">No region assigned</option>
+          {INITIAL_REGIONS.filter((r) => r.isActive).map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.parentGroup ? `${r.parentGroup} — ${r.name}` : r.name}
+            </option>
+          ))}
+        </select>
+      </FieldWrapper>
 
       {/* Venue Type */}
       <div className="mb-1">

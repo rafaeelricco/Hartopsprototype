@@ -324,3 +324,105 @@ export const DASHBOARD_DEFAULTS = [
   "Last 6 months",
   "Last 12 months",
 ] as const;
+
+// ── Geographic regions / territories ───────────────────────────────────────
+
+export interface GeoRegion {
+  id: string;
+  name: string;
+  parentGroup?: string;
+  color: string;
+  description?: string;
+  isActive: boolean;
+}
+
+export const INITIAL_REGIONS: GeoRegion[] = [
+  // NYC Boroughs
+  {
+    id: "reg-manhattan",
+    name: "Manhattan",
+    parentGroup: "NYC Boroughs",
+    color: "#7D152D",
+    description: "Midtown, Downtown, Upper East/West Side",
+    isActive: true,
+  },
+  {
+    id: "reg-brooklyn",
+    name: "Brooklyn",
+    parentGroup: "NYC Boroughs",
+    color: "#2563EB",
+    description: "Williamsburg, DUMBO, Park Slope",
+    isActive: true,
+  },
+  {
+    id: "reg-queens",
+    name: "Queens",
+    parentGroup: "NYC Boroughs",
+    color: "#7C3AED",
+    description: "Astoria, Long Island City, Flushing",
+    isActive: true,
+  },
+  {
+    id: "reg-bronx",
+    name: "Bronx",
+    parentGroup: "NYC Boroughs",
+    color: "#D97706",
+    description: "Fordham, Pelham Bay, Riverdale",
+    isActive: true,
+  },
+  {
+    id: "reg-staten-island",
+    name: "Staten Island",
+    parentGroup: "NYC Boroughs",
+    color: "#0F766E",
+    description: "St. George, Tottenville",
+    isActive: true,
+  },
+  // Florida Zones
+  {
+    id: "reg-lower-fl",
+    name: "Lower Florida",
+    parentGroup: "Florida Zones",
+    color: "#E11D48",
+    description: "Miami-Dade, Broward, Palm Beach",
+    isActive: true,
+  },
+  {
+    id: "reg-mid-fl",
+    name: "Mid Florida",
+    parentGroup: "Florida Zones",
+    color: "#EA580C",
+    description: "Orlando, Tampa Bay, Jacksonville",
+    isActive: true,
+  },
+  {
+    id: "reg-panhandle",
+    name: "Panhandle",
+    parentGroup: "Florida Zones",
+    color: "#CA8A04",
+    description: "Tallahassee, Pensacola, Panama City",
+    isActive: true,
+  },
+  // Ungrouped metros
+  {
+    id: "reg-chicago",
+    name: "Chicago Metro",
+    color: "#4F46E5",
+    description: "Downtown, suburbs, and surrounding area",
+    isActive: true,
+  },
+  {
+    id: "reg-la",
+    name: "LA Metro",
+    color: "#059669",
+    description: "Greater Los Angeles and Orange County",
+    isActive: true,
+  },
+  {
+    id: "reg-austin",
+    name: "Austin",
+    color: "#DC2626",
+    description: "Austin metro and Hill Country",
+    isActive: true,
+  },
+];

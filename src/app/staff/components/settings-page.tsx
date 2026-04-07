@@ -1,6 +1,6 @@
 // =============================================================================
 // Settings — Hart Agency Operating Staff dashboard.
-// 5 tabs: Profile, Notifications, Team, Preferences, Integrations.
+// 6 tabs: Profile, Notifications, Team, Geography, Preferences, Integrations.
 // Follows the educator settings-page pattern (Shadcn UI components).
 // =============================================================================
 
@@ -40,6 +40,7 @@ import {
   MessageSquare,
   Zap,
   Table,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -86,6 +87,8 @@ import {
   type TeamRole,
   type NotificationPref,
   type Integration,
+  INITIAL_REGIONS,
+  type GeoRegion,
 } from "./settings-data";
 
 // ---------------------------------------------------------------------------
@@ -210,6 +213,7 @@ type SettingsTab =
   | "profile"
   | "notifications"
   | "team"
+  | "geography"
   | "preferences"
   | "integrations";
 
@@ -217,6 +221,7 @@ const VALID_TABS: SettingsTab[] = [
   "profile",
   "notifications",
   "team",
+  "geography",
   "preferences",
   "integrations",
 ];
@@ -265,6 +270,10 @@ export function SettingsPage() {
             <Users className="w-4 h-4" />
             Team
           </TabsTrigger>
+          <TabsTrigger value="geography">
+            <MapPin className="w-4 h-4" />
+            Geography
+          </TabsTrigger>
           <TabsTrigger value="preferences">
             <SlidersHorizontal className="w-4 h-4" />
             Preferences
@@ -283,6 +292,9 @@ export function SettingsPage() {
         </TabsContent>
         <TabsContent value="team">
           <TeamTab />
+        </TabsContent>
+        <TabsContent value="geography">
+          <GeographyTab />
         </TabsContent>
         <TabsContent value="preferences">
           <PreferencesTab />
@@ -1215,6 +1227,438 @@ function ConfirmRemoveDialog({
             Remove
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// =============================================================================
+// 3b. Geography Tab
+// =============================================================================
+
+const REGION_COLOR_PRESETS = [
+  "#7D152D",
+  "#2563EB",
+  "#7C3AED",
+  "#D97706",
+  "#0F766E",
+  "#E11D48",
+  "#4F46E5",
+  "#059669",
+];
+
+function GeographyTab() {
+  const [regions, setRegions] = useState<GeoRegion[]>([...INITIAL_REGIONS]);
+  const [search, setSearch] = useState("");
+  const [groupFilter, setGroupFilter] = useState<string>("all");
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  const groups = useMemo(() => {
+    const set = new Set<string>();
+    regions.forEach((r) => {
+      if (r.parentGroup) set.add(r.parentGroup);
+    });
+    return Array.from(set).sort();
+  }, [regions]);
+
+  const filtered = useMemo(() => {
+    let result = regions;
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (r) =>
+          r.name.toLowerCase().includes(q) ||
+          (r.description ?? "").toLowerCase().includes(q),
+      );
+    }
+    if (groupFilter === "ungrouped") {
+      result = result.filter((r) => !r.parentGroup);
+    } else if (groupFilter !== "all") {
+      result = result.filter((r) => r.parentGroup === groupFilter);
+    }
+    return result;
+  }, [regions, search, groupFilter]);
+
+  function handleAdd(region: Omit<GeoRegion, "id">) {
+    const newRegion: GeoRegion = {
+      ...region,
+      id: "reg-new-" + Date.now(),
+    };
+    setRegions((prev) => [...prev, newRegion]);
+    setShowAddDialog(false);
+    toast.success("Region added");
+  }
+
+  function handleUpdate(updated: GeoRegion) {
+    setRegions((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+    setEditingId(null);
+    toast.success("Region updated");
+  }
+
+  function handleRemove(id: string) {
+    setRegions((prev) => prev.filter((r) => r.id !== id));
+    setRemovingId(null);
+    toast.success("Region removed");
+  }
+
+  function handleToggleActive(id: string) {
+    setRegions((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, isActive: !r.isActive } : r)),
+    );
+  }
+
+  return (
+    <div className="space-y-6 pt-4">
+      <Card className="gap-0">
+        <CardHeader className="px-5 pt-5 pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-sm font-semibold">
+                  Regions & Territories
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Define the geographic areas your organization uses for event
+                  assignment and filtering.
+                </CardDescription>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setShowAddDialog(true)}
+              className="cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Region
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="px-5 pb-5 space-y-4">
+          {/* Search & group filter */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search regions..."
+                className="pl-9"
+              />
+            </div>
+            <select
+              value={groupFilter}
+              onChange={(e) => setGroupFilter(e.target.value)}
+              className="h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="all">All Groups</option>
+              {groups.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+              <option value="ungrouped">Ungrouped</option>
+            </select>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            {filtered.length} region{filtered.length !== 1 ? "s" : ""}
+          </p>
+
+          {/* Region list */}
+          <div className="divide-y divide-border">
+            {filtered.map((region) => (
+              <div
+                key={region.id}
+                className="flex items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-3 h-3 rounded-full shrink-0"
+                    style={{ backgroundColor: region.color }}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {region.name}
+                    </p>
+                    {region.description && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {region.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  {region.parentGroup && (
+                    <span className="px-2 py-0.5 rounded-md text-[0.6875rem] border bg-muted text-muted-foreground">
+                      {region.parentGroup}
+                    </span>
+                  )}
+                  <Switch
+                    checked={region.isActive}
+                    onCheckedChange={() => handleToggleActive(region.id)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setEditingId(region.id)}
+                    className="size-8 text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setRemovingId(region.id)}
+                    className="size-8 text-muted-foreground hover:text-destructive cursor-pointer"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <p className="text-sm text-muted-foreground py-6 text-center">
+                No regions found.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add dialog */}
+      <RegionFormDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        groups={groups}
+        onSubmit={(data) => handleAdd(data)}
+        title="Add Region"
+        description="Create a new geographic region for your organization."
+      />
+
+      {/* Edit dialog */}
+      <RegionFormDialog
+        open={!!editingId}
+        onOpenChange={(v) => !v && setEditingId(null)}
+        groups={groups}
+        region={regions.find((r) => r.id === editingId) ?? undefined}
+        onSubmit={(data) => {
+          if (editingId) handleUpdate({ ...data, id: editingId } as GeoRegion);
+        }}
+        title="Edit Region"
+        description="Update the region details."
+      />
+
+      {/* Remove confirm */}
+      <Dialog
+        open={!!removingId}
+        onOpenChange={(v) => !v && setRemovingId(null)}
+      >
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
+              </div>
+              <div>
+                <DialogTitle>Remove region?</DialogTitle>
+                <DialogDescription>
+                  "{regions.find((r) => r.id === removingId)?.name}" will be
+                  removed. Events tagged with this region will become untagged.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRemovingId(null)}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => removingId && handleRemove(removingId)}
+              className="cursor-pointer"
+            >
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function RegionFormDialog({
+  open,
+  onOpenChange,
+  groups,
+  region,
+  onSubmit,
+  title,
+  description,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  groups: string[];
+  region?: GeoRegion;
+  onSubmit: (data: Omit<GeoRegion, "id">) => void;
+  title: string;
+  description: string;
+}) {
+  const [name, setName] = useState("");
+  const [groupMode, setGroupMode] = useState<"existing" | "new">("existing");
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+  const [newGroup, setNewGroup] = useState("");
+  const [desc, setDesc] = useState("");
+  const [color, setColor] = useState(REGION_COLOR_PRESETS[0]!);
+
+  useEffect(() => {
+    if (open && region) {
+      setName(region.name);
+      setDesc(region.description ?? "");
+      setColor(region.color);
+      if (region.parentGroup && groups.includes(region.parentGroup)) {
+        setGroupMode("existing");
+        setSelectedGroup(region.parentGroup);
+      } else if (region.parentGroup) {
+        setGroupMode("new");
+        setNewGroup(region.parentGroup);
+      } else {
+        setGroupMode("existing");
+        setSelectedGroup("");
+      }
+    } else if (open) {
+      setName("");
+      setDesc("");
+      setColor(REGION_COLOR_PRESETS[0]!);
+      setGroupMode("existing");
+      setSelectedGroup("");
+      setNewGroup("");
+    }
+  }, [open, region, groups]);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!name.trim()) {
+      toast.error("Region name is required.");
+      return;
+    }
+    const parentGroup =
+      groupMode === "new"
+        ? newGroup.trim() || undefined
+        : selectedGroup || undefined;
+
+    onSubmit({
+      name: name.trim(),
+      parentGroup,
+      color,
+      description: desc.trim() || undefined,
+      isActive: region?.isActive ?? true,
+    });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">
+              Region Name
+            </Label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Manhattan, Lower Florida"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Group</Label>
+            <select
+              value={groupMode === "new" ? "__new__" : selectedGroup}
+              onChange={(e) => {
+                if (e.target.value === "__new__") {
+                  setGroupMode("new");
+                } else {
+                  setGroupMode("existing");
+                  setSelectedGroup(e.target.value);
+                }
+              }}
+              className="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="">No Group (ungrouped)</option>
+              {groups.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+              <option value="__new__">+ New Group...</option>
+            </select>
+            {groupMode === "new" && (
+              <Input
+                value={newGroup}
+                onChange={(e) => setNewGroup(e.target.value)}
+                placeholder="e.g. NYC Boroughs"
+                className="mt-1.5"
+              />
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">
+              Description (optional)
+            </Label>
+            <Input
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              placeholder="e.g. Midtown, Downtown, Upper East/West Side"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Color</Label>
+            <div className="flex items-center gap-2">
+              {REGION_COLOR_PRESETS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setColor(c)}
+                  className="w-7 h-7 rounded-full border-2 transition-all cursor-pointer"
+                  style={{
+                    backgroundColor: c,
+                    borderColor: color === c ? "#1E293B" : "transparent",
+                    transform: color === c ? "scale(1.15)" : "scale(1)",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" className="cursor-pointer">
+              {region ? "Save Changes" : "Add Region"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
