@@ -66,7 +66,7 @@ export function AppShell() {
             </Breadcrumb>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
@@ -76,7 +76,7 @@ export function AppShell() {
               <Bell size={18} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
             </Button>
-          </div>
+          </div> */}
         </header>
         <div className="flex-1 overflow-auto">
           <Outlet />

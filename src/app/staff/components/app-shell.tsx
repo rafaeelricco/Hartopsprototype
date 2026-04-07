@@ -99,7 +99,7 @@ export function AppShell() {
               </Select>
             )}
 
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
@@ -107,7 +107,7 @@ export function AppShell() {
             >
               <Bell size={18} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
-            </Button>
+            </Button> */}
           </div>
         </header>
         <div className="flex-1 overflow-auto">
