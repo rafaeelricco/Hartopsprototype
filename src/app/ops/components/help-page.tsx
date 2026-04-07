@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import {
   Card,
   CardContent,
@@ -16,6 +17,7 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  ChevronRight,
   FileText,
   Video,
   Zap,
@@ -99,6 +101,7 @@ const resources = [
     description: "Understand roles, access controls, and best practices",
     icon: Shield,
     type: "Guide",
+    href: "/ops/dashboard/capability-matrix",
   },
   {
     title: "Video Walkthrough",
@@ -298,44 +301,56 @@ export function HelpPage() {
         </CardHeader>
         <CardContent className="px-5 pb-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {resources.map((resource) => (
-              <Button
-                key={resource.title}
-                variant="ghost"
-                className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors text-left cursor-pointer bg-transparent h-auto"
-                asChild
-              >
-                <a href="#">
-                  <div className="flex items-center justify-center size-9 rounded-md bg-muted shrink-0 mt-0.5">
-                    <resource.icon className="size-4 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="text-foreground truncate"
-                        style={{ fontSize: "0.8125rem", fontWeight: 500 }}
-                      >
-                        {resource.title}
-                      </span>
-                      <ExternalLink className="size-3 text-muted-foreground shrink-0" />
+            {resources.map((resource) => {
+              const isInternal = "href" in resource && resource.href;
+              const Wrapper = isInternal ? Link : "a";
+              const wrapperProps = isInternal
+                ? { to: resource.href as string }
+                : { href: "#" };
+
+              return (
+                <Button
+                  key={resource.title}
+                  variant="ghost"
+                  className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors text-left cursor-pointer bg-transparent h-auto"
+                  asChild
+                >
+                  <Wrapper {...(wrapperProps as any)}>
+                    <div className="flex items-center justify-center size-9 rounded-md bg-muted shrink-0 mt-0.5">
+                      <resource.icon className="size-4 text-muted-foreground" />
                     </div>
-                    <p
-                      className="text-muted-foreground mt-0.5"
-                      style={{ fontSize: "0.75rem" }}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-foreground truncate"
+                          style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                        >
+                          {resource.title}
+                        </span>
+                        {isInternal ? (
+                          <ChevronRight className="size-3 text-muted-foreground shrink-0" />
+                        ) : (
+                          <ExternalLink className="size-3 text-muted-foreground shrink-0" />
+                        )}
+                      </div>
+                      <p
+                        className="text-muted-foreground mt-0.5"
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        {resource.description}
+                      </p>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="shrink-0 mt-0.5"
+                      style={{ fontSize: "0.625rem" }}
                     >
-                      {resource.description}
-                    </p>
-                  </div>
-                  <Badge
-                    variant="secondary"
-                    className="shrink-0 mt-0.5"
-                    style={{ fontSize: "0.625rem" }}
-                  >
-                    {resource.type}
-                  </Badge>
-                </a>
-              </Button>
-            ))}
+                      {resource.type}
+                    </Badge>
+                  </Wrapper>
+                </Button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>

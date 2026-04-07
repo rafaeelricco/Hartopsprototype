@@ -4,11 +4,11 @@ Tasks extracted from the [Hart / Ambar Prototype Walkthrough – 2026-04-02](doc
 
 ## Ops (Operator / Hart Super Admin)
 
-- **Add filters to the Events view**: Right now the operator has to go into each event to see details. Needs filters by organization, region/territory, and assignment status so they can get a bird's-eye view across all agencies. **Phase 1.** *(~00:09:01 – 00:10:58)*
+- ~~**Add filters to the Events view**: Right now the operator has to go into each event to see details. Needs filters by organization, region/territory, and assignment status so they can get a bird's-eye view across all agencies. **Phase 1.** *(~00:09:01 – 00:10:58)*~~ **Done — 2026-04-07** — Added Region column + filter (5 territories), Assignment filter (assigned/unassigned/pending), and quick-assign educator dialog with inline table updates.
 
 - ~~**Add ability to assign/reassign ambassadors**: Luis flagged that the operator level should also have the capability to assign and reassign ambassadors to events (not just the educator manager). Quick-action buttons on the list view. **Phase 1.** *(~00:34:27 – 00:36:47)*~~ **Done — 2026-04-07**
 
-- **User roles section in capability matrix**: Stephanie asked for a section mapping what each user type can access in Phase 1. Ethan confirmed it'll be added. **Phase 1 (documentation task).** *(~00:03:22 – 00:04:29)*
+- ~~**User roles section in capability matrix**: Stephanie asked for a section mapping what each user type can access in Phase 1. Ethan confirmed it'll be added. **Phase 1 (documentation task).** *(~00:03:22 – 00:04:29)*~~ **Done — 2026-04-07** — Added `/ops/dashboard/capability-matrix` page with tabbed role-vs-capability matrix; linked from Help page "Security & Permissions" card.
 
 - **Tiered subscription / differentiated access per affiliate type**: Stephanie asked about structuring different feature tiers for affiliates vs. suppliers. **Phase 3.** *(~01:00:52 – 01:02:03)*
 

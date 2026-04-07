@@ -41,7 +41,10 @@ export function AppShell() {
                 {pathnames.slice(1).map((value, index) => {
                   const last = index === pathnames.length - 2;
                   const to = `/${pathnames.slice(0, index + 2).join("/")}`;
-                  const label = value.charAt(0).toUpperCase() + value.slice(1);
+                  const label = value
+                    .split("-")
+                    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                    .join(" ");
 
                   return (
                     <React.Fragment key={to}>

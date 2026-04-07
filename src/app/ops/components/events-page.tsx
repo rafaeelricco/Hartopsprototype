@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  MapPin,
   UserPlus,
   Pencil,
   Star,
@@ -53,6 +54,7 @@ export interface EventRecord {
   startTime: string;
   endTime: string;
   location: string;
+  region: "Northeast" | "Southeast" | "Midwest" | "West" | "Southwest";
   attendeesRegistered: number;
   attendeesCheckedIn: number;
   capacity: number;
@@ -76,6 +78,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "6:00 PM",
     endTime: "11:00 PM",
     location: "Grand Ballroom, Hilton Downtown",
+    region: "Northeast",
     attendeesRegistered: 250,
     attendeesCheckedIn: 187,
     capacity: 300,
@@ -101,6 +104,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "11:30 AM",
     endTime: "2:00 PM",
     location: "Convention Center, Hall B",
+    region: "Northeast",
     attendeesRegistered: 180,
     attendeesCheckedIn: 142,
     capacity: 200,
@@ -125,6 +129,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "10:00 AM",
     endTime: "11:30 AM",
     location: "Zoom (Online)",
+    region: "Southeast",
     attendeesRegistered: 320,
     attendeesCheckedIn: 289,
     capacity: 500,
@@ -147,6 +152,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "8:00 AM",
     endTime: "5:00 PM",
     location: "Tech Center, Austin",
+    region: "Southwest",
     attendeesRegistered: 450,
     attendeesCheckedIn: 0,
     capacity: 500,
@@ -172,6 +178,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "9:00 AM",
     endTime: "12:00 PM",
     location: "HQ Conference Room, Boston",
+    region: "Northeast",
     attendeesRegistered: 12,
     attendeesCheckedIn: 0,
     capacity: 20,
@@ -194,6 +201,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "10:00 AM",
     endTime: "4:00 PM",
     location: "LA Convention Center",
+    region: "West",
     attendeesRegistered: 380,
     attendeesCheckedIn: 0,
     capacity: 500,
@@ -218,6 +226,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "1:00 PM",
     endTime: "3:00 PM",
     location: "Microsoft Teams (Online)",
+    region: "Midwest",
     attendeesRegistered: 95,
     attendeesCheckedIn: 0,
     capacity: 150,
@@ -240,6 +249,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "9:00 AM",
     endTime: "3:00 PM",
     location: "Pinnacle HQ, Denver + Virtual",
+    region: "West",
     attendeesRegistered: 65,
     attendeesCheckedIn: 0,
     capacity: 100,
@@ -262,6 +272,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "7:00 PM",
     endTime: "10:00 PM",
     location: "Rooftop Lounge, Chicago",
+    region: "Midwest",
     attendeesRegistered: 95,
     attendeesCheckedIn: 88,
     capacity: 120,
@@ -287,6 +298,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "10:00 AM",
     endTime: "4:00 PM",
     location: "City Park, Austin",
+    region: "Southwest",
     attendeesRegistered: 320,
     attendeesCheckedIn: 295,
     capacity: 400,
@@ -311,6 +323,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "6:30 PM",
     endTime: "9:30 PM",
     location: "Four Seasons Ballroom, SF",
+    region: "West",
     attendeesRegistered: 200,
     attendeesCheckedIn: 192,
     capacity: 220,
@@ -336,6 +349,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "2:00 PM",
     endTime: "4:00 PM",
     location: "Webex (Online)",
+    region: "Southeast",
     attendeesRegistered: 150,
     attendeesCheckedIn: 134,
     capacity: 200,
@@ -358,6 +372,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "5:00 PM",
     endTime: "8:00 PM",
     location: "Meridian Gallery, LA",
+    region: "West",
     attendeesRegistered: 75,
     attendeesCheckedIn: 70,
     capacity: 100,
@@ -380,6 +395,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "10:00 AM",
     endTime: "12:00 PM",
     location: "Acme HQ + Zoom",
+    region: "Northeast",
     attendeesRegistered: 280,
     attendeesCheckedIn: 265,
     capacity: 300,
@@ -402,6 +418,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "11:00 AM",
     endTime: "12:30 PM",
     location: "Google Meet (Online)",
+    region: "West",
     attendeesRegistered: 45,
     attendeesCheckedIn: 40,
     capacity: 60,
@@ -424,6 +441,7 @@ export const MOCK_EVENTS: EventRecord[] = [
     startTime: "10:00 AM",
     endTime: "1:00 PM",
     location: "Seattle Country Club",
+    region: "West",
     attendeesRegistered: 60,
     attendeesCheckedIn: 0,
     capacity: 80,
@@ -447,6 +465,8 @@ const ORGANIZATIONS = [
   "Catalyst Inc.",
   "Pinnacle Ventures",
 ];
+
+const REGIONS = ["Northeast", "Southeast", "Midwest", "West", "Southwest"] as const;
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -507,6 +527,7 @@ export function EventsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [orgFilter, setOrgFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [regionFilter, setRegionFilter] = useState("all");
   const [assignmentFilter, setAssignmentFilter] = useState("all");
   const [page, setPage] = useState(1);
 
@@ -583,6 +604,11 @@ export function EventsPage() {
         (e) => e.type.toLowerCase() === typeFilter.toLowerCase(),
       );
     }
+    if (regionFilter !== "all") {
+      result = result.filter(
+        (e) => e.region.toLowerCase() === regionFilter.toLowerCase(),
+      );
+    }
     if (assignmentFilter !== "all") {
       result = result.filter((e) => {
         const val = getAssignmentFilterValue(getAssignments(e));
@@ -590,7 +616,7 @@ export function EventsPage() {
       });
     }
     return result;
-  }, [search, statusFilter, orgFilter, typeFilter, assignmentFilter, localAssignments]);
+  }, [search, statusFilter, orgFilter, typeFilter, regionFilter, assignmentFilter, localAssignments]);
 
   /* ---- Pagination ---- */
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -603,15 +629,16 @@ export function EventsPage() {
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, orgFilter, typeFilter, assignmentFilter]);
+  }, [search, statusFilter, orgFilter, typeFilter, regionFilter, assignmentFilter]);
 
   const hasActiveFilters =
-    statusFilter !== "all" || orgFilter !== "all" || typeFilter !== "all" || assignmentFilter !== "all";
+    statusFilter !== "all" || orgFilter !== "all" || typeFilter !== "all" || regionFilter !== "all" || assignmentFilter !== "all";
 
   const clearFilters = () => {
     setStatusFilter("all");
     setOrgFilter("all");
     setTypeFilter("all");
+    setRegionFilter("all");
     setAssignmentFilter("all");
     setSearch("");
   };
@@ -722,6 +749,24 @@ export function EventsPage() {
           </SelectContent>
         </Select>
 
+        {/* Region filter */}
+        <Select value={regionFilter} onValueChange={setRegionFilter}>
+          <SelectTrigger
+            className="w-[150px] cursor-pointer"
+            style={{ fontSize: "0.8125rem" }}
+          >
+            <SelectValue placeholder="Region" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Regions</SelectItem>
+            {REGIONS.map((r) => (
+              <SelectItem key={r} value={r.toLowerCase()}>
+                {r}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         {/* Assignment filter */}
         <Select value={assignmentFilter} onValueChange={setAssignmentFilter}>
           <SelectTrigger
@@ -765,6 +810,7 @@ export function EventsPage() {
                     "Organization",
                     "Type",
                     "Date & Time",
+                    "Region",
                     "Attendees",
                     "Educators",
                     "Status",
@@ -791,7 +837,7 @@ export function EventsPage() {
               <tbody>
                 {paged.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-5 py-12 text-center">
+                    <td colSpan={9} className="px-5 py-12 text-center">
                       <p
                         className="text-muted-foreground"
                         style={{ fontSize: "0.875rem" }}
@@ -860,6 +906,19 @@ export function EventsPage() {
                         >
                           {event.startTime} – {event.endTime}
                         </span>
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2 min-w-[100px]">
+                          <div className="flex items-center justify-center size-6 rounded bg-muted shrink-0">
+                            <MapPin className="size-3 text-muted-foreground" />
+                          </div>
+                          <span
+                            className="text-foreground"
+                            style={{ fontSize: "0.8125rem" }}
+                          >
+                            {event.region}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-5 py-3">
                         <span
