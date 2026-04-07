@@ -90,8 +90,6 @@ export function EducatorsPage() {
   const [specialtyFilter, setSpecialtyFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-
-
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
     let result = [...MOCK_EDUCATORS];
@@ -492,5 +490,3 @@ export function EducatorsPage() {
 /* ------------------------------------------------------------------ */
 /* Stat Card                                                           */
 /* ------------------------------------------------------------------ */
-
-

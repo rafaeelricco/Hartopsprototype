@@ -16,6 +16,7 @@ This document demonstrates all new features added to the Hart Ops prototype, cov
 A centralized weekly calendar view showing all educators' availability at a glance. Operations managers can quickly identify scheduling gaps and plan assignments.
 
 **Key features:**
+
 - Weekly grid with 3 time periods: Morning (AM), Afternoon (PM), Evening (Eve)
 - Color-coded time slots (gold/slate/purple)
 - Status filter tabs (Active / Inactive / All)
@@ -36,6 +37,7 @@ A centralized weekly calendar view showing all educators' availability at a glan
 A sortable, filterable educator roster view for operations administrators. Displays quality scores with trend indicators, status badges, specialties, and event completion counts.
 
 **Key features:**
+
 - Sortable columns (Educator, Location, Status, Quality Score, Events Completed, Last Event)
 - Multi-filter dropdowns (Status, State, Specialties)
 - Quality score with trend arrows (improving/declining/stable)
@@ -55,6 +57,7 @@ A sortable, filterable educator roster view for operations administrators. Displ
 Redesigned educator detail page featuring a custom profile header and a dedicated Performance Scorecard section. The scorecard calculates a composite Quality Score (0–100) from weighted metrics.
 
 **Key features:**
+
 - Profile header with avatar, status badge, quality score badge, location, and event count
 - Info grid: Location, Status, Events Completed, Last Event, Quality Score, Specialties
 - **Performance Scorecard:**
@@ -77,6 +80,7 @@ Redesigned educator detail page featuring a custom profile header and a dedicate
 A cross-organization event monitoring table providing the operations team with a single view of all events across all client organizations.
 
 **Key features:**
+
 - Searchable event list with organization, type, date/time, attendees, and status
 - Filter dropdowns: Organization, Status (Live/Upcoming/Completed/Cancelled), Type (In-Person/Virtual/Hybrid)
 - Live status with pulsing green indicator
@@ -98,6 +102,7 @@ A cross-organization event monitoring table providing the operations team with a
 A comprehensive dashboard for educator managers showing key metrics, pending offers, event trends, and items requiring attention.
 
 **Key features:**
+
 - **Stat Cards:** Total Events This Week, Active Events Now, Events Requiring Attention — with trend indicators
 - **Pending Offers Summary:** Displays counts for Awaiting, Accepted, and Declined offers with color-coded cards
 - **Events Trend Chart:** 6-month area chart showing monthly event volume
@@ -119,6 +124,7 @@ A comprehensive dashboard for educator managers showing key metrics, pending off
 Events management with a 7-state lifecycle tracking system (Unassigned → Pending → Confirmed → Live → Completed → Finalized, with Cancelled branch).
 
 **Key features:**
+
 - Status filter tabs with counts: All, Upcoming, Live, Completed
 - 7 color-coded status badges following the event lifecycle state machine
 - Event type badges: Tasting (purple), Demo (cyan), Activation (orange), Promo (pink)
@@ -143,6 +149,7 @@ Events management with a 7-state lifecycle tracking system (Unassigned → Pendi
 Monthly calendar visualization of all events with status-colored dots, providing a visual overview of event distribution across the month.
 
 **Key features:**
+
 - Month navigation with previous/next buttons
 - Day cells showing event names with status color indicators
 - Green dots for live, amber for pending, red for unassigned
@@ -163,6 +170,7 @@ Monthly calendar visualization of all events with status-colored dots, providing
 Comprehensive event detail page with a visual 6-step lifecycle progress indicator and full event metadata.
 
 **Key features:**
+
 - **Lifecycle progress indicator:** 6-step stepper (Unassigned → Pending → Confirmed → Live → Completed → Finalized)
 - Current phase highlighted with filled circle; completed phases show checkmarks
 - Status and event type badges in header
@@ -184,6 +192,7 @@ Comprehensive event detail page with a visual 6-step lifecycle progress indicato
 When assigning educators to events, the system ranks available educators by proximity to the venue using Haversine distance calculation.
 
 **Key features:**
+
 - **Venue context:** Shows event venue name and full address at top of assignment panel
 - **Proximity ranking:** Educators sorted by distance to venue
 - **Distance tier badges:** Nearby (<10 mi, green), Moderate (10–25 mi, amber), Far (>25 mi, red)
@@ -208,6 +217,7 @@ When assigning educators to events, the system ranks available educators by prox
 For events in Confirmed/Pending status, the assignment panel shows each assigned educator with their distance, offer status, and response timeline.
 
 **Key features:**
+
 - Assigned educator cards with distance indicator (~28 mi, ~18 mi)
 - Offer status badges: Accepted (green), Awaiting Response (yellow)
 - Response timestamp ("12d ago", "Sent 12d ago")
@@ -227,6 +237,7 @@ For events in Confirmed/Pending status, the assignment panel shows each assigned
 The educator manager's roster view showing all assigned educators with performance metrics, quality scores, and upcoming events.
 
 **Key features:**
+
 - Status filter tabs: All, Active, Inactive
 - Search by name, email, or phone
 - Sortable columns: Name, Quality, Rating, Sales, On-Time
@@ -249,6 +260,7 @@ The educator manager's roster view showing all assigned educators with performan
 Detailed educator profile page with comprehensive metrics, performance scorecard, event history, and an integrated availability calendar.
 
 **Key features:**
+
 - **Profile header:** Avatar, name, status, event count, location, distance from manager ("~8 mi from you"), Edit button
 - **Contact info grid:** Email, Phone, Home Address
 - **Performance metrics:** Avg Rating, Sales/Event, Punctuality, Events This Month, Total Events
@@ -276,6 +288,7 @@ Detailed educator profile page with comprehensive metrics, performance scorecard
 For completed events, the detail page shows comprehensive post-event data including final stats, questionnaire responses, photos, and a finalization workflow.
 
 **Key features:**
+
 - **Punctuality tracking:** "Early Check-out" flag with actual check-in/out times
 - **Final Stats grid:** Total Samples, Interactions, Sales, Survey rating, Questionnaires completed, Photos count, Actual Duration
 - **Inventory Comparison:** Pre-event vs Post-event counts with sold/used delta
@@ -293,14 +306,14 @@ For completed events, the detail page shows comprehensive post-event data includ
 
 ## Summary of New Features
 
-| Feature | Platform | Date | Commit(s) |
-|---------|----------|------|-----------|
-| Educator Availability Calendar | Ops | Mar 27 | `cfe95e7` |
-| Educator Performance Scorecards & Quality Scoring | Ops, Educator | Mar 27 | `2c3c1b9`, `7a8df77` |
-| Educator Detail Page Redesign | Ops | Mar 27 | `890c637` |
-| Educator Dashboard & Offer Status Tracking | Educator Manager | Mar 27 | `fafd108` |
-| Geography-First Educator Matching | Educator Manager | Mar 27 | `4cde1a8` |
-| Educator Cancellation Request Tracking | Educator Manager | Mar 31 | `d5df704` |
-| Punctuality Flags (Late Check-in / Early Checkout) | Educator Manager | Mar 26 | `4dd8101` |
-| Pre-Approval Checklist for Event Finalization | Educator Manager | Mar 26 | `38ea39c` |
-| 7-State Event Lifecycle (State Machine) | Educator Manager | Mar 26–27 | Multiple |
+| Feature                                            | Platform         | Date      | Commit(s)            |
+| -------------------------------------------------- | ---------------- | --------- | -------------------- |
+| Educator Availability Calendar                     | Ops              | Mar 27    | `cfe95e7`            |
+| Educator Performance Scorecards & Quality Scoring  | Ops, Educator    | Mar 27    | `2c3c1b9`, `7a8df77` |
+| Educator Detail Page Redesign                      | Ops              | Mar 27    | `890c637`            |
+| Educator Dashboard & Offer Status Tracking         | Educator Manager | Mar 27    | `fafd108`            |
+| Geography-First Educator Matching                  | Educator Manager | Mar 27    | `4cde1a8`            |
+| Educator Cancellation Request Tracking             | Educator Manager | Mar 31    | `d5df704`            |
+| Punctuality Flags (Late Check-in / Early Checkout) | Educator Manager | Mar 26    | `4dd8101`            |
+| Pre-Approval Checklist for Event Finalization      | Educator Manager | Mar 26    | `38ea39c`            |
+| 7-State Event Lifecycle (State Machine)            | Educator Manager | Mar 26–27 | Multiple             |

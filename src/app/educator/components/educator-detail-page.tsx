@@ -413,10 +413,25 @@ export function EducatorDetailPage() {
             {/* Hero Quality Score */}
             {(() => {
               const level = getScoreLevel(educator.qualityScore);
-              const levelLabel = level === "excellent" ? "Excellent" : level === "average" ? "Average" : "Needs Improvement";
+              const levelLabel =
+                level === "excellent"
+                  ? "Excellent"
+                  : level === "average"
+                    ? "Average"
+                    : "Needs Improvement";
               const trendDelta = educator.trends.qualityScore;
-              const ringColor = level === "excellent" ? "#22C55E" : level === "average" ? "#F59E0B" : "#EF4444";
-              const ringBg = level === "excellent" ? "#22C55E1A" : level === "average" ? "#F59E0B1A" : "#EF44441A";
+              const ringColor =
+                level === "excellent"
+                  ? "#22C55E"
+                  : level === "average"
+                    ? "#F59E0B"
+                    : "#EF4444";
+              const ringBg =
+                level === "excellent"
+                  ? "#22C55E1A"
+                  : level === "average"
+                    ? "#F59E0B1A"
+                    : "#EF44441A";
               return (
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 flex items-center gap-6">
                   {/* Circular score indicator */}
@@ -424,10 +439,24 @@ export function EducatorDetailPage() {
                     className="relative flex-shrink-0 flex items-center justify-center"
                     style={{ width: 80, height: 80 }}
                   >
-                    <svg viewBox="0 0 36 36" className="w-full h-full" style={{ transform: "rotate(-90deg)" }}>
-                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="#E2E8F0" strokeWidth="3" />
+                    <svg
+                      viewBox="0 0 36 36"
+                      className="w-full h-full"
+                      style={{ transform: "rotate(-90deg)" }}
+                    >
                       <circle
-                        cx="18" cy="18" r="15.5" fill="none"
+                        cx="18"
+                        cy="18"
+                        r="15.5"
+                        fill="none"
+                        stroke="#E2E8F0"
+                        strokeWidth="3"
+                      />
+                      <circle
+                        cx="18"
+                        cy="18"
+                        r="15.5"
+                        fill="none"
                         stroke={ringColor}
                         strokeWidth="3"
                         strokeDasharray={`${educator.qualityScore * 0.974} 100`}
@@ -444,23 +473,44 @@ export function EducatorDetailPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <Gauge size={16} style={{ color: ringColor }} />
-                      <span style={{ fontSize: "1rem", fontWeight: 600, color: "#0F172A" }}>Quality Score</span>
+                      <span
+                        style={{
+                          fontSize: "1rem",
+                          fontWeight: 600,
+                          color: "#0F172A",
+                        }}
+                      >
+                        Quality Score
+                      </span>
                       <span
                         className="px-2 py-0.5 rounded-md font-medium"
-                        style={{ fontSize: "0.6875rem", background: ringBg, color: ringColor }}
+                        style={{
+                          fontSize: "0.6875rem",
+                          background: ringBg,
+                          color: ringColor,
+                        }}
                       >
                         {levelLabel}
                       </span>
                     </div>
                     <p style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>
-                      Composite score from 5 weighted metrics. Updated each period.
+                      Composite score from 5 weighted metrics. Updated each
+                      period.
                     </p>
                     {trendDelta !== 0 && (
-                      <p className="mt-1 flex items-center gap-1" style={{ fontSize: "0.8125rem" }}>
-                        <span className={`font-semibold ${getTrendColor(trendDelta)}`}>
-                          {getTrendArrow(trendDelta)} {formatTrendDelta(trendDelta)} pts
+                      <p
+                        className="mt-1 flex items-center gap-1"
+                        style={{ fontSize: "0.8125rem" }}
+                      >
+                        <span
+                          className={`font-semibold ${getTrendColor(trendDelta)}`}
+                        >
+                          {getTrendArrow(trendDelta)}{" "}
+                          {formatTrendDelta(trendDelta)} pts
                         </span>
-                        <span style={{ color: "#94A3B8" }}>vs. previous period</span>
+                        <span style={{ color: "#94A3B8" }}>
+                          vs. previous period
+                        </span>
                       </p>
                     )}
                   </div>
@@ -478,21 +528,46 @@ export function EducatorDetailPage() {
                 return (
                   <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[#94A3B8]" style={{ fontSize: "0.75rem" }}>
+                      <div
+                        className="flex items-center gap-2 text-[#94A3B8]"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <ShoppingCart size={14} /> Retail Sales Avg
                       </div>
                       {trend !== 0 && (
-                        <span className={`text-xs font-semibold ${getTrendColor(trend)}`}>
+                        <span
+                          className={`text-xs font-semibold ${getTrendColor(trend)}`}
+                        >
                           {getTrendArrow(trend)} {formatTrendDelta(trend)}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#0F172A" }}>{val.toFixed(1)}</span>
-                      <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>units / event</span>
+                      <span
+                        style={{
+                          fontSize: "1.25rem",
+                          fontWeight: 600,
+                          color: "#0F172A",
+                        }}
+                      >
+                        {val.toFixed(1)}
+                      </span>
+                      <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                        units / event
+                      </span>
                     </div>
                     <div className="w-full bg-[#F1F5F9] rounded-full h-1.5 mt-1">
-                      <div className={`h-1.5 rounded-full ${colors.bg.replace('/10', '')}`} style={{ width: `${Math.min(val / 20, 1) * 100}%`, background: colors.text.includes('green') ? '#22C55E' : colors.text.includes('amber') ? '#F59E0B' : '#EF4444' }} />
+                      <div
+                        className={`h-1.5 rounded-full ${colors.bg.replace("/10", "")}`}
+                        style={{
+                          width: `${Math.min(val / 20, 1) * 100}%`,
+                          background: colors.text.includes("green")
+                            ? "#22C55E"
+                            : colors.text.includes("amber")
+                              ? "#F59E0B"
+                              : "#EF4444",
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -506,20 +581,43 @@ export function EducatorDetailPage() {
                 return (
                   <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[#94A3B8]" style={{ fontSize: "0.75rem" }}>
+                      <div
+                        className="flex items-center gap-2 text-[#94A3B8]"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <Clock size={14} /> Check-in Score
                       </div>
                       {trend !== 0 && (
-                        <span className={`text-xs font-semibold ${getTrendColor(trend)}`}>
+                        <span
+                          className={`text-xs font-semibold ${getTrendColor(trend)}`}
+                        >
                           {getTrendArrow(trend)} {formatTrendDelta(trend)}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#0F172A" }}>{val}%</span>
+                      <span
+                        style={{
+                          fontSize: "1.25rem",
+                          fontWeight: 600,
+                          color: "#0F172A",
+                        }}
+                      >
+                        {val}%
+                      </span>
                     </div>
                     <div className="w-full bg-[#F1F5F9] rounded-full h-1.5 mt-1">
-                      <div className="h-1.5 rounded-full" style={{ width: `${val}%`, background: colors.text.includes('green') ? '#22C55E' : colors.text.includes('amber') ? '#F59E0B' : '#EF4444' }} />
+                      <div
+                        className="h-1.5 rounded-full"
+                        style={{
+                          width: `${val}%`,
+                          background: colors.text.includes("green")
+                            ? "#22C55E"
+                            : colors.text.includes("amber")
+                              ? "#F59E0B"
+                              : "#EF4444",
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -533,20 +631,43 @@ export function EducatorDetailPage() {
                 return (
                   <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[#94A3B8]" style={{ fontSize: "0.75rem" }}>
+                      <div
+                        className="flex items-center gap-2 text-[#94A3B8]"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <CheckCircle2 size={14} /> Event Completion Avg
                       </div>
                       {trend !== 0 && (
-                        <span className={`text-xs font-semibold ${getTrendColor(trend)}`}>
+                        <span
+                          className={`text-xs font-semibold ${getTrendColor(trend)}`}
+                        >
                           {getTrendArrow(trend)} {formatTrendDelta(trend)}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#0F172A" }}>{val}%</span>
+                      <span
+                        style={{
+                          fontSize: "1.25rem",
+                          fontWeight: 600,
+                          color: "#0F172A",
+                        }}
+                      >
+                        {val}%
+                      </span>
                     </div>
                     <div className="w-full bg-[#F1F5F9] rounded-full h-1.5 mt-1">
-                      <div className="h-1.5 rounded-full" style={{ width: `${val}%`, background: colors.text.includes('green') ? '#22C55E' : colors.text.includes('amber') ? '#F59E0B' : '#EF4444' }} />
+                      <div
+                        className="h-1.5 rounded-full"
+                        style={{
+                          width: `${val}%`,
+                          background: colors.text.includes("green")
+                            ? "#22C55E"
+                            : colors.text.includes("amber")
+                              ? "#F59E0B"
+                              : "#EF4444",
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -559,21 +680,44 @@ export function EducatorDetailPage() {
                 return (
                   <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[#94A3B8]" style={{ fontSize: "0.75rem" }}>
+                      <div
+                        className="flex items-center gap-2 text-[#94A3B8]"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <Star size={14} /> Retailer Survey Score
                       </div>
                       {trend !== 0 && (
-                        <span className={`text-xs font-semibold ${getTrendColor(trend)}`}>
+                        <span
+                          className={`text-xs font-semibold ${getTrendColor(trend)}`}
+                        >
                           {getTrendArrow(trend)} {formatTrendDelta(trend)}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#0F172A" }}>{val.toFixed(1)}</span>
-                      <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>/ 5</span>
+                      <span
+                        style={{
+                          fontSize: "1.25rem",
+                          fontWeight: 600,
+                          color: "#0F172A",
+                        }}
+                      >
+                        {val.toFixed(1)}
+                      </span>
+                      <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                        / 5
+                      </span>
                       <div className="flex gap-0.5 ml-1">
                         {[1, 2, 3, 4, 5].map((s) => (
-                          <Star key={s} size={12} fill={s <= Math.round(val) ? "#F59E0B" : "none"} style={{ color: s <= Math.round(val) ? "#F59E0B" : "#E2E8F0" }} />
+                          <Star
+                            key={s}
+                            size={12}
+                            fill={s <= Math.round(val) ? "#F59E0B" : "none"}
+                            style={{
+                              color:
+                                s <= Math.round(val) ? "#F59E0B" : "#E2E8F0",
+                            }}
+                          />
                         ))}
                       </div>
                     </div>
@@ -589,26 +733,65 @@ export function EducatorDetailPage() {
                 return (
                   <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-[#94A3B8]" style={{ fontSize: "0.75rem" }}>
+                      <div
+                        className="flex items-center gap-2 text-[#94A3B8]"
+                        style={{ fontSize: "0.75rem" }}
+                      >
                         <RotateCcw size={14} /> Cancellation Rating
                       </div>
                       {trend !== 0 && (
-                        <span className={`text-xs font-semibold ${getTrendColor(trend)}`}>
+                        <span
+                          className={`text-xs font-semibold ${getTrendColor(trend)}`}
+                        >
                           {getTrendArrow(trend)} {formatTrendDelta(trend)}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: "1.25rem", fontWeight: 600, color: "#0F172A" }}>{val}%</span>
+                      <span
+                        style={{
+                          fontSize: "1.25rem",
+                          fontWeight: 600,
+                          color: "#0F172A",
+                        }}
+                      >
+                        {val}%
+                      </span>
                       <span
                         className="px-2 py-0.5 rounded-md font-medium"
-                        style={{ fontSize: "0.6875rem", background: colors.text.includes('green') ? '#ECFDF5' : colors.text.includes('amber') ? '#FFFBEB' : '#FEF2F2', color: colors.text.includes('green') ? '#0F766E' : colors.text.includes('amber') ? '#D97706' : '#DC2626' }}
+                        style={{
+                          fontSize: "0.6875rem",
+                          background: colors.text.includes("green")
+                            ? "#ECFDF5"
+                            : colors.text.includes("amber")
+                              ? "#FFFBEB"
+                              : "#FEF2F2",
+                          color: colors.text.includes("green")
+                            ? "#0F766E"
+                            : colors.text.includes("amber")
+                              ? "#D97706"
+                              : "#DC2626",
+                        }}
                       >
-                        {val >= 90 ? "Reliable" : val >= 70 ? "Fair" : "At Risk"}
+                        {val >= 90
+                          ? "Reliable"
+                          : val >= 70
+                            ? "Fair"
+                            : "At Risk"}
                       </span>
                     </div>
                     <div className="w-full bg-[#F1F5F9] rounded-full h-1.5 mt-1">
-                      <div className="h-1.5 rounded-full" style={{ width: `${val}%`, background: colors.text.includes('green') ? '#22C55E' : colors.text.includes('amber') ? '#F59E0B' : '#EF4444' }} />
+                      <div
+                        className="h-1.5 rounded-full"
+                        style={{
+                          width: `${val}%`,
+                          background: colors.text.includes("green")
+                            ? "#22C55E"
+                            : colors.text.includes("amber")
+                              ? "#F59E0B"
+                              : "#EF4444",
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -617,7 +800,10 @@ export function EducatorDetailPage() {
               {/* Preferred Brands/Categories */}
               {educator.preferredBrands.length > 0 && (
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2 text-[#94A3B8]" style={{ fontSize: "0.75rem" }}>
+                  <div
+                    className="flex items-center gap-2 text-[#94A3B8]"
+                    style={{ fontSize: "0.75rem" }}
+                  >
                     <Tag size={14} /> Preferred Brands / Categories
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-1">
@@ -625,7 +811,11 @@ export function EducatorDetailPage() {
                       <span
                         key={brand}
                         className="px-2.5 py-0.5 rounded-full"
-                        style={{ fontSize: "0.75rem", background: "#F1F5F9", color: "#475569" }}
+                        style={{
+                          fontSize: "0.75rem",
+                          background: "#F1F5F9",
+                          color: "#475569",
+                        }}
                       >
                         {brand}
                       </span>

@@ -20,7 +20,11 @@ import {
 } from "@/app/shared/components/ui/tooltip";
 import { PageHeader } from "@/app/shared/components/layouts/page-header";
 import { mockEducators } from "./educator-roster-data";
-import { getScoreColor, getTrendArrow, getTrendColor } from "./educator-scoring";
+import {
+  getScoreColor,
+  getTrendArrow,
+  getTrendColor,
+} from "./educator-scoring";
 
 type SortKey =
   | "name"
@@ -254,9 +258,15 @@ export function EducatorsPage() {
 
                   {/* Quality Score */}
                   {(() => {
-                    if (!edu.qualityScore) return (
-                      <span className="text-muted-foreground" style={{ fontSize: "0.875rem" }}>\u2014</span>
-                    );
+                    if (!edu.qualityScore)
+                      return (
+                        <span
+                          className="text-muted-foreground"
+                          style={{ fontSize: "0.875rem" }}
+                        >
+                          \u2014
+                        </span>
+                      );
                     const colors = getScoreColor(edu.qualityScore);
                     const trendDelta = edu.trends.qualityScore;
                     return (
@@ -269,7 +279,10 @@ export function EducatorsPage() {
                           {edu.qualityScore}
                         </span>
                         {trendDelta !== 0 && (
-                          <span className={`${getTrendColor(trendDelta)}`} style={{ fontSize: "0.625rem", fontWeight: 600 }}>
+                          <span
+                            className={`${getTrendColor(trendDelta)}`}
+                            style={{ fontSize: "0.625rem", fontWeight: 600 }}
+                          >
                             {getTrendArrow(trendDelta)}
                           </span>
                         )}

@@ -74,10 +74,7 @@ import {
   type AssignmentStatus,
 } from "./events-data";
 import { mockEducators, type Educator } from "./educator-roster-data";
-import {
-  rankByGeography,
-  distanceTierConfig,
-} from "./geo-matching";
+import { rankByGeography, distanceTierConfig } from "./geo-matching";
 import { CURRENT_EDUCATOR_MANAGER } from "./settings-data";
 
 /* --- Phase Badge (7 states per mm-ui-006) --- */
@@ -452,8 +449,6 @@ function getScoreColor(score: number): string {
   return "bg-red-500/10 text-red-600 border-red-500/20";
 }
 
-
-
 /* --- Availability Strip (compact 7-day view for assignment panel, G1) --- */
 
 const SLOT_COLORS: Record<string, string> = {
@@ -647,9 +642,7 @@ export function EventDetailPage() {
             educatorName: edu.name,
             assignmentStatus: "Pending",
             offeredAt: new Date().toISOString(),
-            expiresAt: new Date(
-              Date.now() + 48 * 60 * 60 * 1000,
-            ).toISOString(),
+            expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
           });
         }
       }
@@ -1016,9 +1009,7 @@ export function EventDetailPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() =>
-                                  handleResendOffer(ae.educatorId)
-                                }
+                                onClick={() => handleResendOffer(ae.educatorId)}
                                 className="h-7 px-2 text-primary hover:text-primary/80 hover:bg-primary/10 cursor-pointer"
                                 title="Resend Offer"
                               >
@@ -1357,9 +1348,7 @@ export function EventDetailPage() {
                   filtered = filtered.filter((r) => r.brandMatch);
                 }
                 if (filterNearby) {
-                  filtered = filtered.filter(
-                    (r) => r.distanceToVenue < 15,
-                  );
+                  filtered = filtered.filter((r) => r.distanceToVenue < 15);
                 }
 
                 // Apply sort
@@ -1374,8 +1363,7 @@ export function EventDetailPage() {
                           b.educator,
                           event,
                         );
-                        if (aConflict !== bConflict)
-                          return aConflict ? 1 : -1;
+                        if (aConflict !== bConflict) return aConflict ? 1 : -1;
                         return (
                           getCompositeScore(b.educator, event) -
                           getCompositeScore(a.educator, event)
@@ -1545,9 +1533,7 @@ export function EventDetailPage() {
                               size="sm"
                               variant="ghost"
                               onClick={() =>
-                                setExpandedEducator(
-                                  isExpanded ? null : edu.id,
-                                )
+                                setExpandedEducator(isExpanded ? null : edu.id)
                               }
                               className="cursor-pointer h-7 px-2 text-muted-foreground"
                             >
@@ -1576,8 +1562,8 @@ export function EventDetailPage() {
                                 fontWeight: 500,
                               }}
                             >
-                              <Star className="w-3 h-3 text-amber-400" />{" "}
-                              Score Breakdown
+                              <Star className="w-3 h-3 text-amber-400" /> Score
+                              Breakdown
                             </p>
                             <div className="flex items-center gap-2 flex-wrap">
                               <span
@@ -1951,20 +1937,22 @@ export function EventDetailPage() {
                           >
                             Scheduled:{" "}
                             {event.scheduledStart &&
-                              new Date(
-                                event.scheduledStart,
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}{" "}
+                              new Date(event.scheduledStart).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                },
+                              )}{" "}
                             · Arrived:{" "}
                             {event.actualCheckIn &&
-                              new Date(
-                                event.actualCheckIn,
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}
+                              new Date(event.actualCheckIn).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                },
+                              )}
                           </p>
                         </div>
                       </div>
@@ -1989,20 +1977,22 @@ export function EventDetailPage() {
                           >
                             Scheduled end:{" "}
                             {event.scheduledEnd &&
-                              new Date(
-                                event.scheduledEnd,
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}{" "}
+                              new Date(event.scheduledEnd).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                },
+                              )}{" "}
                             · Left:{" "}
                             {event.actualCheckOut &&
-                              new Date(
-                                event.actualCheckOut,
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}
+                              new Date(event.actualCheckOut).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                },
+                              )}
                           </p>
                         </div>
                       </div>
@@ -2482,9 +2472,7 @@ export function EventDetailPage() {
                             >
                               {check.label}
                               {check.required && !isFinalizedView && (
-                                <span className="text-red-500 ml-0.5">
-                                  *
-                                </span>
+                                <span className="text-red-500 ml-0.5">*</span>
                               )}
                             </label>
                           </div>
@@ -2544,14 +2532,11 @@ export function EventDetailPage() {
                     ) : (
                       (() => {
                         const requiredChecks =
-                          event.preApprovalChecks?.filter(
-                            (c) => c.required,
-                          ) ?? [];
+                          event.preApprovalChecks?.filter((c) => c.required) ??
+                          [];
                         const allChecked =
                           requiredChecks.length === 0 ||
-                          requiredChecks.every((c) =>
-                            approvalChecks.has(c.id),
-                          );
+                          requiredChecks.every((c) => approvalChecks.has(c.id));
                         return (
                           <div className="flex items-center justify-between">
                             <div>

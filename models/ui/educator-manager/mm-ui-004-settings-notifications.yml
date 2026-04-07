@@ -96,7 +96,6 @@ core_content:
       - doc: "PDF-EM"
         details: "Educator Managers §6.2 — FAQs and Contact Information (support email, phone)"
 
-
   - section_title: "Logout"
     points:
       - "Entry Point: Logout action within the Settings section."

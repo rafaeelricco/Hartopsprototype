@@ -330,8 +330,15 @@ function EducatorCell({ event }: { event: EventItem }) {
           Pending
           {event.assignedEducators && event.assignedEducators.length > 0 && (
             <span className="ml-0.5">
-              ({event.assignedEducators.filter((ae) => ae.assignmentStatus !== "Pending" && ae.assignmentStatus !== "Withdrawn").length}/
-              {event.assignedEducators.length})
+              (
+              {
+                event.assignedEducators.filter(
+                  (ae) =>
+                    ae.assignmentStatus !== "Pending" &&
+                    ae.assignmentStatus !== "Withdrawn",
+                ).length
+              }
+              /{event.assignedEducators.length})
             </span>
           )}
         </span>
@@ -549,15 +556,25 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                       {getPunctualityFlags(event).includes("late-checkin") && (
                         <span
                           className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
-                          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+                          style={{
+                            fontSize: "0.5625rem",
+                            fontWeight: 500,
+                            lineHeight: "1rem",
+                          }}
                         >
                           Late
                         </span>
                       )}
-                      {getPunctualityFlags(event).includes("early-checkout") && (
+                      {getPunctualityFlags(event).includes(
+                        "early-checkout",
+                      ) && (
                         <span
                           className="inline-flex items-center rounded-full border px-1.5 py-0 flex-shrink-0 bg-red-500/10 text-red-600 border-red-500/20"
-                          style={{ fontSize: "0.5625rem", fontWeight: 500, lineHeight: "1rem" }}
+                          style={{
+                            fontSize: "0.5625rem",
+                            fontWeight: 500,
+                            lineHeight: "1rem",
+                          }}
                         >
                           Early Out
                         </span>

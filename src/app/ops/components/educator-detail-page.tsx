@@ -296,7 +296,11 @@ export function EducatorDetailPage() {
                       color: "#D97706",
                     }}
                   >
-                    <Star size={10} fill="#F59E0B" style={{ color: "#F59E0B" }} />
+                    <Star
+                      size={10}
+                      fill="#F59E0B"
+                      style={{ color: "#F59E0B" }}
+                    />
                     {educator.qualityScore} Quality
                   </span>
                 )}
@@ -545,11 +549,7 @@ export function EducatorDetailPage() {
             {(() => {
               const val = Math.min(100, educator.qualityScore + 3);
               const color =
-                val >= 80
-                  ? "#22C55E"
-                  : val >= 60
-                    ? "#F59E0B"
-                    : "#EF4444";
+                val >= 80 ? "#22C55E" : val >= 60 ? "#F59E0B" : "#EF4444";
               return (
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                   <div
@@ -583,11 +583,7 @@ export function EducatorDetailPage() {
             {(() => {
               const val = Math.max(70, educator.qualityScore - 5);
               const color =
-                val >= 80
-                  ? "#22C55E"
-                  : val >= 60
-                    ? "#F59E0B"
-                    : "#EF4444";
+                val >= 80 ? "#22C55E" : val >= 60 ? "#F59E0B" : "#EF4444";
               return (
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                   <div
@@ -621,11 +617,7 @@ export function EducatorDetailPage() {
             {(() => {
               const val = Math.min(100, educator.qualityScore + 1);
               const color =
-                val >= 80
-                  ? "#22C55E"
-                  : val >= 60
-                    ? "#F59E0B"
-                    : "#EF4444";
+                val >= 80 ? "#22C55E" : val >= 60 ? "#F59E0B" : "#EF4444";
               return (
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col gap-1.5">
                   <div

@@ -4,6 +4,6 @@ This folder contains information extracted from external sources and converted i
 
 ## Contents
 
-| Folder | Source | Description |
-|--------|--------|-------------|
+| Folder             | Source                                          | Description                                                                                                                                                                                  |
+| ------------------ | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `hart-sharepoint/` | Hart Agency SharePoint site (via OneDrive sync) | Extracted text from 31 documents covering HEMs application documentation, technical outlines, platform architecture (Visio), event data, questionnaires, survey decks, and database schemas. |

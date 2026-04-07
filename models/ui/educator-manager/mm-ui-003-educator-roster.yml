@@ -86,7 +86,6 @@ core_content:
       - doc: "MM8"
         details: "Core Content — Educator Management"
 
-
   - section_title: "Educator Detail View"
     points:
       - "Entry Point: Clicking an educator card in the Roster List."

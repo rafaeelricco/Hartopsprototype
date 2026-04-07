@@ -48,13 +48,13 @@ export interface Educator {
     slots: ("morning" | "afternoon" | "evening")[];
   }[];
   // ─── P1 Scoring Metrics ───
-  retailSalesAvg: number;          // Retail Sales Reported Average (units/event)
-  preferredBrands: string[];       // Preferred Brands/Categories
-  checkInScore: number;            // Check-in Score (0–100)
-  eventCompletionAvg: number;      // Event Completed to End Time Avg (0–100%)
-  retailerSurveyScore: number;     // Retailer Survey Score (1–5)
-  cancellationRating: number;      // Cancellation Rating (0–100, 100 = no cancellations)
-  qualityScore: number;            // Composite quality score (0–100)
+  retailSalesAvg: number; // Retail Sales Reported Average (units/event)
+  preferredBrands: string[]; // Preferred Brands/Categories
+  checkInScore: number; // Check-in Score (0–100)
+  eventCompletionAvg: number; // Event Completed to End Time Avg (0–100%)
+  retailerSurveyScore: number; // Retailer Survey Score (1–5)
+  cancellationRating: number; // Cancellation Rating (0–100, 100 = no cancellations)
+  qualityScore: number; // Composite quality score (0–100)
   // ─── Trend tracking (delta vs. previous period) ───
   trends: {
     retailSalesAvg: number;
@@ -126,7 +126,7 @@ export const mockEducators: Educator[] = [
       city: "New York",
       state: "NY",
       zip: "10012",
-      lat: 40.7230,
+      lat: 40.723,
       lng: -73.9998,
     },
     brandCertifications: ["Absolut", "Malibu", "Kahlua"],
@@ -190,7 +190,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 4.7,
     cancellationRating: 100,
     qualityScore: 88,
-    trends: { retailSalesAvg: 1.3, checkInScore: 2, eventCompletionAvg: 0, retailerSurveyScore: 0.2, cancellationRating: 0, qualityScore: 2.1 },
+    trends: {
+      retailSalesAvg: 1.3,
+      checkInScore: 2,
+      eventCompletionAvg: 0,
+      retailerSurveyScore: 0.2,
+      cancellationRating: 0,
+      qualityScore: 2.1,
+    },
   },
   {
     id: "edu-2",
@@ -218,8 +225,8 @@ export const mockEducators: Educator[] = [
       city: "Hoboken",
       state: "NJ",
       zip: "07030",
-      lat: 40.7440,
-      lng: -74.0280,
+      lat: 40.744,
+      lng: -74.028,
     },
     brandCertifications: ["Jameson", "Glenlivet"],
     upcomingEvents: [
@@ -266,7 +273,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 4.4,
     cancellationRating: 95,
     qualityScore: 81,
-    trends: { retailSalesAvg: 0.5, checkInScore: -1, eventCompletionAvg: 1, retailerSurveyScore: 0.1, cancellationRating: 0, qualityScore: 0.8 },
+    trends: {
+      retailSalesAvg: 0.5,
+      checkInScore: -1,
+      eventCompletionAvg: 1,
+      retailerSurveyScore: 0.1,
+      cancellationRating: 0,
+      qualityScore: 0.8,
+    },
   },
   {
     id: "edu-3",
@@ -295,7 +309,7 @@ export const mockEducators: Educator[] = [
       state: "NY",
       zip: "11201",
       lat: 40.6862,
-      lng: -73.9770,
+      lng: -73.977,
     },
     brandCertifications: ["Beefeater", "Absolut"],
     upcomingEvents: [
@@ -335,7 +349,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 3.8,
     cancellationRating: 88,
     qualityScore: 68,
-    trends: { retailSalesAvg: -0.8, checkInScore: -3, eventCompletionAvg: -2, retailerSurveyScore: -0.3, cancellationRating: -5, qualityScore: -2.4 },
+    trends: {
+      retailSalesAvg: -0.8,
+      checkInScore: -3,
+      eventCompletionAvg: -2,
+      retailerSurveyScore: -0.3,
+      cancellationRating: -5,
+      qualityScore: -2.4,
+    },
   },
   {
     id: "edu-4",
@@ -364,7 +385,7 @@ export const mockEducators: Educator[] = [
       state: "NY",
       zip: "10075",
       lat: 40.7734,
-      lng: -73.9560,
+      lng: -73.956,
     },
     brandCertifications: ["Avion", "Absolut", "Jameson", "Malibu"],
     upcomingEvents: [
@@ -427,7 +448,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 4.9,
     cancellationRating: 100,
     qualityScore: 92,
-    trends: { retailSalesAvg: 2.1, checkInScore: 0, eventCompletionAvg: 0, retailerSurveyScore: 0.1, cancellationRating: 0, qualityScore: 1.5 },
+    trends: {
+      retailSalesAvg: 2.1,
+      checkInScore: 0,
+      eventCompletionAvg: 0,
+      retailerSurveyScore: 0.1,
+      cancellationRating: 0,
+      qualityScore: 1.5,
+    },
   },
   {
     id: "edu-5",
@@ -503,7 +531,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 4.2,
     cancellationRating: 90,
     qualityScore: 75,
-    trends: { retailSalesAvg: 1.0, checkInScore: 3, eventCompletionAvg: 2, retailerSurveyScore: 0.3, cancellationRating: 5, qualityScore: 3.2 },
+    trends: {
+      retailSalesAvg: 1.0,
+      checkInScore: 3,
+      eventCompletionAvg: 2,
+      retailerSurveyScore: 0.3,
+      cancellationRating: 5,
+      qualityScore: 3.2,
+    },
   },
   {
     id: "edu-6",
@@ -588,7 +623,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 4.6,
     cancellationRating: 97,
     qualityScore: 84,
-    trends: { retailSalesAvg: 0.8, checkInScore: 1, eventCompletionAvg: 0, retailerSurveyScore: 0.0, cancellationRating: 0, qualityScore: 0.6 },
+    trends: {
+      retailSalesAvg: 0.8,
+      checkInScore: 1,
+      eventCompletionAvg: 0,
+      retailerSurveyScore: 0.0,
+      cancellationRating: 0,
+      qualityScore: 0.6,
+    },
   },
   {
     id: "edu-7",
@@ -645,7 +687,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 3.5,
     cancellationRating: 70,
     qualityScore: 55,
-    trends: { retailSalesAvg: -1.2, checkInScore: -5, eventCompletionAvg: -4, retailerSurveyScore: -0.4, cancellationRating: -8, qualityScore: -3.8 },
+    trends: {
+      retailSalesAvg: -1.2,
+      checkInScore: -5,
+      eventCompletionAvg: -4,
+      retailerSurveyScore: -0.4,
+      cancellationRating: -8,
+      qualityScore: -3.8,
+    },
   },
   {
     id: "edu-8",
@@ -714,7 +763,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 4.3,
     cancellationRating: 92,
     qualityScore: 78,
-    trends: { retailSalesAvg: 0.6, checkInScore: 2, eventCompletionAvg: 1, retailerSurveyScore: 0.2, cancellationRating: 3, qualityScore: 1.8 },
+    trends: {
+      retailSalesAvg: 0.6,
+      checkInScore: 2,
+      eventCompletionAvg: 1,
+      retailerSurveyScore: 0.2,
+      cancellationRating: 3,
+      qualityScore: 1.8,
+    },
   },
   {
     id: "edu-9",
@@ -752,7 +808,14 @@ export const mockEducators: Educator[] = [
     retailerSurveyScore: 0,
     cancellationRating: 0,
     qualityScore: 0,
-    trends: { retailSalesAvg: 0, checkInScore: 0, eventCompletionAvg: 0, retailerSurveyScore: 0, cancellationRating: 0, qualityScore: 0 },
+    trends: {
+      retailSalesAvg: 0,
+      checkInScore: 0,
+      eventCompletionAvg: 0,
+      retailerSurveyScore: 0,
+      cancellationRating: 0,
+      qualityScore: 0,
+    },
   },
 ];
 

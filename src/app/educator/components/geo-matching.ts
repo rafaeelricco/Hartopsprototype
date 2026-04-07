@@ -28,18 +28,30 @@ export function haversineDistance(
 
 /* ─── Educator-to-venue distance ─── */
 
-export function getDistanceToVenue(educator: Educator, event: EventItem): number {
-  const eduCoords = educator.homeAddress?.lat != null && educator.homeAddress?.lng != null
-    ? { lat: educator.homeAddress.lat, lng: educator.homeAddress.lng }
-    : null;
-  const venueCoords = event.venueLat != null && event.venueLng != null
-    ? { lat: event.venueLat, lng: event.venueLng }
-    : null;
+export function getDistanceToVenue(
+  educator: Educator,
+  event: EventItem,
+): number {
+  const eduCoords =
+    educator.homeAddress?.lat != null && educator.homeAddress?.lng != null
+      ? { lat: educator.homeAddress.lat, lng: educator.homeAddress.lng }
+      : null;
+  const venueCoords =
+    event.venueLat != null && event.venueLng != null
+      ? { lat: event.venueLat, lng: event.venueLng }
+      : null;
 
   if (eduCoords && venueCoords) {
-    return Math.round(
-      haversineDistance(eduCoords.lat, eduCoords.lng, venueCoords.lat, venueCoords.lng) * 10,
-    ) / 10;
+    return (
+      Math.round(
+        haversineDistance(
+          eduCoords.lat,
+          eduCoords.lng,
+          venueCoords.lat,
+          venueCoords.lng,
+        ) * 10,
+      ) / 10
+    );
   }
   // Fallback to static distanceMiles
   return educator.distanceMiles ?? 50;
@@ -75,8 +87,13 @@ export const distanceTierConfig: Record<
 
 /* ─── Availability check ─── */
 
-export function isAvailableOnDate(educator: Educator, dateStr: string): boolean {
-  return educator.availability.some((a) => a.date === dateStr && a.slots.length > 0);
+export function isAvailableOnDate(
+  educator: Educator,
+  dateStr: string,
+): boolean {
+  return educator.availability.some(
+    (a) => a.date === dateStr && a.slots.length > 0,
+  );
 }
 
 /* ─── Ranked result type ─── */

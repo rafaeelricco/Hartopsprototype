@@ -8,7 +8,6 @@ import {
   CloudSun,
   Moon,
   Users,
-
   Filter,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
@@ -92,8 +91,6 @@ const SLOT_META: Record<
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
-
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 type StatusFilter = "Active" | "Inactive" | "All";
@@ -124,8 +121,6 @@ export function AvailabilityCalendarPage() {
     return list;
   }, [statusFilter, search]);
 
-
-
   const prevWeek = () => {
     const d = new Date(weekAnchor);
     d.setDate(d.getDate() - 7);
@@ -141,10 +136,7 @@ export function AvailabilityCalendarPage() {
   const goThisWeek = () => setWeekAnchor(new Date());
 
   // Get slots for a given educator+date
-  const getSlots = (
-    educator: Educator,
-    dateStr: string,
-  ): string[] => {
+  const getSlots = (educator: Educator, dateStr: string): string[] => {
     const entry = educator.availability.find((a) => a.date === dateStr);
     return entry?.slots || [];
   };
@@ -297,7 +289,10 @@ export function AvailabilityCalendarPage() {
                 </p>
                 <p
                   className={isToday ? "text-[#7D152D]" : "text-[#0F172A]"}
-                  style={{ fontSize: "0.875rem", fontWeight: isToday ? 700 : 500 }}
+                  style={{
+                    fontSize: "0.875rem",
+                    fontWeight: isToday ? 700 : 500,
+                  }}
                 >
                   {day.getDate()}
                 </p>

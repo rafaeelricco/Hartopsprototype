@@ -33,7 +33,11 @@ export type StatusDisplayGroup =
   | "Completed"
   | "Cancelled";
 
-export type AssignmentStatus = "Pending" | "Accepted" | "Declined" | "Withdrawn";
+export type AssignmentStatus =
+  | "Pending"
+  | "Accepted"
+  | "Declined"
+  | "Withdrawn";
 
 export interface AssignedEducator {
   educatorId: string;
@@ -49,13 +53,10 @@ export function computeEventStatusFromAssignments(
   educators: AssignedEducator[],
 ): EventStatus {
   if (educators.length === 0) return "Unassigned";
-  const hasAccepted = educators.some(
-    (e) => e.assignmentStatus === "Accepted",
-  );
+  const hasAccepted = educators.some((e) => e.assignmentStatus === "Accepted");
   const allDeclinedOrWithdrawn = educators.every(
     (e) =>
-      e.assignmentStatus === "Declined" ||
-      e.assignmentStatus === "Withdrawn",
+      e.assignmentStatus === "Declined" || e.assignmentStatus === "Withdrawn",
   );
   if (hasAccepted) return "Confirmed";
   if (allDeclinedOrWithdrawn) return "Unassigned";
@@ -152,7 +153,11 @@ export interface EventItem {
   cancellationReason?: CancellationReason;
   cancelledAt?: string;
   // Cancellation request from educator (day-of cancel tagging)
-  cancellationRequestStatus?: "none" | "pending-manager-approval" | "approved" | "rejected";
+  cancellationRequestStatus?:
+    | "none"
+    | "pending-manager-approval"
+    | "approved"
+    | "rejected";
   cancellationRequestReason?: CancellationReason;
   cancellationRequestDetail?: string;
   cancellationCommunicationMethod?: "call" | "text" | "chat";
@@ -502,7 +507,11 @@ export const mockEvents: EventItem[] = [
     finalizedAt: null,
     preApprovalChecks: [
       { id: "samples-pickup", label: "Samples Picked Up", required: true },
-      { id: "evaluations-received", label: "Evaluations Received", required: true },
+      {
+        id: "evaluations-received",
+        label: "Evaluations Received",
+        required: true,
+      },
     ],
     photoCount: 8,
     photoUrls: [
@@ -570,7 +579,7 @@ export const mockEvents: EventItem[] = [
     venue: "Costco, Hackensack",
     venueAddress: "50 S River St, Hackensack, NJ 07601",
     venueLat: 40.8838,
-    venueLng: -74.0430,
+    venueLng: -74.043,
     borough: "Hackensack",
     state: "NJ",
     venueType: "Retail",
@@ -621,7 +630,7 @@ export const mockEvents: EventItem[] = [
     duration: "4h",
     venue: "Wine.com Pop-up, Chelsea",
     venueAddress: "75 9th Ave, New York, NY 10011",
-    venueLat: 40.7420,
+    venueLat: 40.742,
     venueLng: -74.0048,
     borough: "Manhattan",
     state: "NY",
@@ -782,7 +791,11 @@ export const mockEvents: EventItem[] = [
     finalizedAt: null,
     preApprovalChecks: [
       { id: "samples-pickup", label: "Samples Picked Up", required: true },
-      { id: "evaluations-received", label: "Evaluations Received", required: true },
+      {
+        id: "evaluations-received",
+        label: "Evaluations Received",
+        required: true,
+      },
     ],
     photoCount: 12,
     photoUrls: [
@@ -985,7 +998,11 @@ export const mockEvents: EventItem[] = [
     finalizedAt: "2026-03-16T09:30:00",
     preApprovalChecks: [
       { id: "samples-pickup", label: "Samples Picked Up", required: true },
-      { id: "evaluations-received", label: "Evaluations Received", required: true },
+      {
+        id: "evaluations-received",
+        label: "Evaluations Received",
+        required: true,
+      },
     ],
     photoCount: 10,
     photoUrls: [

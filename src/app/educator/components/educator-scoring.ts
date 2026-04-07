@@ -41,7 +41,10 @@ export function getScoreLevel(score: number): ScoreLevel {
 }
 
 /** Tailwind classes for score badge background + text */
-export const scoreLevelStyles: Record<ScoreLevel, { bg: string; text: string; border: string }> = {
+export const scoreLevelStyles: Record<
+  ScoreLevel,
+  { bg: string; text: string; border: string }
+> = {
   excellent: {
     bg: "bg-green-500/10",
     text: "text-green-600",

@@ -79,8 +79,6 @@ export function AccountsPage() {
     forceUpdate((n) => n + 1);
   }, []);
 
-
-
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
     let result = [...MOCK_ACCOUNTS];
@@ -577,8 +575,6 @@ export function AccountsPage() {
 /* ------------------------------------------------------------------ */
 /* Stat Card                                                           */
 /* ------------------------------------------------------------------ */
-
-
 
 /* ------------------------------------------------------------------ */
 /* Profile Tile (drawer label-value pair)                               */

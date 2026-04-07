@@ -20,7 +20,6 @@ import {
 } from "../../shared/components/ui/select";
 import { Input } from "@/app/shared/components/ui/input";
 
-
 /* ------------------------------------------------------------------ */
 /* Mock data                                                           */
 /* ------------------------------------------------------------------ */
@@ -483,8 +482,6 @@ export function EventsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-
-
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
     let result = [...MOCK_EVENTS];
@@ -849,4 +846,3 @@ export function EventsPage() {
     </div>
   );
 }
-
