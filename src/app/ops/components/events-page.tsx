@@ -7,6 +7,9 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  UserPlus,
+  Pencil,
+  Star,
 } from "lucide-react";
 import { Card, CardContent } from "../../shared/components/ui/card";
 import { Badge } from "../../shared/components/ui/badge";
@@ -19,6 +22,15 @@ import {
   SelectValue,
 } from "../../shared/components/ui/select";
 import { Input } from "@/app/shared/components/ui/input";
+import { Checkbox } from "../../shared/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "../../shared/components/ui/dialog";
+import { MOCK_EDUCATORS } from "./educator-data";
 
 /* ------------------------------------------------------------------ */
 /* Mock data                                                           */
@@ -468,6 +480,21 @@ function getTypeColor(type: string) {
   }
 }
 
+function getAssignmentLabel(educators: AssignedEducatorRecord[]) {
+  const lead = educators[0];
+  if (!lead) return null;
+  const first = lead.name.split(" ");
+  const shortName = `${first[0]} ${first[1]?.[0] ?? ""}.`;
+  const rest = educators.length - 1;
+  return rest > 0 ? `${shortName} +${rest}` : shortName;
+}
+
+function getAssignmentFilterValue(educators: AssignedEducatorRecord[]) {
+  if (educators.length === 0) return "unassigned";
+  if (educators.some((e) => e.status === "Pending")) return "pending";
+  return "assigned";
+}
+
 const PAGE_SIZE = 8;
 
 /* ------------------------------------------------------------------ */
@@ -480,7 +507,55 @@ export function EventsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [orgFilter, setOrgFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [assignmentFilter, setAssignmentFilter] = useState("all");
   const [page, setPage] = useState(1);
+
+  // Assignment dialog state
+  const [showAssignment, setShowAssignment] = useState(false);
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [assignmentSearch, setAssignmentSearch] = useState("");
+  const [draftSelectedIds, setDraftSelectedIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [localAssignments, setLocalAssignments] = useState<
+    Record<string, AssignedEducatorRecord[]>
+  >({});
+
+  // Get effective assignments for an event (local override or mock data)
+  const getAssignments = (event: EventRecord) =>
+    localAssignments[event.id] ?? event.assignedEducators;
+
+  const handleOpenAssignment = (eventId: string) => {
+    const event = MOCK_EVENTS.find((e) => e.id === eventId);
+    if (!event) return;
+    const current = getAssignments(event);
+    setActiveEventId(eventId);
+    setDraftSelectedIds(new Set(current.map((e) => e.educatorId)));
+    setAssignmentSearch("");
+    setShowAssignment(true);
+  };
+
+  const handleConfirmAssignments = () => {
+    if (!activeEventId) return;
+    const currentEvent = MOCK_EVENTS.find((e) => e.id === activeEventId);
+    if (!currentEvent) return;
+    const existing = getAssignments(currentEvent);
+    const newAssignments: AssignedEducatorRecord[] = [];
+    draftSelectedIds.forEach((id) => {
+      const prev = existing.find((e) => e.educatorId === id);
+      if (prev) {
+        newAssignments.push(prev);
+      } else {
+        const edu = MOCK_EDUCATORS.find((e) => e.id === id);
+        if (edu) {
+          newAssignments.push({ educatorId: id, name: edu.name, status: "Pending" });
+        }
+      }
+    });
+    setLocalAssignments((prev) => ({ ...prev, [activeEventId]: newAssignments }));
+    setShowAssignment(false);
+    setActiveEventId(null);
+  };
 
   /* ---- Filtering ---- */
   const filtered = useMemo(() => {
@@ -508,8 +583,14 @@ export function EventsPage() {
         (e) => e.type.toLowerCase() === typeFilter.toLowerCase(),
       );
     }
+    if (assignmentFilter !== "all") {
+      result = result.filter((e) => {
+        const val = getAssignmentFilterValue(getAssignments(e));
+        return val === assignmentFilter;
+      });
+    }
     return result;
-  }, [search, statusFilter, orgFilter, typeFilter]);
+  }, [search, statusFilter, orgFilter, typeFilter, assignmentFilter, localAssignments]);
 
   /* ---- Pagination ---- */
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -522,15 +603,16 @@ export function EventsPage() {
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, orgFilter, typeFilter]);
+  }, [search, statusFilter, orgFilter, typeFilter, assignmentFilter]);
 
   const hasActiveFilters =
-    statusFilter !== "all" || orgFilter !== "all" || typeFilter !== "all";
+    statusFilter !== "all" || orgFilter !== "all" || typeFilter !== "all" || assignmentFilter !== "all";
 
   const clearFilters = () => {
     setStatusFilter("all");
     setOrgFilter("all");
     setTypeFilter("all");
+    setAssignmentFilter("all");
     setSearch("");
   };
 
@@ -640,6 +722,22 @@ export function EventsPage() {
           </SelectContent>
         </Select>
 
+        {/* Assignment filter */}
+        <Select value={assignmentFilter} onValueChange={setAssignmentFilter}>
+          <SelectTrigger
+            className="w-[150px] cursor-pointer"
+            style={{ fontSize: "0.8125rem" }}
+          >
+            <SelectValue placeholder="Assignment" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Assignments</SelectItem>
+            <SelectItem value="assigned">Assigned</SelectItem>
+            <SelectItem value="unassigned">Unassigned</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+          </SelectContent>
+        </Select>
+
         {/* Clear Filters */}
         {hasActiveFilters && (
           <Button
@@ -668,6 +766,7 @@ export function EventsPage() {
                     "Type",
                     "Date & Time",
                     "Attendees",
+                    "Educators",
                     "Status",
                   ].map((h) => (
                     <th
@@ -681,12 +780,18 @@ export function EventsPage() {
                       </span>
                     </th>
                   ))}
+                  <th
+                    className="text-left px-5 py-3 text-muted-foreground"
+                    style={{ fontSize: "0.75rem", fontWeight: 500 }}
+                  >
+                    <span className="sr-only">Actions</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {paged.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-5 py-12 text-center">
+                    <td colSpan={8} className="px-5 py-12 text-center">
                       <p
                         className="text-muted-foreground"
                         style={{ fontSize: "0.875rem" }}
@@ -771,6 +876,47 @@ export function EventsPage() {
                           / {event.capacity}
                         </span>
                       </td>
+                      {/* Educators column */}
+                      <td className="px-5 py-3">
+                        {(() => {
+                          const educators = getAssignments(event);
+                          if (educators.length === 0) {
+                            return (
+                              <span
+                                className="text-muted-foreground"
+                                style={{ fontSize: "0.75rem" }}
+                              >
+                                Unassigned
+                              </span>
+                            );
+                          }
+                          const hasPending = educators.some(
+                            (e) => e.status === "Pending",
+                          );
+                          return (
+                            <div className="flex items-center gap-1.5 min-w-[120px]">
+                              <span
+                                className="text-foreground"
+                                style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                              >
+                                {getAssignmentLabel(educators)}
+                              </span>
+                              {hasPending && (
+                                <span
+                                  className="inline-flex items-center rounded-full border px-1.5 py-0 bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                                  style={{
+                                    fontSize: "0.5625rem",
+                                    fontWeight: 500,
+                                    lineHeight: "1rem",
+                                  }}
+                                >
+                                  Pending
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
                       <td className="px-5 py-3">
                         <Badge
                           variant="secondary"
@@ -782,6 +928,32 @@ export function EventsPage() {
                           )}
                           {event.status}
                         </Badge>
+                      </td>
+                      {/* Actions column */}
+                      <td className="px-5 py-3">
+                        {(event.status === "Upcoming" ||
+                          event.status === "Live") && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenAssignment(event.id);
+                            }}
+                            title={
+                              getAssignments(event).length === 0
+                                ? "Assign educators"
+                                : "Reassign educators"
+                            }
+                          >
+                            {getAssignments(event).length === 0 ? (
+                              <UserPlus className="size-4" />
+                            ) : (
+                              <Pencil className="size-3.5" />
+                            )}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -843,6 +1015,157 @@ export function EventsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Assignment Dialog */}
+      <Dialog open={showAssignment} onOpenChange={setShowAssignment}>
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5 pb-3 shrink-0 border-b border-border">
+            <DialogTitle style={{ fontSize: "1.125rem", fontWeight: 600 }}>
+              {(() => {
+                const ev = MOCK_EVENTS.find((e) => e.id === activeEventId);
+                if (!ev) return "Manage Educators";
+                const current = getAssignments(ev);
+                return current.length === 0
+                  ? "Assign Educators"
+                  : "Reassign Educators";
+              })()}
+            </DialogTitle>
+            <DialogDescription style={{ fontSize: "0.875rem" }}>
+              {(() => {
+                const ev = MOCK_EVENTS.find((e) => e.id === activeEventId);
+                return ev
+                  ? `${ev.name} · ${ev.date} · ${ev.location}`
+                  : "Select educators to assign to this event.";
+              })()}
+            </DialogDescription>
+            <div className="relative mt-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                value={assignmentSearch}
+                onChange={(e) => setAssignmentSearch(e.target.value)}
+                placeholder="Search educators by name..."
+                className="pl-9 h-9"
+              />
+            </div>
+          </DialogHeader>
+
+          {/* Educator List */}
+          <div className="flex-1 overflow-y-auto p-5 pb-0 bg-muted/20">
+            <div className="divide-y divide-border rounded-lg border border-border bg-card overflow-hidden">
+              {MOCK_EDUCATORS.filter((e) => e.status === "active")
+                .filter((e) => {
+                  const q = assignmentSearch.toLowerCase().trim();
+                  if (!q) return true;
+                  return (
+                    e.name.toLowerCase().includes(q) ||
+                    e.city.toLowerCase().includes(q) ||
+                    e.specialties.some((s) => s.toLowerCase().includes(q))
+                  );
+                })
+                .map((educator) => {
+                  const isSelected = draftSelectedIds.has(educator.id);
+                  return (
+                    <div
+                      key={educator.id}
+                      className={`p-3.5 transition-colors hover:bg-muted/50 ${
+                        isSelected
+                          ? "bg-primary/5 border-l-2 border-l-primary"
+                          : "border-l-2 border-l-transparent"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          id={`list-edu-${educator.id}`}
+                          checked={isSelected}
+                          className="mt-0.5"
+                          onCheckedChange={(checked) => {
+                            setDraftSelectedIds((prev) => {
+                              const next = new Set(prev);
+                              if (checked) next.add(educator.id);
+                              else next.delete(educator.id);
+                              return next;
+                            });
+                          }}
+                        />
+                        <div className="flex items-center justify-between flex-1 min-w-0">
+                          <div className="space-y-0.5 flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <label
+                                htmlFor={`list-edu-${educator.id}`}
+                                className="text-foreground cursor-pointer"
+                                style={{
+                                  fontSize: "0.875rem",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {educator.name}
+                              </label>
+                            </div>
+                            <div
+                              className="flex items-center gap-3 text-muted-foreground"
+                              style={{ fontSize: "0.75rem" }}
+                            >
+                              {educator.qualityScore > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Star className="w-3 h-3 text-amber-500" />{" "}
+                                  {educator.qualityScore}
+                                </span>
+                              )}
+                              <span>
+                                {educator.city}, {educator.state}
+                              </span>
+                              <span>{educator.eventsCompleted} events</span>
+                            </div>
+                            {educator.specialties.length > 0 && (
+                              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+                                {educator.specialties.map((spec) => (
+                                  <span
+                                    key={spec}
+                                    className="inline-flex items-center rounded-full px-1.5 py-0 border bg-muted text-muted-foreground border-border"
+                                    style={{
+                                      fontSize: "0.5625rem",
+                                      fontWeight: 500,
+                                      lineHeight: "1rem",
+                                    }}
+                                  >
+                                    {spec}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-5 border-t border-border shrink-0 bg-muted/10 flex items-center justify-between gap-3 rounded-b-lg">
+            <span className="text-xs text-muted-foreground">
+              {draftSelectedIds.size} educator
+              {draftSelectedIds.size !== 1 ? "s" : ""} selected
+            </span>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowAssignment(false)}
+                className="cursor-pointer"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-[#7D152D] hover:bg-[#7D152D]/90 cursor-pointer"
+                onClick={handleConfirmAssignments}
+              >
+                Confirm Assignments
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
