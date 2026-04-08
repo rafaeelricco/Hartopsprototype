@@ -3802,7 +3802,7 @@ function FAQEditModal({
                     setForm((p) => ({ ...p, answer: e.target.value }))
                   }
                   rows={8}
-                  className="w-full px-3 py-2 outline-none resize-none shadow-none"
+                  className="w-full px-3 py-2 rounded-t-none outline-none resize-none shadow-none"
                   style={{ fontSize: "0.8125rem", lineHeight: 1.6 }}
                   placeholder="Provide a clear, detailed answer..."
                 />
