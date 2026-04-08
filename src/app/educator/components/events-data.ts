@@ -27,6 +27,37 @@ export type CancellationReason =
   | "Retailer Cancellation"
   | "Other";
 
+// ─── Product & Sales Types ───
+
+export interface CampaignProduct {
+  id: string;
+  name: string;
+  unitPrice?: number;
+}
+
+export interface TrackedProductSale {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice?: number;
+}
+
+// ─── Venue Classification ───
+
+export type PremiseCategory = "on-premise" | "off-premise";
+
+export function getPremiseCategory(venueType: VenueType): PremiseCategory {
+  const onPremise: VenueType[] = ["Bar/Restaurant", "Event Space"];
+  return onPremise.includes(venueType) ? "on-premise" : "off-premise";
+}
+
+export function getSalesLabel(venueType: VenueType) {
+  const premise = getPremiseCategory(venueType);
+  return premise === "on-premise"
+    ? { unit: "Drinks", action: "drinks served" }
+    : { unit: "Bottles", action: "bottles sold" };
+}
+
 export type StatusDisplayGroup =
   | "Upcoming"
   | "Live"
@@ -100,6 +131,9 @@ export interface EventItem {
   assignedEducators?: AssignedEducator[];
   status: EventStatus;
   products: string[];
+  campaignProducts?: CampaignProduct[];
+  salesTarget?: number;
+  bonusThreshold?: number;
   instructions: string;
   goals: string;
   notes?: string;
@@ -121,6 +155,7 @@ export interface EventItem {
     samplesDistributed: number;
     consumerInteractions: number;
     salesGenerated: number;
+    salesByProduct?: TrackedProductSale[];
   };
   questionnairesCompleted?: number;
   educatorLiveNotes?: string[];
@@ -132,6 +167,7 @@ export interface EventItem {
     totalSamples: number;
     totalInteractions: number;
     totalSales: number;
+    salesByProduct?: TrackedProductSale[];
     rating: number;
     photosSubmitted: number;
     duration: string;
@@ -310,6 +346,13 @@ export const mockEvents: EventItem[] = [
     ],
     status: "Live",
     products: ["Jameson Original", "Jameson Black Barrel", "Jameson Cold Brew"],
+    campaignProducts: [
+      { id: "p-jam-1", name: "Jameson Original", unitPrice: 32 },
+      { id: "p-jam-2", name: "Jameson Black Barrel", unitPrice: 45 },
+      { id: "p-jam-3", name: "Jameson Cold Brew", unitPrice: 28 },
+    ],
+    salesTarget: 10,
+    bonusThreshold: 20,
     instructions:
       "Station near the whiskey endcap. Highlight the Cold Brew for younger consumers.",
     goals: "60+ samplings, 10+ sales, push Cold Brew variant.",
@@ -328,6 +371,11 @@ export const mockEvents: EventItem[] = [
       samplesDistributed: 34,
       consumerInteractions: 28,
       salesGenerated: 6,
+      salesByProduct: [
+        { productId: "p-jam-1", productName: "Jameson Original", quantity: 2, unitPrice: 32 },
+        { productId: "p-jam-2", productName: "Jameson Black Barrel", quantity: 1, unitPrice: 45 },
+        { productId: "p-jam-3", productName: "Jameson Cold Brew", quantity: 3, unitPrice: 28 },
+      ],
     },
     questionnairesCompleted: 12,
     educatorLiveNotes: [
@@ -366,6 +414,13 @@ export const mockEvents: EventItem[] = [
     educatorName: "James Rodriguez",
     status: "Completed",
     products: ["Malibu Original", "Malibu Strawberry", "Malibu Pineapple"],
+    campaignProducts: [
+      { id: "p-mal-1", name: "Malibu Original", unitPrice: 22 },
+      { id: "p-mal-2", name: "Malibu Strawberry", unitPrice: 22 },
+      { id: "p-mal-3", name: "Malibu Pineapple", unitPrice: 22 },
+    ],
+    salesTarget: 15,
+    bonusThreshold: 30,
     instructions: "Summer theme setup. Use provided beach-themed table runner.",
     goals: "100+ samplings, 20+ cases sold.",
     notes:
@@ -385,6 +440,11 @@ export const mockEvents: EventItem[] = [
       totalSamples: 112,
       totalInteractions: 89,
       totalSales: 18,
+      salesByProduct: [
+        { productId: "p-mal-1", productName: "Malibu Original", quantity: 8, unitPrice: 22 },
+        { productId: "p-mal-2", productName: "Malibu Strawberry", quantity: 5, unitPrice: 22 },
+        { productId: "p-mal-3", productName: "Malibu Pineapple", quantity: 5, unitPrice: 22 },
+      ],
       rating: 4.5,
       photosSubmitted: 8,
       duration: "4h 15m",
@@ -835,6 +895,12 @@ export const mockEvents: EventItem[] = [
     educatorName: "Emily Park",
     status: "Live",
     products: ["Absolut Elyx 750ml", "Absolut Elyx 1L"],
+    campaignProducts: [
+      { id: "p-elyx-1", name: "Absolut Elyx 750ml", unitPrice: 45 },
+      { id: "p-elyx-2", name: "Absolut Elyx 1L", unitPrice: 55 },
+    ],
+    salesTarget: 5,
+    bonusThreshold: 10,
     instructions:
       "High-end presentation. Copper pineapple mug displays. Focus on the craft story.",
     goals: "30+ premium tastings, 5+ bottles sold.",
@@ -853,6 +919,10 @@ export const mockEvents: EventItem[] = [
       samplesDistributed: 18,
       consumerInteractions: 15,
       salesGenerated: 3,
+      salesByProduct: [
+        { productId: "p-elyx-1", productName: "Absolut Elyx 750ml", quantity: 2, unitPrice: 45 },
+        { productId: "p-elyx-2", productName: "Absolut Elyx 1L", quantity: 1, unitPrice: 55 },
+      ],
     },
     questionnairesCompleted: 7,
     educatorLiveNotes: [
@@ -954,6 +1024,13 @@ export const mockEvents: EventItem[] = [
       "Hendrick's Neptunia",
       "Hendrick's Orbium",
     ],
+    campaignProducts: [
+      { id: "p-hen-1", name: "Hendrick's Original", unitPrice: 14 },
+      { id: "p-hen-2", name: "Hendrick's Neptunia", unitPrice: 16 },
+      { id: "p-hen-3", name: "Hendrick's Orbium", unitPrice: 16 },
+    ],
+    salesTarget: 12,
+    bonusThreshold: 24,
     instructions:
       "Garden party theme. Use cucumber garnishes and floral arrangements. Neat and G&T pours.",
     goals: "60+ tastings, 12+ bottles sold.",
@@ -971,6 +1048,11 @@ export const mockEvents: EventItem[] = [
       totalSamples: 72,
       totalInteractions: 58,
       totalSales: 15,
+      salesByProduct: [
+        { productId: "p-hen-1", productName: "Hendrick's Original", quantity: 5, unitPrice: 14 },
+        { productId: "p-hen-2", productName: "Hendrick's Neptunia", quantity: 7, unitPrice: 16 },
+        { productId: "p-hen-3", productName: "Hendrick's Orbium", quantity: 3, unitPrice: 16 },
+      ],
       rating: 4.9,
       photosSubmitted: 10,
       duration: "4h 05m",
@@ -1092,12 +1174,20 @@ export function getEventById(id: string): EventItem | undefined {
           ],
           status: "Finalized",
           products: ["Assorted Products"],
+          campaignProducts: [
+            { id: `${past.id}-p1`, name: "Product A", unitPrice: 25 },
+            { id: `${past.id}-p2`, name: "Product B", unitPrice: 30 },
+          ],
           instructions: "Archived instructions.",
           goals: "Archived goals.",
           finalStats: {
             totalSamples: past.salesUnits * 4,
             totalInteractions: past.salesUnits * 6,
             totalSales: past.salesUnits,
+            salesByProduct: [
+              { productId: `${past.id}-p1`, productName: "Product A", quantity: Math.ceil(past.salesUnits * 0.6), unitPrice: 25 },
+              { productId: `${past.id}-p2`, productName: "Product B", quantity: Math.floor(past.salesUnits * 0.4), unitPrice: 30 },
+            ],
             rating: past.rating,
             photosSubmitted: 4,
             duration: "4h",

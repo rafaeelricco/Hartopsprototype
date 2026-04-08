@@ -67,6 +67,7 @@ import {
   getPunctualityFlags,
   getLateMinutes,
   getEarlyMinutes,
+  getSalesLabel,
   type EventStatus,
   type EventItem,
   type CancellationReason,
@@ -395,6 +396,72 @@ function MetricCard({
             {subValue}
           </p>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* --- Sales Target Progress (IMP-642) --- */
+
+function SalesTargetProgress({
+  totalSales,
+  venueType,
+  salesTarget,
+  bonusThreshold,
+}: {
+  totalSales: number;
+  venueType: EventItem["venueType"];
+  salesTarget?: number | undefined;
+  bonusThreshold?: number | undefined;
+}) {
+  const labels = getSalesLabel(venueType);
+  const hasTarget = salesTarget != null && salesTarget > 0;
+  if (!hasTarget) return null;
+
+  const progressMax = bonusThreshold ?? salesTarget;
+  const progressPct = progressMax > 0 ? Math.min((totalSales / progressMax) * 100, 100) : 0;
+  const targetPct = progressMax > 0 ? (salesTarget / progressMax) * 100 : 0;
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-2">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <Target className="w-3.5 h-3.5" />
+            Target: {salesTarget} {labels.unit.toLowerCase()}
+          </span>
+          <span className="font-medium text-foreground">
+            {totalSales} / {progressMax}
+          </span>
+        </div>
+        <div className="relative h-2 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+            style={{
+              width: `${progressPct}%`,
+              backgroundColor:
+                totalSales >= (bonusThreshold ?? Infinity)
+                  ? "#8b5cf6"
+                  : totalSales >= salesTarget
+                    ? "#22c55e"
+                    : "#f59e0b",
+            }}
+          />
+          {targetPct > 0 && targetPct < 100 && (
+            <div
+              className="absolute inset-y-0 w-0.5 bg-foreground/40"
+              style={{ left: `${targetPct}%` }}
+            />
+          )}
+        </div>
+        <div className="flex justify-between text-[0.625rem] text-muted-foreground">
+          <span>
+            {totalSales >= salesTarget ? "Target reached" : `${salesTarget - totalSales} more to target`}
+          </span>
+          {bonusThreshold != null && (
+            <span>Bonus at {bonusThreshold}</span>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -1804,11 +1871,12 @@ export function EventDetailPage() {
               label="Interactions"
               value={event.liveMetrics.consumerInteractions}
             />
-            {/* 4. Sales (G13) */}
+            {/* 4. Sales (G13) — venue-adaptive label */}
             <MetricCard
               icon={DollarSign}
-              label="Sales"
+              label={getSalesLabel(event.venueType).unit + " Sold"}
               value={event.liveMetrics.salesGenerated}
+              subValue={getSalesLabel(event.venueType).action}
             />
             {/* 5. Questionnaires */}
             <MetricCard
@@ -1834,6 +1902,14 @@ export function EventDetailPage() {
               value={event.photoCount || 0}
             />
           </div>
+
+          {/* Sales target progress (IMP-642) */}
+          <SalesTargetProgress
+            totalSales={event.liveMetrics.salesGenerated}
+            venueType={event.venueType}
+            salesTarget={event.salesTarget}
+            bonusThreshold={event.bonusThreshold}
+          />
 
           {/* Educator Live Notes stream */}
           {event.educatorLiveNotes && event.educatorLiveNotes.length > 0 && (
@@ -2014,7 +2090,12 @@ export function EventDetailPage() {
                 label="Interactions"
                 value={event.finalStats.totalInteractions}
               />
-              <MetricCard label="Sales" value={event.finalStats.totalSales} />
+              <MetricCard
+                icon={DollarSign}
+                label={getSalesLabel(event.venueType).unit + " Sold"}
+                value={event.finalStats.totalSales}
+                subValue={getSalesLabel(event.venueType).action}
+              />
               <MetricCard
                 icon={Star}
                 label="Rating"
@@ -2038,8 +2119,16 @@ export function EventDetailPage() {
               />
             </div>
 
+            {/* Sales target progress (IMP-642) */}
+            <SalesTargetProgress
+              totalSales={event.finalStats.totalSales}
+              venueType={event.venueType}
+              salesTarget={event.salesTarget}
+              bonusThreshold={event.bonusThreshold}
+            />
+
             {/* Inventory Comparison (pre vs post per mm-ui-002) */}
-            {event.inventoryComparison && (
+            {/* {event.inventoryComparison && (
               <Card className="gap-0">
                 <CardHeader className="px-5 pt-5 pb-3">
                   <div className="flex items-center gap-2">
@@ -2100,7 +2189,7 @@ export function EventDetailPage() {
                   </div>
                 </CardContent>
               </Card>
-            )}
+            )} */}
 
             {/* Educator Notes (final) — editable before finalize */}
             {event.educatorNotesFinal != null && (

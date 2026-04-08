@@ -35,6 +35,7 @@ import {
   mockEvents,
   getStatusDisplayGroup,
   getPunctualityFlags,
+  getSalesLabel,
   type EventStatus,
   type StatusDisplayGroup,
   type EventItem,
@@ -656,7 +657,7 @@ function FinalizationQueue({ onExit }: { onExit: () => void }) {
                           value: event.finalStats.totalInteractions,
                         },
                         {
-                          label: "Sales",
+                          label: getSalesLabel(event.venueType).unit + " Sold",
                           value: event.finalStats.totalSales,
                         },
                         {
