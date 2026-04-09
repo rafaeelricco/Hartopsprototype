@@ -419,7 +419,8 @@ function SalesTargetProgress({
   if (!hasTarget) return null;
 
   const progressMax = bonusThreshold ?? salesTarget;
-  const progressPct = progressMax > 0 ? Math.min((totalSales / progressMax) * 100, 100) : 0;
+  const progressPct =
+    progressMax > 0 ? Math.min((totalSales / progressMax) * 100, 100) : 0;
   const targetPct = progressMax > 0 ? (salesTarget / progressMax) * 100 : 0;
 
   return (
@@ -456,11 +457,11 @@ function SalesTargetProgress({
         </div>
         <div className="flex justify-between text-[0.625rem] text-muted-foreground">
           <span>
-            {totalSales >= salesTarget ? "Target reached" : `${salesTarget - totalSales} more to target`}
+            {totalSales >= salesTarget
+              ? "Target reached"
+              : `${salesTarget - totalSales} more to target`}
           </span>
-          {bonusThreshold != null && (
-            <span>Bonus at {bonusThreshold}</span>
-          )}
+          {bonusThreshold != null && <span>Bonus at {bonusThreshold}</span>}
         </div>
       </CardContent>
     </Card>

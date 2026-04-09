@@ -19,7 +19,11 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { Input } from "@/app/shared/components/ui/input";
-import { INITIAL_SKUS, getDocumentsForSku, type SKU } from "./brand-assets-data";
+import {
+  INITIAL_SKUS,
+  getDocumentsForSku,
+  type SKU,
+} from "./brand-assets-data";
 import {
   DOCUMENT_TYPE_STYLES,
   type BrandDocument,
@@ -115,10 +119,7 @@ export function StepProductsSamples({
         >
           Products & Samples
         </h2>
-        <p
-          className="mt-1"
-          style={{ fontSize: "0.875rem", color: "#64748B" }}
-        >
+        <p className="mt-1" style={{ fontSize: "0.875rem", color: "#64748B" }}>
           Select which products will be sampled at this event. Physical sample
           quantities are defined at the kit level and captured by the educator
           at check-in.
@@ -131,11 +132,18 @@ export function StepProductsSamples({
           className="flex items-start gap-2.5 rounded-lg px-4 py-3"
           style={{ background: "#EFF6FF", border: "1px solid #BFDBFE" }}
         >
-          <Info size={16} className="mt-0.5 shrink-0" style={{ color: "#2563EB" }} />
+          <Info
+            size={16}
+            className="mt-0.5 shrink-0"
+            style={{ color: "#2563EB" }}
+          />
           <p style={{ fontSize: "0.8125rem", color: "#1E40AF" }}>
-            <strong>{inheritedProductIds.length} product{inheritedProductIds.length !== 1 ? "s" : ""}</strong>{" "}
-            inherited from <strong>{campaignName}</strong>. You can add or remove
-            products below.
+            <strong>
+              {inheritedProductIds.length} product
+              {inheritedProductIds.length !== 1 ? "s" : ""}
+            </strong>{" "}
+            inherited from <strong>{campaignName}</strong>. You can add or
+            remove products below.
           </p>
         </div>
       )}
@@ -212,7 +220,8 @@ export function StepProductsSamples({
             </div>
             {totalDocs > 0 && (
               <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
-                {totalDocs} brand education doc{totalDocs !== 1 ? "s" : ""} linked
+                {totalDocs} brand education doc{totalDocs !== 1 ? "s" : ""}{" "}
+                linked
               </span>
             )}
           </div>
@@ -311,9 +320,7 @@ function ProductPickerCard({
             {sku.skuCode}
           </span>
           {sku.abv !== "0.0%" && (
-            <span
-              style={{ fontSize: "0.625rem", color: "#94A3B8" }}
-            >
+            <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>
               {sku.abv}
             </span>
           )}

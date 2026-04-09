@@ -72,7 +72,9 @@ export function LocationCombobox({
           style={style}
         >
           <span
-            className={value ? "text-[#0F172A] truncate" : "text-[#94A3B8] truncate"}
+            className={
+              value ? "text-[#0F172A] truncate" : "text-[#94A3B8] truncate"
+            }
             style={{ fontSize: "0.9375rem" }}
           >
             {value || "Search accounts or enter location..."}
@@ -84,7 +86,8 @@ export function LocationCombobox({
                 tabIndex={0}
                 onClick={handleClear}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") handleClear(e as unknown as React.MouseEvent);
+                  if (e.key === "Enter" || e.key === " ")
+                    handleClear(e as unknown as React.MouseEvent);
                 }}
                 className="hover:bg-[#F1F5F9] rounded p-0.5 transition-colors"
               >

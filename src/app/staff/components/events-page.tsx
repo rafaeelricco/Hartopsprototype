@@ -88,8 +88,7 @@ function getAssignmentLabel(educators: AssignedEducatorRecord[]): string {
   if (educators.length === 0) return "Unassigned";
   const lead = educators[0]!;
   const parts = lead.name.split(" ");
-  const short =
-    parts.length >= 2 ? `${parts[0]} ${parts[1]![0]}.` : lead.name;
+  const short = parts.length >= 2 ? `${parts[0]} ${parts[1]![0]}.` : lead.name;
   if (educators.length === 1) return short;
   return `${short} +${educators.length - 1}`;
 }
@@ -144,7 +143,8 @@ export function EventsPage() {
       const event = events.find((e) => e.id === eventId);
       if (!event) return;
       setActiveEventId(eventId);
-      const current = localAssignments[eventId] ?? event.assignedEducators ?? [];
+      const current =
+        localAssignments[eventId] ?? event.assignedEducators ?? [];
       setDraftSelectedIds(new Set(current.map((e) => e.educatorId)));
       setAssignmentSearch("");
       setShowAssignment(true);
@@ -224,7 +224,15 @@ export function EventsPage() {
       );
     }
     return result;
-  }, [events, statusFilter, campaignFilter, assignmentFilter, regionFilter, search, getAssignments]);
+  }, [
+    events,
+    statusFilter,
+    campaignFilter,
+    assignmentFilter,
+    regionFilter,
+    search,
+    getAssignments,
+  ]);
 
   // Sorted list (for list view)
   const sorted = useMemo(() => {

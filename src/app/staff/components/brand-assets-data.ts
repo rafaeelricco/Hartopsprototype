@@ -170,9 +170,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-001",
     skuCode: "ABS-VOD-750",
     productName: "Absolut Vodka 750ml",
-    description: "Swedish premium vodka. Clean, rich, and smooth with a distinct character.",
+    description:
+      "Swedish premium vodka. Clean, rich, and smooth with a distinct character.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1608885898957-a559228e4bee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1608885898957-a559228e4bee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "750 mL bottle",
     abv: "40.0%",
     status: "active",
@@ -187,7 +189,8 @@ export const INITIAL_SKUS: SKU[] = [
     productName: "Absolut Lime 750ml",
     description: "Lime-flavored premium vodka with natural citrus essence.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1614313511387-1436a4480ebb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1614313511387-1436a4480ebb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "750 mL bottle",
     abv: "40.0%",
     status: "active",
@@ -200,9 +203,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-003",
     skuCode: "KAH-CLS-700",
     productName: "Kahlúa 700ml",
-    description: "Coffee-flavored liqueur made with 100% Arabica coffee and rum.",
+    description:
+      "Coffee-flavored liqueur made with 100% Arabica coffee and rum.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "700 mL bottle",
     abv: "20.0%",
     status: "active",
@@ -215,9 +220,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-004",
     skuCode: "MAL-COC-750",
     productName: "Malibu Coconut Rum 750ml",
-    description: "Caribbean rum with natural coconut flavor. Smooth and refreshing.",
+    description:
+      "Caribbean rum with natural coconut flavor. Smooth and refreshing.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1598018553943-29ace5dc4bc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1598018553943-29ace5dc4bc0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "750 mL bottle",
     abv: "21.0%",
     status: "active",
@@ -230,9 +237,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-005",
     skuCode: "BEF-GIN-750",
     productName: "Beefeater Gin 750ml",
-    description: "Classic London dry gin with bold juniper character since 1863.",
+    description:
+      "Classic London dry gin with bold juniper character since 1863.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1609951651556-5334e2706168?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1609951651556-5334e2706168?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "750 mL bottle",
     abv: "40.0%",
     status: "active",
@@ -245,9 +254,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-006",
     skuCode: "JAM-IW-750",
     productName: "Jameson Irish Whiskey 750ml",
-    description: "Triple-distilled blended Irish whiskey. Smooth, mellow, and perfectly balanced.",
+    description:
+      "Triple-distilled blended Irish whiskey. Smooth, mellow, and perfectly balanced.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1527281400683-1aae777175f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1527281400683-1aae777175f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "750 mL bottle",
     abv: "40.0%",
     status: "active",
@@ -260,9 +271,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-007",
     skuCode: "MKR-BRB-750",
     productName: "Maker's Mark Bourbon 750ml",
-    description: "Handmade Kentucky straight bourbon whisky. Bold, yet approachable.",
+    description:
+      "Handmade Kentucky straight bourbon whisky. Bold, yet approachable.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "750 mL bottle",
     abv: "45.0%",
     status: "active",
@@ -275,9 +288,11 @@ export const INITIAL_SKUS: SKU[] = [
     id: "sku-008",
     skuCode: "HND-GIN-700",
     productName: "Hendrick's Gin 700ml",
-    description: "Scottish gin infused with rose petal and cucumber. Wonderfully peculiar.",
+    description:
+      "Scottish gin infused with rose petal and cucumber. Wonderfully peculiar.",
     category: "Spirits",
-    imageUrl: "https://images.unsplash.com/photo-1585975754989-4f5a8e201e78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+    imageUrl:
+      "https://images.unsplash.com/photo-1585975754989-4f5a8e201e78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
     unitSize: "700 mL bottle",
     abv: "41.4%",
     status: "active",

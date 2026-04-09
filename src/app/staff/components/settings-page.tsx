@@ -1573,9 +1573,7 @@ function RegionFormDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">
-              Region Name
-            </Label>
+            <Label className="text-xs text-muted-foreground">Region Name</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}

@@ -466,7 +466,13 @@ const ORGANIZATIONS = [
   "Pinnacle Ventures",
 ];
 
-const REGIONS = ["Northeast", "Southeast", "Midwest", "West", "Southwest"] as const;
+const REGIONS = [
+  "Northeast",
+  "Southeast",
+  "Midwest",
+  "West",
+  "Southwest",
+] as const;
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -569,11 +575,18 @@ export function EventsPage() {
       } else {
         const edu = MOCK_EDUCATORS.find((e) => e.id === id);
         if (edu) {
-          newAssignments.push({ educatorId: id, name: edu.name, status: "Pending" });
+          newAssignments.push({
+            educatorId: id,
+            name: edu.name,
+            status: "Pending",
+          });
         }
       }
     });
-    setLocalAssignments((prev) => ({ ...prev, [activeEventId]: newAssignments }));
+    setLocalAssignments((prev) => ({
+      ...prev,
+      [activeEventId]: newAssignments,
+    }));
     setShowAssignment(false);
     setActiveEventId(null);
   };
@@ -616,7 +629,15 @@ export function EventsPage() {
       });
     }
     return result;
-  }, [search, statusFilter, orgFilter, typeFilter, regionFilter, assignmentFilter, localAssignments]);
+  }, [
+    search,
+    statusFilter,
+    orgFilter,
+    typeFilter,
+    regionFilter,
+    assignmentFilter,
+    localAssignments,
+  ]);
 
   /* ---- Pagination ---- */
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -629,10 +650,21 @@ export function EventsPage() {
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
-  }, [search, statusFilter, orgFilter, typeFilter, regionFilter, assignmentFilter]);
+  }, [
+    search,
+    statusFilter,
+    orgFilter,
+    typeFilter,
+    regionFilter,
+    assignmentFilter,
+  ]);
 
   const hasActiveFilters =
-    statusFilter !== "all" || orgFilter !== "all" || typeFilter !== "all" || regionFilter !== "all" || assignmentFilter !== "all";
+    statusFilter !== "all" ||
+    orgFilter !== "all" ||
+    typeFilter !== "all" ||
+    regionFilter !== "all" ||
+    assignmentFilter !== "all";
 
   const clearFilters = () => {
     setStatusFilter("all");
@@ -956,7 +988,10 @@ export function EventsPage() {
                             <div className="flex items-center gap-1.5 min-w-[120px]">
                               <span
                                 className="text-foreground"
-                                style={{ fontSize: "0.8125rem", fontWeight: 500 }}
+                                style={{
+                                  fontSize: "0.8125rem",
+                                  fontWeight: 500,
+                                }}
                               >
                                 {getAssignmentLabel(educators)}
                               </span>

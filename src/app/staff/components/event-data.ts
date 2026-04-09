@@ -397,10 +397,7 @@ export const INITIAL_EVENTS: EventItem[] = [
       { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
       { educatorId: "EDU-007", name: "Lauren Nguyen", status: "Pending" },
     ],
-    sampleConfigs: [
-      { skuId: "sku-001" },
-      { skuId: "sku-002" },
-    ],
+    sampleConfigs: [{ skuId: "sku-001" }, { skuId: "sku-002" }],
     kitReadiness: "partial",
     createdAt: "2026-02-05",
   },
