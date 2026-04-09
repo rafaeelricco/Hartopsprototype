@@ -46,31 +46,133 @@ export const FILE_TYPE_LABELS: Record<FileType, string> = {
   spreadsheet: "Spreadsheet",
 };
 
-// ── Brand list (derived from campaign-data products) ────────────────────────
+// ── Brand entity ────────────────────────────────────────────────────────────
+// Brands are the organizing layer for the product library. Each brand carries
+// canonical "product info" content (story, talking points, compliance notes)
+// that gets surfaced to educators in the mobile app alongside any SKUs linked
+// to it. See IMP-649 for the broader rationale.
 
 export interface Brand {
   id: string;
   name: string;
   supplier?: string;
+  logoUrl?: string;
+  /** Short brand story — supports the lightweight markdown used across the app (**bold**, *italic*, ## headings). */
+  story?: string;
+  /** Key talking points educators should know when sampling. */
+  keyTalkingPoints?: string[];
+  /** Compliance or legal notes that must not be forgotten at the venue. */
+  complianceNotes?: string;
+  tags?: string[];
+  updatedAt?: string;
 }
 
 export const BRAND_LIST: Brand[] = [
-  { id: "brand-absolut", name: "Absolut", supplier: "Pernod Ricard" },
-  { id: "brand-kahlua", name: "Kahlúa", supplier: "Pernod Ricard" },
-  { id: "brand-malibu", name: "Malibu", supplier: "Pernod Ricard" },
-  { id: "brand-beefeater", name: "Beefeater", supplier: "Pernod Ricard" },
-  { id: "brand-jameson", name: "Jameson", supplier: "Pernod Ricard" },
-  { id: "brand-makers-mark", name: "Maker's Mark", supplier: "Beam Suntory" },
-  { id: "brand-hendricks", name: "Hendrick's", supplier: "William Grant" },
+  {
+    id: "brand-absolut",
+    name: "Absolut",
+    supplier: "Pernod Ricard",
+    logoUrl:
+      "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=256&q=80",
+    story:
+      "## Swedish vodka, one source\nCrafted in Åhus, Sweden, from winter wheat and pure deep-well water. **One source**, one community, one superior taste since 1879. Absolut champions bold creativity and inclusivity — every bottle tells the story of the same village that has made it for more than 140 years.",
+    keyTalkingPoints: [
+      "Single-source wheat and water from Åhus, Sweden",
+      "Continuous distillation — no batches, no shortcuts",
+      "Flavored range uses natural ingredients, no added sugar",
+      "Pairs exceptionally well in cocktails and mixers",
+    ],
+    complianceNotes:
+      "21+ only. Verify ID before serving any sample. Do not pour more than a 0.25 oz taste.",
+    tags: ["vodka", "flagship", "cocktail"],
+    updatedAt: "2026-03-21",
+  },
+  {
+    id: "brand-kahlua",
+    name: "Kahlúa",
+    supplier: "Pernod Ricard",
+    story:
+      "## The original coffee liqueur\nKahlúa has been blending rum, sugar, vanilla, and 100% arabica beans from Veracruz since 1936. The *signature ingredient* in an Espresso Martini and the comforting base of countless after-dinner drinks worldwide.",
+    keyTalkingPoints: [
+      "100% arabica coffee beans from Veracruz, Mexico",
+      "Hero cocktails: Espresso Martini, White Russian, Mudslide",
+      "Works chilled, over ice, or as a dessert pour",
+    ],
+    complianceNotes:
+      "Contains caffeine. Flag to consumers who ask about late-evening sampling.",
+    tags: ["coffee-liqueur", "dessert", "espresso-martini"],
+    updatedAt: "2026-02-14",
+  },
+  {
+    id: "brand-malibu",
+    name: "Malibu",
+    supplier: "Pernod Ricard",
+    story:
+      "## Taste the island life\nCoconut-flavored Caribbean rum liqueur, first crafted in Barbados in 1980. **Light, sweet, summer-ready.** The easy gateway to tropical cocktails.",
+    keyTalkingPoints: [
+      "21% ABV — lighter than a standard rum",
+      "Best served with pineapple, orange, or cranberry juice",
+      "Excellent for beach, poolside, and festival activations",
+    ],
+    tags: ["rum", "coconut", "tropical"],
+    updatedAt: "2026-01-30",
+  },
+  {
+    id: "brand-beefeater",
+    name: "Beefeater",
+    supplier: "Pernod Ricard",
+    tags: ["gin", "london-dry"],
+    updatedAt: "2025-12-01",
+  },
+  {
+    id: "brand-jameson",
+    name: "Jameson",
+    supplier: "Pernod Ricard",
+    story:
+      "## Triple-distilled Irish whiskey\nFrom Midleton, County Cork since 1780. Triple-distilled for a notably smooth finish — the **most approachable Irish whiskey** for new sippers.",
+    keyTalkingPoints: [
+      "Triple-distilled — smoother than most Scotch or Bourbon",
+      "Great neat, on the rocks, or in a Ginger & Lime",
+      "Perfect bridge for consumers new to whiskey",
+    ],
+    tags: ["whiskey", "irish", "smooth"],
+    updatedAt: "2026-03-05",
+  },
+  {
+    id: "brand-makers-mark",
+    name: "Maker's Mark",
+    supplier: "Beam Suntory",
+    tags: ["bourbon", "wheated"],
+    updatedAt: "2026-02-10",
+  },
+  {
+    id: "brand-hendricks",
+    name: "Hendrick's",
+    supplier: "William Grant",
+    tags: ["gin", "craft"],
+    updatedAt: "2026-02-18",
+  },
   {
     id: "brand-crystal-creek",
     name: "Crystal Creek",
     supplier: "Hart Private Label",
+    tags: ["mixer", "private-label"],
+    updatedAt: "2026-01-15",
   },
   {
     id: "brand-mango-sunrise",
     name: "Mango Sunrise",
     supplier: "Hart Private Label",
+    story:
+      "## Tropical hard seltzer\nA Hart private-label release: real mango essence, only 100 calories, and 5% ABV. Bright, clean, and positioned for the **summer festival circuit**.",
+    keyTalkingPoints: [
+      "100 calories per 12 oz can",
+      "Real fruit essence — no artificial flavoring",
+      "Serves best chilled, straight from the can",
+      "Target demo: 21–34 festival-goers, beach events",
+    ],
+    tags: ["seltzer", "private-label", "summer-2026"],
+    updatedAt: "2026-03-18",
   },
 ];
 

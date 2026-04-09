@@ -25,7 +25,9 @@ import {
   type SKU,
 } from "./brand-assets-data";
 import {
+  BRAND_LIST,
   DOCUMENT_TYPE_STYLES,
+  type Brand,
   type BrandDocument,
 } from "./brand-education-data";
 import type { SampleConfig } from "./event-data";
@@ -181,10 +183,14 @@ export function StepProductsSamples({
         {filteredSkus.map((sku) => {
           const isSelected = selectedIds.has(sku.id);
           const isInherited = inheritedProductIds.includes(sku.id);
+          const brand = sku.brandId
+            ? BRAND_LIST.find((b) => b.id === sku.brandId)
+            : undefined;
           return (
             <ProductPickerCard
               key={sku.id}
               sku={sku}
+              brand={brand}
               isSelected={isSelected}
               isInherited={isInherited}
               onToggle={() => toggleProduct(sku.id)}
@@ -254,20 +260,27 @@ export function StepProductsSamples({
 
 function ProductPickerCard({
   sku,
+  brand,
   isSelected,
   isInherited,
   onToggle,
 }: {
   sku: SKU;
+  brand?: Brand | undefined;
   isSelected: boolean;
   isInherited: boolean;
   onToggle: () => void;
 }) {
+  const [showBrandInfo, setShowBrandInfo] = useState(false);
+  const hasBrandContent =
+    !!brand &&
+    ((brand.story ?? "").trim().length > 0 ||
+      (brand.keyTalkingPoints ?? []).length > 0 ||
+      !!brand.complianceNotes);
+
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="relative flex flex-col rounded-xl border overflow-hidden text-left transition-all cursor-pointer group"
+    <div
+      className="relative flex flex-col rounded-xl border overflow-hidden text-left transition-all group"
       style={{
         borderColor: isSelected ? "#7D152D" : "#E2E8F0",
         background: isSelected ? "#FDF2F4" : "#FFFFFF",
@@ -276,66 +289,164 @@ function ProductPickerCard({
           : "0 1px 2px rgba(0,0,0,0.04)",
       }}
     >
-      {/* Image */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#F8FAFC]">
-        <img
-          src={sku.imageUrl}
-          alt={sku.productName}
-          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-        />
-        {/* Selection checkbox */}
-        <div
-          className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
-          style={{
-            background: isSelected ? "#7D152D" : "rgba(255,255,255,0.9)",
-            border: isSelected ? "none" : "1.5px solid #CBD5E1",
-          }}
-        >
-          {isSelected && <Check size={12} className="text-white" />}
-        </div>
-        {/* Inherited badge */}
-        {isInherited && isSelected && (
+      <button
+        type="button"
+        onClick={onToggle}
+        className="text-left cursor-pointer w-full"
+      >
+        {/* Image */}
+        <div className="relative w-full aspect-[4/3] overflow-hidden bg-[#F8FAFC]">
+          <img
+            src={sku.imageUrl}
+            alt={sku.productName}
+            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+          />
+          {/* Selection checkbox */}
           <div
-            className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-medium"
+            className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center transition-colors"
             style={{
-              background: "rgba(37, 99, 235, 0.9)",
-              color: "#FFFFFF",
+              background: isSelected ? "#7D152D" : "rgba(255,255,255,0.9)",
+              border: isSelected ? "none" : "1.5px solid #CBD5E1",
             }}
           >
-            Inherited
+            {isSelected && <Check size={12} className="text-white" />}
           </div>
-        )}
-      </div>
-      {/* Info */}
-      <div className="px-2.5 py-2">
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <span
-            className="px-1.5 py-0.5 rounded font-mono"
-            style={{
-              fontSize: "0.625rem",
-              background: "#F1F5F9",
-              color: "#475569",
-            }}
-          >
-            {sku.skuCode}
-          </span>
-          {sku.abv !== "0.0%" && (
-            <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>
-              {sku.abv}
-            </span>
+          {/* Inherited badge */}
+          {isInherited && isSelected && (
+            <div
+              className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[10px] font-medium"
+              style={{
+                background: "rgba(37, 99, 235, 0.9)",
+                color: "#FFFFFF",
+              }}
+            >
+              Inherited
+            </div>
           )}
         </div>
-        <p
-          className="font-medium leading-tight line-clamp-1"
-          style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-        >
-          {sku.productName}
-        </p>
-        <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-          {sku.category} · {sku.unitSize}
-        </p>
-      </div>
-    </button>
+        {/* Info */}
+        <div className="px-2.5 py-2">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span
+              className="px-1.5 py-0.5 rounded font-mono"
+              style={{
+                fontSize: "0.625rem",
+                background: "#F1F5F9",
+                color: "#475569",
+              }}
+            >
+              {sku.skuCode}
+            </span>
+            {sku.abv !== "0.0%" && (
+              <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>
+                {sku.abv}
+              </span>
+            )}
+          </div>
+          <p
+            className="font-medium leading-tight line-clamp-1"
+            style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+          >
+            {sku.productName}
+          </p>
+          <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            {sku.category} · {sku.unitSize}
+          </p>
+        </div>
+      </button>
+
+      {/* Brand info button + popover (outside the main toggle button to avoid
+          nested <button> elements) */}
+      {brand && hasBrandContent && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowBrandInfo((v) => !v);
+            }}
+            className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/95 hover:bg-white shadow flex items-center justify-center transition-colors cursor-pointer"
+            aria-label={`Brand info for ${brand.name}`}
+            title={`${brand.name} — brand info`}
+          >
+            <Info size={12} style={{ color: "#7D152D" }} />
+          </button>
+          {showBrandInfo && (
+            <>
+              {/* Outside-click catcher */}
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowBrandInfo(false)}
+              />
+              <div
+                className="absolute z-50 right-2 bottom-10 w-64 rounded-xl border border-[#E2E8F0] bg-white shadow-xl p-3"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span
+                    className="px-1.5 py-0.5 rounded"
+                    style={{
+                      fontSize: "0.625rem",
+                      background: "#7D152D14",
+                      color: "#7D152D",
+                    }}
+                  >
+                    {brand.name}
+                  </span>
+                  {brand.supplier && (
+                    <span style={{ fontSize: "0.625rem", color: "#94A3B8" }}>
+                      {brand.supplier}
+                    </span>
+                  )}
+                </div>
+                {brand.story && (
+                  <p
+                    className="mb-2"
+                    style={{
+                      fontSize: "0.6875rem",
+                      color: "#475569",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {brand.story
+                      .replace(/^##\s*/gm, "")
+                      .replace(/\*\*(.+?)\*\*/g, "$1")
+                      .replace(/\*(.+?)\*/g, "$1")
+                      .split("\n")
+                      .filter((line) => line.trim().length > 0)
+                      .slice(0, 3)
+                      .join(" ")}
+                  </p>
+                )}
+                {brand.keyTalkingPoints &&
+                  brand.keyTalkingPoints.length > 0 && (
+                    <ul
+                      className="list-disc pl-4 space-y-0.5 mb-2"
+                      style={{ fontSize: "0.6875rem", color: "#475569" }}
+                    >
+                      {brand.keyTalkingPoints.slice(0, 4).map((tp, i) => (
+                        <li key={i}>{tp}</li>
+                      ))}
+                    </ul>
+                  )}
+                {brand.complianceNotes && (
+                  <p
+                    className="px-2 py-1 rounded"
+                    style={{
+                      fontSize: "0.625rem",
+                      color: "#B91C1C",
+                      background: "#FEF2F2",
+                    }}
+                  >
+                    {brand.complianceNotes}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 
