@@ -1932,15 +1932,6 @@ function ProductsSamplesCard({ event }: { event: EventItem }) {
             </div>
           );
         })}
-        <div
-          className="flex items-center gap-1.5 pt-2"
-          style={{ borderTop: "1px solid #F1F5F9" }}
-        >
-          <Info size={11} style={{ color: "#94A3B8" }} />
-          <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-            Quantities are set at the kit level
-          </span>
-        </div>
       </div>
     </div>
   );
