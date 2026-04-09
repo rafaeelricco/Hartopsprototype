@@ -9,6 +9,12 @@ export interface AssignedEducatorRecord {
   status: "Pending" | "Accepted" | "Declined";
 }
 
+export interface SampleConfig {
+  skuId: string;
+  notes?: string;
+  brandEducationDocIds?: string[];
+}
+
 export interface EventItem {
   id: string;
   campaignId: string;
@@ -28,6 +34,8 @@ export interface EventItem {
   assignmentStatus: "unassigned" | "assigned" | "pending";
   assignedEducators?: AssignedEducatorRecord[];
   linkedProductIds?: string[] | undefined;
+  sampleConfigs?: SampleConfig[] | undefined;
+  kitReadiness?: "not-ready" | "partial" | "ready" | undefined;
   regionId?: string | undefined;
   createdAt: string;
 }
@@ -355,6 +363,11 @@ export const INITIAL_EVENTS: EventItem[] = [
       { educatorId: "EDU-001", name: "Maria Santos", status: "Accepted" },
       { educatorId: "EDU-003", name: "Ashley Chen", status: "Accepted" },
     ],
+    sampleConfigs: [
+      { skuId: "sku-001", brandEducationDocIds: ["doc-1"] },
+      { skuId: "sku-002", brandEducationDocIds: ["doc-1"] },
+    ],
+    kitReadiness: "ready",
     createdAt: "2026-01-20",
   },
   {
@@ -384,6 +397,11 @@ export const INITIAL_EVENTS: EventItem[] = [
       { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
       { educatorId: "EDU-007", name: "Lauren Nguyen", status: "Pending" },
     ],
+    sampleConfigs: [
+      { skuId: "sku-001" },
+      { skuId: "sku-002" },
+    ],
+    kitReadiness: "partial",
     createdAt: "2026-02-05",
   },
   {
@@ -438,6 +456,12 @@ export const INITIAL_EVENTS: EventItem[] = [
     assignedEducators: [
       { educatorId: "EDU-005", name: "Sophia Rivera", status: "Accepted" },
     ],
+    sampleConfigs: [
+      { skuId: "sku-003", brandEducationDocIds: ["doc-9"] },
+      { skuId: "sku-004", brandEducationDocIds: ["doc-3"] },
+      { skuId: "sku-005" },
+    ],
+    kitReadiness: "ready",
     createdAt: "2026-01-10",
   },
   {
@@ -498,6 +522,11 @@ export const INITIAL_EVENTS: EventItem[] = [
     assignedEducators: [
       { educatorId: "EDU-009", name: "Jasmine Williams", status: "Pending" },
     ],
+    sampleConfigs: [
+      { skuId: "sku-001" },
+      { skuId: "sku-006", brandEducationDocIds: ["doc-5"] },
+    ],
+    kitReadiness: "not-ready",
     createdAt: "2025-12-28",
   },
   {
@@ -612,6 +641,12 @@ export const INITIAL_EVENTS: EventItem[] = [
     assignedEducators: [
       { educatorId: "EDU-001", name: "Maria Santos", status: "Accepted" },
     ],
+    sampleConfigs: [
+      { skuId: "sku-006", brandEducationDocIds: ["doc-5"] },
+      { skuId: "sku-007", brandEducationDocIds: ["doc-7"] },
+      { skuId: "sku-008", brandEducationDocIds: ["doc-6"] },
+    ],
+    kitReadiness: "ready",
     createdAt: "2026-02-05",
   },
   {

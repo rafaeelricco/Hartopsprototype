@@ -33,6 +33,7 @@ import {
   Download,
   Loader2,
   Building2,
+  Package,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
@@ -57,6 +58,7 @@ import {
   type EventItem,
   type DataModule,
 } from "./event-data";
+import { INITIAL_SKUS, getDocumentsForSku } from "./brand-assets-data";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -810,6 +812,11 @@ function Phase1Editable({
             </div>
           </div>
         </div>
+
+        {/* Products & Samples card */}
+        {(event.sampleConfigs?.length ?? 0) > 0 && (
+          <ProductsSamplesCard event={event} />
+        )}
 
         {/* Data Modules card — grouped by objective */}
         <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
@@ -1842,6 +1849,99 @@ function LockedModuleCard({ mod }: { mod: DataModule }) {
       )}
 
       {!mod.sampleType && <div className="h-5 w-16 rounded bg-[#E2E8F0]" />}
+    </div>
+  );
+}
+
+// =============================================================================
+// Products & Samples Card — shows configured products on event detail sidebar
+// =============================================================================
+
+const KIT_READINESS_STYLES: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
+  ready: { bg: "#ECFDF5", text: "#059669", label: "Kit Ready" },
+  partial: { bg: "#FFF7ED", text: "#D97706", label: "Partial" },
+  "not-ready": { bg: "#FEF2F2", text: "#DC2626", label: "Not Ready" },
+};
+
+function ProductsSamplesCard({ event }: { event: EventItem }) {
+  const configs = event.sampleConfigs ?? [];
+  const kitStatus = event.kitReadiness
+    ? KIT_READINESS_STYLES[event.kitReadiness]
+    : null;
+
+  return (
+    <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden">
+      <div className="px-4 py-3.5 border-b border-[#E2E8F0] flex items-center gap-2">
+        <Package size={14} style={{ color: "#7D152D" }} />
+        <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+          Products & Samples ({configs.length})
+        </span>
+        {kitStatus && (
+          <span
+            className="ml-auto px-2 py-0.5 rounded-full"
+            style={{
+              fontSize: "0.6875rem",
+              fontWeight: 500,
+              background: kitStatus.bg,
+              color: kitStatus.text,
+            }}
+          >
+            {kitStatus.label}
+          </span>
+        )}
+      </div>
+      <div className="px-4 py-3 space-y-2">
+        {configs.map((config) => {
+          const sku = INITIAL_SKUS.find((s) => s.id === config.skuId);
+          if (!sku) return null;
+          const docs = getDocumentsForSku(config.skuId);
+          return (
+            <div
+              key={config.skuId}
+              className="flex items-center gap-2.5 py-1.5"
+            >
+              <img
+                src={sku.imageUrl}
+                alt={sku.productName}
+                className="w-8 h-8 rounded-md object-cover shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p
+                  className="truncate"
+                  style={{ fontSize: "0.75rem", color: "#0F172A" }}
+                >
+                  {sku.productName}
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="font-mono"
+                    style={{ fontSize: "0.625rem", color: "#94A3B8" }}
+                  >
+                    {sku.skuCode}
+                  </span>
+                  {docs.length > 0 && (
+                    <span style={{ fontSize: "0.625rem", color: "#7D152D" }}>
+                      · {docs.length} doc{docs.length !== 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        <div
+          className="flex items-center gap-1.5 pt-2"
+          style={{ borderTop: "1px solid #F1F5F9" }}
+        >
+          <Info size={11} style={{ color: "#94A3B8" }} />
+          <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            Quantities are set at the kit level
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

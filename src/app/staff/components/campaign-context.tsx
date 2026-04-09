@@ -57,6 +57,8 @@ interface CampaignContextValue {
         | "duration"
         | "venueType"
         | "assignmentStatus"
+        | "sampleConfigs"
+        | "kitReadiness"
       >
     >,
   ) => void;
@@ -225,6 +227,8 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
         | "duration"
         | "venueType"
         | "assignmentStatus"
+        | "sampleConfigs"
+        | "kitReadiness"
       >
     >,
   ) {

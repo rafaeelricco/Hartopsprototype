@@ -1,7 +1,8 @@
 // =============================================================================
-// Full-Page Event Creation Wizard — 4-step flow
+// Full-Page Event Creation Wizard — 5-step flow
 // Step 1: Select Campaign → Step 2: Event Basics →
-// Step 3: Objectives + Projected Impact → Step 4: Customization
+// Step 3: Objectives + Projected Impact → Step 4: Products & Samples →
+// Step 5: Customization
 // Accessible from /staff/events/create
 // =============================================================================
 
@@ -27,6 +28,7 @@ import {
   ChevronUp,
   Search,
   ArrowLeft,
+  Package,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -39,11 +41,14 @@ import {
   getDataModulesForObjectives,
   type DataModule,
   type EventItem,
+  type SampleConfig,
 } from "./event-data";
 import { useCampaignContext } from "./campaign-context";
 import { type Campaign } from "./campaign-data";
 import { LocationCombobox } from "./location-combobox";
 import { INITIAL_REGIONS } from "./settings-data";
+import { getDocumentsForSku } from "./brand-assets-data";
+import { StepProductsSamples } from "./step-products-samples";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -58,6 +63,7 @@ type WizardData = {
   venueType: "" | "off-premises" | "on-premises" | "special" | "cannabis";
   objectives: string[];
   advancedModules: string[];
+  sampleConfigs: SampleConfig[];
 };
 
 const INITIAL_DATA: WizardData = {
@@ -71,13 +77,15 @@ const INITIAL_DATA: WizardData = {
   venueType: "",
   objectives: [],
   advancedModules: [],
+  sampleConfigs: [],
 };
 
 const STEPS = [
   { num: 1, label: "Campaign", icon: Target },
   { num: 2, label: "Event Basics", icon: FileText },
   { num: 3, label: "Objectives", icon: Target },
-  { num: 4, label: "Customization", icon: Settings2 },
+  { num: 4, label: "Products & Samples", icon: Package },
+  { num: 5, label: "Customization", icon: Settings2 },
 ];
 
 // ── Main Component ───────────────────────────────────────────────────────────
@@ -110,10 +118,20 @@ export function CreateEventPage() {
   const [step, setStep] = useState(preselectedActivity ? 2 : 1);
   const [data, setData] = useState<WizardData>(() => {
     if (preselectedCampaign) {
+      const inheritedConfigs: SampleConfig[] = (
+        preselectedCampaign.linkedProductIds ?? []
+      ).map((skuId) => {
+        const docs = getDocumentsForSku(skuId);
+        return {
+          skuId,
+          brandEducationDocIds: docs.map((d) => d.id),
+        };
+      });
       return {
         ...INITIAL_DATA,
         campaignId: preselectedCampaign.id,
         objectives: [...(preselectedCampaign.objectives ?? [])],
+        sampleConfigs: inheritedConfigs,
         ...(preselectedActivity?.venueType
           ? { venueType: preselectedActivity.venueType }
           : {}),
@@ -188,8 +206,9 @@ export function CreateEventPage() {
     if (step === 1 && !validateStep1()) return;
     if (step === 2 && !validateStep2()) return;
     if (step === 3 && !validateStep3()) return;
+    // Step 4 (Products & Samples) — no hard validation, allow skip
     setErrors({});
-    setStep((s) => Math.min(s + 1, 4));
+    setStep((s) => Math.min(s + 1, 5));
   }
 
   function handleBack() {
@@ -198,14 +217,11 @@ export function CreateEventPage() {
   }
 
   function handleSubmit() {
-    const selectedCampaign = getCampaign(data.campaignId);
-    // Determine product IDs: prefer activity subset, fallback to campaign
-    let productIds: string[] | undefined;
-    if (preselectedActivity?.linkedProductIds?.length) {
-      productIds = preselectedActivity.linkedProductIds;
-    } else if (selectedCampaign?.linkedProductIds?.length) {
-      productIds = selectedCampaign.linkedProductIds;
-    }
+    // Derive linkedProductIds from sampleConfigs (backward compat)
+    const productIds =
+      data.sampleConfigs.length > 0
+        ? data.sampleConfigs.map((c) => c.skuId)
+        : undefined;
     const event = createEvent({
       campaignId: data.campaignId,
       ...(preselectedActivity ? { activityId: preselectedActivity.id } : {}),
@@ -223,6 +239,9 @@ export function CreateEventPage() {
       dataModules: mappedModules.map((m) => m.id),
       advancedModules: data.advancedModules,
       ...(productIds ? { linkedProductIds: productIds } : {}),
+      ...(data.sampleConfigs.length > 0
+        ? { sampleConfigs: data.sampleConfigs }
+        : {}),
     });
     navigate(
       campaignIdParam
@@ -374,10 +393,21 @@ export function CreateEventPage() {
             onSelect={(id) => {
               const selected = getCampaign(id);
               const objectives = selected?.objectives ?? [];
+              // Auto-inherit products from campaign as sampleConfigs
+              const inheritedConfigs: SampleConfig[] = (
+                selected?.linkedProductIds ?? []
+              ).map((skuId) => {
+                const docs = getDocumentsForSku(skuId);
+                return {
+                  skuId,
+                  brandEducationDocIds: docs.map((d) => d.id),
+                };
+              });
               setData((d) => ({
                 ...d,
                 campaignId: id,
                 objectives: [...objectives],
+                sampleConfigs: inheritedConfigs,
               }));
               setInheritedObjectiveCount(objectives.length);
               setErrors((e) => {
@@ -428,6 +458,20 @@ export function CreateEventPage() {
           </div>
         )}
         {step === 4 && (
+          <StepProductsSamples
+            sampleConfigs={data.sampleConfigs}
+            onChange={(configs) =>
+              setData((d) => ({ ...d, sampleConfigs: configs }))
+            }
+            inheritedProductIds={
+              getCampaign(data.campaignId)?.linkedProductIds ?? []
+            }
+            campaignName={
+              getCampaign(data.campaignId)?.name ?? "Selected Campaign"
+            }
+          />
+        )}
+        {step === 5 && (
           <StepAdvanced
             selected={data.advancedModules}
             toggle={toggleAdvanced}
@@ -463,7 +507,7 @@ export function CreateEventPage() {
           )}
         </div>
 
-        {step < 4 ? (
+        {step < 5 ? (
           <Button
             onClick={handleNext}
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
