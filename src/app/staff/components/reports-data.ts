@@ -208,6 +208,14 @@ export const DEFAULT_COMPARISON_IDS: string[] = CAMPAIGN_METRICS.slice()
   .slice(0, 3)
   .map((c) => c.campaignId);
 
+// ── Per-campaign metrics lookup (used by Campaign Detail aggregated KPIs) ──
+
+export function getCampaignMetrics(
+  campaignId: string,
+): CampaignMetrics | undefined {
+  return CAMPAIGN_METRICS.find((c) => c.campaignId === campaignId);
+}
+
 // ── Photo Proof Gallery mock data ───────────────────────────────────────────
 
 export interface ProofPhoto {

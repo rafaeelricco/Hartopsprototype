@@ -28,6 +28,8 @@ import { Button } from "@/app/shared/components/ui/button";
 import { useCampaignContext } from "./campaign-context";
 import { OBJECTIVES, type EventItem } from "./event-data";
 import { MOCK_PRODUCTS, CHANNEL_OPTIONS } from "./campaign-data";
+import { getCampaignMetrics } from "./reports-data";
+import { CampaignMetricsSection } from "@/app/shared/components/campaign-metrics-section";
 import { Input } from "@/app/shared/components/ui/input";
 
 const STATUS_LABELS: Record<
@@ -423,6 +425,23 @@ export function CampaignDetail() {
           </div>
         </div>
       )}
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Aggregated Metrics (IMP-648)                                      */}
+      {/* ---------------------------------------------------------------- */}
+      <CampaignMetricsSection
+        metrics={(() => {
+          const m = getCampaignMetrics(campaign.id);
+          if (!m) return null;
+          return {
+            eventsCompleted: m.events,
+            consumersReached: m.consumerReach,
+            samplesDistributed: m.samples,
+            salesGenerated: m.totalSales,
+          };
+        })()}
+        anticipatedEventCount={campaign.anticipatedEventCount}
+      />
 
       {/* ---------------------------------------------------------------- */}
       {/* Activities Section                                                */}

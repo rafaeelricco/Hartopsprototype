@@ -12,8 +12,8 @@
 //  8. Trend chart is scope-aware
 // =============================================================================
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { Link } from "react-router";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { Link, useSearchParams } from "react-router";
 import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   BarChart3,
@@ -115,10 +115,34 @@ export function ReportsPage() {
   // ── Trend chart (change #8) ─────────────────────────────────────────────
   const trendData = useMemo(() => getTrendData(scope), [scope]);
 
+  // ── Deep-link handoff from /staff/campaigns "Compare" CTA (IMP-648) ─────
+  const [searchParams] = useSearchParams();
+  const comparisonRef = useRef<HTMLDivElement | null>(null);
+
   // ── Campaign Comparison (change #3) ─────────────────────────────────────
   const [selectedCampaigns, setSelectedCampaigns] = useState<Set<string>>(
-    () => new Set(DEFAULT_COMPARISON_IDS),
+    () => {
+      const fromQuery = searchParams.get("campaigns");
+      if (fromQuery) {
+        const ids = fromQuery
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (ids.length > 0) return new Set(ids);
+      }
+      return new Set(DEFAULT_COMPARISON_IDS);
+    },
   );
+
+  // Scroll to the comparison table when arriving with ?view=comparison
+  useEffect(() => {
+    if (searchParams.get("view") === "comparison" && comparisonRef.current) {
+      comparisonRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [searchParams]);
   const [sortKey, setSortKey] = useState<SortKey>("totalSales");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
@@ -542,7 +566,10 @@ export function ReportsPage() {
       </div>
 
       {/* ── Campaign Comparison (change #3) ──────────────────────────── */}
-      <div className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden mb-8">
+      <div
+        ref={comparisonRef}
+        className="bg-white rounded-xl border border-[#E2E8F0] overflow-hidden mb-8"
+      >
         <div className="px-5 py-4 border-b border-[#E2E8F0]">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">

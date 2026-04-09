@@ -5,7 +5,7 @@
 // =============================================================================
 
 import { useState, useMemo } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { PageHeader } from "../../shared/components/layouts/page-header";
 import {
   Plus,
@@ -14,9 +14,11 @@ import {
   Megaphone,
   ChevronLeft,
   ChevronRight,
+  BarChart3,
 } from "lucide-react";
 import { type Campaign } from "./campaign-data";
 import { useCampaignContext } from "./campaign-context";
+import { DEFAULT_COMPARISON_IDS } from "./reports-data";
 import {
   CreateCampaignModal,
   type CreateCampaignFormData,
@@ -45,6 +47,7 @@ const STATUS_FILTERS: Campaign["status"][] = ["active", "draft", "completed"];
 export function Campaigns() {
   const { campaigns, createCampaign, existingCampaignNames } =
     useCampaignContext();
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<Campaign["status"] | "all">(
@@ -112,14 +115,30 @@ export function Campaigns() {
           </>
         }
         actions={
-          <Button
-            onClick={() => setModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer"
-            style={{ background: "#7D152D", fontSize: "0.875rem" }}
-          >
-            <Plus size={16} strokeWidth={2.5} />
-            Create Campaign
-          </Button>
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                const ids = DEFAULT_COMPARISON_IDS.join(",");
+                navigate(
+                  `/staff/reports?view=comparison&campaigns=${encodeURIComponent(ids)}`,
+                );
+              }}
+              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg border border-[#E2E8F0] bg-white text-[#7D152D] hover:bg-[#7D152D]/5 transition-colors cursor-pointer"
+              style={{ fontSize: "0.875rem" }}
+            >
+              <BarChart3 size={16} strokeWidth={2.5} />
+              Compare
+            </Button>
+            <Button
+              onClick={() => setModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 h-11 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer"
+              style={{ background: "#7D152D", fontSize: "0.875rem" }}
+            >
+              <Plus size={16} strokeWidth={2.5} />
+              Create Campaign
+            </Button>
+          </>
         }
       />
 
