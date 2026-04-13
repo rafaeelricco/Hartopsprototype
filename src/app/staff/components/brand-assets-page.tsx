@@ -442,7 +442,7 @@ function BrandLibrary({
   return (
     <>
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
           {
             label: "Brands",
@@ -491,7 +491,7 @@ function BrandLibrary({
             </p>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -1329,12 +1329,12 @@ function ProductLibrary({
   }, [skus]);
 
   // Stat counts — #4
-  const stats = useMemo(() => {
-    const active = skus.filter((s) => s.status === "active").length;
-    const draft = skus.filter((s) => s.status === "draft").length;
-    const disc = skus.filter((s) => s.status === "discontinued").length;
-    return { total: skus.length, active, draft, disc };
-  }, [skus]);
+  // const stats = useMemo(() => {
+  //   const active = skus.filter((s) => s.status === "active").length;
+  //   const draft = skus.filter((s) => s.status === "draft").length;
+  //   const disc = skus.filter((s) => s.status === "discontinued").length;
+  //   return { total: skus.length, active, draft, disc };
+  // }, [skus]);
 
   // CRUD
   function handleSave(sku: SKU) {
@@ -1372,7 +1372,7 @@ function ProductLibrary({
   return (
     <>
       {/* #4 — Stat cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
           {
             label: "Total SKUs",
@@ -1421,7 +1421,7 @@ function ProductLibrary({
             </p>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
@@ -3497,7 +3497,7 @@ function BrandEducationTab({
   return (
     <>
       {/* Stat cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
           {
             label: "Total Documents",
@@ -3546,7 +3546,7 @@ function BrandEducationTab({
             </p>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
