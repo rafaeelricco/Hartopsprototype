@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 78px;
+      }
+      .swatch .chip {
+        height: 54px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 11px;
+        color: #111827;
+        margin-top: 6px;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .mono {
+        font-family: ui-monospace, Menlo, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div
+        style="
+          background: #fff;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          border-radius: 16px;
+          padding: 20px;
+          max-width: 380px;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+          "
+        >
+          <div style="font-size: 13px; color: rgba(17, 24, 39, 0.58)">
+            Total Organizations
+          </div>
+          <div
+            style="
+              width: 28px;
+              height: 28px;
+              border-radius: 8px;
+              background: rgba(125, 21, 45, 0.08);
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              color: #7d152d;
+              font-size: 14px;
+            "
+          >
+            ◧
+          </div>
+        </div>
+        <div
+          style="
+            font-size: 28px;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.2;
+          "
+        >
+          64
+        </div>
+        <div style="font-size: 12px; margin-top: 4px">
+          <span style="color: #16a34a; font-weight: 500">+12.3%</span>
+          <span style="color: rgba(17, 24, 39, 0.58)">from last month</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

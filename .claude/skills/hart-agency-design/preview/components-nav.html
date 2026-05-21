@@ -1,0 +1,935 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Sidebar — Hart Ops</title>
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      /* shadcn sidebar tokens — lifted directly from the Ops app */
+      :root {
+        --sidebar-width: 16rem; /* 256px */
+        --sidebar-bg: #ffffff;
+        --sidebar-fg: #111827; /* gray-900 */
+        --sidebar-muted-fg: rgba(17, 24, 39, 0.62);
+        --sidebar-border: #e5e7eb; /* gray-200 */
+        --sidebar-accent: #f3f4f6; /* gray-100 — hover/active bg */
+        --sidebar-accent-fg: #111827;
+        --sidebar-primary: #7d152d; /* team avatar bg */
+        --sidebar-primary-fg: #ffffff;
+        --sidebar-ring: #7d152d;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        color: var(--sidebar-fg);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card {
+        padding: 28px 32px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 4px 0;
+      }
+      .note {
+        font-size: 12px;
+        color: rgba(17, 24, 39, 0.58);
+        margin: 0 0 20px 0;
+        max-width: 520px;
+        line-height: 1.5;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        width: var(--sidebar-width);
+        background: var(--sidebar-bg);
+        color: var(--sidebar-fg);
+        border: 1px solid var(--sidebar-border);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        height: 640px;
+        overflow: hidden;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+      }
+
+      /* Header — TeamSwitcher */
+      .sidebar-header {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .sidebar-footer {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-top: 1px solid var(--sidebar-border);
+      }
+      .sidebar-content {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+      .sidebar-group {
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar-group-label {
+        height: 28px; /* slightly tighter than h-8 reads cleaner */
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--sidebar-muted-fg);
+        border-radius: 6px;
+      }
+      .sidebar-menu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      .sidebar-menu-item {
+        position: relative;
+      }
+
+      /* SidebarMenuButton — default size: h-8 text-sm, size-lg: h-12 */
+      .menu-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        height: 32px;
+        padding: 8px;
+        border-radius: 6px;
+        font-size: 14px;
+        line-height: 1;
+        color: var(--sidebar-fg);
+        background: transparent;
+        border: 0;
+        text-align: left;
+        cursor: pointer;
+        overflow: hidden;
+        font-family: inherit;
+        transition:
+          background-color 0.12s ease,
+          color 0.12s ease;
+      }
+      .menu-btn > svg {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .menu-btn > span:last-child {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .menu-btn:hover {
+        background: var(--sidebar-accent);
+        color: var(--sidebar-accent-fg);
+      }
+      .menu-btn[data-active="true"] {
+        background: var(--sidebar-accent);
+        color: var(--sidebar-accent-fg);
+        font-weight: 500;
+      }
+
+      /* size=lg — used by TeamSwitcher + NavUser */
+      .menu-btn.lg {
+        height: 48px;
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      /* Team logo tile */
+      .team-logo {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--sidebar-primary);
+        color: var(--sidebar-primary-fg);
+        border-radius: 8px;
+      }
+      .team-logo svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .stack {
+        display: grid;
+        gap: 1px;
+        flex: 1;
+        min-width: 0;
+        text-align: left;
+        line-height: 1.2;
+      }
+      .stack .t1 {
+        font-size: 14px;
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .stack .t2 {
+        font-size: 12px;
+        color: var(--sidebar-muted-fg);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .avatar {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #e5e7eb;
+        color: rgba(17, 24, 39, 0.58);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        overflow: hidden;
+      }
+
+      .chevrons {
+        margin-left: auto;
+        width: 16px;
+        height: 16px;
+        color: var(--sidebar-muted-fg);
+        flex-shrink: 0;
+      }
+
+      /* Layout helpers */
+      .stage {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+
+      .app-frame {
+        flex: 1;
+        min-width: 0;
+        height: 640px;
+        background: transparent;
+        border: 1px solid var(--sidebar-border);
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+      }
+      .app-frame > .sidebar {
+        border-radius: 0;
+        border: 0;
+        border-right: 1px solid var(--sidebar-border);
+        height: 100%;
+        box-shadow: none;
+      }
+      .app-main {
+        flex: 1;
+        padding: 24px 28px;
+        background: transparent;
+        min-width: 0;
+      }
+      .app-main .crumbs {
+        font-size: 12px;
+        color: rgba(17, 24, 39, 0.58);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .app-main h1 {
+        font-size: 24px;
+        margin: 10px 0 4px 0;
+        color: #111827;
+        font-weight: 600;
+      }
+      .app-main .sub {
+        font-size: 13px;
+        color: rgba(17, 24, 39, 0.58);
+        margin: 0 0 20px 0;
+      }
+      .app-main .row-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .app-main .tile {
+        background: #fff;
+        border: 1px solid var(--sidebar-border);
+        border-radius: 10px;
+        padding: 14px;
+        height: 72px;
+      }
+      .app-main .tile .k {
+        font-size: 11px;
+        color: rgba(17, 24, 39, 0.58);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+      }
+      .app-main .tile .v {
+        font-size: 22px;
+        color: #111827;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+
+      .legend {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 12px;
+        color: #374151;
+        background: #fff;
+        border: 1px solid var(--sidebar-border);
+        border-radius: 10px;
+        padding: 16px;
+        width: 220px;
+      }
+      .legend h3 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(17, 24, 39, 0.58);
+        font-weight: 600;
+        margin: 0 0 4px 0;
+      }
+      .legend .token {
+        display: grid;
+        grid-template-columns: 14px 1fr;
+        gap: 8px;
+        align-items: center;
+      }
+      .legend .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        border: 1px solid var(--sidebar-border);
+      }
+      .legend code {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+        color: #111827;
+      }
+      .legend .meta {
+        color: rgba(17, 24, 39, 0.58);
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <p class="note">
+        Faithful render of the <code>AppSidebar</code> component from the Ops
+        repo (<code>src/app/ops/components/app-sidebar.tsx</code>), using the
+        real shadcn sidebar primitives, nav items, icons, and active-state
+        tokens. Top tile shows the component in isolation; bottom shows it
+        slotted into the app shell.
+      </p>
+
+      <div class="stage">
+        <!-- Isolated sidebar -->
+        <div>
+          <div class="sidebar" role="navigation" aria-label="Main">
+            <!-- HEADER: TeamSwitcher -->
+            <div class="sidebar-header">
+              <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn lg" type="button">
+                    <span class="team-logo" aria-hidden="true">
+                      <!-- lucide: GalleryVerticalEnd -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M7 2h10" />
+                        <path d="M5 6h14" />
+                        <rect width="18" height="12" x="3" y="10" rx="2" />
+                      </svg>
+                    </span>
+                    <div class="stack">
+                      <span class="t1">Hart Ops</span>
+                      <span class="t2">Super Admin</span>
+                    </div>
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="sidebar-content">
+              <!-- NavMain — Platform -->
+              <div class="sidebar-group">
+                <div class="sidebar-group-label">Platform</div>
+                <ul class="sidebar-menu">
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button" data-active="true">
+                      <!-- LayoutDashboard -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <rect width="7" height="9" x="3" y="3" rx="1" />
+                        <rect width="7" height="5" x="14" y="3" rx="1" />
+                        <rect width="7" height="9" x="14" y="12" rx="1" />
+                        <rect width="7" height="5" x="3" y="16" rx="1" />
+                      </svg>
+                      <span>Dashboard</span>
+                    </button>
+                  </li>
+
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- Building2 -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                        <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                        <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                        <path d="M10 6h4" />
+                        <path d="M10 10h4" />
+                        <path d="M10 14h4" />
+                        <path d="M10 18h4" />
+                      </svg>
+                      <span>Organizations</span>
+                    </button>
+                  </li>
+
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- Store -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"
+                        />
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                        <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+                        <path d="M2 7h20" />
+                        <path
+                          d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-2.59-1.93a.73.73 0 0 0-1.41 0A2.73 2.73 0 0 1 13.25 12a2.73 2.73 0 0 1-2.75-1.93a.73.73 0 0 0-1.41 0A2.73 2.73 0 0 1 6.5 12a2.73 2.73 0 0 1-2.75-1.93a.73.73 0 0 0-1.41 0A2 2 0 0 1 2 10Z"
+                        />
+                      </svg>
+                      <span>Account Master</span>
+                    </button>
+                  </li>
+
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- Users -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                      </svg>
+                      <span>Educators</span>
+                    </button>
+                  </li>
+
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- CalendarCheck -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M8 2v4" />
+                        <path d="M16 2v4" />
+                        <rect width="18" height="18" x="3" y="4" rx="2" />
+                        <path d="M3 10h18" />
+                        <path d="m9 16 2 2 4-4" />
+                      </svg>
+                      <span>Availability</span>
+                    </button>
+                  </li>
+
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- CalendarDays -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M8 2v4" />
+                        <path d="M16 2v4" />
+                        <rect width="18" height="18" x="3" y="4" rx="2" />
+                        <path d="M3 10h18" />
+                        <path d="M8 14h.01" />
+                        <path d="M12 14h.01" />
+                        <path d="M16 14h.01" />
+                        <path d="M8 18h.01" />
+                        <path d="M12 18h.01" />
+                        <path d="M16 18h.01" />
+                      </svg>
+                      <span>Events</span>
+                    </button>
+                  </li>
+
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- Settings -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span>Settings</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- NavProjects — Projects -->
+              <div class="sidebar-group">
+                <div class="sidebar-group-label">Projects</div>
+                <ul class="sidebar-menu">
+                  <li class="sidebar-menu-item">
+                    <button class="menu-btn" type="button">
+                      <!-- FileBarChart -->
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                        <path d="M8 18v-2" />
+                        <path d="M12 18v-4" />
+                        <path d="M16 18v-6" />
+                      </svg>
+                      <span>Reports</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- FOOTER: NavUser -->
+            <div class="sidebar-footer">
+              <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn lg" type="button">
+                    <span class="avatar" aria-hidden="true">AH</span>
+                    <div class="stack">
+                      <span class="t1">Admin Hart</span>
+                      <span class="t2">admin@hartops.com</span>
+                    </div>
+                    <svg
+                      class="chevrons"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="m7 15 5 5 5-5" />
+                      <path d="m7 9 5-5 5 5" />
+                    </svg>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Token legend -->
+        <div class="legend">
+          <h3>Tokens in play</h3>
+          <div class="token">
+            <span class="dot" style="background: #ffffff"></span>
+            <div>
+              <code>--sidebar</code>
+              <div class="meta">#FFFFFF</div>
+            </div>
+          </div>
+          <div class="token">
+            <span class="dot" style="background: #f3f4f6"></span>
+            <div>
+              <code>--sidebar-accent</code>
+              <div class="meta">#F3F4F6 · hover/active bg</div>
+            </div>
+          </div>
+          <div class="token">
+            <span class="dot" style="background: #e5e7eb"></span>
+            <div>
+              <code>--sidebar-border</code>
+              <div class="meta">#E5E7EB</div>
+            </div>
+          </div>
+          <div class="token">
+            <span class="dot" style="background: #7d152d"></span>
+            <div>
+              <code>--sidebar-primary</code>
+              <div class="meta">#7D152D · team tile</div>
+            </div>
+          </div>
+          <div class="token">
+            <span class="dot" style="background: #111827"></span>
+            <div>
+              <code>--sidebar-foreground</code>
+              <div class="meta">#111827</div>
+            </div>
+          </div>
+          <h3 style="margin-top: 8px">Sizes</h3>
+          <div class="meta"><code>width: 16rem</code> (256px)</div>
+          <div class="meta">
+            <code>item h: 32px</code> · <code>p: 8px</code>
+          </div>
+          <div class="meta">
+            <code>icon: 16px</code> · <code>gap: 8px</code>
+          </div>
+          <div class="meta">
+            <code>radius: 6px</code> · <code>text: 14px</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- In-context: full app shell -->
+      <p class="eyebrow" style="margin-top: 36px">
+        In context — slotted into the app shell
+      </p>
+      <div class="app-frame">
+        <div class="sidebar" role="navigation" aria-label="Main">
+          <div class="sidebar-header">
+            <ul class="sidebar-menu">
+              <li class="sidebar-menu-item">
+                <button class="menu-btn lg" type="button">
+                  <span class="team-logo" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M7 2h10" />
+                      <path d="M5 6h14" />
+                      <rect width="18" height="12" x="3" y="10" rx="2" />
+                    </svg>
+                  </span>
+                  <div class="stack">
+                    <span class="t1">Hart Ops</span
+                    ><span class="t2">Super Admin</span>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </div>
+          <div class="sidebar-content">
+            <div class="sidebar-group">
+              <div class="sidebar-group-label">Platform</div>
+              <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect width="7" height="9" x="3" y="3" rx="1" />
+                      <rect width="7" height="5" x="14" y="3" rx="1" />
+                      <rect width="7" height="9" x="14" y="12" rx="1" />
+                      <rect width="7" height="5" x="3" y="16" rx="1" /></svg
+                    ><span>Dashboard</span>
+                  </button>
+                </li>
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button" data-active="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+                      <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+                      <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                      <path d="M10 6h4" />
+                      <path d="M10 10h4" />
+                      <path d="M10 14h4" />
+                      <path d="M10 18h4" /></svg
+                    ><span>Organizations</span>
+                  </button>
+                </li>
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"
+                      />
+                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                      <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+                      <path d="M2 7h20" /></svg
+                    ><span>Account Master</span>
+                  </button>
+                </li>
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg
+                    ><span>Educators</span>
+                  </button>
+                </li>
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M8 2v4" />
+                      <path d="M16 2v4" />
+                      <rect width="18" height="18" x="3" y="4" rx="2" />
+                      <path d="M3 10h18" />
+                      <path d="m9 16 2 2 4-4" /></svg
+                    ><span>Availability</span>
+                  </button>
+                </li>
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M8 2v4" />
+                      <path d="M16 2v4" />
+                      <rect width="18" height="18" x="3" y="4" rx="2" />
+                      <path d="M3 10h18" /></svg
+                    ><span>Events</span>
+                  </button>
+                </li>
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                      />
+                      <circle cx="12" cy="12" r="3" /></svg
+                    ><span>Settings</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="sidebar-group">
+              <div class="sidebar-group-label">Projects</div>
+              <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                  <button class="menu-btn" type="button">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                      />
+                      <polyline points="14 2 14 8 20 8" />
+                      <path d="M8 18v-2" />
+                      <path d="M12 18v-4" />
+                      <path d="M16 18v-6" /></svg
+                    ><span>Reports</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="sidebar-footer">
+            <ul class="sidebar-menu">
+              <li class="sidebar-menu-item">
+                <button class="menu-btn lg" type="button">
+                  <span class="avatar" aria-hidden="true">AH</span>
+                  <div class="stack">
+                    <span class="t1">Admin Hart</span
+                    ><span class="t2">admin@hartops.com</span>
+                  </div>
+                  <svg
+                    class="chevrons"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="m7 15 5 5 5-5" />
+                    <path d="m7 9 5-5 5 5" />
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="app-main">
+          <div class="crumbs">
+            Hart Ops / <span style="color: #111827">Organizations</span>
+          </div>
+          <h1>Organizations</h1>
+          <p class="sub">
+            Manage partner districts, schools, and private clients.
+          </p>
+          <div class="row-cards">
+            <div class="tile">
+              <div class="k">Active</div>
+              <div class="v">124</div>
+            </div>
+            <div class="tile">
+              <div class="k">Pending setup</div>
+              <div class="v">7</div>
+            </div>
+            <div class="tile">
+              <div class="k">Educators</div>
+              <div class="v">312</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

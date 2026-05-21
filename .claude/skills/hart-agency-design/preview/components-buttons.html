@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .group + .group {
+        margin-top: 28px;
+      }
+      button.btn {
+        border: none;
+        border-radius: 10px;
+        font-family: Inter, sans-serif;
+        font-weight: 500;
+        cursor: pointer;
+        color: #fff;
+        background: #7d152d;
+        height: 36px;
+        padding: 0 16px;
+        font-size: 14px;
+      }
+      button.btn.secondary {
+        background: #f3f4f6;
+        color: #111827;
+      }
+      button.btn.outline {
+        background: #fff;
+        color: #111827;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.04);
+      }
+      button.btn.ghost {
+        background: transparent;
+        color: #111827;
+      }
+      button.btn.destructive {
+        background: #ef4444;
+      }
+      a.btn-link {
+        color: #7d152d;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="group">
+        <p class="eyebrow">Variants</p>
+        <div class="row">
+          <button class="btn">Default</button>
+          <button class="btn secondary">Secondary</button>
+          <button class="btn outline">Outline</button>
+          <button class="btn ghost">Ghost</button>
+          <button class="btn destructive">Destructive</button>
+          <a class="btn-link">Link</a>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="eyebrow">Sizes</p>
+        <div class="row">
+          <button
+            class="btn"
+            style="height: 24px; padding: 0 8px; font-size: 12px"
+          >
+            xs
+          </button>
+          <button class="btn" style="height: 32px; padding: 0 12px">sm</button>
+          <button class="btn">default</button>
+          <button class="btn" style="height: 40px; padding: 0 24px">lg</button>
+          <button
+            class="btn"
+            style="
+              width: 36px;
+              height: 36px;
+              padding: 0;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
+            +
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

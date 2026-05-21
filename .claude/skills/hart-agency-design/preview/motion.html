@@ -1,0 +1,276 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .note {
+        font-size: 11px;
+        color: rgba(17, 24, 39, 0.62);
+        margin: 0 0 16px 0;
+        max-width: 560px;
+        line-height: 1.5;
+      }
+      .group + .group {
+        margin-top: 28px;
+      }
+      .track {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        height: 48px;
+      }
+      .track + .track {
+        margin-top: 10px;
+      }
+      .track-label {
+        width: 160px;
+        font-size: 11px;
+        color: #111827;
+        font-weight: 500;
+      }
+      .track-hint {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 10px;
+        color: rgba(17, 24, 39, 0.55);
+      }
+      .rail {
+        position: relative;
+        flex: 1;
+        max-width: 320px;
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+      .dot {
+        position: absolute;
+        top: -6px;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #7d152d;
+      }
+      .dot.fast {
+        animation: slide 100ms var(--ease-in-out) infinite alternate;
+      }
+      .dot.normal {
+        animation: slide 200ms var(--ease-in-out) infinite alternate;
+      }
+      .dot.slow {
+        animation: slide 300ms var(--ease-in-out) infinite alternate;
+      }
+      .dot.slower {
+        animation: slide 500ms var(--ease-in-out) infinite alternate;
+      }
+      @keyframes slide {
+        from {
+          left: 0;
+        }
+        to {
+          left: calc(100% - 20px);
+        }
+      }
+      .easing-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        max-width: 520px;
+      }
+      .ease-cell {
+        padding: 10px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+      }
+      .ease-title {
+        font-size: 12px;
+        font-weight: 500;
+        color: #111827;
+      }
+      .ease-fn {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 10px;
+        color: rgba(17, 24, 39, 0.55);
+        margin-top: 2px;
+      }
+      .ease-sample {
+        margin-top: 10px;
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        background: #7d152d;
+      }
+      .linear {
+        animation: slide-linear 1200ms linear infinite alternate;
+      }
+      .in {
+        animation: slide-in 1200ms cubic-bezier(0.4, 0, 1, 1) infinite alternate;
+      }
+      .out {
+        animation: slide-out 1200ms cubic-bezier(0, 0, 0.2, 1) infinite
+          alternate;
+      }
+      .in-out {
+        animation: slide-in-out 1200ms cubic-bezier(0.4, 0, 0.2, 1) infinite
+          alternate;
+      }
+      .spring {
+        animation: slide-spring 1200ms cubic-bezier(0.34, 1.56, 0.64, 1)
+          infinite alternate;
+      }
+      @keyframes slide-linear {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(120px);
+        }
+      }
+      @keyframes slide-in {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(120px);
+        }
+      }
+      @keyframes slide-out {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(120px);
+        }
+      }
+      @keyframes slide-in-out {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(120px);
+        }
+      }
+      @keyframes slide-spring {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(120px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="group">
+        <p class="eyebrow">Durations</p>
+        <p class="note">
+          Four duration tokens. 100ms is micro-feedback; 200ms is the default
+          for UI transitions; 300/500ms are reserved for sheet transitions.
+        </p>
+        <div class="track">
+          <span class="track-label">fast · 100ms</span>
+          <div class="rail"><div class="dot fast"></div></div>
+          <span class="track-hint">press flash, focus fade</span>
+        </div>
+        <div class="track">
+          <span class="track-label">normal · 200ms</span>
+          <div class="rail"><div class="dot normal"></div></div>
+          <span class="track-hint">standard UI transition</span>
+        </div>
+        <div class="track">
+          <span class="track-label">slow · 300ms</span>
+          <div class="rail"><div class="dot slow"></div></div>
+          <span class="track-hint">sheet close, cross-fade</span>
+        </div>
+        <div class="track">
+          <span class="track-label">slower · 500ms</span>
+          <div class="rail"><div class="dot slower"></div></div>
+          <span class="track-hint">sheet open (bottom-sheet rise)</span>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="eyebrow">Easing</p>
+        <p class="note">
+          Each 1.2s loop — same distance, different curve.
+          <code>ease-in-out</code> is the default for hover, color, and layout
+          shifts.
+        </p>
+        <div class="easing-grid">
+          <div class="ease-cell">
+            <div class="ease-title">linear</div>
+            <div class="ease-fn">cubic-bezier(0, 0, 1, 1)</div>
+            <div class="ease-sample linear"></div>
+          </div>
+          <div class="ease-cell">
+            <div class="ease-title">ease-in</div>
+            <div class="ease-fn">cubic-bezier(0.4, 0, 1, 1)</div>
+            <div class="ease-sample in"></div>
+          </div>
+          <div class="ease-cell">
+            <div class="ease-title">ease-out</div>
+            <div class="ease-fn">cubic-bezier(0, 0, 0.2, 1)</div>
+            <div class="ease-sample out"></div>
+          </div>
+          <div class="ease-cell">
+            <div class="ease-title">ease-in-out (default)</div>
+            <div class="ease-fn">cubic-bezier(0.4, 0, 0.2, 1)</div>
+            <div class="ease-sample in-out"></div>
+          </div>
+          <div class="ease-cell">
+            <div class="ease-title">ease-spring</div>
+            <div class="ease-fn">cubic-bezier(0.34, 1.56, 0.64, 1)</div>
+            <div class="ease-sample spring"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

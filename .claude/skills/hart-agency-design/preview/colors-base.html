@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 120px;
+      }
+      .swatch .chip {
+        height: 64px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 12px;
+        color: #111827;
+        margin-top: 8px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+        margin-top: 2px;
+      }
+      .swatch .use {
+        font-size: 10px;
+        color: rgba(17, 24, 39, 0.62);
+        line-height: 1.4;
+        margin-top: 4px;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .note {
+        font-size: 11px;
+        color: rgba(17, 24, 39, 0.62);
+        margin: 0 0 16px 0;
+        max-width: 560px;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <p class="note">
+        Kept separate from the gray ramp. <strong>White</strong> is the default
+        surface; <strong>Black</strong> shows up rarely — reserved for true
+        black ink needs (print, logo lockups on light stock). For UI text, use
+        <code>Gray 900</code> instead.
+      </p>
+      <div class="row">
+        <div class="swatch">
+          <div class="chip" style="background: #ffffff"></div>
+          <div class="label">White</div>
+          <div class="hex">#FFFFFF</div>
+          <div class="use">Default surface / card bg</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #000000"></div>
+          <div class="label">Black</div>
+          <div class="hex">#000000</div>
+          <div class="use">Print &amp; logo only — prefer Gray 900 in UI</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

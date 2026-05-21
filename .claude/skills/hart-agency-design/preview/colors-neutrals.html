@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 64px;
+      }
+      .swatch .chip {
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 10px;
+        color: #111827;
+        margin-top: 6px;
+        font-weight: 600;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 9px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .note {
+        font-size: 11px;
+        color: rgba(17, 24, 39, 0.62);
+        margin: 0 0 16px 0;
+        max-width: 560px;
+        line-height: 1.5;
+      }
+      .group + .group {
+        margin-top: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="group">
+        <p class="note">
+          The grayscale neutrals used throughout the Hart Ops and Hart Agency
+          surfaces. Pure <code>#000</code> and <code>#FFF</code> live in a
+          separate <em>Base</em> swatch — they aren't steps in this ramp.
+        </p>
+        <div class="row">
+          <div class="swatch">
+            <div class="chip" style="background: #f9fafb"></div>
+            <div class="label">Gray 50</div>
+            <div class="hex">#F9FAFB</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #f3f4f6"></div>
+            <div class="label">Gray 100</div>
+            <div class="hex">#F3F4F6</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #e5e7eb"></div>
+            <div class="label">Gray 200</div>
+            <div class="hex">#E5E7EB</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #d1d5db"></div>
+            <div class="label">Gray 300</div>
+            <div class="hex">#D1D5DB</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #9ca3af"></div>
+            <div class="label">Gray 400</div>
+            <div class="hex">#9CA3AF</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #6b7280"></div>
+            <div class="label">Gray 500</div>
+            <div class="hex">#6B7280</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #4b5563"></div>
+            <div class="label">Gray 600</div>
+            <div class="hex">#4B5563</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #374151"></div>
+            <div class="label">Gray 700</div>
+            <div class="hex">#374151</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #1f2937"></div>
+            <div class="label">Gray 800</div>
+            <div class="hex">#1F2937</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #111827"></div>
+            <div class="label">Gray 900</div>
+            <div class="hex">#111827</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #020617"></div>
+            <div class="label">Gray 950</div>
+            <div class="hex">#020617</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="eyebrow">Warm neutrals — defined in tokens, not yet wired</p>
+        <p class="note">
+          Accent variants reserved for rare warm surfaces. Declared in
+          <code>tokens.json</code>, not wired into the app shell.
+        </p>
+        <div class="row">
+          <div class="swatch">
+            <div class="chip" style="background: #f6f5f5"></div>
+            <div class="label">50</div>
+            <div class="hex">#f6f5f5</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #eeebec"></div>
+            <div class="label">100</div>
+            <div class="hex">#eeebec</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #dbd6d7"></div>
+            <div class="label">200</div>
+            <div class="hex">#dbd6d7</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #c1b8ba"></div>
+            <div class="label">300</div>
+            <div class="hex">#c1b8ba</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #a29497"></div>
+            <div class="label">400</div>
+            <div class="hex">#a29497</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #857478"></div>
+            <div class="label">500</div>
+            <div class="hex">#857478</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #6a5c5f"></div>
+            <div class="label">600</div>
+            <div class="hex">#6a5c5f</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #4f4447"></div>
+            <div class="label">700</div>
+            <div class="hex">#4f4447</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #362f31"></div>
+            <div class="label">800</div>
+            <div class="hex">#362f31</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #201c1d"></div>
+            <div class="label">900</div>
+            <div class="hex">#201c1d</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

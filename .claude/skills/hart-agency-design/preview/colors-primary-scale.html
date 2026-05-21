@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 78px;
+      }
+      .swatch .chip {
+        height: 54px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 11px;
+        color: #111827;
+        margin-top: 6px;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .mono {
+        font-family: ui-monospace, Menlo, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="row">
+        <div class="swatch">
+          <div class="chip" style="background: #f8f3f4"></div>
+          <div class="label">50</div>
+          <div class="hex">#f8f3f4</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #f5e4e8"></div>
+          <div class="label">100</div>
+          <div class="hex">#f5e4e8</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #efc1cc"></div>
+          <div class="label">200</div>
+          <div class="hex">#efc1cc</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #ec8ca2"></div>
+          <div class="label">300</div>
+          <div class="hex">#ec8ca2</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #ec4a70"></div>
+          <div class="label">400</div>
+          <div class="hex">#ec4a70</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #7d152d"></div>
+          <div class="label">500</div>
+          <div class="hex">#7D152D</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #b61036"></div>
+          <div class="label">600</div>
+          <div class="hex">#b61036</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #850d29"></div>
+          <div class="label">700</div>
+          <div class="hex">#850d29</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #5a0b1d"></div>
+          <div class="label">800</div>
+          <div class="hex">#5a0b1d</div>
+        </div>
+        <div class="swatch">
+          <div class="chip" style="background: #340913"></div>
+          <div class="label">900</div>
+          <div class="hex">#340913</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

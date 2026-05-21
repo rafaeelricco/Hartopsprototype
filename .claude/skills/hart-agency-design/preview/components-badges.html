@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 22px;
+        padding: 0 10px;
+        border-radius: 11px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div
+        style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center"
+      >
+        <span class="badge" style="background: #7d152d; color: #fff"
+          >Default</span
+        >
+        <span class="badge" style="background: #f3f4f6; color: #111827"
+          >Secondary</span
+        >
+        <span class="badge" style="background: #ef4444; color: #fff"
+          >Destructive</span
+        >
+        <span
+          class="badge"
+          style="
+            background: #fff;
+            color: #111827;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+          "
+          >Outline</span
+        >
+        <span
+          class="badge"
+          style="background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0"
+          >Active</span
+        >
+        <span
+          class="badge"
+          style="background: #fef9c3; color: #ca8a04; border: 1px solid #fde68a"
+          >Trial</span
+        >
+      </div>
+    </div>
+  </body>
+</html>

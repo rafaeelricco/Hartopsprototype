@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 78px;
+      }
+      .swatch .chip {
+        height: 54px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 11px;
+        color: #111827;
+        margin-top: 6px;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .group + .group {
+        margin-top: 28px;
+      }
+      table.tokens {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 420px;
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+      }
+      table.tokens td {
+        padding: 5px 14px 5px 0;
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+      table.tokens tr + tr td {
+        border-top: 1px dashed rgba(125, 21, 45, 0.18);
+      }
+      .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        vertical-align: middle;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+      }
+      .slot {
+        color: #111827;
+      }
+      .slot-hex {
+        color: rgba(125, 21, 45, 0.75);
+        text-align: right;
+      }
+      .badges {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 4px;
+      }
+      .badge-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+      .badge {
+        padding: 4px 10px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .badge-hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="group">
+        <div class="row">
+          <div class="swatch">
+            <div class="chip" style="background: #22c55e"></div>
+            <div class="label">Success</div>
+            <div class="hex">#22C55E</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #f59e0b"></div>
+            <div class="label">Warning</div>
+            <div class="hex">#F59E0B</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #ef4444"></div>
+            <div class="label">Error</div>
+            <div class="hex">#EF4444</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #3b82f6"></div>
+            <div class="label">Info</div>
+            <div class="hex">#3B82F6</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #111827"></div>
+            <div class="label">Foreground</div>
+            <div class="hex">#111827</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #6b7280"></div>
+            <div class="label">Muted fg</div>
+            <div class="hex">#6B7280</div>
+          </div>
+          <div class="swatch">
+            <div class="chip" style="background: #7d152d"></div>
+            <div class="label">Ring</div>
+            <div class="hex">#7D152D</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <p class="eyebrow">Semantic slots · shadcn mapping</p>
+        <table class="tokens">
+          <tr>
+            <td><span class="dot" style="background: #f9fafb"></span></td>
+            <td class="slot">--background</td>
+            <td class="slot-hex">#F9FAFB</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #111827"></span></td>
+            <td class="slot">--foreground</td>
+            <td class="slot-hex">#111827</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #ffffff"></span></td>
+            <td class="slot">--card</td>
+            <td class="slot-hex">#FFFFFF</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #7d152d"></span></td>
+            <td class="slot">--primary</td>
+            <td class="slot-hex">#7D152D</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #ffffff"></span></td>
+            <td class="slot">--primary-foreground</td>
+            <td class="slot-hex">#FFFFFF</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #f3f4f6"></span></td>
+            <td class="slot">--secondary</td>
+            <td class="slot-hex">#F3F4F6</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #f3f4f6"></span></td>
+            <td class="slot">--muted</td>
+            <td class="slot-hex">#F3F4F6</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #e5e7eb"></span></td>
+            <td class="slot">--border</td>
+            <td class="slot-hex">#E5E7EB</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #7d152d"></span></td>
+            <td class="slot">--ring</td>
+            <td class="slot-hex">#7D152D</td>
+          </tr>
+          <tr>
+            <td><span class="dot" style="background: #dc2626"></span></td>
+            <td class="slot">--destructive</td>
+            <td class="slot-hex">#DC2626</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="group">
+        <p class="eyebrow">Status badges</p>
+        <div class="badges">
+          <div class="badge-stack">
+            <span
+              class="badge"
+              style="
+                background: #dcfce7;
+                color: #16a34a;
+                border: 1px solid #bbf7d0;
+              "
+              >Active</span
+            >
+            <span class="badge-hex">#DCFCE7 / #16A34A</span>
+          </div>
+          <div class="badge-stack">
+            <span
+              class="badge"
+              style="
+                background: #fef9c3;
+                color: #ca8a04;
+                border: 1px solid #fde68a;
+              "
+              >Trial</span
+            >
+            <span class="badge-hex">#FEF9C3 / #CA8A04</span>
+          </div>
+          <div class="badge-stack">
+            <span
+              class="badge"
+              style="
+                background: rgba(125, 21, 45, 0.08);
+                color: #7d152d;
+                border: 1px solid rgba(125, 21, 45, 0.18);
+              "
+              >Completed</span
+            >
+            <span class="badge-hex">burgundy 8% / #7D152D</span>
+          </div>
+          <div class="badge-stack">
+            <span
+              class="badge"
+              style="
+                background: #dbeafe;
+                color: #1d4ed8;
+                border: 1px solid #bfdbfe;
+              "
+              >Prospect</span
+            >
+            <span class="badge-hex">#DBEAFE / #1D4ED8</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

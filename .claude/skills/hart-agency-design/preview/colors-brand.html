@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 78px;
+      }
+      .swatch .chip {
+        height: 54px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 11px;
+        color: #111827;
+        margin-top: 6px;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .mono {
+        font-family: ui-monospace, Menlo, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="row">
+        <div class="swatch">
+          <div class="chip" style="background: #7d152d; height: 84px"></div>
+          <div class="label">Hart Burgundy</div>
+          <div class="hex">#7D152D</div>
+        </div>
+        <div style="flex: 1; min-width: 260px; padding-top: 4px">
+          <div
+            style="
+              font-size: 14px;
+              color: #111827;
+              font-weight: 500;
+              margin-bottom: 6px;
+            "
+          >
+            The single brand color.
+          </div>
+          <div
+            style="
+              font-size: 13px;
+              color: rgba(17, 24, 39, 0.58);
+              line-height: 1.55;
+            "
+          >
+            Used for primary buttons, active navigation, focus rings, chart
+            series 1, and small tinted chip backgrounds at
+            <span class="mono">/8</span> opacity. Never paired with a second
+            accent.
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

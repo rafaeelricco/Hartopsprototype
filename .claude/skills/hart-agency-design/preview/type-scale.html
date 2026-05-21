@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+      (() => {
+        const MESSAGE_TYPE = "hart-ds-iframe-height";
+        const measureHeight = (doc) =>
+          Math.ceil(doc.documentElement.getBoundingClientRect().height);
+        const postHeight = (height) => {
+          if (window.parent === window) return;
+          window.parent.postMessage({ type: MESSAGE_TYPE, height }, "*");
+        };
+        let scheduled = false;
+        const schedule = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            postHeight(measureHeight(document));
+          });
+        };
+        document.documentElement.style.overflow = "hidden";
+        if (document.readyState === "complete") schedule();
+        else window.addEventListener("load", schedule, { once: true });
+        document.fonts?.ready?.then(schedule);
+        new ResizeObserver(schedule).observe(document.documentElement);
+      })();
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: "Inter", sans-serif;
+      }
+      .card {
+        padding: 20px 24px;
+        box-sizing: border-box;
+        background: transparent;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .swatch {
+        width: 78px;
+      }
+      .swatch .chip {
+        height: 54px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+      .swatch .label {
+        font-size: 11px;
+        color: #111827;
+        margin-top: 6px;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+      .swatch .hex {
+        font-size: 10px;
+        color: rgba(125, 21, 45, 0.75);
+        font-family: ui-monospace, Menlo, monospace;
+        line-height: 1.4;
+      }
+      .eyebrow {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #7d152d;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      .mono {
+        font-family: ui-monospace, Menlo, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div
+        style="display: flex; flex-direction: column; gap: 4px; color: #111827"
+      >
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="font-size: 24px; font-weight: 500">2xl · 24</span
+          ><span
+            style="font-size: 12px; color: rgba(17, 24, 39, 0.58)"
+            class="mono"
+            >text-2xl — Page H1</span
+          >
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="font-size: 20px; font-weight: 500">xl · 20</span
+          ><span
+            style="font-size: 12px; color: rgba(17, 24, 39, 0.58)"
+            class="mono"
+            >text-xl — H2</span
+          >
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="font-size: 18px; font-weight: 500">lg · 18</span
+          ><span
+            style="font-size: 12px; color: rgba(17, 24, 39, 0.58)"
+            class="mono"
+            >text-lg — Dialog title</span
+          >
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="font-size: 16px; font-weight: 500">base · 16</span
+          ><span
+            style="font-size: 12px; color: rgba(17, 24, 39, 0.58)"
+            class="mono"
+            >text-base — Labels, H4</span
+          >
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="font-size: 14px">sm · 14</span
+          ><span
+            style="font-size: 12px; color: rgba(17, 24, 39, 0.58)"
+            class="mono"
+            >text-sm — Body default</span
+          >
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="font-size: 12px">xs · 12</span
+          ><span
+            style="font-size: 12px; color: rgba(17, 24, 39, 0.58)"
+            class="mono"
+            >text-xs — Caption, badge</span
+          >
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

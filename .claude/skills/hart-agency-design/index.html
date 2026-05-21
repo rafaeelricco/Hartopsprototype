@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hart Agency — Design System</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="./preview/tokens.css" />
+    <style>
+      /* ==========================================================================
+       Layout — one unified catalog page over /design/preview/*.html shards.
+       Nothing here authors tokens; all styling reads from preview/tokens.css.
+       ========================================================================== */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-background);
+        color: var(--color-foreground);
+      }
+      body {
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+
+      figure {
+        margin: 0;
+      }
+
+      /* ---------- Main stage ---------- */
+      main.stage {
+        min-width: 0;
+        padding: 48px 56px 96px;
+        max-width: 1120px;
+        margin: 0 auto;
+      }
+
+      header.doc-header {
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 28px;
+        margin-bottom: 40px;
+      }
+      header.doc-header .kicker {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-primary);
+        margin: 0 0 10px 0;
+      }
+      header.doc-header h1 {
+        font-size: 32px;
+        font-weight: var(--font-weight-semibold);
+        letter-spacing: -0.01em;
+        margin: 0 0 10px 0;
+      }
+      header.doc-header .lede {
+        font-size: 15px;
+        color: var(--color-muted-foreground);
+        line-height: 1.6;
+        max-width: 640px;
+        margin: 0;
+      }
+
+      section.group {
+        margin: 0 0 56px 0;
+        scroll-margin-top: 32px;
+      }
+      section.group > h2.group-title {
+        font-size: 22px;
+        font-weight: var(--font-weight-semibold);
+        margin: 0 0 6px 0;
+        letter-spacing: -0.01em;
+      }
+      section.group > p.group-note {
+        font-size: 14px;
+        color: var(--color-muted-foreground);
+        line-height: 1.55;
+        margin: 0 0 24px 0;
+        max-width: 620px;
+      }
+
+      .card-wrap {
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        background: var(--color-card);
+        margin-bottom: 20px;
+        overflow: hidden;
+        scroll-margin-top: 32px;
+      }
+      .card-wrap > figcaption {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--color-border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--color-card);
+      }
+      .card-wrap > figcaption .title {
+        font-size: 14px;
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-foreground);
+      }
+      .card-wrap > figcaption .slug {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--color-muted-foreground);
+        margin-left: auto;
+      }
+      .card-wrap iframe {
+        display: block;
+        width: 100%;
+        border: 0;
+        background: var(--color-card);
+      }
+
+      /* Mobile reference block */
+      .mobile-block {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .mobile-block figure {
+        margin: 0;
+        border: 1px solid var(--color-border);
+        border-radius: 16px;
+        padding: 14px;
+        background: var(--color-card);
+      }
+      .mobile-block figure img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        display: block;
+        background: var(--color-muted);
+      }
+      .mobile-block figure figcaption {
+        font-size: 12px;
+        color: var(--color-muted-foreground);
+        margin-top: 10px;
+        text-align: center;
+        font-weight: var(--font-weight-medium);
+      }
+      .mobile-block .img-placeholder {
+        width: 100%;
+        aspect-ratio: 390 / 844;
+        border-radius: 10px;
+        background: var(--color-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--color-muted-foreground);
+        padding: 12px;
+        text-align: center;
+        line-height: 1.4;
+      }
+      p.spec-link {
+        font-size: 14px;
+        color: var(--color-foreground);
+        line-height: 1.6;
+      }
+      p.spec-link a {
+        color: var(--color-primary);
+        font-weight: var(--font-weight-medium);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      @media (max-width: 960px) {
+        main.stage {
+          padding: 32px 20px 64px;
+        }
+        .mobile-block {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <header class="doc-header">
+        <p class="kicker">Hart Agency · Design System</p>
+        <h1>Hart Agency Visual Language</h1>
+        <p class="lede">
+          Every token, pattern, and component we ship across Hart Ops and
+          Educator Mobile, on one scrollable page.
+        </p>
+      </header>
+
+      <!-- ===== Brand ===== -->
+      <section class="group" id="brand">
+        <h2 class="group-title">Brand</h2>
+        <p class="group-note">
+          Positioning, logo lockup, and the iconography contract. One brand
+          color, Lucide icons only.
+        </p>
+
+        <figure class="card-wrap" id="brand-principles">
+          <figcaption>
+            <span class="title">Principles</span
+            ><span class="slug">preview/brand-principles.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/brand-principles.html"
+            title="Brand principles"
+            height="220"
+            loading="eager"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="brand-logo">
+          <figcaption>
+            <span class="title">Logo</span>
+            <span class="slug">preview/brand-logo.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/brand-logo.html"
+            title="Logo lockup"
+            height="180"
+            loading="eager"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="brand-iconography">
+          <figcaption>
+            <span class="title">Iconography</span
+            ><span class="slug">preview/brand-iconography.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/brand-iconography.html"
+            title="Iconography contract"
+            height="220"
+            loading="lazy"
+          ></iframe>
+        </figure>
+      </section>
+
+      <!-- ===== Color ===== -->
+      <section class="group" id="colors">
+        <h2 class="group-title">Color</h2>
+        <p class="group-note">
+          One brand burgundy paired with the Tailwind Gray ramp. Four semantic
+          roles plus soft tinted badges.
+        </p>
+
+        <figure class="card-wrap" id="colors-base">
+          <figcaption>
+            <span class="title">Base</span
+            ><span class="slug">preview/colors-base.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/colors-base.html"
+            title="Base colors"
+            height="240"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="colors-brand">
+          <figcaption>
+            <span class="title">Brand color</span
+            ><span class="slug">preview/colors-brand.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/colors-brand.html"
+            title="Brand color"
+            height="190"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="colors-primary-scale">
+          <figcaption>
+            <span class="title">Burgundy scale — 50 → 900</span
+            ><span class="slug">preview/colors-primary-scale.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/colors-primary-scale.html"
+            title="Burgundy scale"
+            height="160"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="colors-neutrals">
+          <figcaption>
+            <span class="title">Neutrals (Gray + warm accent)</span
+            ><span class="slug">preview/colors-neutrals.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/colors-neutrals.html"
+            title="Neutrals"
+            height="380"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="colors-semantic">
+          <figcaption>
+            <span class="title">Semantic (palette · slots · badges)</span
+            ><span class="slug">preview/colors-semantic.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/colors-semantic.html"
+            title="Semantic colors"
+            height="640"
+            loading="lazy"
+          ></iframe>
+        </figure>
+      </section>
+
+      <!-- ===== Typography ===== -->
+      <section class="group" id="typography">
+        <h2 class="group-title">Typography</h2>
+        <p class="group-note">
+          Inter only. 400 body, 500 UI chrome, 600 titles &amp; metrics.
+          Six-step scale from 12 to 24.
+        </p>
+
+        <figure class="card-wrap" id="type-family">
+          <figcaption>
+            <span class="title">Family</span
+            ><span class="slug">preview/type-family.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/type-family.html"
+            title="Typeface"
+            height="230"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="type-scale">
+          <figcaption>
+            <span class="title">Scale</span
+            ><span class="slug">preview/type-scale.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/type-scale.html"
+            title="Type scale"
+            height="260"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="type-recipes">
+          <figcaption>
+            <span class="title">Recipes</span
+            ><span class="slug">preview/type-recipes.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/type-recipes.html"
+            title="Type recipes"
+            height="220"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="type-overline">
+          <figcaption>
+            <span class="title">Overline &amp; labels</span
+            ><span class="slug">preview/type-overline.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/type-overline.html"
+            title="Overlines and labels"
+            height="220"
+            loading="lazy"
+          ></iframe>
+        </figure>
+      </section>
+
+      <!-- ===== Layout ===== -->
+      <section class="group" id="layout">
+        <h2 class="group-title">Layout</h2>
+        <p class="group-note">
+          4px spacing base, the 8/10/12/16 radius scale, and elevation — flat by
+          default; shadows only on overlays.
+        </p>
+
+        <figure class="card-wrap" id="spacing-scale">
+          <figcaption>
+            <span class="title">Spacing — 4px base</span
+            ><span class="slug">preview/spacing-scale.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/spacing-scale.html"
+            title="Spacing scale"
+            height="150"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="radius">
+          <figcaption>
+            <span class="title">Corner radius</span
+            ><span class="slug">preview/radius.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/radius.html"
+            title="Corner radius scale"
+            height="180"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="elevation">
+          <figcaption>
+            <span class="title">Elevation</span
+            ><span class="slug">preview/elevation.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/elevation.html"
+            title="Elevation samples"
+            height="160"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="motion">
+          <figcaption>
+            <span class="title">Motion — durations &amp; easing</span
+            ><span class="slug">preview/motion.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/motion.html"
+            title="Motion"
+            height="440"
+            loading="lazy"
+          ></iframe>
+        </figure>
+      </section>
+
+      <!-- ===== Components ===== -->
+      <section class="group" id="components">
+        <h2 class="group-title">Components</h2>
+        <p class="group-note">
+          Buttons, inputs, cards, badges, and the shadcn-parallel sidebar nav —
+          all Elevation-0 with the 1-pixel rule.
+        </p>
+
+        <figure class="card-wrap" id="components-buttons">
+          <figcaption>
+            <span class="title">Buttons (variants &amp; sizes)</span
+            ><span class="slug">preview/components-buttons.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/components-buttons.html"
+            title="Buttons"
+            height="260"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="components-states">
+          <figcaption>
+            <span class="title">Interaction states</span
+            ><span class="slug">preview/components-states.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/components-states.html"
+            title="Interaction states"
+            height="180"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="components-inputs">
+          <figcaption>
+            <span class="title">Input &amp; Label</span
+            ><span class="slug">preview/components-inputs.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/components-inputs.html"
+            title="Input + label"
+            height="180"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="components-card">
+          <figcaption>
+            <span class="title">Card (stat)</span
+            ><span class="slug">preview/components-card.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/components-card.html"
+            title="Stat card"
+            height="200"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="components-badges">
+          <figcaption>
+            <span class="title">Badges</span
+            ><span class="slug">preview/components-badges.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/components-badges.html"
+            title="Badges"
+            height="120"
+            loading="lazy"
+          ></iframe>
+        </figure>
+
+        <figure class="card-wrap" id="components-nav">
+          <figcaption>
+            <span class="title">Sidebar nav — Hart Ops shell</span
+            ><span class="slug">preview/components-nav.html</span>
+          </figcaption>
+          <iframe
+            src="./preview/components-nav.html"
+            title="Sidebar nav"
+            height="1500"
+            loading="lazy"
+          ></iframe>
+        </figure>
+      </section>
+
+      <!-- ===== Educator Mobile ===== -->
+      <section class="group" id="educator-mobile">
+        <h2 class="group-title">Educator Mobile patterns</h2>
+        <p class="group-note">
+          Field-facing PWA companion to Hart Ops. Same tokens, different frame
+          and motion vocabulary. The mobile surface isn't yet wired into
+          <code>/app/frontend/</code> — treat the spec as canonical.
+        </p>
+
+        <div class="mobile-block">
+          <figure>
+            <img
+              src="./assets/educator-mobile-home.png"
+              alt="Home screen — today, stats, upcoming"
+              onerror="
+                this.replaceWith(
+                  Object.assign(document.createElement('div'), {
+                    className: 'img-placeholder',
+                    textContent: 'educator-mobile-home.png · pending capture',
+                  }),
+                )
+              "
+            />
+            <figcaption>Home — today, stats, upcoming</figcaption>
+          </figure>
+          <figure>
+            <img
+              src="./assets/educator-mobile-checkin.png"
+              alt="Check-in screen — viewfinder with manual entry"
+              onerror="
+                this.replaceWith(
+                  Object.assign(document.createElement('div'), {
+                    className: 'img-placeholder',
+                    textContent:
+                      'educator-mobile-checkin.png · pending capture',
+                  }),
+                )
+              "
+            />
+            <figcaption>Check-in — viewfinder + manual entry</figcaption>
+          </figure>
+          <figure>
+            <img
+              src="./assets/educator-mobile-success.png"
+              alt="Success screen — post-checkin confirmation"
+              onerror="
+                this.replaceWith(
+                  Object.assign(document.createElement('div'), {
+                    className: 'img-placeholder',
+                    textContent:
+                      'educator-mobile-success.png · pending capture',
+                  }),
+                )
+              "
+            />
+            <figcaption>Success — post-check-in confirmation</figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <script type="module">
+      /**
+       * Listens for height messages posted by the inline autosizer in each
+       * /design/preview/*.html shard and writes the reported height to
+       * iframe.style.height.
+       *
+       * postMessage (rather than contentDocument reach-in) so this works
+       * under both http:// and file:// — Chromium blocks cross-document
+       * access between local files, but postMessage stays open.
+       */
+
+      /** @typedef {HTMLIFrameElement} Frame */
+
+      const MESSAGE_TYPE = "hart-ds-iframe-height";
+
+      /** @type {(prev: number, next: number) => boolean} */
+      const isSignificantChange = (prev, next) => Math.abs(next - prev) >= 1;
+
+      /** @type {WeakMap<Frame, number>} */
+      const lastHeight = new WeakMap();
+
+      const frames = /** @type {Frame[]} */ ([
+        ...document.querySelectorAll(".card-wrap iframe, .mobile-block iframe"),
+      ]);
+
+      /** @type {(source: MessageEventSource | null) => Frame | undefined} */
+      const findFrame = (source) =>
+        source
+          ? frames.find((frame) => frame.contentWindow === source)
+          : undefined;
+
+      /** @type {(frame: Frame, height: number) => void} */
+      const applyHeight = (frame, height) => {
+        const prev = lastHeight.get(frame) ?? 0;
+        if (!isSignificantChange(prev, height)) return;
+        lastHeight.set(frame, height);
+        frame.style.height = `${height}px`;
+      };
+
+      window.addEventListener("message", (event) => {
+        const data = /** @type {{ type?: unknown, height?: unknown }} */ (
+          event.data
+        );
+        if (
+          !data ||
+          data.type !== MESSAGE_TYPE ||
+          typeof data.height !== "number"
+        )
+          return;
+        const frame = findFrame(event.source);
+        if (frame) applyHeight(frame, data.height);
+      });
+    </script>
+  </body>
+</html>
