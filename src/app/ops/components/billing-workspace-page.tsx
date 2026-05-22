@@ -237,6 +237,7 @@ export function BillingWorkspacePage() {
     billedTo: string;
     billingEntity: BillingEntity;
     distributor: string;
+    invoiceNumber: string;
     total: number;
     activityIds: string[];
   } | null>(null);
@@ -330,7 +331,18 @@ export function BillingWorkspacePage() {
   }
 
   function handleVerifyLicence(activityId: string) {
-    updateBillingActivity(activityId, { licenceVerified: true });
+    updateBillingActivity(activityId, {
+      licenceVerified: true,
+      status: "ready-to-bill",
+    });
+    const idx = MOCK_BILLING_ACTIVITIES.findIndex((a) => a.id === activityId);
+    if (idx >= 0) {
+      delete (
+        MOCK_BILLING_ACTIVITIES[idx] as {
+          missingReason?: string;
+        }
+      ).missingReason;
+    }
     refreshActivities();
     setResolveSlaFor(null);
     toast.success("Liquor licence verified");
@@ -410,6 +422,7 @@ export function BillingWorkspacePage() {
       billedTo: group.billedTo,
       billingEntity: group.billingEntity,
       distributor: group.distributor,
+      invoiceNumber: nextInvoiceNumber(),
       total,
       activityIds: group.activities.map((a) => a.id),
     });
@@ -454,9 +467,7 @@ export function BillingWorkspacePage() {
   // ----------------------- KPIs -------------------------------------------
 
   const kpiAwaiting = filtered.filter((a) => a.status === "missing").length;
-  const kpiNotInQb = filtered.filter(
-    (a) => a.status === "approved" || a.status === "ready-to-bill",
-  ).length;
+  const kpiNotInQb = filtered.filter((a) => a.status === "approved").length;
   const cycleInvoices = invoices.filter(
     (i) => i.cycleId === CURRENT_BILLING_CYCLE.id,
   );
@@ -474,9 +485,7 @@ export function BillingWorkspacePage() {
 
   // Invoice groups — grouped by Billed To + Billing Entity (entities never mix)
   const invoiceGroups = useMemo(() => {
-    const approved = filtered.filter(
-      (a) => a.status === "approved" || a.status === "ready-to-bill",
-    );
+    const approved = filtered.filter((a) => a.status === "approved");
     const map = new Map<
       string,
       {
@@ -860,7 +869,7 @@ export function BillingWorkspacePage() {
                           className="mt-0.5"
                           style={{ fontSize: "0.75rem", color: "#94A3B8" }}
                         >
-                          Auto-number: <strong>{nextInvoiceNumber()}</strong>
+                          Auto-number: <strong>assigned on export</strong>
                         </div>
                       </div>
                     </div>
@@ -1135,7 +1144,7 @@ export function BillingWorkspacePage() {
         <QbExportDialog
           open={true}
           onClose={() => setQbExportFor(null)}
-          invoiceNumberDefault={nextInvoiceNumber()}
+          invoiceNumberDefault={qbExportFor.invoiceNumber}
           billedTo={qbExportFor.billedTo}
           total={qbExportFor.total}
           onConfirm={handleQbConfirm}

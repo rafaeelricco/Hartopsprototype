@@ -72,6 +72,8 @@ type WizardData = {
   sampleConfigs: SampleConfig[];
 };
 
+type WizardErrorKey = keyof WizardData | "objectives" | "billing";
+
 const INITIAL_DATA: WizardData = {
   campaignId: "",
   name: "",
@@ -151,7 +153,7 @@ export function CreateEventPage() {
   );
   const [billing, setBilling] = useState<BillingStepData>(INITIAL_BILLING);
   const [errors, setErrors] = useState<
-    Partial<Record<keyof WizardData | "objectives", string>>
+    Partial<Record<WizardErrorKey, string>>
   >({});
   const [showEducator, setShowEducator] = useState(false);
   const [campaignSearch, setCampaignSearch] = useState("");
@@ -191,7 +193,7 @@ export function CreateEventPage() {
   }
 
   function validateStep2(): boolean {
-    const errs: Partial<Record<keyof WizardData | "objectives", string>> = {};
+    const errs: Partial<Record<WizardErrorKey, string>> = {};
     if (!data.name.trim()) errs.name = "Event name is required.";
     if (!data.location.trim()) errs.location = "Location is required.";
     if (!data.date) errs.date = "Date is required.";
@@ -213,17 +215,17 @@ export function CreateEventPage() {
   function validateStep4(): boolean {
     // Billing step — soft validation. Each BA in the roster needs an educator
     // pick; overrides need a reason.
-    const errs: Partial<Record<keyof WizardData | "objectives", string>> = {};
+    const errs: Partial<Record<WizardErrorKey, string>> = {};
     if (billing.activityType === "event") {
       const missingBa = billing.bas.some((b) => !b.educatorId);
       if (missingBa) {
-        errs.location = "Pick an educator for every BA row, or remove the row.";
+        errs.billing = "Pick an educator for every BA row, or remove the row.";
       }
       const missingReason = billing.bas.some(
         (b) => b.overrideRate > 0 && !b.overrideReason,
       );
       if (missingReason) {
-        errs.location = "Pick a reason for every rate override.";
+        errs.billing = "Pick a reason for every rate override.";
       }
     }
     setErrors(errs);
@@ -487,12 +489,27 @@ export function CreateEventPage() {
           </div>
         )}
         {step === 4 && (
-          <StepBilling
-            accountId={data.accountId}
-            venueType={data.venueType}
-            billing={billing}
-            onChange={setBilling}
-          />
+          <div className="space-y-4">
+            {errors.billing && (
+              <p
+                className="rounded-lg border px-3 py-2"
+                style={{
+                  borderColor: "#FECACA",
+                  background: "#FEF2F2",
+                  fontSize: "0.8125rem",
+                  color: "#B91C1C",
+                }}
+              >
+                {errors.billing}
+              </p>
+            )}
+            <StepBilling
+              accountId={data.accountId}
+              venueType={data.venueType}
+              billing={billing}
+              onChange={setBilling}
+            />
+          </div>
         )}
         {step === 5 && (
           <StepProductsSamples
@@ -752,7 +769,7 @@ function StepBasics({
   onLocationSelect,
 }: {
   data: WizardData;
-  errors: Partial<Record<keyof WizardData | "objectives", string>>;
+  errors: Partial<Record<WizardErrorKey, string>>;
   updateField: (field: keyof WizardData, value: string) => void;
   onLocationSelect: (location: string, accountId: string) => void;
 }) {

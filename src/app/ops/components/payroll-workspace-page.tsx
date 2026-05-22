@@ -166,8 +166,16 @@ export function PayrollWorkspacePage() {
     setItems([...MOCK_PAYROLL_LINE_ITEMS]);
   }
 
+  const cycleItems = useMemo(() => {
+    return items.filter(
+      (p) =>
+        p.date >= CURRENT_PAYROLL_CYCLE.windowStart &&
+        p.date <= CURRENT_PAYROLL_CYCLE.windowEnd,
+    );
+  }, [items]);
+
   const filtered = useMemo(() => {
-    return items.filter((p) => {
+    return cycleItems.filter((p) => {
       if (
         filters.billingEntity !== "all" &&
         p.billingEntity !== filters.billingEntity
@@ -177,7 +185,7 @@ export function PayrollWorkspacePage() {
       if (p.date < filters.cycleStart || p.date > filters.cycleEnd) return false;
       return true;
     });
-  }, [items, filters]);
+  }, [cycleItems, filters]);
 
   const managers = useMemo(
     () => Array.from(new Set(items.map((p) => p.manager))),
@@ -186,19 +194,29 @@ export function PayrollWorkspacePage() {
 
   // ----------------------- KPIs -------------------------------------------
 
-  const awaiting = filtered.filter(
-    (p) => p.status === "missing" || p.status === "pending-manager",
+  const awaiting = cycleItems.filter(
+    (p) =>
+      p.status === "missing" ||
+      p.status === "pending-manager" ||
+      p.status === "override-pending",
   );
-  const totalPayEstimated = filtered.reduce((s, p) => s + p.finalPay, 0);
+  const exportableItems = cycleItems.filter((p) => p.status === "approved");
+  const totalPayEstimated = exportableItems.reduce((s, p) => s + p.finalPay, 0);
   const overrideCount = filtered.filter((p) => !!p.override).length;
 
   // Cycle progress
-  const approvedCount = filtered.filter((p) => p.status === "approved").length;
+  const approvedCount = exportableItems.length;
+  const resolvedCount = cycleItems.filter(
+    (p) => p.status === "approved" || p.status === "rejected",
+  ).length;
   const cycleProgressPct =
-    filtered.length === 0
+    cycleItems.length === 0
       ? 0
-      : Math.round((approvedCount / filtered.length) * 100);
-  const canExport = awaiting.length === 0 && cycleStatus !== "exported";
+      : Math.round((resolvedCount / cycleItems.length) * 100);
+  const canExport =
+    exportableItems.length > 0 &&
+    awaiting.length === 0 &&
+    cycleStatus !== "exported";
 
   // ----------------------- Handlers ---------------------------------------
 
@@ -491,7 +509,7 @@ export function PayrollWorkspacePage() {
                   />
                 </div>
                 <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                  {approvedCount} of {filtered.length} approved.{" "}
+                  {resolvedCount} of {cycleItems.length} resolved.{" "}
                   {cycleStatus === "exported" && (
                     <span style={{ color: "#0F766E" }}>
                       Cycle locked & handed off to Kayla.
@@ -641,7 +659,7 @@ export function PayrollWorkspacePage() {
                     note={`${overrideCount} present`}
                   />
                   <ChecklistItem
-                    done={filtered.every((p) => p.standardRate > 0)}
+                    done={cycleItems.every((p) => p.standardRate > 0)}
                     label="Every educator has a rate on file"
                   />
                 </ul>
@@ -669,7 +687,7 @@ export function PayrollWorkspacePage() {
                       className="mt-0.5"
                       style={{ fontSize: "0.75rem", color: "#94A3B8" }}
                     >
-                      {filtered.length} line items · territory{" "}
+                      {exportableItems.length} approved line items · territory{" "}
                       {CURRENT_PAYROLL_CYCLE.territory}
                     </div>
                   </div>
@@ -814,7 +832,7 @@ export function PayrollWorkspacePage() {
             </DialogHeader>
             <div className="space-y-2">
               <Row label="Total pay" value={fmt(totalPayEstimated)} bold />
-              <Row label="Line items" value={String(filtered.length)} />
+              <Row label="Line items" value={String(exportableItems.length)} />
               <Row
                 label="Approved"
                 value={String(approvedCount)}
@@ -825,7 +843,9 @@ export function PayrollWorkspacePage() {
                 value=""
               />
               {BILLING_ENTITIES.map((e) => {
-                const subset = filtered.filter((p) => p.billingEntity === e);
+                const subset = exportableItems.filter(
+                  (p) => p.billingEntity === e,
+                );
                 if (subset.length === 0) return null;
                 const subtotal = subset.reduce((s, p) => s + p.finalPay, 0);
                 return (

@@ -7,7 +7,7 @@
 // fields differ to prove the activity-as-billable generalisation.
 // =============================================================================
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   DollarSign,
   Building2,
@@ -115,9 +115,18 @@ export function StepBilling({
   );
 
   const feeKind: ServiceFeeKind =
-    billing.activityType === "survey" ? "mixer" : venueTypeToFeeKind(venueType);
+    billing.activityType === "survey"
+      ? "mixer"
+      : (account?.serviceFeeKind ?? venueTypeToFeeKind(venueType));
   const feeRate = SERVICE_FEE_BY_KIND[feeKind];
   const accountEntity = account?.billingEntity ?? "Hart Agency";
+
+  useEffect(() => {
+    if (billing.billingEntityOverridden || billing.billingEntity === accountEntity) {
+      return;
+    }
+    onChange({ ...billing, billingEntity: accountEntity });
+  }, [accountEntity, billing, onChange]);
 
   const slaEligible =
     !!account &&
@@ -313,8 +322,11 @@ export function StepBilling({
           value={billing.billingEntity}
           onValueChange={(v) => {
             const value = v as BillingEntity;
-            patch("billingEntity", value);
-            patch("billingEntityOverridden", value !== accountEntity);
+            onChange({
+              ...billing,
+              billingEntity: value,
+              billingEntityOverridden: value !== accountEntity,
+            });
           }}
         >
           <SelectTrigger id="billing-entity">
