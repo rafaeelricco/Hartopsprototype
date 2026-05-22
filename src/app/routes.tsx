@@ -22,6 +22,8 @@ import { DraftEventsPage } from "./ops/components/draft-events-page";
 import { AvailabilityCalendarPage } from "./ops/components/availability-calendar-page";
 import { HelpPage } from "./ops/components/help-page";
 import { CapabilityMatrixPage } from "./ops/components/capability-matrix-page";
+import { BillingWorkspacePage } from "./ops/components/billing-workspace-page";
+import { PayrollWorkspacePage } from "./ops/components/payroll-workspace-page";
 import { TermsOfServicePage } from "./ops/components/terms-of-service";
 import { PrivacyPolicyPage } from "./ops/components/privacy-policy";
 import { NotFound } from "./ops/components/not-found";
@@ -75,6 +77,8 @@ export const router = createBrowserRouter([
       },
       { path: "events", Component: OpsEventsPage },
       { path: "events/:eventId", Component: OpsEventDetailPage },
+      { path: "billing", Component: BillingWorkspacePage },
+      { path: "payroll", Component: PayrollWorkspacePage },
       { path: "reports", Component: OpsReportsPage },
       { path: "settings", Component: OpsSettingsPage },
       { path: "accounts", Component: AccountsPage },

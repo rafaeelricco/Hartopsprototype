@@ -14,6 +14,7 @@ import {
   Gauge,
 } from "lucide-react";
 import { MOCK_EDUCATORS } from "./educator-data";
+import { CompensationPanel } from "../../educator/components/compensation-panel";
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -405,6 +406,22 @@ export function EducatorDetailPage() {
           />
         )}
       </div>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Compensation Panel (R2 — mm-ui-008)                               */}
+      {/* ---------------------------------------------------------------- */}
+      <CompensationPanel
+        educatorId={educator.id}
+        educatorName={educator.name}
+        initialStandardRate={educator.standardRate ?? 0}
+        initialEffectiveDate={
+          educator.standardRateEffectiveDate ??
+          new Date().toISOString().split("T")[0]!
+        }
+        initialRateHistory={educator.rateHistory ?? []}
+        recentOverrides={educator.recentOverrides ?? []}
+        upcomingEventsCount={0}
+      />
 
       {/* ---------------------------------------------------------------- */}
       {/* Performance Scorecard                                             */}

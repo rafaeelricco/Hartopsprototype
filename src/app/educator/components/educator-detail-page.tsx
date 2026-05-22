@@ -44,6 +44,7 @@ import {
   formatTrendDelta,
   getScoreLevel,
 } from "./educator-scoring";
+import { CompensationPanel } from "./compensation-panel";
 
 const statusStyles: Record<string, { bg: string; text: string }> = {
   Active: { bg: "#ECFDF5", text: "#0F766E" },
@@ -393,6 +394,19 @@ export function EducatorDetailPage() {
             />
           )}
         </div>
+
+        {/* ---------------------------------------------------------------- */}
+        {/* Compensation Panel (R2 — mm-ui-008)                               */}
+        {/* ---------------------------------------------------------------- */}
+        <CompensationPanel
+          educatorId={educator.id}
+          educatorName={educator.name}
+          initialStandardRate={educator.standardRate}
+          initialEffectiveDate={educator.standardRateEffectiveDate}
+          initialRateHistory={educator.rateHistory}
+          recentOverrides={educator.recentOverrides}
+          upcomingEventsCount={educator.upcomingEvents.length}
+        />
 
         {/* ---------------------------------------------------------------- */}
         {/* Performance Scorecard                                             */}

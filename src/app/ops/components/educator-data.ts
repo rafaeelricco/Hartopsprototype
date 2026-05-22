@@ -2,6 +2,10 @@ import type { Educator } from "../../shared/data/shared-types";
 
 /* ------------------------------------------------------------------ */
 /* Mock educator data — follows account-data.ts pattern                */
+/* R2: a subset of educators carry seeded comp data (standardRate,     */
+/* rateHistory, recentOverrides) so the Compensation Panel renders.    */
+/* EDU-001 (Maria Santos) is the rich demo, mirroring Ana Martinez on  */
+/* the Educator Manager side.                                          */
 /* ------------------------------------------------------------------ */
 
 export const MOCK_EDUCATORS: Educator[] = [
@@ -16,6 +20,56 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 47,
     specialties: ["Spirits", "Wine", "Cocktail Mixing"],
     lastEventDate: "2026-03-14",
+    standardRate: 42,
+    standardRateEffectiveDate: "2026-02-01",
+    rateHistory: [
+      {
+        id: "rh-edu-001-3",
+        rate: 45,
+        effectiveDate: "2026-06-15",
+        setBy: "Hart Ops — Finance",
+        note: "Q3 uplift across the Metro NY top-quartile.",
+      },
+      {
+        id: "rh-edu-001-2",
+        rate: 42,
+        effectiveDate: "2026-02-01",
+        setBy: "Manager — Metro Region",
+        note: "Performance-based increase after Q4 review.",
+      },
+      {
+        id: "rh-edu-001-1",
+        rate: 38,
+        effectiveDate: "2025-06-01",
+        setBy: "Manager — Metro Region",
+      },
+    ],
+    recentOverrides: [
+      {
+        activityId: "evt-ops-201",
+        activityName: "Diageo VIP Tasting — Le Bernardin",
+        date: "2026-03-04",
+        standardRate: 42,
+        overrideRate: 55,
+        reason: "Special Skill",
+      },
+      {
+        activityId: "evt-ops-208",
+        activityName: "Absolut Elyx Activation — Moxy Rooftop",
+        date: "2026-03-11",
+        standardRate: 42,
+        overrideRate: 52,
+        reason: "Extended Event",
+      },
+      {
+        activityId: "evt-ops-214",
+        activityName: "Avion Tequila Launch — Times Square",
+        date: "2026-03-14",
+        standardRate: 42,
+        overrideRate: 50,
+        reason: "Travel",
+      },
+    ],
   },
   {
     id: "EDU-002",
@@ -28,6 +82,17 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 32,
     specialties: ["Beer", "Craft Spirits"],
     lastEventDate: "2026-03-12",
+    standardRate: 38,
+    standardRateEffectiveDate: "2025-08-20",
+    rateHistory: [
+      {
+        id: "rh-edu-002-1",
+        rate: 38,
+        effectiveDate: "2025-08-20",
+        setBy: "Manager — Outer Boroughs",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-003",
@@ -40,6 +105,33 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 38,
     specialties: ["Wine", "Spirits", "Brand Education"],
     lastEventDate: "2026-03-15",
+    standardRate: 40,
+    standardRateEffectiveDate: "2025-10-01",
+    rateHistory: [
+      {
+        id: "rh-edu-003-2",
+        rate: 40,
+        effectiveDate: "2025-10-01",
+        setBy: "Manager — North Jersey",
+        note: "Promotion to senior educator tier.",
+      },
+      {
+        id: "rh-edu-003-1",
+        rate: 36,
+        effectiveDate: "2025-04-15",
+        setBy: "Manager — North Jersey",
+      },
+    ],
+    recentOverrides: [
+      {
+        activityId: "evt-ops-220",
+        activityName: "Glenlivet Brand Education — Newport",
+        date: "2026-03-15",
+        standardRate: 40,
+        overrideRate: 48,
+        reason: "Special Skill",
+      },
+    ],
   },
   {
     id: "EDU-004",
@@ -52,6 +144,10 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 0,
     specialties: ["Beer", "Wine"],
     lastEventDate: null,
+    standardRate: 0,
+    standardRateEffectiveDate: "2026-03-15",
+    rateHistory: [],
+    recentOverrides: [],
   },
   {
     id: "EDU-005",
@@ -64,6 +160,18 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 61,
     specialties: ["Tequila", "Spirits", "Cocktail Mixing"],
     lastEventDate: "2026-03-16",
+    standardRate: 45,
+    standardRateEffectiveDate: "2025-09-01",
+    rateHistory: [
+      {
+        id: "rh-edu-005-1",
+        rate: 45,
+        effectiveDate: "2025-09-01",
+        setBy: "Manager — Florida",
+        note: "Premium tequila-specialist rate.",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-006",
@@ -76,6 +184,17 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 19,
     specialties: ["Beer", "Spirits"],
     lastEventDate: "2026-02-28",
+    standardRate: 35,
+    standardRateEffectiveDate: "2025-11-15",
+    rateHistory: [
+      {
+        id: "rh-edu-006-1",
+        rate: 35,
+        effectiveDate: "2025-11-15",
+        setBy: "Manager — Florida",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-007",
@@ -88,6 +207,17 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 28,
     specialties: ["Wine", "Brand Education"],
     lastEventDate: "2026-03-10",
+    standardRate: 40,
+    standardRateEffectiveDate: "2025-07-01",
+    rateHistory: [
+      {
+        id: "rh-edu-007-1",
+        rate: 40,
+        effectiveDate: "2025-07-01",
+        setBy: "Manager — Connecticut",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-008",
@@ -100,6 +230,17 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 12,
     specialties: ["Beer"],
     lastEventDate: "2025-11-22",
+    standardRate: 32,
+    standardRateEffectiveDate: "2025-06-01",
+    rateHistory: [
+      {
+        id: "rh-edu-008-1",
+        rate: 32,
+        effectiveDate: "2025-06-01",
+        setBy: "Manager — Connecticut",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-009",
@@ -112,6 +253,17 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 35,
     specialties: ["Spirits", "Cocktail Mixing", "Brand Education"],
     lastEventDate: "2026-03-13",
+    standardRate: 41,
+    standardRateEffectiveDate: "2025-12-01",
+    rateHistory: [
+      {
+        id: "rh-edu-009-1",
+        rate: 41,
+        effectiveDate: "2025-12-01",
+        setBy: "Manager — Metro Region",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-010",
@@ -124,6 +276,17 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 22,
     specialties: ["Beer", "Craft Spirits", "Wine"],
     lastEventDate: "2026-03-08",
+    standardRate: 36,
+    standardRateEffectiveDate: "2025-10-18",
+    rateHistory: [
+      {
+        id: "rh-edu-010-1",
+        rate: 36,
+        effectiveDate: "2025-10-18",
+        setBy: "Manager — North Jersey",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "EDU-011",
@@ -136,6 +299,10 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 0,
     specialties: ["Tequila", "Cocktail Mixing"],
     lastEventDate: null,
+    standardRate: 0,
+    standardRateEffectiveDate: "2026-03-01",
+    rateHistory: [],
+    recentOverrides: [],
   },
   {
     id: "EDU-012",
@@ -148,5 +315,16 @@ export const MOCK_EDUCATORS: Educator[] = [
     eventsCompleted: 26,
     specialties: ["Spirits", "Wine"],
     lastEventDate: "2026-03-11",
+    standardRate: 38,
+    standardRateEffectiveDate: "2025-11-01",
+    rateHistory: [
+      {
+        id: "rh-edu-012-1",
+        rate: 38,
+        effectiveDate: "2025-11-01",
+        setBy: "Manager — Outer Boroughs",
+      },
+    ],
+    recentOverrides: [],
   },
 ];

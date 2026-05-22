@@ -1,6 +1,11 @@
 // Educator Roster mock data — scoped to authenticated manager's assigned educators
 // Quick Stats: avg rating, sales per event, punctuality
 
+import type {
+  RateHistoryEntry,
+  RecentOverride,
+} from "../../shared/data/billing-types";
+
 export interface Educator {
   id: string;
   name: string;
@@ -64,6 +69,11 @@ export interface Educator {
     cancellationRating: number;
     qualityScore: number;
   };
+  // ─── R2 Compensation (mm-ui-008) ───
+  standardRate: number; // dollars per hour, current effective
+  standardRateEffectiveDate: string; // YYYY-MM-DD
+  rateHistory: RateHistoryEntry[];
+  recentOverrides: RecentOverride[];
 }
 
 // Generate availability for a 14-day window starting 2026-03-18
@@ -198,6 +208,57 @@ export const mockEducators: Educator[] = [
       cancellationRating: 0,
       qualityScore: 2.1,
     },
+    standardRate: 40,
+    standardRateEffectiveDate: "2026-01-01",
+    rateHistory: [
+      {
+        id: "rh-ana-3",
+        rate: 42,
+        effectiveDate: "2026-06-01",
+        setBy: "Manager — Metro Region",
+        note: "Annual review uplift; takes effect for events from 2026-06-01.",
+      },
+      {
+        id: "rh-ana-2",
+        rate: 40,
+        effectiveDate: "2026-01-01",
+        setBy: "Manager — Metro Region",
+        note: "Performance-based increase after 6 months.",
+      },
+      {
+        id: "rh-ana-1",
+        rate: 35,
+        effectiveDate: "2025-06-15",
+        setBy: "Manager — Metro Region",
+        note: "Starting rate at onboarding.",
+      },
+    ],
+    recentOverrides: [
+      {
+        activityId: "evt-101",
+        activityName: "Absolut Vodka Tasting",
+        date: "2026-03-21",
+        standardRate: 40,
+        overrideRate: 50,
+        reason: "Extended Event",
+      },
+      {
+        activityId: "evt-108",
+        activityName: "Malibu Summer Promo",
+        date: "2026-03-25",
+        standardRate: 40,
+        overrideRate: 45,
+        reason: "Travel",
+      },
+      {
+        activityId: "evt-112",
+        activityName: "Kahlua Coffee Cocktail Demo",
+        date: "2026-03-29",
+        standardRate: 40,
+        overrideRate: 55,
+        reason: "Special Skill",
+      },
+    ],
   },
   {
     id: "edu-2",
@@ -281,6 +342,17 @@ export const mockEducators: Educator[] = [
       cancellationRating: 0,
       qualityScore: 0.8,
     },
+    standardRate: 38,
+    standardRateEffectiveDate: "2025-12-01",
+    rateHistory: [
+      {
+        id: "rh-sarah-1",
+        rate: 38,
+        effectiveDate: "2025-12-01",
+        setBy: "Manager — North Jersey",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "edu-3",
@@ -357,6 +429,17 @@ export const mockEducators: Educator[] = [
       cancellationRating: -5,
       qualityScore: -2.4,
     },
+    standardRate: 35,
+    standardRateEffectiveDate: "2025-09-10",
+    rateHistory: [
+      {
+        id: "rh-james-1",
+        rate: 35,
+        effectiveDate: "2025-09-10",
+        setBy: "Manager — Outer Boroughs",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "edu-4",
@@ -456,6 +539,33 @@ export const mockEducators: Educator[] = [
       cancellationRating: 0,
       qualityScore: 1.5,
     },
+    standardRate: 45,
+    standardRateEffectiveDate: "2025-10-01",
+    rateHistory: [
+      {
+        id: "rh-david-2",
+        rate: 45,
+        effectiveDate: "2025-10-01",
+        setBy: "Manager — Metro Region",
+        note: "Top-performer rate.",
+      },
+      {
+        id: "rh-david-1",
+        rate: 40,
+        effectiveDate: "2025-04-01",
+        setBy: "Manager — Metro Region",
+      },
+    ],
+    recentOverrides: [
+      {
+        activityId: "evt-105",
+        activityName: "Avion Tequila Launch",
+        date: "2026-03-20",
+        standardRate: 45,
+        overrideRate: 55,
+        reason: "Special Skill",
+      },
+    ],
   },
   {
     id: "edu-5",
@@ -539,6 +649,17 @@ export const mockEducators: Educator[] = [
       cancellationRating: 5,
       qualityScore: 3.2,
     },
+    standardRate: 36,
+    standardRateEffectiveDate: "2025-11-05",
+    rateHistory: [
+      {
+        id: "rh-maria-1",
+        rate: 36,
+        effectiveDate: "2025-11-05",
+        setBy: "Manager — North Jersey",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "edu-6",
@@ -631,6 +752,17 @@ export const mockEducators: Educator[] = [
       cancellationRating: 0,
       qualityScore: 0.6,
     },
+    standardRate: 40,
+    standardRateEffectiveDate: "2025-05-22",
+    rateHistory: [
+      {
+        id: "rh-emily-1",
+        rate: 40,
+        effectiveDate: "2025-05-22",
+        setBy: "Manager — Outer Boroughs",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "edu-7",
@@ -695,6 +827,17 @@ export const mockEducators: Educator[] = [
       cancellationRating: -8,
       qualityScore: -3.8,
     },
+    standardRate: 32,
+    standardRateEffectiveDate: "2025-10-18",
+    rateHistory: [
+      {
+        id: "rh-carlos-1",
+        rate: 32,
+        effectiveDate: "2025-10-18",
+        setBy: "Manager — North Jersey",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "edu-8",
@@ -771,6 +914,17 @@ export const mockEducators: Educator[] = [
       cancellationRating: 3,
       qualityScore: 1.8,
     },
+    standardRate: 38,
+    standardRateEffectiveDate: "2025-12-02",
+    rateHistory: [
+      {
+        id: "rh-lisa-1",
+        rate: 38,
+        effectiveDate: "2025-12-02",
+        setBy: "Manager — Morris County",
+      },
+    ],
+    recentOverrides: [],
   },
   {
     id: "edu-9",
@@ -816,6 +970,10 @@ export const mockEducators: Educator[] = [
       cancellationRating: 0,
       qualityScore: 0,
     },
+    standardRate: 0,
+    standardRateEffectiveDate: "2026-03-15",
+    rateHistory: [],
+    recentOverrides: [],
   },
 ];
 

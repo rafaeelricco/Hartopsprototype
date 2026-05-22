@@ -3,6 +3,12 @@
 // Imported by both ops and staff platforms to ensure schema consistency
 // =============================================================================
 
+import type {
+  BillingEntity,
+  LiquorLicence,
+  ServiceFeeKind,
+} from "../app/shared/data/billing-types";
+
 export interface AccountProfile {
   venueSubType?: string; // e.g., "bar", "restaurant", "club", "liquor-store", "grocery"
   displayCount?: number; // Number of physical display units acting as secondary placement
@@ -39,6 +45,21 @@ export interface Account {
   // Distributor cross-references (Industry standard identifiers)
   // Mapping of distributorName -> local ID in distributor's system
   distributorAccountIds?: Record<string, string>;
+
+  // R2 — Billing & Payroll fields. Default Hart billing entity is derived from
+  // the account; the operator can override per row on Update Billing. Liquor
+  // licence + corporate billing address are read-only on the Client Staff
+  // billing step.
+  billingEntity?: BillingEntity;
+  serviceFeeKind?: ServiceFeeKind;
+  liquorLicence?: LiquorLicence;
+  billingAddress?: {
+    company: string;
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
 
   // Venue Characteristics / AI Profile Inputs
   profile: AccountProfile;

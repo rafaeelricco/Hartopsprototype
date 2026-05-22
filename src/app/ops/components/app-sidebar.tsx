@@ -11,6 +11,8 @@ import {
   Store,
   Users,
   CalendarCheck,
+  Receipt,
+  Wallet,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -74,6 +76,16 @@ const data = {
       title: "Events",
       url: "/ops/dashboard/events",
       icon: CalendarDays,
+    },
+    {
+      title: "Billing",
+      url: "/ops/dashboard/billing",
+      icon: Receipt,
+    },
+    {
+      title: "Payroll",
+      url: "/ops/dashboard/payroll",
+      icon: Wallet,
     },
     {
       title: "Settings",

@@ -1,8 +1,8 @@
 // =============================================================================
-// Full-Page Event Creation Wizard — 5-step flow
-// Step 1: Select Campaign → Step 2: Event Basics →
-// Step 3: Objectives + Projected Impact → Step 4: Products & Samples →
-// Step 5: Customization
+// Full-Page Event Creation Wizard — 6-step flow
+// Step 1: Select Campaign → Step 2: Event Basics → Step 3: Objectives →
+// Step 4: Billing (R2 — mm-ui-011) → Step 5: Products & Samples →
+// Step 6: Customization
 // Accessible from /staff/events/create
 // =============================================================================
 
@@ -29,6 +29,7 @@ import {
   Search,
   ArrowLeft,
   Package,
+  Receipt,
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
@@ -49,6 +50,11 @@ import { LocationCombobox } from "./location-combobox";
 import { INITIAL_REGIONS } from "./settings-data";
 import { getDocumentsForSku } from "./brand-assets-data";
 import { StepProductsSamples } from "./step-products-samples";
+import {
+  StepBilling,
+  INITIAL_BILLING,
+  type BillingStepData,
+} from "./step-billing";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -84,8 +90,9 @@ const STEPS = [
   { num: 1, label: "Campaign", icon: Target },
   { num: 2, label: "Event Basics", icon: FileText },
   { num: 3, label: "Objectives", icon: Target },
-  { num: 4, label: "Products & Samples", icon: Package },
-  { num: 5, label: "Customization", icon: Settings2 },
+  { num: 4, label: "Billing", icon: Receipt },
+  { num: 5, label: "Products & Samples", icon: Package },
+  { num: 6, label: "Customization", icon: Settings2 },
 ];
 
 // ── Main Component ───────────────────────────────────────────────────────────
@@ -142,6 +149,7 @@ export function CreateEventPage() {
   const [inheritedObjectiveCount, setInheritedObjectiveCount] = useState(
     () => preselectedCampaign?.objectives?.length ?? 0,
   );
+  const [billing, setBilling] = useState<BillingStepData>(INITIAL_BILLING);
   const [errors, setErrors] = useState<
     Partial<Record<keyof WizardData | "objectives", string>>
   >({});
@@ -202,13 +210,34 @@ export function CreateEventPage() {
     return true;
   }
 
+  function validateStep4(): boolean {
+    // Billing step — soft validation. Each BA in the roster needs an educator
+    // pick; overrides need a reason.
+    const errs: Partial<Record<keyof WizardData | "objectives", string>> = {};
+    if (billing.activityType === "event") {
+      const missingBa = billing.bas.some((b) => !b.educatorId);
+      if (missingBa) {
+        errs.location = "Pick an educator for every BA row, or remove the row.";
+      }
+      const missingReason = billing.bas.some(
+        (b) => b.overrideRate > 0 && !b.overrideReason,
+      );
+      if (missingReason) {
+        errs.location = "Pick a reason for every rate override.";
+      }
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
   function handleNext() {
     if (step === 1 && !validateStep1()) return;
     if (step === 2 && !validateStep2()) return;
     if (step === 3 && !validateStep3()) return;
-    // Step 4 (Products & Samples) — no hard validation, allow skip
+    if (step === 4 && !validateStep4()) return;
+    // Step 5 (Products & Samples) — no hard validation, allow skip
     setErrors({});
-    setStep((s) => Math.min(s + 1, 5));
+    setStep((s) => Math.min(s + 1, 6));
   }
 
   function handleBack() {
@@ -458,6 +487,14 @@ export function CreateEventPage() {
           </div>
         )}
         {step === 4 && (
+          <StepBilling
+            accountId={data.accountId}
+            venueType={data.venueType}
+            billing={billing}
+            onChange={setBilling}
+          />
+        )}
+        {step === 5 && (
           <StepProductsSamples
             sampleConfigs={data.sampleConfigs}
             onChange={(configs) =>
@@ -471,7 +508,7 @@ export function CreateEventPage() {
             }
           />
         )}
-        {step === 5 && (
+        {step === 6 && (
           <StepAdvanced
             selected={data.advancedModules}
             toggle={toggleAdvanced}
@@ -507,7 +544,7 @@ export function CreateEventPage() {
           )}
         </div>
 
-        {step < 5 ? (
+        {step < 6 ? (
           <Button
             onClick={handleNext}
             className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 h-auto cursor-pointer"
