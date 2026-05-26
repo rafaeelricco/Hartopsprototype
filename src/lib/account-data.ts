@@ -18,7 +18,7 @@ export let MOCK_ACCOUNTS: Account[] = [
       "Southern Glazers": "SG-99412",
       "Empire Merchants": "EM-0012",
     },
-    billingEntity: "Hart Wine and Spirits",
+    billingEntity: "Hart Agency",
     serviceFeeKind: "trade",
     liquorLicence: {
       number: "NY-LIQ-44218",
@@ -233,7 +233,7 @@ export let MOCK_ACCOUNTS: Account[] = [
     distributorAccountIds: {
       "Southern Glazers": "SG-22119",
     },
-    billingEntity: "Upstate NY",
+    billingEntity: "Hart Agency",
     serviceFeeKind: "bar",
     liquorLicence: {
       number: "NY-LIQ-91044",
