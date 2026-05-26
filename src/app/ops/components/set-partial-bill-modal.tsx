@@ -111,7 +111,7 @@ export function SetPartialBillModal({
           </div>
 
           <div>
-            <Label className="mb-2 block">Partial educator pay</Label>
+            <Label className="mb-2 block">Partial Brand Ambassador pay</Label>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label

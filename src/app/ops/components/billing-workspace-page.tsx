@@ -4,7 +4,7 @@
 // Update Billing, Invoices, Reports, History.
 // Top-of-page filters (entity / distributor / date range / territory) persist
 // across tabs via local state. Inline flows: Set Partial Bill, Resolve SLA,
-// QB Export. First-class editable Billing Entity selector on Update Billing.
+// QB Export. Single-entity model (Hart Agency only) post May-26 consolidation.
 // =============================================================================
 
 import { useMemo, useState } from "react";
@@ -49,19 +49,29 @@ import {
 } from "@/app/shared/components/ui/table";
 import { Card, CardContent } from "@/app/shared/components/ui/card";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/shared/components/ui/popover";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/app/shared/components/ui/dialog";
+import { Label } from "@/app/shared/components/ui/label";
 import {
-  BILLING_ENTITIES,
   SERVICE_FEE_BY_KIND,
+  ACTIVITY_CATEGORIES,
+  INVOICE_PAYMENT_STATUSES,
 } from "@/app/shared/data/billing-types";
 import type {
+  ActivityCategory,
   BillingActivity,
-  BillingEntity,
+  InvoicePaymentStatus,
   CancellationAdjustment,
   GeneratedReport,
   Invoice,
@@ -80,14 +90,22 @@ import {
   approveBillingActivities,
   addInvoice,
   lockInvoice,
+  rejectInvoice,
   logCancellationAdjustment,
-  nextInvoiceNumber,
+  peekNextInvoiceNumber,
+  consumeNextInvoiceNumber,
+  updateInvoicePayment,
 } from "./billing-data";
 import { SetPartialBillModal } from "./set-partial-bill-modal";
 import { ResolveSlaModal } from "./resolve-sla-modal";
 import { QbExportDialog } from "./qb-export-dialog";
 import { InvoiceDetailsModal } from "./invoice-details-modal";
 import { GenerateReportDialog } from "./generate-report-dialog";
+import {
+  EditActivityBillingModal,
+  type EditActivityBillingPatch,
+} from "./edit-activity-billing-modal";
+import { CampaignTag } from "./campaign-tag";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -122,20 +140,54 @@ function statusBadge(
   }
 }
 
+function PaymentStatusBadge({
+  status,
+}: {
+  status: InvoicePaymentStatus;
+}) {
+  const map: Record<
+    InvoicePaymentStatus,
+    { bg: string; fg: string; label: string }
+  > = {
+    open: { bg: "#FFFBEB", fg: "#92400E", label: "Open" },
+    "partially-paid": {
+      bg: "#EFF6FF",
+      fg: "#1D4ED8",
+      label: "Partially paid",
+    },
+    paid: { bg: "#ECFDF5", fg: "#0F766E", label: "Paid" },
+    overdue: { bg: "#FEF2F2", fg: "#B91C1C", label: "Overdue" },
+  };
+  const s = map[status];
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
+      style={{
+        fontSize: "0.75rem",
+        background: s.bg,
+        color: s.fg,
+        fontWeight: 500,
+      }}
+    >
+      {s.label}
+    </span>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Filters bar
 // ---------------------------------------------------------------------------
 
 interface FiltersState {
-  billingEntity: BillingEntity | "all";
   distributor: string;
   territory: string;
+  categories: ActivityCategory[];
 }
 
 const INITIAL_FILTERS: FiltersState = {
-  billingEntity: "all",
   distributor: "all",
   territory: "all",
+  categories: [],
 };
 
 function FiltersBar({
@@ -158,24 +210,6 @@ function FiltersBar({
         <Filter size={14} />
         Filters
       </div>
-      <Select
-        value={value.billingEntity}
-        onValueChange={(v) =>
-          onChange({ ...value, billingEntity: v as BillingEntity | "all" })
-        }
-      >
-        <SelectTrigger className="h-9 w-[200px]">
-          <SelectValue placeholder="Billing entity" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Hart entities</SelectItem>
-          {BILLING_ENTITIES.map((e) => (
-            <SelectItem key={e} value={e}>
-              {e}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
       <Select
         value={value.distributor}
         onValueChange={(v) => onChange({ ...value, distributor: v })}
@@ -208,7 +242,96 @@ function FiltersBar({
           ))}
         </SelectContent>
       </Select>
+      <BillingCategoryMultiSelect
+        selected={value.categories}
+        onChange={(next) => onChange({ ...value, categories: next })}
+      />
     </div>
+  );
+}
+
+function BillingCategoryMultiSelect({
+  selected,
+  onChange,
+}: {
+  selected: ActivityCategory[];
+  onChange: (next: ActivityCategory[]) => void;
+}) {
+  const label =
+    selected.length === 0
+      ? "All categories"
+      : selected.length === 1
+        ? ACTIVITY_CATEGORIES.find((c) => c.value === selected[0])?.label ??
+          "1 category"
+        : `${selected.length} categories`;
+  function toggle(value: ActivityCategory) {
+    if (selected.includes(value)) onChange(selected.filter((v) => v !== value));
+    else onChange([...selected, value]);
+  }
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 w-[220px] justify-between font-normal"
+        >
+          <span
+            className="truncate"
+            style={{
+              color: selected.length === 0 ? "#64748B" : "#0F172A",
+            }}
+          >
+            {label}
+          </span>
+          <ChevronDown size={14} style={{ color: "#94A3B8" }} />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-[260px] p-2"
+        align="start"
+        style={{ background: "white" }}
+      >
+        <div className="flex items-center justify-between px-1 py-1">
+          <span
+            style={{
+              fontSize: "0.6875rem",
+              color: "#94A3B8",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
+            Activity categories
+          </span>
+          {selected.length > 0 && (
+            <button
+              type="button"
+              onClick={() => onChange([])}
+              className="cursor-pointer hover:underline"
+              style={{ fontSize: "0.6875rem", color: "#7D152D" }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className="space-y-1 max-h-[260px] overflow-y-auto">
+          {ACTIVITY_CATEGORIES.map((cat) => (
+            <label
+              key={cat.value}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer hover:bg-[#F8FAFC]"
+            >
+              <Checkbox
+                checked={selected.includes(cat.value)}
+                onCheckedChange={() => toggle(cat.value)}
+              />
+              <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                {cat.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -235,7 +358,6 @@ export function BillingWorkspacePage() {
   );
   const [qbExportFor, setQbExportFor] = useState<{
     billedTo: string;
-    billingEntity: BillingEntity;
     distributor: string;
     total: number;
     activityIds: string[];
@@ -243,7 +365,6 @@ export function BillingWorkspacePage() {
   const [reportPreview, setReportPreview] = useState<string | null>(null);
   const [invoiceDetailsFor, setInvoiceDetailsFor] = useState<{
     billedTo: string;
-    billingEntity: BillingEntity;
     distributor: string;
     activities: BillingActivity[];
     locked: boolean;
@@ -251,18 +372,83 @@ export function BillingWorkspacePage() {
   const [generateOpen, setGenerateOpen] = useState(false);
   const [reports, setReports] =
     useState<GeneratedReport[]>(MOCK_BILLING_REPORTS);
+  const [schedulePreviewFor, setSchedulePreviewFor] = useState<{
+    billedTo: string;
+    distributor: string;
+    activities: BillingActivity[];
+  } | null>(null);
+  const [editActivityFor, setEditActivityFor] =
+    useState<BillingActivity | null>(null);
+  const [historyPaymentFilter, setHistoryPaymentFilter] = useState<
+    InvoicePaymentStatus | "all"
+  >("all");
+  const [updatePaymentFor, setUpdatePaymentFor] = useState<Invoice | null>(
+    null,
+  );
+  const [updatePaymentDraft, setUpdatePaymentDraft] = useState<{
+    paymentStatus: InvoicePaymentStatus;
+    paidAmount: string;
+  }>({ paymentStatus: "open", paidAmount: "" });
+
+  // Billing period filter — Ivie's ask (May-26). Invoices are generated per
+  // billing period (default bi-weekly). The operator can also narrow / widen
+  // the range, and per-activity checkboxes inside each invoice card let them
+  // exclude items from this run for billing in a later period.
+  // Default to the current billing cycle window so seeded activities appear.
+  const [billingPeriodStart, setBillingPeriodStart] = useState(
+    CURRENT_BILLING_CYCLE.windowStart,
+  );
+  const [billingPeriodEnd, setBillingPeriodEnd] = useState(
+    CURRENT_BILLING_CYCLE.windowEnd,
+  );
+  const [excludedActivityIds, setExcludedActivityIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  function applyPeriodPreset(preset: "this-week" | "last-2-weeks" | "this-month") {
+    const today = new Date();
+    let start: Date;
+    if (preset === "this-week") {
+      start = new Date(today);
+      const day = start.getDay();
+      const diff = (day + 6) % 7; // Monday start
+      start.setDate(start.getDate() - diff);
+    } else if (preset === "last-2-weeks") {
+      start = new Date(today);
+      start.setDate(start.getDate() - 14);
+    } else {
+      start = new Date(today.getFullYear(), today.getMonth(), 1);
+    }
+    setBillingPeriodStart(start.toISOString().slice(0, 10));
+    setBillingPeriodEnd(today.toISOString().slice(0, 10));
+  }
+
+  // Shift the current period back / forward by its own length (default ~14d).
+  // Operator can step through bi-weekly cycles without re-picking dates.
+  function shiftBillingPeriod(direction: -1 | 1) {
+    const s = new Date(billingPeriodStart);
+    const e = new Date(billingPeriodEnd);
+    const span = Math.max(
+      1,
+      Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1,
+    );
+    s.setDate(s.getDate() + direction * span);
+    e.setDate(e.getDate() + direction * span);
+    setBillingPeriodStart(s.toISOString().slice(0, 10));
+    setBillingPeriodEnd(e.toISOString().slice(0, 10));
+  }
 
   // Apply filters
   const filtered = useMemo(() => {
     return activities.filter((a) => {
-      if (
-        filters.billingEntity !== "all" &&
-        a.billingEntity !== filters.billingEntity
-      )
-        return false;
       if (filters.distributor !== "all" && a.distributor !== filters.distributor)
         return false;
       if (filters.territory !== "all" && a.territory !== filters.territory)
+        return false;
+      if (
+        filters.categories.length > 0 &&
+        !filters.categories.includes(a.category)
+      )
         return false;
       return true;
     });
@@ -330,38 +516,60 @@ export function BillingWorkspacePage() {
   }
 
   function handleVerifyLicence(activityId: string) {
-    updateBillingActivity(activityId, { licenceVerified: true });
+    updateBillingActivity(activityId, {
+      licenceVerified: true,
+      status: "ready-to-bill",
+    });
+    // Drop the SLA missing-reason so the row exits Missing Bills.
+    const idx = MOCK_BILLING_ACTIVITIES.findIndex((a) => a.id === activityId);
+    if (idx >= 0) {
+      delete (MOCK_BILLING_ACTIVITIES[idx] as { missingReason?: string })
+        .missingReason;
+    }
     refreshActivities();
     setResolveSlaFor(null);
-    toast.success("Liquor licence verified");
+    toast.success("Liquor licence verified · row moved to Update Billing");
   }
 
-  function handleEntityChange(activityId: string, entity: BillingEntity) {
-    updateBillingActivity(activityId, {
-      billingEntity: entity,
-      billingEntityOverridden: true,
-    });
+  function handleEditActivitySave(
+    id: string,
+    patch: EditActivityBillingPatch,
+  ) {
+    updateBillingActivity(id, patch);
     refreshActivities();
+    toast.success("Activity billing updated");
   }
 
   function handlePatchInvoiceActivity(
     id: string,
-    patch: { travel?: number; gratuity?: number; eventAmount?: number },
+    patch: { travel?: number; eventAmount?: number },
   ) {
     const existing = MOCK_BILLING_ACTIVITIES.find((a) => a.id === id);
     if (!existing) return;
     const eventAmount = patch.eventAmount ?? existing.eventAmount;
     const travel = patch.travel ?? existing.travel;
-    const gratuity = patch.gratuity ?? existing.gratuity;
-    const fee = eventAmount * SERVICE_FEE_BY_KIND[existing.serviceFeeKind];
+    // Service fee math (May-26 fix): bar = 10% × bar spend, trade = 20% × event amount, mixer = 0.
+    const fee =
+      existing.serviceFeeKind === "bar"
+        ? (existing.barSpend ?? 0) * SERVICE_FEE_BY_KIND.bar
+        : existing.serviceFeeKind === "trade"
+          ? eventAmount * SERVICE_FEE_BY_KIND.trade
+          : 0;
+    const barSpend = existing.barSpend ?? 0;
+    const gratuity = existing.serviceFeeKind === "bar" ? barSpend * 0.2 : 0;
+    const expenseTotals =
+      (existing.suppliesAmount ?? 0) +
+      (existing.promotionPublicityAmount ?? 0) +
+      (existing.travelEntertainmentAmount ?? 0);
+    const expected =
+      eventAmount + fee + travel + barSpend + gratuity + expenseTotals;
     updateBillingActivity(id, {
       eventAmount,
       travel,
-      gratuity,
-      expectedAmount: eventAmount + fee + travel + gratuity,
+      gratuity, // recomputed, kept in data for SLA form
+      expectedAmount: expected,
     });
     refreshActivities();
-    // Keep the modal in sync.
     setInvoiceDetailsFor((prev) =>
       prev
         ? {
@@ -373,7 +581,7 @@ export function BillingWorkspacePage() {
                     eventAmount,
                     travel,
                     gratuity,
-                    expectedAmount: eventAmount + fee + travel + gratuity,
+                    expectedAmount: expected,
                   }
                 : a,
             ),
@@ -401,14 +609,12 @@ export function BillingWorkspacePage() {
 
   function openQbExport(group: {
     billedTo: string;
-    billingEntity: BillingEntity;
     distributor: string;
     activities: BillingActivity[];
   }) {
     const total = group.activities.reduce((s, a) => s + a.expectedAmount, 0);
     setQbExportFor({
       billedTo: group.billedTo,
-      billingEntity: group.billingEntity,
       distributor: group.distributor,
       total,
       activityIds: group.activities.map((a) => a.id),
@@ -421,13 +627,23 @@ export function BillingWorkspacePage() {
     licenceVerified: boolean;
   }) {
     if (!qbExportFor) return;
+    // Commit the auto-number from the counter — invoiceCounter only advances
+    // when an invoice is actually created, not on every render of the Invoices
+    // tab.
+    const autoNumber = consumeNextInvoiceNumber();
+    const manualOverride = input.invoiceNumber !== autoNumber;
+    // Default to net-30 from today. Ivie can update later.
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 30);
     const invoice: Invoice = {
       id: `inv-${Date.now()}`,
       invoiceNumber: input.invoiceNumber,
-      manualOverride: false,
-      billingEntity: qbExportFor.billingEntity,
+      manualOverride,
+      billingEntity: "Hart Agency",
       billedTo: qbExportFor.billedTo,
       distributor: qbExportFor.distributor,
+      paymentStatus: "open",
+      paymentDueAt: dueDate.toISOString().slice(0, 10),
       distributorIdUsed: input.distributorIdUsed,
       licenceVerified: input.licenceVerified,
       cycleId: CURRENT_BILLING_CYCLE.id,
@@ -472,36 +688,41 @@ export function BillingWorkspacePage() {
       ? 0
       : Math.round((lockedActivities / totalCycleActivities) * 100);
 
-  // Invoice groups — grouped by Billed To + Billing Entity (entities never mix)
+  // Invoice groups — grouped by Billed To only (post-consolidation: there's a
+  // single Hart entity now, so no cross-entity split rule).
   const invoiceGroups = useMemo(() => {
     const approved = filtered.filter(
-      (a) => a.status === "approved" || a.status === "ready-to-bill",
+      (a) =>
+        (a.status === "approved" || a.status === "ready-to-bill") &&
+        a.date >= billingPeriodStart &&
+        a.date <= billingPeriodEnd,
     );
     const map = new Map<
       string,
       {
         billedTo: string;
-        billingEntity: BillingEntity;
         distributor: string;
         activities: BillingActivity[];
+        includedActivities: BillingActivity[];
       }
     >();
     for (const a of approved) {
-      const key = `${a.billingEntity}::${a.billedTo}`;
+      const key = a.billedTo;
       const existing = map.get(key);
       if (existing) {
         existing.activities.push(a);
+        if (!excludedActivityIds.has(a.id)) existing.includedActivities.push(a);
       } else {
         map.set(key, {
           billedTo: a.billedTo,
-          billingEntity: a.billingEntity,
           distributor: a.distributor,
           activities: [a],
+          includedActivities: excludedActivityIds.has(a.id) ? [] : [a],
         });
       }
     }
     return Array.from(map.values());
-  }, [filtered]);
+  }, [filtered, billingPeriodStart, billingPeriodEnd, excludedActivityIds]);
 
   return (
     <div className="p-6 space-y-6 font-[Inter]">
@@ -626,7 +847,7 @@ export function BillingWorkspacePage() {
                 <p style={{ fontSize: "0.8125rem", color: "#991B1B" }}>
                   Resolve each in <strong>Missing Bills</strong>: verify SLA,
                   set partial bills for cancellations, or reconcile recurring
-                  educator-count changes.
+                  brandAmbassador-count changes.
                 </p>
               </div>
             </div>
@@ -664,10 +885,11 @@ export function BillingWorkspacePage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Activity</TableHead>
+                    <TableHead>Campaign</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Account</TableHead>
                     <TableHead>Distributor</TableHead>
-                    <TableHead>Educators</TableHead>
+                    <TableHead>Brand Ambassadors</TableHead>
                     <TableHead className="text-right">Expected</TableHead>
                     <TableHead>Missing reason</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -701,10 +923,16 @@ export function BillingWorkspacePage() {
                               <span>· {a.type}</span>
                             </div>
                           </TableCell>
+                          <TableCell>
+                            <CampaignTag
+                              campaignId={a.campaignId}
+                              campaignName={a.campaignName}
+                            />
+                          </TableCell>
                           <TableCell>{a.date}</TableCell>
                           <TableCell>{a.accountName}</TableCell>
                           <TableCell>{a.distributor}</TableCell>
-                          <TableCell>{a.educatorCount}</TableCell>
+                          <TableCell>{a.brandAmbassadorCount}</TableCell>
                           <TableCell className="text-right">
                             {fmt(a.expectedAmount)}
                           </TableCell>
@@ -741,15 +969,15 @@ export function BillingWorkspacePage() {
                               </Button>
                             )}
                             {a.missingReason ===
-                              "Recurring — educator count changed" && (
+                              "Recurring — brand ambassador count changed" && (
                               <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => {
                                   if (a.recurringInstance) {
                                     updateBillingActivity(a.id, {
-                                      educatorCount:
-                                        a.recurringInstance.currentEducatorCount,
+                                      brandAmbassadorCount:
+                                        a.recurringInstance.currentBrandAmbassadorCount,
                                       status: "ready-to-bill",
                                     });
                                     // Drop the missing reason via the index
@@ -768,7 +996,7 @@ export function BillingWorkspacePage() {
                                     }
                                     refreshActivities();
                                     toast.success(
-                                      `Recalculated for ${a.recurringInstance.currentEducatorCount} educators`,
+                                      `Recalculated for ${a.recurringInstance.currentBrandAmbassadorCount} brandAmbassadors`,
                                     );
                                   }
                                 }}
@@ -785,7 +1013,7 @@ export function BillingWorkspacePage() {
                     0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={8}
+                        colSpan={9}
                         className="text-center py-8"
                         style={{ color: "#94A3B8" }}
                       >
@@ -806,29 +1034,119 @@ export function BillingWorkspacePage() {
               (a) => a.status !== "missing" && a.status !== "billing-locked",
             )}
             onApprove={handleApprove}
-            onEntityChange={handleEntityChange}
+            onEdit={(a) => setEditActivityFor(a)}
           />
         </TabsContent>
 
         {/* --------------- Invoices ------------------------------------- */}
         <TabsContent value="invoices" className="space-y-4">
+          {/* Billing-period filter (Ivie May-26). Default bi-weekly. */}
+          <Card>
+            <CardContent className="p-4 flex flex-wrap items-center gap-3">
+              <div
+                className="flex items-center gap-1.5"
+                style={{ fontSize: "0.8125rem", color: "#64748B" }}
+              >
+                <Filter size={14} />
+                Billing period
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => shiftBillingPeriod(-1)}
+                title="Previous billing period"
+              >
+                <ChevronLeft size={14} />
+              </Button>
+              <input
+                type="date"
+                className="rounded-md border h-9 px-3"
+                style={{
+                  fontSize: "0.875rem",
+                  borderColor: "#E2E8F0",
+                  background: "white",
+                }}
+                value={billingPeriodStart}
+                onChange={(e) => setBillingPeriodStart(e.target.value)}
+              />
+              <span style={{ fontSize: "0.8125rem", color: "#94A3B8" }}>→</span>
+              <input
+                type="date"
+                className="rounded-md border h-9 px-3"
+                style={{
+                  fontSize: "0.875rem",
+                  borderColor: "#E2E8F0",
+                  background: "white",
+                }}
+                value={billingPeriodEnd}
+                onChange={(e) => setBillingPeriodEnd(e.target.value)}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => shiftBillingPeriod(1)}
+                title="Next billing period"
+              >
+                <ChevronRight size={14} />
+              </Button>
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => applyPeriodPreset("this-week")}
+                >
+                  This week
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => applyPeriodPreset("last-2-weeks")}
+                >
+                  Last 2 weeks
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => applyPeriodPreset("this-month")}
+                >
+                  This month
+                </Button>
+              </div>
+              {excludedActivityIds.size > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setExcludedActivityIds(new Set())}
+                  className="ml-auto cursor-pointer hover:underline"
+                  style={{ fontSize: "0.75rem", color: "#7D152D" }}
+                >
+                  Reset {excludedActivityIds.size} excluded
+                </button>
+              )}
+            </CardContent>
+          </Card>
+
           {invoiceGroups.length === 0 ? (
             <Card>
               <CardContent
                 className="p-8 text-center"
                 style={{ color: "#94A3B8" }}
               >
-                Approve activities in Update Billing to generate invoices.
+                No approved activities in this billing period. Approve in
+                Update Billing or widen the period above.
               </CardContent>
             </Card>
           ) : (
             invoiceGroups.map((g) => {
-              const total = g.activities.reduce(
+              const includedTotal = g.includedActivities.reduce(
+                (s, a) => s + a.expectedAmount,
+                0,
+              );
+              const fullTotal = g.activities.reduce(
                 (s, a) => s + a.expectedAmount,
                 0,
               );
               return (
-                <Card key={`${g.billingEntity}-${g.billedTo}`}>
+                <Card key={g.billedTo}>
                   <CardContent className="p-6 space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -842,11 +1160,10 @@ export function BillingWorkspacePage() {
                           className="mt-0.5"
                           style={{ fontSize: "0.75rem", color: "#64748B" }}
                         >
-                          Billing entity:{" "}
-                          <strong style={{ color: "#7D152D" }}>
-                            {g.billingEntity}
-                          </strong>{" "}
-                          · {g.activities.length} activities
+                          {billingPeriodStart} → {billingPeriodEnd} ·{" "}
+                          {g.includedActivities.length} of{" "}
+                          {g.activities.length} activit
+                          {g.activities.length === 1 ? "y" : "ies"} included
                         </div>
                       </div>
                       <div className="text-right">
@@ -854,18 +1171,105 @@ export function BillingWorkspacePage() {
                           className="font-semibold"
                           style={{ fontSize: "1.25rem", color: "#0F172A" }}
                         >
-                          {fmt(total)}
+                          {fmt(includedTotal)}
                         </div>
+                        {includedTotal !== fullTotal && (
+                          <div
+                            className="mt-0.5"
+                            style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+                          >
+                            (of {fmt(fullTotal)} eligible)
+                          </div>
+                        )}
                         <div
                           className="mt-0.5"
                           style={{ fontSize: "0.75rem", color: "#94A3B8" }}
                         >
-                          Auto-number: <strong>{nextInvoiceNumber()}</strong>
+                          Auto-number: <strong>{peekNextInvoiceNumber()}</strong>
                         </div>
                       </div>
                     </div>
+
+                    {/* Per-activity selection — Ivie's "select what to include" ask */}
+                    <div
+                      className="rounded-md border"
+                      style={{ borderColor: "#E2E8F0" }}
+                    >
+                      {g.activities.map((a) => {
+                        const included = !excludedActivityIds.has(a.id);
+                        return (
+                          <label
+                            key={a.id}
+                            className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-[#F8FAFC]"
+                            style={{
+                              borderBottom: "1px solid #F1F5F9",
+                            }}
+                          >
+                            <Checkbox
+                              checked={included}
+                              onCheckedChange={() => {
+                                setExcludedActivityIds((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(a.id)) next.delete(a.id);
+                                  else next.add(a.id);
+                                  return next;
+                                });
+                              }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div
+                                className="flex items-center gap-2 truncate"
+                                style={{
+                                  fontSize: "0.8125rem",
+                                  color: included ? "#0F172A" : "#94A3B8",
+                                  textDecoration: included
+                                    ? "none"
+                                    : "line-through",
+                                }}
+                              >
+                                <span className="truncate">{a.name}</span>
+                                <CampaignTag
+                                  campaignId={a.campaignId}
+                                  campaignName={a.campaignName}
+                                  variant="compact"
+                                />
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "0.6875rem",
+                                  color: "#94A3B8",
+                                }}
+                              >
+                                {a.date} ·{" "}
+                                {a.billingCode ?? "no code"}
+                              </div>
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "0.8125rem",
+                                color: included ? "#0F172A" : "#94A3B8",
+                                fontWeight: 500,
+                              }}
+                            >
+                              {fmt(a.expectedAmount)}
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+
                     <div className="flex flex-wrap gap-2">
-                      <Button size="sm" onClick={() => openQbExport(g)}>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          openQbExport({
+                            billedTo: g.billedTo,
+                            distributor: g.distributor,
+                            activities: g.includedActivities,
+                          })
+                        }
+                        disabled={g.includedActivities.length === 0}
+                      >
                         <Send size={13} className="mr-1.5" />
                         Export to QuickBooks
                       </Button>
@@ -875,7 +1279,6 @@ export function BillingWorkspacePage() {
                         onClick={() =>
                           setInvoiceDetailsFor({
                             billedTo: g.billedTo,
-                            billingEntity: g.billingEntity,
                             distributor: g.distributor,
                             activities: g.activities,
                             locked: false,
@@ -904,6 +1307,15 @@ export function BillingWorkspacePage() {
                       >
                         <Download size={13} className="mr-1.5" />
                         PDF
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSchedulePreviewFor(g)}
+                        title="Customer-facing budget schedule (separate from the invoice)"
+                      >
+                        <FileText size={13} className="mr-1.5" />
+                        Schedule (Excel)
                       </Button>
                     </div>
                   </CardContent>
@@ -1023,6 +1435,33 @@ export function BillingWorkspacePage() {
 
         {/* --------------- History -------------------------------------- */}
         <TabsContent value="history" className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-1.5"
+              style={{ fontSize: "0.8125rem", color: "#64748B" }}
+            >
+              <Filter size={14} />
+              Payment status
+            </div>
+            <Select
+              value={historyPaymentFilter}
+              onValueChange={(v) =>
+                setHistoryPaymentFilter(v as InvoicePaymentStatus | "all")
+              }
+            >
+              <SelectTrigger className="h-9 w-[200px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                {INVOICE_PAYMENT_STATUSES.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -1031,16 +1470,21 @@ export function BillingWorkspacePage() {
                     <TableHead>Cycle</TableHead>
                     <TableHead>Invoice no.</TableHead>
                     <TableHead>Billed To</TableHead>
-                    <TableHead>Entity</TableHead>
                     <TableHead className="text-right">Total</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Payment status</TableHead>
+                    <TableHead>Due</TableHead>
                     <TableHead>QB sync</TableHead>
-                    <TableHead className="text-right">View</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {invoices
                     .filter((i) => i.status === "locked")
+                    .filter(
+                      (i) =>
+                        historyPaymentFilter === "all" ||
+                        i.paymentStatus === historyPaymentFilter,
+                    )
                     .map((i) => {
                       const cycle = HISTORICAL_BILLING_CYCLES.find(
                         (c) => c.id === i.cycleId,
@@ -1064,22 +1508,34 @@ export function BillingWorkspacePage() {
                           >
                             {i.billedTo}
                           </TableCell>
-                          <TableCell>{i.billingEntity}</TableCell>
                           <TableCell className="text-right">
                             {fmt(i.total)}
                           </TableCell>
                           <TableCell>
-                            <span
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
-                              style={{
-                                fontSize: "0.75rem",
-                                background: "#F1F5F9",
-                                color: "#475569",
-                              }}
-                            >
-                              <Lock size={11} />
-                              Locked
-                            </span>
+                            <PaymentStatusBadge status={i.paymentStatus} />
+                            {i.paymentStatus === "partially-paid" &&
+                              i.paidAmount != null && (
+                                <div
+                                  className="mt-0.5"
+                                  style={{
+                                    fontSize: "0.6875rem",
+                                    color: "#64748B",
+                                  }}
+                                >
+                                  {fmt(i.paidAmount)} / {fmt(i.total)}
+                                </div>
+                              )}
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              fontSize: "0.75rem",
+                              color:
+                                i.paymentStatus === "overdue"
+                                  ? "#B91C1C"
+                                  : "#64748B",
+                            }}
+                          >
+                            {i.paymentDueAt ?? "—"}
                           </TableCell>
                           <TableCell
                             style={{
@@ -1088,7 +1544,7 @@ export function BillingWorkspacePage() {
                             }}
                           >
                             {i.qbSyncedAt
-                              ? new Date(i.qbSyncedAt).toLocaleString()
+                              ? new Date(i.qbSyncedAt).toLocaleDateString()
                               : "—"}
                           </TableCell>
                           <TableCell className="text-right">
@@ -1098,7 +1554,6 @@ export function BillingWorkspacePage() {
                               onClick={() =>
                                 setInvoiceDetailsFor({
                                   billedTo: i.billedTo,
-                                  billingEntity: i.billingEntity,
                                   distributor: i.distributor,
                                   activities: acts,
                                   locked: true,
@@ -1106,6 +1561,47 @@ export function BillingWorkspacePage() {
                               }
                             >
                               View
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setUpdatePaymentDraft({
+                                  paymentStatus: i.paymentStatus,
+                                  paidAmount:
+                                    i.paidAmount != null
+                                      ? String(i.paidAmount)
+                                      : "",
+                                });
+                                setUpdatePaymentFor(i);
+                              }}
+                              title="Update payment status"
+                            >
+                              Update payment
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                const ids = rejectInvoice(i.id);
+                                setInvoices(
+                                  invoices.filter((x) => x.id !== i.id),
+                                );
+                                ids.forEach((aid) =>
+                                  updateBillingActivity(aid, {
+                                    status: "ready-to-bill",
+                                  }),
+                                );
+                                refreshActivities();
+                                toast.success(
+                                  `Invoice ${i.invoiceNumber} rejected · ${ids.length} activities re-opened`,
+                                );
+                              }}
+                              title="Reject this invoice and re-open its activities"
+                              style={{ color: "#B91C1C" }}
+                            >
+                              <RefreshCcw size={13} className="mr-1.5" />
+                              Reject
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -1135,7 +1631,7 @@ export function BillingWorkspacePage() {
         <QbExportDialog
           open={true}
           onClose={() => setQbExportFor(null)}
-          invoiceNumberDefault={nextInvoiceNumber()}
+          invoiceNumberDefault={peekNextInvoiceNumber()}
           billedTo={qbExportFor.billedTo}
           total={qbExportFor.total}
           onConfirm={handleQbConfirm}
@@ -1151,11 +1647,23 @@ export function BillingWorkspacePage() {
         onRemoveActivity={handleRemoveActivityFromInvoice}
       />
 
+      <EditActivityBillingModal
+        open={!!editActivityFor}
+        onClose={() => setEditActivityFor(null)}
+        activity={editActivityFor}
+        onSave={handleEditActivitySave}
+        onApprove={(id) => handleApprove([id])}
+      />
+
       <GenerateReportDialog
         open={generateOpen}
         onClose={() => setGenerateOpen(false)}
         workspace="billing"
         cycleId={CURRENT_BILLING_CYCLE.id}
+        defaultRange={{
+          start: CURRENT_BILLING_CYCLE.windowStart,
+          end: CURRENT_BILLING_CYCLE.windowEnd,
+        }}
         onGenerate={(report) => {
           setReports([report, ...reports]);
           setGenerateOpen(false);
@@ -1168,7 +1676,7 @@ export function BillingWorkspacePage() {
         open={!!reportPreview}
         onOpenChange={(v) => (v ? null : setReportPreview(null))}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="!max-w-[min(96vw,1100px)] w-[min(96vw,1100px)]">
           <DialogHeader>
             <DialogTitle>{reportPreview}</DialogTitle>
             <DialogDescription>
@@ -1180,6 +1688,8 @@ export function BillingWorkspacePage() {
             <SlaReportPreview rows={MOCK_SLA_REPORT} />
           ) : reportPreview === "Cancellation Adjustment Report" ? (
             <CancellationReportPreview rows={cancellations} />
+          ) : reportPreview === "Customer Schedule" ? (
+            <CustomerSchedulePreview activities={filtered} />
           ) : (
             <p
               className="py-6 text-center"
@@ -1188,6 +1698,128 @@ export function BillingWorkspacePage() {
               No preview available for this report yet.
             </p>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer Schedule preview (P1 #11 — Kayla's customer budget export) */}
+      <Dialog
+        open={!!schedulePreviewFor}
+        onOpenChange={(v) => (v ? null : setSchedulePreviewFor(null))}
+      >
+        <DialogContent className="!max-w-[min(96vw,1300px)] w-[min(96vw,1300px)]">
+          <DialogHeader>
+            <DialogTitle>Customer Schedule — {schedulePreviewFor?.billedTo}</DialogTitle>
+            <DialogDescription>
+              Budget-facing schedule export. Distinct from the invoice — shows
+              max ambassador expense per activity so the customer can size their
+              spend.
+            </DialogDescription>
+          </DialogHeader>
+          {schedulePreviewFor && (
+            <CustomerSchedulePreview activities={schedulePreviewFor.activities} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Update payment status — Ivie's expanded tracking */}
+      <Dialog
+        open={!!updatePaymentFor}
+        onOpenChange={(v) => (v ? null : setUpdatePaymentFor(null))}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Update payment</DialogTitle>
+            <DialogDescription>
+              {updatePaymentFor?.invoiceNumber} ·{" "}
+              {updatePaymentFor ? fmt(updatePaymentFor.total) : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="up-status">Status</Label>
+              <Select
+                value={updatePaymentDraft.paymentStatus}
+                onValueChange={(v) =>
+                  setUpdatePaymentDraft({
+                    ...updatePaymentDraft,
+                    paymentStatus: v as InvoicePaymentStatus,
+                  })
+                }
+              >
+                <SelectTrigger id="up-status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {INVOICE_PAYMENT_STATUSES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {updatePaymentDraft.paymentStatus === "partially-paid" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="up-amount">Amount received so far</Label>
+                <input
+                  id="up-amount"
+                  type="number"
+                  className="w-full rounded-md border px-3 py-2"
+                  style={{
+                    fontSize: "0.875rem",
+                    borderColor: "#E2E8F0",
+                  }}
+                  value={updatePaymentDraft.paidAmount}
+                  onChange={(e) =>
+                    setUpdatePaymentDraft({
+                      ...updatePaymentDraft,
+                      paidAmount: e.target.value,
+                    })
+                  }
+                  placeholder="e.g. 800"
+                />
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setUpdatePaymentFor(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!updatePaymentFor) return;
+                const status = updatePaymentDraft.paymentStatus;
+                const patch: {
+                  paymentStatus: InvoicePaymentStatus;
+                  paidAmount?: number;
+                  paidAt?: string;
+                } = { paymentStatus: status };
+                if (status === "paid") {
+                  patch.paidAmount = updatePaymentFor.total;
+                  patch.paidAt = new Date().toISOString().slice(0, 10);
+                } else if (status === "partially-paid") {
+                  patch.paidAmount =
+                    parseFloat(updatePaymentDraft.paidAmount) || 0;
+                  patch.paidAt = new Date().toISOString().slice(0, 10);
+                }
+                updateInvoicePayment(updatePaymentFor.id, patch);
+                setInvoices(
+                  invoices.map((x) =>
+                    x.id === updatePaymentFor.id ? { ...x, ...patch } : x,
+                  ),
+                );
+                setUpdatePaymentFor(null);
+                toast.success(
+                  `${updatePaymentFor.invoiceNumber} marked ${status}`,
+                );
+              }}
+            >
+              Save
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
@@ -1201,11 +1833,11 @@ export function BillingWorkspacePage() {
 function UpdateBillingTab({
   activities,
   onApprove,
-  onEntityChange,
+  onEdit,
 }: {
   activities: BillingActivity[];
   onApprove: (ids: string[]) => void;
-  onEntityChange: (id: string, entity: BillingEntity) => void;
+  onEdit: (activity: BillingActivity) => void;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -1264,18 +1896,19 @@ function UpdateBillingTab({
               <TableRow>
                 <TableHead style={{ width: 36 }}></TableHead>
                 <TableHead>Activity</TableHead>
+                <TableHead>Campaign</TableHead>
+                <TableHead>Billing code</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Account</TableHead>
-                <TableHead>Billing entity</TableHead>
                 <TableHead>Billed To</TableHead>
                 <TableHead>Service fee</TableHead>
-                <TableHead className="text-right">Event $</TableHead>
+                <TableHead className="text-right">Activity $</TableHead>
                 <TableHead className="text-right">BA $</TableHead>
                 <TableHead className="text-right">Travel</TableHead>
-                <TableHead className="text-right">Grat.</TableHead>
                 <TableHead className="text-right">Invoice total</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -1294,6 +1927,22 @@ function UpdateBillingTab({
                     <TableCell className="max-w-[220px] truncate">
                       {a.name}
                     </TableCell>
+                    <TableCell>
+                      <CampaignTag
+                        campaignId={a.campaignId}
+                        campaignName={a.campaignName}
+                      />
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "#475569",
+                        fontFamily:
+                          "ui-monospace, SFMono-Regular, Menlo, monospace",
+                      }}
+                    >
+                      {a.billingCode ?? "—"}
+                    </TableCell>
                     <TableCell>{a.date}</TableCell>
                     <TableCell
                       style={{ fontSize: "0.75rem", color: "#64748B" }}
@@ -1302,33 +1951,6 @@ function UpdateBillingTab({
                     </TableCell>
                     <TableCell className="max-w-[180px] truncate">
                       {a.accountName}
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={a.billingEntity}
-                        onValueChange={(v) =>
-                          onEntityChange(a.id, v as BillingEntity)
-                        }
-                      >
-                        <SelectTrigger className="h-8 w-[180px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {BILLING_ENTITIES.map((e) => (
-                            <SelectItem key={e} value={e}>
-                              {e}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {a.billingEntityOverridden && (
-                        <div
-                          className="mt-1"
-                          style={{ fontSize: "0.6875rem", color: "#D97706" }}
-                        >
-                          override logged
-                        </div>
-                      )}
                     </TableCell>
                     <TableCell
                       className="max-w-[220px] truncate"
@@ -1349,9 +1971,6 @@ function UpdateBillingTab({
                     </TableCell>
                     <TableCell className="text-right">
                       {fmt(a.travel)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.gratuity)}
                     </TableCell>
                     <TableCell className="text-right font-medium">
                       {fmt(a.expectedAmount)}
@@ -1376,13 +1995,24 @@ function UpdateBillingTab({
                         </div>
                       )}
                     </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onEdit(a)}
+                        title="Edit billing details before approving"
+                      >
+                        <Pencil size={13} className="mr-1" />
+                        Edit
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 );
               })}
               {activities.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={14}
+                    colSpan={15}
                     className="text-center py-8"
                     style={{ color: "#94A3B8" }}
                   >
@@ -1544,6 +2174,115 @@ function CancellationReportPreview({
                   style={{ fontSize: "0.75rem", color: "#64748B" }}
                 >
                   {new Date(c.loggedAt).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CustomerSchedulePreview — P1 #11. Customer-facing budget export distinct
+// from the invoice. Shows labor + max ambassador expense, liquor licence,
+// distributor IDs, creator info, and TD link placeholders per Kayla 01:26:35.
+// ---------------------------------------------------------------------------
+
+function CustomerSchedulePreview({
+  activities,
+}: {
+  activities: BillingActivity[];
+}) {
+  if (activities.length === 0) {
+    return (
+      <p
+        className="py-6 text-center"
+        style={{ color: "#94A3B8", fontSize: "0.875rem" }}
+      >
+        No activities in the current selection to schedule.
+      </p>
+    );
+  }
+  return (
+    <div
+      className="rounded-lg border"
+      style={{ borderColor: "#E2E8F0", maxHeight: 500, overflow: "auto" }}
+    >
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Activity ID</TableHead>
+            <TableHead>Campaign</TableHead>
+            <TableHead>Billing code</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Account</TableHead>
+            <TableHead>Distributor</TableHead>
+            <TableHead>Liquor licence</TableHead>
+            <TableHead className="text-right">Labor</TableHead>
+            <TableHead className="text-right">Max bar spend</TableHead>
+            <TableHead className="text-right">Max Ambassador Expense</TableHead>
+            <TableHead>TD link</TableHead>
+            <TableHead>Created by</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {activities.map((a) => {
+            const maxBarSpend = a.maxBarSpend ?? 0;
+            const maxGratuity = maxBarSpend * 0.2;
+            const maxAmbassadorExpense =
+              a.ambassadorAmount + maxBarSpend + maxGratuity;
+            return (
+              <TableRow key={a.id}>
+                <TableCell>{a.id}</TableCell>
+                <TableCell
+                  className="max-w-[160px] truncate"
+                  title={a.campaignName ?? ""}
+                  style={{
+                    fontSize: "0.75rem",
+                    fontFamily:
+                      "ui-monospace, SFMono-Regular, Menlo, monospace",
+                    color: "#7D152D",
+                  }}
+                >
+                  {a.campaignId ?? "—"}
+                </TableCell>
+                <TableCell
+                  style={{ fontSize: "0.75rem", color: "#475569" }}
+                >
+                  {a.billingCode ?? "—"}
+                </TableCell>
+                <TableCell>{a.date}</TableCell>
+                <TableCell
+                  className="max-w-[180px] truncate"
+                  title={a.accountName}
+                >
+                  {a.accountName}
+                </TableCell>
+                <TableCell
+                  className="max-w-[140px] truncate"
+                  title={a.distributor}
+                >
+                  {a.distributor}
+                </TableCell>
+                <TableCell style={{ fontSize: "0.75rem" }}>—</TableCell>
+                <TableCell className="text-right">
+                  {fmt(a.ambassadorAmount)}
+                </TableCell>
+                <TableCell className="text-right">
+                  {maxBarSpend > 0 ? fmt(maxBarSpend) : "—"}
+                </TableCell>
+                <TableCell className="text-right font-medium">
+                  {fmt(maxAmbassadorExpense)}
+                </TableCell>
+                <TableCell
+                  style={{ fontSize: "0.75rem", color: "#1D4ED8" }}
+                >
+                  td-{a.id.replace(/[^a-z0-9]/gi, "")}
+                </TableCell>
+                <TableCell style={{ fontSize: "0.75rem", color: "#64748B" }}>
+                  client-staff
                 </TableCell>
               </TableRow>
             );

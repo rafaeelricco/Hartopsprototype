@@ -1,7 +1,7 @@
 // =============================================================================
 // R2 — Billing & Payroll shared types
 // Consumed by Hart Ops billing/payroll workspaces, Client Staff event creation
-// billing step, and Educator Manager compensation panel.
+// billing step, and Market Manager compensation panel.
 // =============================================================================
 
 // Three Hart entities that an activity can be billed/paid through.
@@ -29,6 +29,25 @@ export const SERVICE_FEE_BY_KIND: Record<ServiceFeeKind, number> = {
   mixer: 0,
 };
 
+// Bar-spend rules per Kayla (transcript 01:08:32):
+// - Hard ceiling of $700 per activity
+// - 20% gratuity auto-applied on top of bar spend (Hart bills it, venue keeps it)
+// - 10% service fee Hart earns on top (separate from gratuity — see ServiceFeeKind)
+export const BAR_SPEND_CEILING = 700;
+export const BAR_SPEND_GRATUITY_RATE = 0.2;
+
+// Travel-pay (Upstate territory). Leah at 00:10:34 asked for mileage × rate
+// calc that adds to BA payroll. IRS 2026 standard mileage rate seeded as
+// default; configurable per BA / territory in production.
+export const DEFAULT_MILEAGE_RATE = 0.67; // $/mi
+export interface TravelComponent {
+  miles: number;
+  ratePerMile: number; // $/mi
+  // Stored amount so manual override is preserved even if rate changes.
+  amount: number; // computed: miles × ratePerMile (or manually overridden)
+  manualOverride?: boolean;
+}
+
 // Reason for overriding the BA standard rate at event creation. The picklist is
 // a first-class field (not free-text) so the override badge propagates through
 // to the payroll workspace.
@@ -52,8 +71,40 @@ export const OVERRIDE_REASONS: OverrideReason[] = [
 // generalisation that mm11 calls out.
 export type ActivityType = "event" | "survey";
 
+// Activity categories that Larry checks off as the first step of a payroll
+// cycle (transcript 00:03:27). Multi-select filter on Hart Ops payroll &
+// billing workspaces.
+export type ActivityCategory =
+  | "on-premise-sla"
+  | "on-premise"
+  | "off-premise"
+  | "beer-promotion"
+  | "on-dedicated"
+  | "off-dedicated"
+  | "on-trade"
+  | "mixology"
+  | "health-desk"
+  | "warehouse-storage"
+  | "payroll-adjustment"
+  | "survey";
+
+export const ACTIVITY_CATEGORIES: { value: ActivityCategory; label: string }[] = [
+  { value: "on-premise-sla", label: "On-Premise SLA" },
+  { value: "on-premise", label: "On-Premise" },
+  { value: "off-premise", label: "Off-Premise" },
+  { value: "beer-promotion", label: "Beer Promotion" },
+  { value: "on-dedicated", label: "On-Dedicated" },
+  { value: "off-dedicated", label: "Off-Dedicated" },
+  { value: "on-trade", label: "On-Trade" },
+  { value: "mixology", label: "Mixology" },
+  { value: "health-desk", label: "Health Desk" },
+  { value: "warehouse-storage", label: "Warehouse Storage" },
+  { value: "payroll-adjustment", label: "Payroll Adjustment" },
+  { value: "survey", label: "Survey" },
+];
+
 // =============================================================================
-// Educator rate management (mm-ui-008)
+// BrandAmbassador rate management (mm-ui-008)
 // =============================================================================
 
 export interface RateHistoryEntry {
@@ -93,7 +144,7 @@ export type MissingBillReason =
   | "Awaiting approval"
   | "Cancelled — partial bill not set"
   | "SLA — licence not verified"
-  | "Recurring — educator count changed";
+  | "Recurring — brand ambassador count changed";
 
 export type BillingActivityStatus =
   | "missing"
@@ -106,6 +157,7 @@ export type BillingActivityStatus =
 export interface BillingActivity {
   id: string; // activity ID
   type: ActivityType;
+  category: ActivityCategory;
   name: string;
   date: string; // YYYY-MM-DD
   accountId: string;
@@ -116,13 +168,36 @@ export interface BillingActivity {
   billingEntityOverridden?: boolean;
   region: string;
   territory: string;
-  educatorCount: number;
-  educatorIds: string[];
+  brandAmbassadorCount: number;
+  brandAmbassadorIds: string[];
   serviceFeeKind: ServiceFeeKind;
+  // Parent campaign — drives the billing-code dropdown (post May-26 ask from
+  // Leah) AND acts as the Power Automate joining string for SLA / receipt /
+  // manager-report aggregation (Ivie 00:27:43).
+  campaignId?: string;
+  campaignName?: string;
+  // Billing code (manually assigned per HEMS workflow — Kayla 01:07:15).
+  // Drawn from the parent campaign's `billingCodes` list; custom is allowed
+  // but logged as `billingCodeCustom: true` for audit.
+  billingCode?: string;
+  billingCodeCustom?: boolean;
+  supplier?: string;
   eventAmount: number; // pre-fee, pre-overrides
   ambassadorAmount: number; // pay total
   travel: number;
+  travelComponent?: TravelComponent; // P1 #3 — Upstate mileage × rate breakdown
+  // Bar-spend tracking (P0 #10). On-premise activities only.
+  // `barSpend` is the actual receipt amount the manager logs post-event.
+  // `maxBarSpend` is the customer-budgeted ceiling at creation time (≤ $700).
+  // `gratuity` is auto-computed as 20% of barSpend at invoice time.
+  barSpend?: number;
+  maxBarSpend?: number;
   gratuity: number;
+  // P2 #12 — Post-activity expense columns (Kayla's spreadsheet additions).
+  // Stored here so they roll into the invoice and the next billing/payroll export.
+  suppliesAmount?: number;
+  promotionPublicityAmount?: number;
+  travelEntertainmentAmount?: number;
   expectedAmount: number; // total invoice line
   status: BillingActivityStatus;
   missingReason?: MissingBillReason;
@@ -131,8 +206,8 @@ export interface BillingActivity {
   cancellation?: CancellationAdjustment;
   recurringInstance?: {
     seriesId: string;
-    originalEducatorCount: number;
-    currentEducatorCount: number;
+    originalBrandAmbassadorCount: number;
+    currentBrandAmbassadorCount: number;
     requiresRecalc: boolean;
   };
 }
@@ -155,6 +230,23 @@ export interface CancellationAdjustment {
   bookerNotified: boolean;
 }
 
+// Payment status — Ivie's ask at 00:25:32 for visibility on money-in.
+export type InvoicePaymentStatus =
+  | "open"
+  | "partially-paid"
+  | "paid"
+  | "overdue";
+
+export const INVOICE_PAYMENT_STATUSES: {
+  value: InvoicePaymentStatus;
+  label: string;
+}[] = [
+  { value: "open", label: "Open" },
+  { value: "partially-paid", label: "Partially paid" },
+  { value: "paid", label: "Paid" },
+  { value: "overdue", label: "Overdue" },
+];
+
 export interface Invoice {
   id: string;
   invoiceNumber: string; // auto-generated default
@@ -171,6 +263,11 @@ export interface Invoice {
   status: "draft" | "exported" | "locked";
   qbSyncedAt?: string;
   sharepointSentAt?: string;
+  // Payment tracking (Ivie's expanded-tracking ask, May-26).
+  paymentStatus: InvoicePaymentStatus;
+  paymentDueAt?: string; // ISO date — net-30 default
+  paidAmount?: number; // for partial payments
+  paidAt?: string; // ISO — last payment received
 }
 
 export interface BillingCycle {
@@ -191,7 +288,7 @@ export interface SlaReportRow {
   accountName: string;
   licenceNumber: string;
   licenceActiveAtEventDate: boolean;
-  executor: string; // educator name
+  executor: string; // brandAmbassador name
   spendAmount: number;
 }
 
@@ -218,11 +315,21 @@ export interface PayrollLineItem {
   id: string;
   activityId: string;
   activityType: ActivityType;
+  activityCategory: ActivityCategory;
   activityName: string;
+  cycleId?: string; // populated for historical rows; current cycle is implicit
+  territory: string; // P3 #8 — used for territory split-print reports
+  travelComponent?: TravelComponent; // P1 #3 — mileage × rate added to final pay
+  // P2 #6 — Cancellation pay breakdown mirroring the billing SetPartialBill modal.
+  cancellationBreakdown?: {
+    kitPickup: number;
+    travel: number;
+    time: number;
+  };
   date: string; // YYYY-MM-DD
   accountName: string;
-  educatorId: string;
-  educatorName: string;
+  brandAmbassadorId: string;
+  brandAmbassadorName: string;
   hours: number;
   standardRate: number; // from BA record, effective on activity date
   rateEffectiveDate: string; // provenance for tooltip
@@ -236,8 +343,8 @@ export interface PayrollLineItem {
   billingEntity: BillingEntity;
   status: PayrollApprovalStatus;
   recurringRecalcRequired?: {
-    previousEducatorCount: number;
-    currentEducatorCount: number;
+    previousBrandAmbassadorCount: number;
+    currentBrandAmbassadorCount: number;
     previousFinalPay: number;
     newFinalPay: number;
   };
@@ -252,7 +359,22 @@ export interface PayrollCycle {
   status: PayrollCycleStatus;
   exportedAt?: string;
   totalPay?: number;
-  educatorsPaid?: number;
+  brandAmbassadorsPaid?: number;
+}
+
+// Second-eyes manager review (P3 #9). Larry asks Leah to review the Upstate
+// roster before he runs the final export (transcript 00:23:22).
+export interface PayrollReviewRequest {
+  id: string;
+  cycleId: string;
+  reviewer: string; // who's being asked
+  requestedBy: string; // who's asking
+  territory?: string; // optional scope — empty = full cycle
+  status: "pending" | "approved" | "changes-requested";
+  requestedAt: string;
+  completedAt?: string;
+  note?: string; // initial note from the requester
+  reviewerComment?: string; // comment from the reviewer on Approve / Changes
 }
 
 export interface GeneratedReport {
@@ -263,8 +385,10 @@ export interface GeneratedReport {
     | "Not in QB Report"
     | "SLA Report"
     | "Cancellation Adjustment Report"
+    | "Customer Schedule"
     | "Payroll Report — Complete"
-    | "Missing Educator Payments"
+    | "Master Journal"
+    | "Missing Brand Ambassador Payments"
     | "Override Summary";
   cycleId: string;
   generatedAt: string;

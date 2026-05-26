@@ -10,15 +10,15 @@ import { Dashboard as OpsDashboard } from "./ops/components/dashboard";
 import { OrganizationsPage } from "./ops/components/organizations-page";
 import { OrganizationDetailPage } from "./ops/components/organization-detail-page";
 import { CampaignDetailPage } from "./ops/components/campaign-detail-page";
-import { OrgEventDetailPage } from "./ops/components/org-event-detail-page";
-import { EventsPage as OpsEventsPage } from "./ops/components/events-page";
-import { EventDetailPage as OpsEventDetailPage } from "./ops/components/event-detail-page";
+import { OrgActivityDetailPage } from "./ops/components/org-activity-detail-page";
+import { ActivitiesPage as OpsActivitiesPage } from "./ops/components/activities-page";
+import { ActivityDetailPage as OpsActivityDetailPage } from "./ops/components/activity-detail-page";
 import { ReportsPage as OpsReportsPage } from "./ops/components/reports-page";
 import { SettingsPage as OpsSettingsPage } from "./ops/components/settings-page";
 import { AccountsPage } from "./ops/components/accounts-page";
-import { EducatorsPage } from "./ops/components/educators-page";
-import { EducatorDetailPage } from "./ops/components/educator-detail-page";
-import { DraftEventsPage } from "./ops/components/draft-events-page";
+import { BrandAmbassadorsPage } from "./ops/components/brand-ambassadors-page";
+import { BrandAmbassadorDetailPage } from "./ops/components/brand-ambassador-detail-page";
+import { DraftActivitiesPage } from "./ops/components/draft-activities-page";
 import { AvailabilityCalendarPage } from "./ops/components/availability-calendar-page";
 import { HelpPage } from "./ops/components/help-page";
 import { CapabilityMatrixPage } from "./ops/components/capability-matrix-page";
@@ -35,21 +35,21 @@ import { DashboardLayout as StaffDashboardLayout } from "./staff/components/dash
 import { DashboardContent as StaffDashboardContent } from "./staff/components/dashboard-content";
 import { Campaigns } from "./staff/components/campaigns";
 import { CampaignDetail } from "./staff/components/campaign-detail";
-import { EventsPage as StaffEventsPage } from "./staff/components/events-page";
-import { EventDetailPage as StaffEventDetailPage } from "./staff/components/event-detail-page";
+import { ActivitiesPage as StaffActivitiesPage } from "./staff/components/activities-page";
+import { ActivityDetailPage as StaffActivityDetailPage } from "./staff/components/activity-detail-page";
 import { ReportsPage as StaffReportsPage } from "./staff/components/reports-page";
 import { BrandAssetsPage } from "./staff/components/brand-assets-page";
 import { SettingsPage as StaffSettingsPage } from "./staff/components/settings-page";
-import { CreateEventPage } from "./staff/components/create-event-page";
+import { CreateActivityPage } from "./staff/components/create-activity-page";
 
-// ---- EDUCATOR MANAGER IMPORTS ----
-import { DashboardLayout as EducatorDashboardLayout } from "./educator/components/dashboard-layout";
-import { Dashboard as EducatorDashboard } from "./educator/components/dashboard";
-import { EventsPage as EducatorEventsPage } from "./educator/components/events-page";
-import { EventDetailPage as EducatorEventDetailPage } from "./educator/components/event-detail-page";
-import { EducatorsPage as EducatorEducatorsPage } from "./educator/components/educators-page";
-import { EducatorDetailPage as EducatorEducatorDetailPage } from "./educator/components/educator-detail-page";
-import { SettingsPage as EducatorSettingsPage } from "./educator/components/settings-page";
+// ---- BRAND_AMBASSADOR MANAGER IMPORTS ----
+import { DashboardLayout as MarketManagerDashboardLayout } from "./market-manager/components/dashboard-layout";
+import { Dashboard as MarketManagerDashboard } from "./market-manager/components/dashboard";
+import { ActivitiesPage as MarketManagerActivitiesPage } from "./market-manager/components/activities-page";
+import { ActivityDetailPage as MarketManagerActivityDetailPage } from "./market-manager/components/activity-detail-page";
+import { BrandAmbassadorsPage as MarketManagerBrandAmbassadorsPage } from "./market-manager/components/brand-ambassadors-page";
+import { BrandAmbassadorDetailPage as MarketManagerBrandAmbassadorDetailPage } from "./market-manager/components/brand-ambassador-detail-page";
+import { SettingsPage as MarketManagerSettingsPage } from "./market-manager/components/settings-page";
 
 export const router = createBrowserRouter([
   // ---- OPS PLATFORM (/ops) ----
@@ -72,20 +72,20 @@ export const router = createBrowserRouter([
         Component: CampaignDetailPage,
       },
       {
-        path: "organizations/:id/events/:eventId",
-        Component: OrgEventDetailPage,
+        path: "organizations/:id/activities/:activityId",
+        Component: OrgActivityDetailPage,
       },
-      { path: "events", Component: OpsEventsPage },
-      { path: "events/:eventId", Component: OpsEventDetailPage },
+      { path: "activities", Component: OpsActivitiesPage },
+      { path: "activities/:activityId", Component: OpsActivityDetailPage },
       { path: "billing", Component: BillingWorkspacePage },
       { path: "payroll", Component: PayrollWorkspacePage },
       { path: "reports", Component: OpsReportsPage },
       { path: "settings", Component: OpsSettingsPage },
       { path: "accounts", Component: AccountsPage },
-      { path: "educators", Component: EducatorsPage },
-      { path: "educators/:id", Component: EducatorDetailPage },
+      { path: "brand-ambassadors", Component: BrandAmbassadorsPage },
+      { path: "brand-ambassadors/:id", Component: BrandAmbassadorDetailPage },
       { path: "availability", Component: AvailabilityCalendarPage },
-      { path: "draft-events", Component: DraftEventsPage },
+      { path: "draft-activities", Component: DraftActivitiesPage },
       { path: "help", Component: HelpPage },
       { path: "capability-matrix", Component: CapabilityMatrixPage },
       { path: "*", Component: NotFound },
@@ -103,30 +103,30 @@ export const router = createBrowserRouter([
       { path: "dashboard", Component: StaffDashboardContent },
       { path: "campaigns", Component: Campaigns },
       { path: "campaigns/:id", Component: CampaignDetail },
-      { path: "events", Component: StaffEventsPage },
-      { path: "events/create", Component: CreateEventPage },
-      { path: "events/:eventId", Component: StaffEventDetailPage },
+      { path: "activities", Component: StaffActivitiesPage },
+      { path: "activities/create", Component: CreateActivityPage },
+      { path: "activities/:activityId", Component: StaffActivityDetailPage },
       { path: "reports", Component: StaffReportsPage },
       { path: "brand-assets", Component: BrandAssetsPage },
       { path: "settings", Component: StaffSettingsPage },
     ],
   },
 
-  // ---- EDUCATOR MANAGER PLATFORM (/educator) ----
-  { path: "/educator", Component: OpsSignIn },
-  { path: "/educator/activate", Component: OpsActivateAccount },
-  { path: "/educator/forgot-password", Component: OpsForgotPassword },
-  { path: "/educator/reset-password", Component: OpsResetPassword },
+  // ---- MARKET MANAGER PLATFORM (/market-manager) ----
+  { path: "/market-manager", Component: OpsSignIn },
+  { path: "/market-manager/activate", Component: OpsActivateAccount },
+  { path: "/market-manager/forgot-password", Component: OpsForgotPassword },
+  { path: "/market-manager/reset-password", Component: OpsResetPassword },
   {
-    path: "/educator",
-    Component: EducatorDashboardLayout,
+    path: "/market-manager",
+    Component: MarketManagerDashboardLayout,
     children: [
-      { path: "dashboard", Component: EducatorDashboard },
-      { path: "events", Component: EducatorEventsPage },
-      { path: "events/:eventId", Component: EducatorEventDetailPage },
-      { path: "educators", Component: EducatorEducatorsPage },
-      { path: "educators/:id", Component: EducatorEducatorDetailPage },
-      { path: "settings", Component: EducatorSettingsPage },
+      { path: "dashboard", Component: MarketManagerDashboard },
+      { path: "activities", Component: MarketManagerActivitiesPage },
+      { path: "activities/:activityId", Component: MarketManagerActivityDetailPage },
+      { path: "brand-ambassadors", Component: MarketManagerBrandAmbassadorsPage },
+      { path: "brand-ambassadors/:id", Component: MarketManagerBrandAmbassadorDetailPage },
+      { path: "settings", Component: MarketManagerSettingsPage },
     ],
   },
 

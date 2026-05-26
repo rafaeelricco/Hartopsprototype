@@ -50,8 +50,8 @@ const data = {
       icon: Megaphone,
     },
     {
-      title: "Events",
-      url: "/staff/events",
+      title: "Activities",
+      url: "/staff/activities",
       icon: CalendarDays,
     },
     {

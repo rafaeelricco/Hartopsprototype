@@ -1,7 +1,7 @@
 // =============================================================================
 // Recurring Recalc Dialog (mm-ui-013)
 // Active guard when an operator tries to approve a payroll row whose source
-// event is a recurring instance with a changed educator count. Shows previous
+// event is a recurring instance with a changed brandAmbassador count. Shows previous
 // vs new pay totals so the operator confirms the recalc explicitly — no silent
 // recalc, no buried badge.
 // =============================================================================
@@ -46,7 +46,7 @@ export function RecurringRecalcDialog({
         <DialogHeader>
           <DialogTitle>Recalculate recurring pay</DialogTitle>
           <DialogDescription>
-            This recurring event's educator count changed. Confirm the new pay
+            This recurring event's brandAmbassador count changed. Confirm the new pay
             before approving.
           </DialogDescription>
         </DialogHeader>
@@ -60,14 +60,14 @@ export function RecurringRecalcDialog({
               className="flex items-center justify-between"
               style={{ fontSize: "0.8125rem", color: "#64748B" }}
             >
-              <span>Educator count</span>
+              <span>Brand Ambassador count</span>
               <span>
                 <strong style={{ color: "#0F172A" }}>
-                  {r.previousEducatorCount}
+                  {r.previousBrandAmbassadorCount}
                 </strong>{" "}
                 →{" "}
                 <strong style={{ color: "#7D152D" }}>
-                  {r.currentEducatorCount}
+                  {r.currentBrandAmbassadorCount}
                 </strong>
               </span>
             </div>
@@ -89,7 +89,7 @@ export function RecurringRecalcDialog({
           </div>
 
           <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-            Educator: {item.educatorName} · {item.activityName}
+            BrandAmbassador: {item.brandAmbassadorName} · {item.activityName}
           </p>
         </div>
 

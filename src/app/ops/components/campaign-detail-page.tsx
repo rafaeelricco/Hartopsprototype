@@ -3,7 +3,7 @@ import {
   ArrowLeft,
   Megaphone,
   CalendarDays,
-  Activity,
+  Activity as ActivityIcon,
   Clock,
 } from "lucide-react";
 import {
@@ -157,14 +157,14 @@ export function CampaignDetailPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
-            label: "Events",
+            label: "Activities",
             value: campaign.events,
-            icon: Activity,
+            icon: ActivityIcon,
           },
           {
             label: "Progress",
             value: `${campaign.progress}%`,
-            icon: Activity,
+            icon: ActivityIcon,
           },
           {
             label: "Status",
@@ -225,7 +225,7 @@ export function CampaignDetailPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-y border-border">
-                    {["Event", "Type", "Date", "Attendees", "Status"].map(
+                    {["Activity", "Type", "Date", "Attendees", "Status"].map(
                       (h) => (
                         <th
                           key={h}
@@ -244,7 +244,7 @@ export function CampaignDetailPage() {
                       key={e.id}
                       onClick={() =>
                         navigate(
-                          `/ops/dashboard/organizations/${id}/events/${e.id}`,
+                          `/ops/dashboard/organizations/${id}/activities/${e.id}`,
                         )
                       }
                       className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"

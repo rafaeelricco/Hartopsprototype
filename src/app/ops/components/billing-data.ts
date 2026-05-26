@@ -47,23 +47,28 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
   {
     id: "act-bill-001",
     type: "event",
+    category: "on-premise-sla",
+    campaignId: "camp-1",
+    campaignName: "Summer Seltzer Launch",
+    billingCode: "SLT-LAUNCH-ON",
+    supplier: "ENJ Gallo",
     name: "Absolut Vodka Tasting — Total Wine NY",
     date: "2026-05-12",
     accountId: "acc-1",
     accountName: "Total Wine & More",
     distributor: "Southern Glazer's Wine & Spirits",
     billedTo: "Southern Glazer's Wine & Spirits, 313 Underhill Blvd, Syosset NY",
-    billingEntity: "Hart Wine and Spirits",
+    billingEntity: "Hart Agency",
     region: "Metro NY",
     territory: "Manhattan",
-    educatorCount: 2,
-    educatorIds: ["edu-1", "edu-4"],
+    brandAmbassadorCount: 2,
+    brandAmbassadorIds: ["edu-1", "edu-4"],
     serviceFeeKind: "trade",
     eventAmount: 600,
     ambassadorAmount: 320,
     travel: 40,
     gratuity: 0,
-    expectedAmount: 720 + 144, // event amount + 20% trade fee
+    expectedAmount: 600 + 120 + 40, // event + 20% trade fee + travel
     status: "missing",
     missingReason: "SLA — licence not verified",
     slaEligible: true,
@@ -74,6 +79,10 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
   {
     id: "act-bill-002",
     type: "event",
+    category: "on-premise",
+    campaignId: "camp-8",
+    campaignName: "Craft Cocktail Roadshow",
+    billingCode: "BF-CRAFT-COCKTAIL",
     name: "Jameson Whiskey Promo — Dead Rabbit",
     date: "2026-05-14",
     accountId: "acc-2",
@@ -83,8 +92,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingEntity: "Hart Agency",
     region: "Metro NY",
     territory: "Manhattan",
-    educatorCount: 1,
-    educatorIds: ["edu-2"],
+    brandAmbassadorCount: 1,
+    brandAmbassadorIds: ["edu-2"],
     serviceFeeKind: "bar",
     eventAmount: 0,
     ambassadorAmount: 0,
@@ -106,10 +115,14 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     },
   },
 
-  // 3. Recurring event with educator-count regression.
+  // 3. Recurring event with brandAmbassador-count regression.
   {
     id: "act-bill-003",
     type: "event",
+    category: "on-premise-sla",
+    campaignId: "camp-8",
+    campaignName: "Craft Cocktail Roadshow",
+    billingCode: "BF-CRAFT-MIXOLOGY",
     name: "Avion Tequila — Recurring Sunday Tasting",
     date: "2026-05-17",
     accountId: "acc-5",
@@ -119,22 +132,24 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingEntity: "Hart Agency",
     region: "Metro NY",
     territory: "Manhattan",
-    educatorCount: 3,
-    educatorIds: ["edu-1", "edu-4", "edu-6"],
+    brandAmbassadorCount: 3,
+    brandAmbassadorIds: ["edu-1", "edu-4", "edu-6"],
     serviceFeeKind: "bar",
     eventAmount: 720,
     ambassadorAmount: 480,
     travel: 60,
-    gratuity: 50,
-    expectedAmount: 720 + 72 + 60 + 50, // event + 10% bar fee + travel + grat
+    barSpend: 250,
+    maxBarSpend: 500,
+    gratuity: 50, // 20% × $250 bar spend
+    expectedAmount: 720 + 25 + 60 + 250 + 50, // event + 10% × barSpend + travel + barSpend + grat
     status: "missing",
-    missingReason: "Recurring — educator count changed",
+    missingReason: "Recurring — brand ambassador count changed",
     slaEligible: true,
     licenceVerified: true,
     recurringInstance: {
       seriesId: "series-avion-sunday",
-      originalEducatorCount: 2,
-      currentEducatorCount: 3,
+      originalBrandAmbassadorCount: 2,
+      currentBrandAmbassadorCount: 3,
       requiresRecalc: true,
     },
   },
@@ -146,6 +161,11 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
   {
     id: "act-bill-004",
     type: "event",
+    category: "off-premise",
+    campaignId: "camp-2",
+    campaignName: "Q1 Retail Activation",
+    billingCode: "PRR-Q1-RETAIL",
+    supplier: "Pernod Ricard",
     name: "Glenlivet Founders Reserve — Whole Foods",
     date: "2026-05-15",
     accountId: "acc-3",
@@ -155,8 +175,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingEntity: "Hart Agency",
     region: "Metro NY",
     territory: "Brooklyn",
-    educatorCount: 1,
-    educatorIds: ["edu-6"],
+    brandAmbassadorCount: 1,
+    brandAmbassadorIds: ["edu-6"],
     serviceFeeKind: "trade",
     eventAmount: 320,
     ambassadorAmount: 160,
@@ -172,23 +192,37 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
   {
     id: "act-bill-005",
     type: "event",
+    category: "on-premise",
+    campaignId: "camp-8",
+    campaignName: "Craft Cocktail Roadshow",
+    billingCode: "BF-CRAFT-COCKTAIL",
     name: "Avion Reposado — Pearl Street Pub",
     date: "2026-05-19",
     accountId: "acc-7",
     accountName: "Pearl Street Pub",
     distributor: "Southern Glazer's Wine & Spirits",
     billedTo: "Southern Glazer's Wine & Spirits, 313 Underhill Blvd, Syosset NY",
-    billingEntity: "Upstate NY",
+    billingEntity: "Hart Agency",
     region: "Upstate NY",
     territory: "Albany",
-    educatorCount: 1,
-    educatorIds: ["edu-8"],
+    brandAmbassadorCount: 1,
+    brandAmbassadorIds: ["edu-8"],
     serviceFeeKind: "bar",
     eventAmount: 280,
     ambassadorAmount: 152,
     travel: 75,
-    gratuity: 0,
-    expectedAmount: 280 + 28 + 75,
+    travelComponent: {
+      miles: 112,
+      ratePerMile: 0.67,
+      amount: 75, // 112 × $0.67 ≈ $75
+    },
+    barSpend: 180,
+    maxBarSpend: 300,
+    gratuity: 36, // 20% × $180 bar spend
+    suppliesAmount: 24,
+    promotionPublicityAmount: 15,
+    travelEntertainmentAmount: 0,
+    expectedAmount: 280 + 18 + 75 + 180 + 36 + 24 + 15, // event + 10% × barSpend + travel + bar + grat + supplies + promPub
     status: "ready-to-bill",
     slaEligible: true,
     licenceVerified: true,
@@ -200,17 +234,21 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
   {
     id: "act-bill-006",
     type: "survey",
+    category: "survey",
+    campaignId: "camp-2",
+    campaignName: "Q1 Retail Activation",
+    billingCode: "PRR-Q1-SAMPLING",
     name: "Trade Channel Reset Survey — May Wave",
     date: "2026-05-16",
     accountId: "acc-1",
     accountName: "Total Wine & More",
     distributor: "Southern Glazer's Wine & Spirits",
     billedTo: "Southern Glazer's Wine & Spirits, 313 Underhill Blvd, Syosset NY",
-    billingEntity: "Hart Wine and Spirits",
+    billingEntity: "Hart Agency",
     region: "Metro NY",
     territory: "Manhattan",
-    educatorCount: 1,
-    educatorIds: ["edu-5"],
+    brandAmbassadorCount: 1,
+    brandAmbassadorIds: ["edu-5"],
     serviceFeeKind: "mixer", // 0% — surveys don't carry a fee
     eventAmount: 120, // 8 completions × $15
     ambassadorAmount: 120,
@@ -227,7 +265,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
 // ---------------------------------------------------------------------------
 
 export let MOCK_INVOICES: Invoice[] = [
-  // Historical, fully exported and billing-locked.
+  // Historical, fully exported and billing-locked. Mix of payment statuses to
+  // demo Ivie's tracking view.
   {
     id: "inv-2026-04a-001",
     invoiceNumber: "INV-13301",
@@ -244,12 +283,16 @@ export let MOCK_INVOICES: Invoice[] = [
     status: "locked",
     qbSyncedAt: "2026-04-22T15:35:00Z",
     sharepointSentAt: "2026-04-22T15:40:00Z",
+    paymentStatus: "paid",
+    paymentDueAt: "2026-05-22",
+    paidAmount: 2840,
+    paidAt: "2026-05-18",
   },
   {
     id: "inv-2026-04a-002",
     invoiceNumber: "INV-13302",
     manualOverride: false,
-    billingEntity: "Hart Wine and Spirits",
+    billingEntity: "Hart Agency",
     billedTo: "Empire Merchants LLC, 2 49th Avenue, Long Island City NY",
     distributor: "Empire Merchants",
     distributorIdUsed: "Empire",
@@ -260,6 +303,29 @@ export let MOCK_INVOICES: Invoice[] = [
     status: "locked",
     qbSyncedAt: "2026-04-22T15:36:00Z",
     sharepointSentAt: "2026-04-22T15:41:00Z",
+    paymentStatus: "partially-paid",
+    paymentDueAt: "2026-05-22",
+    paidAmount: 800,
+    paidAt: "2026-05-20",
+  },
+  {
+    id: "inv-2026-03b-001",
+    invoiceNumber: "INV-13295",
+    manualOverride: false,
+    billingEntity: "Hart Agency",
+    billedTo: "Southern Glazer's Wine & Spirits, 313 Underhill Blvd, Syosset NY",
+    distributor: "Southern Glazer's Wine & Spirits",
+    distributorIdUsed: "Southern",
+    licenceVerified: true,
+    cycleId: "bcyc-2026-03b",
+    generatedAt: "2026-04-08T14:22:00Z",
+    total: 4120,
+    activityIds: ["act-hist-004"],
+    status: "locked",
+    qbSyncedAt: "2026-04-08T14:30:00Z",
+    sharepointSentAt: "2026-04-08T14:35:00Z",
+    paymentStatus: "overdue",
+    paymentDueAt: "2026-05-08",
   },
 ];
 
@@ -375,10 +441,42 @@ export function lockInvoice(id: string): void {
   );
 }
 
+// Update payment status (Ivie's expanded tracking).
+export function updateInvoicePayment(
+  id: string,
+  patch: {
+    paymentStatus?: import("../../shared/data/billing-types").InvoicePaymentStatus;
+    paidAmount?: number;
+    paidAt?: string;
+    paymentDueAt?: string;
+  },
+): void {
+  MOCK_INVOICES = MOCK_INVOICES.map((i) =>
+    i.id === id ? { ...i, ...patch } : i,
+  );
+}
+
+// P1 #5 — Reject a locked invoice and re-open the underlying activities for
+// re-billing. Mirrors Kayla's "reject" flow (transcript 01:19:08) for the case
+// where the bill was wrong or the date range needs to grow.
+export function rejectInvoice(id: string): string[] {
+  const target = MOCK_INVOICES.find((i) => i.id === id);
+  if (!target) return [];
+  MOCK_INVOICES = MOCK_INVOICES.filter((i) => i.id !== id);
+  return target.activityIds;
+}
+
 // Auto-generate the next invoice number (continues the historical INV-1330x
-// series for prototype realism).
+// series for prototype realism). `peekNextInvoiceNumber` is pure and safe
+// to call during render — only `consumeNextInvoiceNumber` advances the counter
+// (called at export time when an invoice is actually assigned).
 let invoiceCounter = 13302;
-export function nextInvoiceNumber(): string {
+export function peekNextInvoiceNumber(): string {
+  return `INV-${invoiceCounter + 1}`;
+}
+export function consumeNextInvoiceNumber(): string {
   invoiceCounter += 1;
   return `INV-${invoiceCounter}`;
 }
+// Legacy alias — kept so callers don't break, but mapped to peek-only behaviour.
+export const nextInvoiceNumber = peekNextInvoiceNumber;

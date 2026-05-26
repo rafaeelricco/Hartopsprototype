@@ -4,7 +4,7 @@
 
 import type { RateHistoryEntry, RecentOverride } from "./billing-types";
 
-export type Educator = {
+export type BrandAmbassador = {
   id: string;
   name: string;
   city: string;
@@ -17,7 +17,7 @@ export type Educator = {
   lastEventDate: string | null;
   // R2 — Compensation (mm-ui-008). Optional so legacy mock data still
   // compiles; consumers that need comp data should rely on the rate fields
-  // below being populated for active educators.
+  // below being populated for active brandAmbassadors.
   standardRate?: number;
   standardRateEffectiveDate?: string;
   rateHistory?: RateHistoryEntry[];

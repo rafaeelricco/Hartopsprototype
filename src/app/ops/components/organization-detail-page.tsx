@@ -5,7 +5,7 @@ import {
   Building2,
   CalendarDays,
   Users,
-  Activity,
+  Activity as ActivityIcon,
   Globe,
   Mail,
   Phone,
@@ -35,7 +35,7 @@ import {
   TabsContent,
 } from "../../shared/components/ui/tabs";
 import { Progress } from "../../shared/components/ui/progress";
-import { MOCK_EVENTS } from "./events-page";
+import { MOCK_EVENTS } from "./activities-page";
 
 /* ------------------------------------------------------------------ */
 /* Mock data — Organizations                                           */
@@ -502,7 +502,7 @@ export const ORG_CAMPAIGNS: Record<number, Campaign[]> = {
     },
     {
       id: 4,
-      name: "Holiday Pop-Up Events",
+      name: "Holiday Pop-Up Activities",
       status: "Planned",
       startDate: "Nov 15, 2026",
       endDate: "Dec 24, 2026",
@@ -712,7 +712,7 @@ export const ORG_EVENTS: Record<number, OrgEvent[]> = {
   4: [
     {
       id: 1,
-      name: "Beta Launch Event",
+      name: "Beta Launch Activity",
       type: "Hybrid",
       date: "Mar 8, 2026",
       attendees: 75,
@@ -796,7 +796,7 @@ export const ORG_EVENTS: Record<number, OrgEvent[]> = {
     },
     {
       id: 4,
-      name: "Supplier Networking Event",
+      name: "Supplier Networking Activity",
       type: "In-Person",
       date: "Jan 25, 2026",
       attendees: 70,
@@ -1667,7 +1667,7 @@ export function OrganizationDetailPage() {
       {/* Tabs */}
       <Tabs defaultValue="overview">
         <TabsList>
-          {["Overview", "Campaigns", "Events", "Team"].map((tab) => (
+          {["Overview", "Campaigns", "Activities", "Team"].map((tab) => (
             <TabsTrigger
               key={tab}
               value={tab.toLowerCase()}
@@ -1687,7 +1687,7 @@ export function OrganizationDetailPage() {
               <Card className="gap-0 border-[#7D152D]/20">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="flex items-center justify-center size-9 rounded-md bg-[#7D152D]/10">
-                    <Activity className="size-4 text-[#7D152D]" />
+                    <ActivityIcon className="size-4 text-[#7D152D]" />
                   </div>
                   <div>
                     <p
@@ -1718,7 +1718,7 @@ export function OrganizationDetailPage() {
             )}
             <StatMini
               icon={CalendarDays}
-              label="Events"
+              label="Activities"
               value={String(org.events)}
             />
             <StatMini
@@ -1731,7 +1731,7 @@ export function OrganizationDetailPage() {
               label="Campaigns"
               value={String(org.campaigns)}
             />
-            <StatMini icon={Activity} label="Plan" value={org.plan} />
+            <StatMini icon={ActivityIcon} label="Plan" value={org.plan} />
           </div>
 
           {/* Contact info — change #6: relative duration on Joined */}
@@ -1798,7 +1798,7 @@ export function OrganizationDetailPage() {
                           "Campaign",
                           "Status",
                           "Date Range",
-                          "Events",
+                          "Activities",
                           "Progress",
                         ].map((h) => (
                           <th
@@ -1896,7 +1896,7 @@ export function OrganizationDetailPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-y border-border">
-                        {["Event", "Type", "Date", "Attendees", "Status"].map(
+                        {["Activity", "Type", "Date", "Attendees", "Status"].map(
                           (h) => (
                             <th
                               key={h}
@@ -1915,7 +1915,7 @@ export function OrganizationDetailPage() {
                           key={ev.id}
                           onClick={() =>
                             navigate(
-                              `/ops/dashboard/organizations/${org.id}/events/${ev.id}`,
+                              `/ops/dashboard/organizations/${org.id}/activities/${ev.id}`,
                             )
                           }
                           className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer"

@@ -99,7 +99,7 @@ export function Campaigns() {
 
   // Stats
   const activeCount = campaigns.filter((c) => c.status === "active").length;
-  const totalEvents = campaigns.reduce((sum, c) => sum + c.eventCount, 0);
+  const totalEvents = campaigns.reduce((sum, c) => sum + c.activityCount, 0);
 
   return (
     <div className="p-6 font-[Inter]">
@@ -332,7 +332,7 @@ function CampaignCard({ campaign }: { campaign: Campaign }) {
       <div className="flex items-center gap-1.5 mb-3">
         <CalendarDays size={14} style={{ color: "#0F766E" }} />
         <span style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-          {campaign.eventCount} {campaign.eventCount === 1 ? "event" : "events"}
+          {campaign.activityCount} {campaign.activityCount === 1 ? "activity" : "activities"}
         </span>
       </div>
 

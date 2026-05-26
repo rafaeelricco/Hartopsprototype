@@ -114,7 +114,7 @@ export function ResolveSlaModal({
             <p style={{ fontSize: "0.75rem", color: "#92400E" }}>
               This activity will appear in the SLA Report submitted back to SGWS.
               Verification covers: licence number, active status on the event
-              date, executor (educator), and spend amount.
+              date, executor (brandAmbassador), and spend amount.
             </p>
           </div>
 

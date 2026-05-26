@@ -15,7 +15,9 @@ import {
   DialogFooter,
 } from "@/app/shared/components/ui/dialog";
 import { Button } from "@/app/shared/components/ui/button";
+import { Input } from "@/app/shared/components/ui/input";
 import { Label } from "@/app/shared/components/ui/label";
+import { Checkbox } from "@/app/shared/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -33,11 +35,13 @@ const BILLING_KINDS: ReportKind[] = [
   "Not in QB Report",
   "SLA Report",
   "Cancellation Adjustment Report",
+  "Customer Schedule",
 ];
 
 const PAYROLL_KINDS: ReportKind[] = [
   "Payroll Report — Complete",
-  "Missing Educator Payments",
+  "Master Journal",
+  "Missing Brand Ambassador Payments",
   "Override Summary",
 ];
 
@@ -48,38 +52,77 @@ interface GenerateReportDialogProps {
   onClose: () => void;
   workspace: "billing" | "payroll";
   cycleId: string;
-  onGenerate: (report: GeneratedReport) => void;
+  // Default date range = current cycle window. Operator can widen / narrow.
+  defaultRange?: { start: string; end: string };
+  // Optional pool of territories that splittable reports can be split by.
+  splittableTerritories?: string[];
+  onGenerate: (report: GeneratedReport, territory?: string) => void;
 }
+
+// Kinds that support "Split by territory" — Larry prints separate reports per
+// Upstate market (Buffalo / Hudson Valley / North Albany).
+const SPLITTABLE_KINDS: ReportKind[] = [
+  "Payroll Report — Complete",
+  "Master Journal",
+];
 
 export function GenerateReportDialog({
   open,
   onClose,
   workspace,
   cycleId,
+  defaultRange,
+  splittableTerritories = [],
   onGenerate,
 }: GenerateReportDialogProps) {
   const kinds = workspace === "billing" ? BILLING_KINDS : PAYROLL_KINDS;
   const [kind, setKind] = useState<ReportKind>(kinds[0]!);
   const [format, setFormat] = useState<ReportFormat>("Excel");
+  const [splitByTerritory, setSplitByTerritory] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [startDate, setStartDate] = useState(defaultRange?.start ?? "");
+  const [endDate, setEndDate] = useState(defaultRange?.end ?? "");
+
+  const canSplit =
+    workspace === "payroll" &&
+    SPLITTABLE_KINDS.includes(kind) &&
+    splittableTerritories.length > 1;
 
   function handleGenerate() {
     setGenerating(true);
-    // Tiny artificial delay to feel like a generation step happened.
     setTimeout(() => {
       const now = new Date();
-      const report: GeneratedReport = {
-        id: `rep-${workspace}-${Date.now()}`,
-        name: `${kind} — generated ${now.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        })}`,
-        kind,
-        cycleId,
-        generatedAt: now.toISOString(),
-        format,
-      };
-      onGenerate(report);
+      const rangeLabel =
+        startDate && endDate
+          ? ` (${startDate} → ${endDate})`
+          : "";
+      const baseName = `${kind} — ${now.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      })}${rangeLabel}`;
+      if (canSplit && splitByTerritory) {
+        splittableTerritories.forEach((t, i) => {
+          const report: GeneratedReport = {
+            id: `rep-${workspace}-${Date.now()}-${i}`,
+            name: `${baseName} · ${t}`,
+            kind,
+            cycleId,
+            generatedAt: now.toISOString(),
+            format,
+          };
+          onGenerate(report, t);
+        });
+      } else {
+        const report: GeneratedReport = {
+          id: `rep-${workspace}-${Date.now()}`,
+          name: baseName,
+          kind,
+          cycleId,
+          generatedAt: now.toISOString(),
+          format,
+        };
+        onGenerate(report);
+      }
       setGenerating(false);
     }, 400);
   }
@@ -115,6 +158,27 @@ export function GenerateReportDialog({
             </Select>
           </div>
 
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="rep-start">Date range — from</Label>
+              <Input
+                id="rep-start"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="rep-end">to</Label>
+              <Input
+                id="rep-end"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="rep-format">Format</Label>
             <Select
@@ -134,15 +198,45 @@ export function GenerateReportDialog({
             </Select>
           </div>
 
+          {canSplit && (
+            <label
+              className="flex items-start gap-2 rounded-md border p-3 cursor-pointer"
+              style={{
+                borderColor: splitByTerritory ? "#7D152D" : "#E2E8F0",
+                background: splitByTerritory ? "#7D152D08" : "white",
+              }}
+            >
+              <Checkbox
+                checked={splitByTerritory}
+                onCheckedChange={(v) => setSplitByTerritory(v === true)}
+              />
+              <div>
+                <div
+                  style={{
+                    fontSize: "0.8125rem",
+                    color: "#0F172A",
+                    fontWeight: 500,
+                  }}
+                >
+                  Split by territory
+                </div>
+                <div style={{ fontSize: "0.6875rem", color: "#64748B" }}>
+                  Generates one report per territory:{" "}
+                  {splittableTerritories.join(", ")}.
+                </div>
+              </div>
+            </label>
+          )}
+
           <div
             className="flex items-start gap-2 rounded-md p-3"
             style={{ background: "#F1F5F9" }}
           >
             <FileText size={14} style={{ color: "#64748B", marginTop: 2 }} />
             <p style={{ fontSize: "0.75rem", color: "#475569" }}>
-              Reports pull from {workspace === "billing" ? "approved" : "approved"}{" "}
-              activities in cycle <strong>{cycleId}</strong>. Click an entry in
-              the archive after generation to preview.
+              Reports pull from approved activities in cycle{" "}
+              <strong>{cycleId}</strong>. Click an entry in the archive after
+              generation to preview.
             </p>
           </div>
         </div>

@@ -70,7 +70,7 @@ const data30d: DashboardData = {
     { label: "Total Samples", value: "24,812", change: "+12.5%", up: true },
     { label: "Consumer Reach", value: "182,493", change: "+8.2%", up: true },
     { label: "Total Sales", value: "$48,290", change: "+15.3%", up: true },
-    { label: "Events", value: "34", change: "-2.1%", up: false },
+    { label: "Activities", value: "34", change: "-2.1%", up: false },
   ],
   chart: generateChartPoints(30, labels30d, 800, 650, 120),
 };
@@ -90,7 +90,7 @@ const data3m: DashboardData = {
     { label: "Total Samples", value: "68,430", change: "+18.7%", up: true },
     { label: "Consumer Reach", value: "512,810", change: "+11.4%", up: true },
     { label: "Total Sales", value: "$134,750", change: "+22.1%", up: true },
-    { label: "Events", value: "97", change: "+5.8%", up: true },
+    { label: "Activities", value: "97", change: "+5.8%", up: true },
   ],
   chart: generateChartPoints(12, labels3m, 2200, 1800, 350),
 };
@@ -110,7 +110,7 @@ const data6m: DashboardData = {
     { label: "Total Samples", value: "142,975", change: "+24.3%", up: true },
     { label: "Consumer Reach", value: "1,048,320", change: "+19.6%", up: true },
     { label: "Total Sales", value: "$287,410", change: "+28.9%", up: true },
-    { label: "Events", value: "186", change: "+12.4%", up: true },
+    { label: "Activities", value: "186", change: "+12.4%", up: true },
   ],
   chart: generateChartPoints(12, labels6m, 4500, 3600, 600),
 };
@@ -130,7 +130,7 @@ const data12m: DashboardData = {
     { label: "Total Samples", value: "298,614", change: "+31.2%", up: true },
     { label: "Consumer Reach", value: "2,194,780", change: "+26.8%", up: true },
     { label: "Total Sales", value: "$612,340", change: "+35.1%", up: true },
-    { label: "Events", value: "412", change: "+18.7%", up: true },
+    { label: "Activities", value: "412", change: "+18.7%", up: true },
   ],
   chart: generateChartPoints(12, labels12m, 9000, 6800, 1200),
 };

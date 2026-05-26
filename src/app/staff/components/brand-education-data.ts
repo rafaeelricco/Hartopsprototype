@@ -49,7 +49,7 @@ export const FILE_TYPE_LABELS: Record<FileType, string> = {
 // ── Brand entity ────────────────────────────────────────────────────────────
 // Brands are the organizing layer for the product library. Each brand carries
 // canonical "product info" content (story, talking points, compliance notes)
-// that gets surfaced to educators in the mobile app alongside any SKUs linked
+// that gets surfaced to brandAmbassadors in the mobile app alongside any SKUs linked
 // to it. See IMP-649 for the broader rationale.
 
 export interface Brand {
@@ -59,7 +59,7 @@ export interface Brand {
   logoUrl?: string;
   /** Short brand story — supports the lightweight markdown used across the app (**bold**, *italic*, ## headings). */
   story?: string;
-  /** Key talking points educators should know when sampling. */
+  /** Key talking points brandAmbassadors should know when sampling. */
   keyTalkingPoints?: string[];
   /** Compliance or legal notes that must not be forgotten at the venue. */
   complianceNotes?: string;
@@ -225,7 +225,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
     id: "doc-2",
     title: "Summer Seltzer Launch — Brand Script",
     description:
-      "Talking points, key messaging, and educator script for the Summer Seltzer Launch campaign. Covers product benefits, target demographics, and competitive positioning.",
+      "Talking points, key messaging, and brand ambassador script for the Summer Seltzer Launch campaign. Covers product benefits, target demographics, and competitive positioning.",
     type: "Brand Script",
     fileUrl: "/documents/seltzer-brand-script.pdf",
     fileName: "seltzer-brand-script.pdf",
@@ -243,7 +243,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
   },
   {
     id: "doc-3",
-    title: "Malibu — Event Setup Guide",
+    title: "Malibu — Activity Setup Guide",
     description:
       "Step-by-step setup instructions for Malibu sampling events. Includes table layout, signage placement, cooler setup, and branded materials checklist.",
     type: "Setup Info",
@@ -265,7 +265,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
     id: "doc-4",
     title: "Q1 Retail Activation — Evaluation Sheet",
     description:
-      "Post-event evaluation form for Q1 retail activation events. Tracks educator performance, consumer engagement, sales impact, and venue feedback.",
+      "Post-event evaluation form for Q1 retail activation events. Tracks brand ambassador performance, consumer engagement, sales impact, and venue feedback.",
     type: "Evaluation Sheet",
     fileUrl: "/documents/q1-retail-eval-sheet.pdf",
     fileName: "q1-retail-eval-sheet.pdf",
@@ -285,7 +285,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
     id: "doc-5",
     title: "Jameson — Brand Education Overview",
     description:
-      "Comprehensive brand education document for Jameson Irish Whiskey. Heritage story, production process, tasting notes, and suggested pairings for educator training.",
+      "Comprehensive brand education document for Jameson Irish Whiskey. Heritage story, production process, tasting notes, and suggested pairings for brand ambassador training.",
     type: "Brand Script",
     fileUrl: "/documents/jameson-brand-education.pdf",
     fileName: "jameson-brand-education.pdf",
@@ -323,7 +323,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
   },
   {
     id: "doc-7",
-    title: "Maker's Mark — Tasting Event Setup",
+    title: "Maker's Mark — Tasting Activity Setup",
     description:
       "Detailed setup guide for Maker's Mark bourbon tasting events. Covers glassware, ice protocol, tasting mats, and branded display arrangement.",
     type: "Setup Info",
@@ -343,7 +343,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
   },
   {
     id: "doc-8",
-    title: "Music Festival — Event Evaluation",
+    title: "Music Festival — Activity Evaluation",
     description:
       "Evaluation template for music festival brand activation events. Includes crowd engagement metrics, product movement, staff performance, and brand visibility scoring.",
     type: "Evaluation Sheet",
@@ -385,7 +385,7 @@ export const INITIAL_DOCUMENTS: BrandDocument[] = [
     id: "doc-10",
     title: "General — Compliance Guide for Sampling",
     description:
-      "Universal compliance and legal guidelines for beverage alcohol sampling events across all brands. Required for all new educator onboarding.",
+      "Universal compliance and legal guidelines for beverage alcohol sampling events across all brands. Required for all new brand ambassador onboarding.",
     type: "General",
     fileUrl: "/documents/compliance-sampling-guide.pdf",
     fileName: "compliance-sampling-guide.pdf",

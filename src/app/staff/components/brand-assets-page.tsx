@@ -77,7 +77,7 @@ import {
   type FileType,
 } from "./brand-education-data";
 import { INITIAL_CAMPAIGNS } from "./campaign-data";
-import { INITIAL_EVENTS } from "./event-data";
+import { INITIAL_ACTIVITIES } from "./activity-data";
 import {
   CAMPAIGN_QUESTIONNAIRES,
   STANDARD_QUESTIONNAIRE,
@@ -335,7 +335,7 @@ function getSkuUsage(skuId: string): SkuUsage {
     }
   }
   const events: { id: string; name: string }[] = [];
-  for (const e of INITIAL_EVENTS) {
+  for (const e of INITIAL_ACTIVITIES) {
     if (e.sampleConfigs?.some((s) => s.skuId === skuId)) {
       events.push({ id: e.id, name: e.name });
     }
@@ -354,7 +354,7 @@ function getBrandUsage(brandId: string, skus: SKU[]): SkuUsage {
     }
   }
   const eventsMap = new Map<string, string>();
-  for (const e of INITIAL_EVENTS) {
+  for (const e of INITIAL_ACTIVITIES) {
     if (e.sampleConfigs?.some((s) => brandSkuIds.has(s.skuId))) {
       eventsMap.set(e.id, e.name);
     }
@@ -877,7 +877,7 @@ function BrandDetailDrawer({
                 textTransform: "uppercase",
               }}
             >
-              Product info (seen by educators)
+              Product info (seen by brandAmbassadors)
             </h4>
             <div className="space-y-3">
               <FormField label="Brand story">
@@ -887,7 +887,7 @@ function BrandDetailDrawer({
                   rows={5}
                   className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D] resize-y"
                   style={{ fontSize: "0.8125rem", lineHeight: 1.6 }}
-                  placeholder="## Heading&#10;**Bold**, *italic* supported. Tell the brand's origin, what makes it distinctive, and the hook educators should open with."
+                  placeholder="## Heading&#10;**Bold**, *italic* supported. Tell the brand's origin, what makes it distinctive, and the hook brand ambassadors should open with."
                 />
                 {form.story && (
                   <div
@@ -938,7 +938,7 @@ function BrandDetailDrawer({
                       className="italic"
                       style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
                     >
-                      No talking points yet. Add bite-sized facts educators can
+                      No talking points yet. Add bite-sized facts brandAmbassadors can
                       rattle off under 10 seconds.
                     </p>
                   )}
@@ -2086,7 +2086,7 @@ function SKUDetailOverlay({
             ))}
           </div>
 
-          {/* Brand — inherited content educators will see */}
+          {/* Brand — inherited content brandAmbassadors will see */}
           {brand && (
             <div className="mb-5 rounded-xl border border-[#E2E8F0] bg-[#FAFBFC] p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -2112,7 +2112,7 @@ function SKUDetailOverlay({
                   className="mb-3 italic"
                   style={{ fontSize: "0.75rem", color: "#94A3B8" }}
                 >
-                  No brand story yet. Add one in the Brands tab so educators see
+                  No brand story yet. Add one in the Brands tab so brandAmbassadors see
                   it in the field.
                 </p>
               )}
@@ -2507,7 +2507,7 @@ function SKUEditModal({
                   className="mt-1"
                   style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
                 >
-                  Educators see this in the mobile app. Prototype stores a local
+                  Brand Ambassadors see this in the mobile app. Prototype stores a local
                   preview only.
                 </p>
               </div>
@@ -5195,7 +5195,7 @@ function FAQEditModal({
               }
               className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] outline-none focus:border-[#7D152D]"
               style={{ fontSize: "0.8125rem" }}
-              placeholder="What should educators know about...?"
+              placeholder="What should brand ambassadors know about...?"
             />
           </FormField>
 
@@ -5392,7 +5392,7 @@ function QuestionnairesTab({
 
   const usageCountByCampaign = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const e of INITIAL_EVENTS) {
+    for (const e of INITIAL_ACTIVITIES) {
       if (!e.campaignId) continue;
       counts.set(e.campaignId, (counts.get(e.campaignId) ?? 0) + 1);
     }

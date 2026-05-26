@@ -183,7 +183,7 @@ export function ReportsPage() {
     return events.filter((e) =>
       PROOF_PHOTOS.some(
         (p) =>
-          p.eventId === e.eventId && p.campaignId === galleryCampaignFilter,
+          p.activityId === e.activityId && p.campaignId === galleryCampaignFilter,
       ),
     );
   }, [galleryCampaignFilter]);
@@ -198,7 +198,7 @@ export function ReportsPage() {
     if (galleryCampaignFilter !== "all")
       filtered = filtered.filter((p) => p.campaignId === galleryCampaignFilter);
     if (galleryEventFilter !== "all")
-      filtered = filtered.filter((p) => p.eventId === galleryEventFilter);
+      filtered = filtered.filter((p) => p.activityId === galleryEventFilter);
     // Sort by date
     filtered = [...filtered].sort((a, b) => {
       const diff = new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -450,7 +450,7 @@ export function ReportsPage() {
         <div className="grid grid-cols-3 gap-3">
           <SecondaryStatCard
             icon={<CalendarDays size={14} />}
-            label="Events"
+            label="Activities"
             value={stats.events.toString()}
             color="#D97706"
           />
@@ -651,7 +651,7 @@ export function ReportsPage() {
                   <tr className="border-b border-[#E2E8F0]">
                     {[
                       { key: "campaignName" as SortKey, label: "Campaign" },
-                      { key: "events" as SortKey, label: "Events" },
+                      { key: "events" as SortKey, label: "Activities" },
                       { key: "samples" as SortKey, label: "Samples" },
                       { key: "consumerReach" as SortKey, label: "Reach" },
                       { key: "totalSales" as SortKey, label: "Total Sales" },
@@ -995,7 +995,7 @@ export function ReportsPage() {
               className="h-8 px-3 bg-[#FFFFFF] hover:bg-[#F1F5F9] border-[#E2E8F0] text-[#0F172A] cursor-pointer"
               onClick={() => {
                 exportEventDetailsCSV();
-                toast.success("Downloading Event Details CSV");
+                toast.success("Downloading Activity Details CSV");
               }}
             >
               <Download size={14} className="mr-2" />
@@ -1078,9 +1078,9 @@ export function ReportsPage() {
                     className="appearance-none pl-7 pr-6 py-1.5 rounded-lg bg-[#F1F5F9] border-0 cursor-pointer hover:bg-[#E2E8F0] transition-colors"
                     style={{ fontSize: "0.6875rem", color: "#64748B" }}
                   >
-                    <option value="all">All events</option>
+                    <option value="all">All activities</option>
                     {galleryEventOptions.map((e) => (
-                      <option key={e.eventId} value={e.eventId}>
+                      <option key={e.activityId} value={e.activityId}>
                         {e.eventName}
                       </option>
                     ))}
@@ -1405,7 +1405,7 @@ function PhotoLightbox({
           </p>
           <div className="flex items-center gap-4 flex-wrap mb-3">
             <Link
-              to={`/staff/events/${photo.eventId}`}
+              to={`/staff/activities/${photo.activityId}`}
               onClick={onClose}
               className="flex items-center gap-1 no-underline hover:underline"
               style={{ fontSize: "0.8125rem", color: "#7D152D" }}

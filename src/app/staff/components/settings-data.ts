@@ -33,7 +33,7 @@ export const CURRENT_USER: UserProfile = {
 export type TeamRole =
   | "Admin"
   | "Operating Staff"
-  | "Field Educator"
+  | "Field BrandAmbassador"
   | "Viewer";
 
 export interface TeamMember {
@@ -50,7 +50,7 @@ export interface TeamMember {
 export const TEAM_ROLES: TeamRole[] = [
   "Admin",
   "Operating Staff",
-  "Field Educator",
+  "Field BrandAmbassador",
   "Viewer",
 ];
 
@@ -79,7 +79,7 @@ export const INITIAL_TEAM: TeamMember[] = [
     id: "tm-3",
     name: "Aisha Johnson",
     email: "aisha.j@hartagency.com",
-    role: "Field Educator",
+    role: "Field BrandAmbassador",
     status: "active",
     lastActive: "2026-03-03T17:20:00Z",
     initials: "AJ",
@@ -89,7 +89,7 @@ export const INITIAL_TEAM: TeamMember[] = [
     id: "tm-4",
     name: "Carlos Rivera",
     email: "c.rivera@hartagency.com",
-    role: "Field Educator",
+    role: "Field BrandAmbassador",
     status: "active",
     lastActive: "2026-03-03T14:05:00Z",
     initials: "CR",
@@ -119,7 +119,7 @@ export const INITIAL_TEAM: TeamMember[] = [
     id: "tm-7",
     name: "Sophia Martinez",
     email: "sophia.m@hartagency.com",
-    role: "Field Educator",
+    role: "Field BrandAmbassador",
     status: "deactivated",
     lastActive: "2026-01-15T09:00:00Z",
     initials: "SM",
@@ -160,10 +160,10 @@ export const INITIAL_NOTIFICATIONS: NotificationPref[] = [
   },
   {
     id: "notif-3",
-    label: "Event phase transitions",
+    label: "Activity phase transitions",
     description:
       "When an event moves from draft to scheduled, active, or completed",
-    category: "Events",
+    category: "Activities",
     email: true,
     push: true,
     inApp: true,
@@ -173,7 +173,7 @@ export const INITIAL_NOTIFICATIONS: NotificationPref[] = [
     label: "Live event alerts",
     description:
       "Real-time updates during active events (check-ins, milestones)",
-    category: "Events",
+    category: "Activities",
     email: false,
     push: true,
     inApp: true,
@@ -208,7 +208,7 @@ export const INITIAL_NOTIFICATIONS: NotificationPref[] = [
   {
     id: "notif-8",
     label: "FAQ push confirmations",
-    description: "When FAQs are successfully pushed to field educator teams",
+    description: "When FAQs are successfully pushed to field brand ambassador teams",
     category: "Brand Assets",
     email: true,
     push: true,
@@ -249,8 +249,8 @@ export interface Integration {
 export const INITIAL_INTEGRATIONS: Integration[] = [
   {
     id: "int-1",
-    name: "Educator Mobile App",
-    description: "Push FAQs and event assignments to the field educator app",
+    name: "BrandAmbassador Mobile App",
+    description: "Push FAQs and event assignments to the field brand ambassador app",
     iconName: "smartphone",
     connected: true,
     lastSync: "2026-03-04T08:00:00Z",

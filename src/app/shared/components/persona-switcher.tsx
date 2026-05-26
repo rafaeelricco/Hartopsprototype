@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronUp, UserCog, Briefcase, Users } from "lucide-react";
 
 interface Persona {
-  id: "ops" | "staff" | "educator";
+  id: "ops" | "staff" | "market-manager";
   label: string;
   description: string;
   dashboardUrl: string;
@@ -35,10 +35,10 @@ const PERSONAS: Persona[] = [
     color: "#0F766E",
   },
   {
-    id: "educator",
-    label: "Educator Manager",
+    id: "market-manager",
+    label: "Market Manager",
     description: "Territory Manager",
-    dashboardUrl: "/educator/dashboard",
+    dashboardUrl: "/market-manager/dashboard",
     icon: Users,
     color: "#1D4ED8",
   },
@@ -46,7 +46,7 @@ const PERSONAS: Persona[] = [
 
 function detectActivePersona(path: string): Persona["id"] {
   if (path.startsWith("/staff")) return "staff";
-  if (path.startsWith("/educator")) return "educator";
+  if (path.startsWith("/market-manager")) return "market-manager";
   return "ops";
 }
 

@@ -256,11 +256,11 @@ export function AccountsPage() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <ProfileTile
-                    label="Events Hosted"
+                    label="Activities Hosted"
                     value={selectedAccount.eventsHosted}
                   />
                   <ProfileTile
-                    label="Last Event"
+                    label="Last Activity"
                     value={selectedAccount.lastEventDate || "—"}
                   />
                 </div>
@@ -392,9 +392,9 @@ export function AccountsPage() {
                     "Type",
                     "Location",
                     "Contact",
-                    "Events Hosted",
+                    "Activities Hosted",
                     "Status",
-                    "Last Event",
+                    "Last Activity",
                   ].map((h) => (
                     <th
                       key={h}

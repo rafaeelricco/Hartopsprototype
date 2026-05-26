@@ -4,7 +4,7 @@
 //
 // Quantities are intentionally NOT handled here. Per Hart's workflow, physical
 // sample quantities live at the kit level (defined when the kit is assembled)
-// and the educator captures starting inventory at check-in. The operator's
+// and the brandAmbassador captures starting inventory at check-in. The operator's
 // job here is product SELECTION only.
 // =============================================================================
 
@@ -30,7 +30,7 @@ import {
   type Brand,
   type BrandDocument,
 } from "./brand-education-data";
-import type { SampleConfig } from "./event-data";
+import type { SampleConfig } from "./activity-data";
 
 // ── Props ────────────────────────────────────────────────────────────────────
 
@@ -123,7 +123,7 @@ export function StepProductsSamples({
         </h2>
         <p className="mt-1" style={{ fontSize: "0.875rem", color: "#64748B" }}>
           Select which products will be sampled at this event. Physical sample
-          quantities are defined at the kit level and captured by the educator
+          quantities are defined at the kit level and captured by the brandAmbassador
           at check-in.
         </p>
       </div>

@@ -13,9 +13,9 @@ import {
 import { Button } from "@/app/shared/components/ui/button";
 import { Input } from "@/app/shared/components/ui/input";
 import {
-  mockEducators,
-  type Educator,
-} from "@/app/educator/components/educator-roster-data";
+  mockBrandAmbassadors,
+  type BrandAmbassador,
+} from "@/app/market-manager/components/brand-ambassador-roster-data";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -104,12 +104,12 @@ export function AvailabilityCalendarPage() {
   const weekDays = useMemo(() => getWeekDays(weekAnchor), [weekAnchor]);
   const todayKey = toISODate(new Date());
 
-  // Filter educators
-  const filteredEducators = useMemo(() => {
+  // Filter brandAmbassadors
+  const filteredBrandAmbassadors = useMemo(() => {
     let list =
       statusFilter === "All"
-        ? mockEducators
-        : mockEducators.filter((e) => e.status === statusFilter);
+        ? mockBrandAmbassadors
+        : mockBrandAmbassadors.filter((e) => e.status === statusFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -135,9 +135,9 @@ export function AvailabilityCalendarPage() {
 
   const goThisWeek = () => setWeekAnchor(new Date());
 
-  // Get slots for a given educator+date
-  const getSlots = (educator: Educator, dateStr: string): string[] => {
-    const entry = educator.availability.find((a) => a.date === dateStr);
+  // Get slots for a given brandAmbassador+date
+  const getSlots = (brandAmbassador: BrandAmbassador, dateStr: string): string[] => {
+    const entry = brandAmbassador.availability.find((a) => a.date === dateStr);
     return entry?.slots || [];
   };
 
@@ -149,10 +149,10 @@ export function AvailabilityCalendarPage() {
           className="text-[#0F172A]"
           style={{ fontSize: "1.5rem", fontWeight: 600 }}
         >
-          Educator Availability
+          BrandAmbassador Availability
         </h1>
         <p className="text-[#94A3B8] mt-1" style={{ fontSize: "0.875rem" }}>
-          Centralized view of all educators' weekly availability. Use this to
+          Centralized view of all brandAmbassadors' weekly availability. Use this to
           plan assignments and identify scheduling gaps.
         </p>
       </div>
@@ -160,8 +160,8 @@ export function AvailabilityCalendarPage() {
       {/* ── Stats ────────────────────────────────────────────────────────
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
-          label="Active Educators"
-          value={mockEducators.filter((e) => e.status === "Active").length}
+          label="Active Brand Ambassadors"
+          value={mockBrandAmbassadors.filter((e) => e.status === "Active").length}
           accent="#0F172A"
         />
         <StatCard
@@ -175,8 +175,8 @@ export function AvailabilityCalendarPage() {
           accent="#7D152D"
         />
         <StatCard
-          label="Total Educators"
-          value={mockEducators.length}
+          label="Total Brand Ambassadors"
+          value={mockBrandAmbassadors.length}
           accent="#64748B"
         />
       </div> */}
@@ -191,7 +191,7 @@ export function AvailabilityCalendarPage() {
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
             />
             <Input
-              placeholder="Search educators…"
+              placeholder="Search brand ambassadors…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-9 h-9"
@@ -269,7 +269,7 @@ export function AvailabilityCalendarPage() {
             style={{ fontSize: "0.75rem", fontWeight: 600 }}
           >
             <Users size={14} />
-            Educator ({filteredEducators.length})
+            BrandAmbassador ({filteredBrandAmbassadors.length})
           </div>
           {weekDays.map((day, i) => {
             const key = toISODate(day);
@@ -301,8 +301,8 @@ export function AvailabilityCalendarPage() {
           })}
         </div>
 
-        {/* Educator rows */}
-        {filteredEducators.length === 0 ? (
+        {/* BrandAmbassador rows */}
+        {filteredBrandAmbassadors.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div
               className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
@@ -311,7 +311,7 @@ export function AvailabilityCalendarPage() {
               <Filter size={22} style={{ color: "#7D152D" }} />
             </div>
             <p style={{ fontSize: "1rem", color: "#0F172A" }} className="mb-1">
-              No educators match
+              No brandAmbassadors match
             </p>
             <p style={{ fontSize: "0.875rem", color: "#94A3B8" }}>
               Try adjusting your search or filter.
@@ -319,30 +319,30 @@ export function AvailabilityCalendarPage() {
           </div>
         ) : (
           <div className="divide-y divide-[#E2E8F0]">
-            {filteredEducators.map((educator) => {
-              const initials = educator.name
+            {filteredBrandAmbassadors.map((brandAmbassador) => {
+              const initials = brandAmbassador.name
                 .split(" ")
                 .map((n) => n[0])
                 .join("");
               const statusColor =
-                educator.status === "Active"
+                brandAmbassador.status === "Active"
                   ? "#0F766E"
-                  : educator.status === "Inactive"
+                  : brandAmbassador.status === "Inactive"
                     ? "#94A3B8"
                     : "#D97706";
 
               return (
                 <div
-                  key={educator.id}
+                  key={brandAmbassador.id}
                   className="grid hover:bg-[#F8FAFC]/50 transition-colors"
                   style={{
                     gridTemplateColumns: "200px repeat(7, 1fr)",
                   }}
                 >
-                  {/* Educator name column */}
+                  {/* BrandAmbassador name column */}
                   <button
                     onClick={() =>
-                      navigate(`/ops/dashboard/educators/${educator.id}`)
+                      navigate(`/ops/dashboard/brand-ambassadors/${brandAmbassador.id}`)
                     }
                     className="px-4 py-3 flex items-center gap-3 text-left border-r border-[#E2E8F0] hover:bg-[#7D152D]/5 transition-colors cursor-pointer bg-transparent"
                   >
@@ -362,7 +362,7 @@ export function AvailabilityCalendarPage() {
                         className="truncate text-[#0F172A]"
                         style={{ fontSize: "0.8125rem", fontWeight: 500 }}
                       >
-                        {educator.name}
+                        {brandAmbassador.name}
                       </p>
                       <div className="flex items-center gap-1.5">
                         <span
@@ -373,7 +373,7 @@ export function AvailabilityCalendarPage() {
                           className="text-[#94A3B8] truncate"
                           style={{ fontSize: "0.625rem" }}
                         >
-                          {educator.homeBase}
+                          {brandAmbassador.homeBase}
                         </span>
                       </div>
                     </div>
@@ -383,7 +383,7 @@ export function AvailabilityCalendarPage() {
                   {weekDays.map((day, _dayIdx) => {
                     const dateStr = toISODate(day);
                     const isToday = dateStr === todayKey;
-                    const slots = getSlots(educator, dateStr);
+                    const slots = getSlots(brandAmbassador, dateStr);
                     const hasSlots = slots.length > 0;
 
                     return (

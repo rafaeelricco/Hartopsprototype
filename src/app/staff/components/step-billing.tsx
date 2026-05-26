@@ -1,7 +1,7 @@
 // =============================================================================
 // Step Billing (mm-ui-011)
 // Mandatory billing step in the event creation wizard. Per-BA roster: pick
-// each educator individually, see their standard rate auto-fill, and override
+// each brandAmbassador individually, see their standard rate auto-fill, and override
 // per-BA with a reason picklist. Service Fee preview from venue type
 // (10% bar / 20% trade / 0% mixer). Activity-type aware: Event vs Survey
 // fields differ to prove the activity-as-billable generalisation.
@@ -29,35 +29,36 @@ import {
 } from "@/app/shared/components/ui/select";
 import { Button } from "@/app/shared/components/ui/button";
 import {
-  BILLING_ENTITIES,
   OVERRIDE_REASONS,
   SERVICE_FEE_BY_KIND,
+  BAR_SPEND_CEILING,
+  BAR_SPEND_GRATUITY_RATE,
 } from "@/app/shared/data/billing-types";
 import type {
   ActivityType,
-  BillingEntity,
   OverrideReason,
   ServiceFeeKind,
 } from "@/app/shared/data/billing-types";
 import { MOCK_ACCOUNTS } from "@/lib/account-data";
-import { mockEducators } from "@/app/educator/components/educator-roster-data";
+import { mockBrandAmbassadors } from "@/app/market-manager/components/brand-ambassador-roster-data";
 
 export interface BillingStepBa {
   rowId: string; // local UI id
-  educatorId: string;
+  brandAmbassadorId: string;
   hours: number;
-  overrideRate: number; // 0 = no override, use educator's standard rate
+  overrideRate: number; // 0 = no override, use brandAmbassador's standard rate
   overrideReason: OverrideReason | "";
   overrideNote: string;
 }
 
 export interface BillingStepData {
   activityType: ActivityType;
-  billingEntity: BillingEntity;
-  billingEntityOverridden: boolean;
   bas: BillingStepBa[];
   travel: number;
-  gratuity: number;
+  // Bar-spend ceiling (P0 #10). Customer's budgeted bar ceiling for the
+  // activity. Capped at BAR_SPEND_CEILING ($700). Auto-computes 20% gratuity
+  // and feeds Max Ambassador Expense (labor + maxBarSpend + gratuity on max).
+  maxBarSpend: number;
   expectedCompletions: number;
   perCompletionRate: number;
 }
@@ -68,20 +69,11 @@ function makeRowId(): string {
 
 export const INITIAL_BILLING: BillingStepData = {
   activityType: "event",
-  billingEntity: "Hart Agency",
-  billingEntityOverridden: false,
-  bas: [
-    {
-      rowId: makeRowId(),
-      educatorId: "",
-      hours: 4,
-      overrideRate: 0,
-      overrideReason: "",
-      overrideNote: "",
-    },
-  ],
+  // Per Leah (May-26): BA assignment is optional at activity creation. The
+  // operator may not know who's working yet — they assign during scheduling.
+  bas: [],
   travel: 0,
-  gratuity: 0,
+  maxBarSpend: 0,
   expectedCompletions: 8,
   perCompletionRate: 15,
 };
@@ -117,8 +109,6 @@ export function StepBilling({
   const feeKind: ServiceFeeKind =
     billing.activityType === "survey" ? "mixer" : venueTypeToFeeKind(venueType);
   const feeRate = SERVICE_FEE_BY_KIND[feeKind];
-  const accountEntity = account?.billingEntity ?? "Hart Agency";
-
   const slaEligible =
     !!account &&
     account.state === "NY" &&
@@ -127,19 +117,19 @@ export function StepBilling({
       k.toLowerCase().includes("southern"),
     );
 
-  const activeEducators = mockEducators.filter((e) => e.status === "Active");
+  const activeBrandAmbassadors = mockBrandAmbassadors.filter((e) => e.status === "Active");
 
   // Per-BA roster math.
   const baRows = billing.bas.map((row) => {
-    const educator = activeEducators.find((e) => e.id === row.educatorId);
-    const standardRate = educator?.standardRate ?? 0;
+    const brandAmbassador = activeBrandAmbassadors.find((e) => e.id === row.brandAmbassadorId);
+    const standardRate = brandAmbassador?.standardRate ?? 0;
     const effectiveRate =
       row.overrideRate > 0 ? row.overrideRate : standardRate;
     const isOverridden = row.overrideRate > 0;
     const subtotal = effectiveRate * row.hours;
     return {
       ...row,
-      educator,
+      brandAmbassador,
       standardRate,
       effectiveRate,
       isOverridden,
@@ -151,9 +141,39 @@ export function StepBilling({
     billing.activityType === "survey"
       ? billing.expectedCompletions * billing.perCompletionRate
       : baRows.reduce((s, r) => s + r.subtotal, 0);
-  const serviceFeeAmount = eventAmount * feeRate;
+
+  // Bar-spend math (P0 #10). Only applies to on-premise (bar) event activities.
+  const isBarVenue =
+    billing.activityType === "event" && feeKind === "bar";
+  const maxBarSpendCapped = Math.min(
+    Math.max(billing.maxBarSpend, 0),
+    BAR_SPEND_CEILING,
+  );
+  const maxGratuity = isBarVenue
+    ? maxBarSpendCapped * BAR_SPEND_GRATUITY_RATE
+    : 0;
+
+  // Service fee math (May-26 fix per Leah):
+  //   bar venues → 10% × bar spend (NOT event amount / BA subtotal)
+  //   trade venues → 20% × event amount
+  //   mixer / survey → 0
+  const serviceFeeAmount = isBarVenue
+    ? maxBarSpendCapped * feeRate
+    : feeKind === "trade"
+      ? eventAmount * feeRate
+      : 0;
+
+  // "Max Ambassador Expense" is the customer's worst-case budget number per
+  // Kayla — labor + max bar spend + 20% gratuity on the max.
+  const maxAmbassadorExpense = isBarVenue
+    ? eventAmount + maxBarSpendCapped + maxGratuity
+    : eventAmount;
+
   const total =
-    eventAmount + serviceFeeAmount + billing.travel + billing.gratuity;
+    eventAmount +
+    serviceFeeAmount +
+    billing.travel +
+    (isBarVenue ? maxBarSpendCapped + maxGratuity : 0);
 
   function patch<K extends keyof BillingStepData>(
     key: K,
@@ -179,7 +199,7 @@ export function StepBilling({
         ...billing.bas,
         {
           rowId: makeRowId(),
-          educatorId: "",
+          brandAmbassadorId: "",
           hours: 4,
           overrideRate: 0,
           overrideReason: "",
@@ -190,7 +210,6 @@ export function StepBilling({
   }
 
   function removeBa(rowId: string) {
-    if (billing.bas.length <= 1) return;
     onChange({
       ...billing,
       bas: billing.bas.filter((b) => b.rowId !== rowId),
@@ -198,8 +217,8 @@ export function StepBilling({
   }
 
   // BAs already picked, so we can disable them in other dropdowns and avoid
-  // accidentally double-booking the same educator.
-  const pickedIds = new Set(billing.bas.map((b) => b.educatorId).filter(Boolean));
+  // accidentally double-booking the same brandAmbassador.
+  const pickedIds = new Set(billing.bas.map((b) => b.brandAmbassadorId).filter(Boolean));
 
   return (
     <div className="space-y-6">
@@ -304,41 +323,6 @@ export function StepBilling({
         )}
       </div>
 
-      {/* Billing entity selector */}
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-2">
-        <Label htmlFor="billing-entity" style={{ fontSize: "0.8125rem" }}>
-          Billing entity
-        </Label>
-        <Select
-          value={billing.billingEntity}
-          onValueChange={(v) => {
-            const value = v as BillingEntity;
-            patch("billingEntity", value);
-            patch("billingEntityOverridden", value !== accountEntity);
-          }}
-        >
-          <SelectTrigger id="billing-entity">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {BILLING_ENTITIES.map((e) => (
-              <SelectItem key={e} value={e}>
-                {e}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-          Default from account: <strong>{accountEntity}</strong>.
-          {billing.billingEntityOverridden && (
-            <span style={{ color: "#D97706" }}>
-              {" "}
-              Override is logged for the operator.
-            </span>
-          )}
-        </p>
-      </div>
-
       {/* Event-mode: per-BA roster */}
       {billing.activityType === "event" && (
         <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-4">
@@ -350,7 +334,10 @@ export function StepBilling({
               <Users size={14} style={{ color: "#7D152D" }} />
               <strong>BA roster</strong>
               <span style={{ color: "#94A3B8", fontWeight: 400 }}>
-                · {billing.bas.length} of up to 5
+                · optional ·{" "}
+                {billing.bas.length === 0
+                  ? "none assigned"
+                  : `${billing.bas.length} of up to 5`}
               </span>
             </div>
             <Button
@@ -364,6 +351,21 @@ export function StepBilling({
               Add BA
             </Button>
           </div>
+
+          {baRows.length === 0 && (
+            <div
+              className="rounded-lg p-4 text-center"
+              style={{
+                background: "#F8FAFC",
+                border: "1px dashed #E2E8F0",
+                fontSize: "0.8125rem",
+                color: "#64748B",
+              }}
+            >
+              No Brand Ambassadors assigned yet. You can add them now or leave
+              this empty and assign during scheduling.
+            </div>
+          )}
 
           <div className="space-y-3">
             {baRows.map((row, idx) => (
@@ -382,17 +384,15 @@ export function StepBilling({
                   >
                     BA #{idx + 1}
                   </div>
-                  {billing.bas.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeBa(row.rowId)}
-                      className="inline-flex items-center gap-1 cursor-pointer transition-colors hover:opacity-80"
-                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
-                      title="Remove this BA"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeBa(row.rowId)}
+                    className="inline-flex items-center gap-1 cursor-pointer transition-colors hover:opacity-80"
+                    style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                    title="Remove this BA"
+                  >
+                    <Trash2 size={12} />
+                  </button>
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -401,21 +401,21 @@ export function StepBilling({
                       htmlFor={`ba-${row.rowId}`}
                       style={{ fontSize: "0.75rem", color: "#64748B" }}
                     >
-                      Educator
+                      BrandAmbassador
                     </Label>
                     <Select
-                      value={row.educatorId}
-                      onValueChange={(v) => patchBa(row.rowId, { educatorId: v })}
+                      value={row.brandAmbassadorId}
+                      onValueChange={(v) => patchBa(row.rowId, { brandAmbassadorId: v })}
                     >
                       <SelectTrigger id={`ba-${row.rowId}`}>
                         <SelectValue placeholder="Pick a BA…" />
                       </SelectTrigger>
                       <SelectContent>
-                        {activeEducators.map((e) => (
+                        {activeBrandAmbassadors.map((e) => (
                           <SelectItem
                             key={e.id}
                             value={e.id}
-                            disabled={pickedIds.has(e.id) && e.id !== row.educatorId}
+                            disabled={pickedIds.has(e.id) && e.id !== row.brandAmbassadorId}
                           >
                             {e.name} ({fmtMoney(e.standardRate)}/hr)
                           </SelectItem>
@@ -547,34 +547,39 @@ export function StepBilling({
             ))}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 pt-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="travel" style={{ fontSize: "0.8125rem" }}>
-                Travel ($)
+          {isBarVenue && (
+            <div className="space-y-1.5 pt-2 sm:max-w-[50%]">
+              <Label htmlFor="max-bar-spend" style={{ fontSize: "0.8125rem" }}>
+                Max bar spend ($)
               </Label>
               <Input
-                id="travel"
+                id="max-bar-spend"
                 type="number"
-                value={billing.travel}
-                onChange={(e) =>
-                  patch("travel", parseFloat(e.target.value) || 0)
-                }
+                min={0}
+                max={BAR_SPEND_CEILING}
+                value={billing.maxBarSpend}
+                onChange={(e) => {
+                  const raw = parseFloat(e.target.value) || 0;
+                  const capped = Math.min(
+                    Math.max(raw, 0),
+                    BAR_SPEND_CEILING,
+                  );
+                  patch("maxBarSpend", capped);
+                }}
               />
+              <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                Budget ceiling only · ${BAR_SPEND_CEILING} platform max with
+                20% gratuity bundled. Actual bar spend is logged after the
+                activity from receipts — the 10% service fee and final invoice
+                line both recalculate from that figure, not from this estimate.
+              </p>
+              {billing.maxBarSpend > BAR_SPEND_CEILING && (
+                <p style={{ fontSize: "0.6875rem", color: "#B91C1C" }}>
+                  Capped at the ${BAR_SPEND_CEILING} platform ceiling.
+                </p>
+              )}
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="gratuity" style={{ fontSize: "0.8125rem" }}>
-                Gratuity ($)
-              </Label>
-              <Input
-                id="gratuity"
-                type="number"
-                value={billing.gratuity}
-                onChange={(e) =>
-                  patch("gratuity", parseFloat(e.target.value) || 0)
-                }
-              />
-            </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -647,7 +652,7 @@ export function StepBilling({
                 className="flex items-center justify-between"
               >
                 <span style={{ color: "#64748B" }}>
-                  {row.educator?.name ?? "Unassigned"} ·{" "}
+                  {row.brandAmbassador?.name ?? "Unassigned"} ·{" "}
                   {fmtMoney(row.effectiveRate)} × {row.hours}h
                   {row.isOverridden && (
                     <span style={{ color: "#D97706" }}>
@@ -683,6 +688,17 @@ export function StepBilling({
           <div className="flex items-center justify-between">
             <span style={{ color: "#64748B" }}>
               Service fee ({(feeRate * 100).toFixed(0)}% — {feeKind})
+              {isBarVenue && (
+                <span
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#94A3B8",
+                    marginLeft: 6,
+                  }}
+                >
+                  (estimate — recalculated from actual bar spend post-activity)
+                </span>
+              )}
             </span>
             <span style={{ color: "#0F172A" }}>{fmtMoney(serviceFeeAmount)}</span>
           </div>
@@ -692,11 +708,28 @@ export function StepBilling({
               <span style={{ color: "#0F172A" }}>{fmtMoney(billing.travel)}</span>
             </div>
           )}
-          {billing.gratuity > 0 && (
-            <div className="flex items-center justify-between">
-              <span style={{ color: "#64748B" }}>Gratuity</span>
-              <span style={{ color: "#0F172A" }}>{fmtMoney(billing.gratuity)}</span>
-            </div>
+          {isBarVenue && maxBarSpendCapped > 0 && (
+            <>
+              <div className="flex items-center justify-between">
+                <span style={{ color: "#64748B" }}>
+                  Max bar spend (ceiling ${BAR_SPEND_CEILING}, includes 20% grat.)
+                </span>
+                <span style={{ color: "#0F172A" }}>
+                  {fmtMoney(maxBarSpendCapped + maxGratuity)}
+                </span>
+              </div>
+              <div
+                className="flex items-center justify-between pt-1 mt-1"
+                style={{ borderTop: "1px dashed #7D152D33" }}
+              >
+                <span style={{ color: "#7D152D" }}>
+                  Max Ambassador Expense (budgeting ceiling)
+                </span>
+                <strong style={{ color: "#7D152D" }}>
+                  {fmtMoney(maxAmbassadorExpense)}
+                </strong>
+              </div>
+            </>
           )}
           <div
             className="pt-2 mt-1 flex items-center justify-between"

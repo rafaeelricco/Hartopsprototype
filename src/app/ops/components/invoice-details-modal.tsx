@@ -26,20 +26,20 @@ import {
   TableRow,
 } from "@/app/shared/components/ui/table";
 import type { BillingActivity } from "@/app/shared/data/billing-types";
+import { CampaignTag } from "./campaign-tag";
 
 interface InvoiceDetailsModalProps {
   open: boolean;
   onClose: () => void;
   group: {
     billedTo: string;
-    billingEntity: string;
     distributor: string;
     activities: BillingActivity[];
   } | null;
   locked: boolean;
   onPatchActivity: (
     id: string,
-    patch: { travel?: number; gratuity?: number; eventAmount?: number },
+    patch: { travel?: number; eventAmount?: number },
   ) => void;
   onRemoveActivity: (id: string) => void;
 }
@@ -55,7 +55,6 @@ function fmt(n: number): string {
 interface RowDraft {
   eventAmount: string;
   travel: string;
-  gratuity: string;
 }
 
 export function InvoiceDetailsModal({
@@ -70,7 +69,6 @@ export function InvoiceDetailsModal({
   const [draft, setDraft] = useState<RowDraft>({
     eventAmount: "",
     travel: "",
-    gratuity: "",
   });
 
   // Reset on group change.
@@ -86,7 +84,6 @@ export function InvoiceDetailsModal({
     setDraft({
       eventAmount: String(a.eventAmount),
       travel: String(a.travel),
-      gratuity: String(a.gratuity),
     });
   }
 
@@ -94,17 +91,16 @@ export function InvoiceDetailsModal({
     onPatchActivity(id, {
       eventAmount: parseFloat(draft.eventAmount) || 0,
       travel: parseFloat(draft.travel) || 0,
-      gratuity: parseFloat(draft.gratuity) || 0,
     });
     setEditingId(null);
   }
 
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? null : onClose())}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="!max-w-[min(96vw,1200px)] w-[min(96vw,1200px)]">
         <DialogHeader>
           <DialogTitle>
-            Invoice details · {group.billingEntity}
+            Invoice details · {group.billedTo}
           </DialogTitle>
           <DialogDescription>
             {group.billedTo} · {fmt(total)}
@@ -127,18 +123,18 @@ export function InvoiceDetailsModal({
         )}
 
         <div
-          className="rounded-lg border"
-          style={{ borderColor: "#E2E8F0", maxHeight: 420, overflow: "auto" }}
+          className="rounded-lg border overflow-x-auto"
+          style={{ borderColor: "#E2E8F0", maxHeight: 420, overflowY: "auto" }}
         >
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Activity</TableHead>
+                <TableHead>Campaign</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Account</TableHead>
-                <TableHead className="text-right">Event $</TableHead>
+                <TableHead className="text-right">Activity $</TableHead>
                 <TableHead className="text-right">Travel</TableHead>
-                <TableHead className="text-right">Grat.</TableHead>
                 <TableHead className="text-right">Line total</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -157,6 +153,13 @@ export function InvoiceDetailsModal({
                       >
                         {a.id}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <CampaignTag
+                        campaignId={a.campaignId}
+                        campaignName={a.campaignName}
+                        variant="compact"
+                      />
                     </TableCell>
                     <TableCell>{a.date}</TableCell>
                     <TableCell
@@ -194,20 +197,6 @@ export function InvoiceDetailsModal({
                         />
                       ) : (
                         fmt(a.travel)
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {editing ? (
-                        <Input
-                          type="number"
-                          className="h-8 w-20 ml-auto"
-                          value={draft.gratuity}
-                          onChange={(e) =>
-                            setDraft({ ...draft, gratuity: e.target.value })
-                          }
-                        />
-                      ) : (
-                        fmt(a.gratuity)
                       )}
                     </TableCell>
                     <TableCell className="text-right font-medium">
@@ -279,15 +268,79 @@ export function InvoiceDetailsModal({
           </Table>
         </div>
 
+        {group.activities.some(
+          (a) =>
+            (a.suppliesAmount ?? 0) > 0 ||
+            (a.promotionPublicityAmount ?? 0) > 0 ||
+            (a.travelEntertainmentAmount ?? 0) > 0,
+        ) && (
+          <div
+            className="rounded-lg border p-3 space-y-2"
+            style={{ borderColor: "#E2E8F0", background: "#F8FAFC" }}
+          >
+            <div
+              style={{
+                fontSize: "0.6875rem",
+                color: "#94A3B8",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
+              Post-activity expenses (Kayla's columns)
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Activity</TableHead>
+                  <TableHead className="text-right">Supplies</TableHead>
+                  <TableHead className="text-right">Prom. & Pub.</TableHead>
+                  <TableHead className="text-right">Travel & Ent.</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {group.activities.map((a) => {
+                  if (
+                    (a.suppliesAmount ?? 0) === 0 &&
+                    (a.promotionPublicityAmount ?? 0) === 0 &&
+                    (a.travelEntertainmentAmount ?? 0) === 0
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <TableRow key={`exp-${a.id}`}>
+                      <TableCell className="max-w-[200px] truncate">
+                        {a.name}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {fmt(a.suppliesAmount ?? 0)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {fmt(a.promotionPublicityAmount ?? 0)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {fmt(a.travelEntertainmentAmount ?? 0)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            <p style={{ fontSize: "0.6875rem", color: "#64748B" }}>
+              Reimbursable to the BA. Already rolled into each line's
+              total above.
+            </p>
+          </div>
+        )}
+
         <div
           className="flex items-start gap-2 rounded-md p-3"
           style={{ background: "#FFFBEB" }}
         >
           <ExternalLink size={14} style={{ color: "#92400E", marginTop: 2 }} />
           <p style={{ fontSize: "0.75rem", color: "#92400E" }}>
-            For full activity edits (educators, date, venue) drill into the
-            source event from Ops → Events. Amounts here adjust the invoice
-            line directly without touching the source.
+            For full activity edits (brand ambassadors, date, venue) drill into
+            the source activity from Ops → Activities. Amounts here adjust the
+            invoice line directly without touching the source.
           </p>
         </div>
 

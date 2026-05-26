@@ -1,7 +1,7 @@
 // =============================================================================
 // Settings — Hart Agency Operating Staff dashboard.
 // 6 tabs: Profile, Notifications, Team, Geography, Preferences, Integrations.
-// Follows the educator settings-page pattern (Shadcn UI components).
+// Follows the brandAmbassador settings-page pattern (Shadcn UI components).
 // =============================================================================
 
 import { useState, useEffect, useMemo } from "react";
@@ -1116,7 +1116,7 @@ function InviteModal({
   onInvite: (email: string, role: TeamRole) => void;
 }) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<TeamRole>("Field Educator");
+  const [role, setRole] = useState<TeamRole>("Field BrandAmbassador");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -1126,7 +1126,7 @@ function InviteModal({
     }
     onInvite(email, role);
     setEmail("");
-    setRole("Field Educator");
+    setRole("Field BrandAmbassador");
   }
 
   return (

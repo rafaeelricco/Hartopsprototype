@@ -222,7 +222,7 @@ export interface ProofPhoto {
   id: string;
   url: string;
   eventName: string;
-  eventId: string;
+  activityId: string;
   campaignId: string;
   campaignName: string;
   location: string;
@@ -235,7 +235,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-1",
     url: "https://images.unsplash.com/photo-1595509449541-0a4f447157be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZXZlcmFnZSUyMHNhbXBsaW5nJTIwcmV0YWlsJTIwc3RvcmUlMjBldmVudHxlbnwxfHx8fDE3NzI2NDk1MTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "Downtown Chicago Sampling",
-    eventId: "evt-1",
+    activityId: "evt-1",
     campaignId: "camp-1",
     campaignName: "Summer Seltzer Launch",
     location: "Binny's Beverage Depot, Chicago IL",
@@ -246,7 +246,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-2",
     url: "https://images.unsplash.com/photo-1758165532022-a68f291317ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb29mdG9wJTIwYmFyJTIwZXZlbmluZyUyMGNvY2t0YWlsJTIwcGFydHl8ZW58MXx8fHwxNzcyNjQ5NTIyfDA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "NYC Speakeasy Night",
-    eventId: "evt-10",
+    activityId: "evt-10",
     campaignId: "camp-8",
     campaignName: "Craft Cocktail Roadshow",
     location: "Please Don't Tell, New York NY",
@@ -257,7 +257,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-3",
     url: "https://images.unsplash.com/photo-1573463908761-567b9356c64f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtdXNpYyUyMGZlc3RpdmFsJTIwY3Jvd2QlMjBvdXRkb29yJTIwc3RhZ2V8ZW58MXx8fHwxNzcyNjQzOTM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "Coachella Brand Booth",
-    eventId: "evt-6",
+    activityId: "evt-6",
     campaignId: "camp-3",
     campaignName: "Music Festival Sponsorship",
     location: "Empire Polo Club, Indio CA",
@@ -268,7 +268,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-4",
     url: "https://images.unsplash.com/photo-1633111158093-c51d43175b77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwY2FtcHVzJTIwZXZlbnQlMjBhY3RpdmF0aW9ufGVufDF8fHx8MTc3MjY0OTUyMHww&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "UCLA Welcome Week Activation",
-    eventId: "evt-8",
+    activityId: "evt-8",
     campaignId: "camp-5",
     campaignName: "Campus Ambassador Program",
     location: "UCLA Campus, Los Angeles CA",
@@ -279,7 +279,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-5",
     url: "https://images.unsplash.com/photo-1719854941469-9e744df5922e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWVyJTIwdGFzdGluZyUyMGJyZXdlcnklMjBldmVudCUyMGNyb3dkfGVufDF8fHx8MTc3MjY0OTUyMHww&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "Brooklyn Brewery Tasting",
-    eventId: "evt-12",
+    activityId: "evt-12",
     campaignId: "camp-1",
     campaignName: "Summer Seltzer Launch",
     location: "Brooklyn Brewery, Brooklyn NY",
@@ -290,7 +290,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-6",
     url: "https://images.unsplash.com/photo-1767009530606-8d597e86a2e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3AlMjB1cCUyMGJyYW5kJTIwZXhwZXJpZW5jZSUyMG91dGRvb3J8ZW58MXx8fHwxNzcyNjQ5NTIxfDA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "Miami Beach Pop-Up",
-    eventId: "evt-2",
+    activityId: "evt-2",
     campaignId: "camp-1",
     campaignName: "Summer Seltzer Launch",
     location: "South Beach Boardwalk, Miami FL",
@@ -301,7 +301,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-7",
     url: "https://images.unsplash.com/photo-1758526348379-6e8a84ae9f6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2NrdGFpbCUyMGJhciUyMG1peG9sb2d5JTIwZXZlbnR8ZW58MXx8fHwxNzcyNjQ5NTE5fDA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "LA Rooftop Mixology",
-    eventId: "evt-11",
+    activityId: "evt-11",
     campaignId: "camp-8",
     campaignName: "Craft Cocktail Roadshow",
     location: "The Highlight Room, Los Angeles CA",
@@ -312,7 +312,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-8",
     url: "https://images.unsplash.com/photo-1762088206695-5cae70780ced?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncm9jZXJ5JTIwc3RvcmUlMjBwcm9tb3Rpb25hbCUyMGRpc3BsYXl8ZW58MXx8fHwxNzcyNjQ5NTIyfDA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "Whole Foods Tasting — SF",
-    eventId: "evt-4",
+    activityId: "evt-4",
     campaignId: "camp-2",
     campaignName: "Q1 Retail Activation",
     location: "Whole Foods Market, San Francisco CA",
@@ -323,7 +323,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-9",
     url: "https://images.unsplash.com/photo-1615484966964-128d59b61ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0YWlsZ2F0ZSUyMGZvb3RiYWxsJTIwc3RhZGl1bSUyMGZvb2QlMjBzYW1wbGluZ3xlbnwxfHx8fDE3NzI2NDk1MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "NFL Tailgate Series",
-    eventId: "evt-nfl-1",
+    activityId: "evt-nfl-1",
     campaignId: "camp-7",
     campaignName: "NFL Tailgate Series",
     location: "MetLife Stadium, East Rutherford NJ",
@@ -334,7 +334,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-10",
     url: "https://images.unsplash.com/photo-1473444594556-6c20ae662bd5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMGJvYXJkd2FsayUyMHN1bW1lciUyMGZvb2QlMjB2ZW5kb3J8ZW58MXx8fHwxNzcyNjQ5NTIzfDA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "San Diego Waterfront Sampling",
-    eventId: "evt-14",
+    activityId: "evt-14",
     campaignId: "camp-1",
     campaignName: "Summer Seltzer Launch",
     location: "Seaport Village, San Diego CA",
@@ -345,7 +345,7 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
     id: "photo-11",
     url: "https://images.unsplash.com/photo-1770453572726-f51592710ca6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkcmluayUyMHRhc3RpbmclMjBldmVudCUyMHBlb3BsZXxlbnwxfHx8fDE3NzI2NDk1MzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
     eventName: "Total Wine Demo — Denver",
-    eventId: "evt-5",
+    activityId: "evt-5",
     campaignId: "camp-2",
     campaignName: "Q1 Retail Activation",
     location: "Total Wine & More, Denver CO",
@@ -356,11 +356,11 @@ export const PROOF_PHOTOS: ProofPhoto[] = [
 
 // ── Unique events appearing in the gallery (for event-level filter) ─────────
 
-export function getGalleryEvents(): { eventId: string; eventName: string }[] {
+export function getGalleryEvents(): { activityId: string; eventName: string }[] {
   const map = new Map<string, string>();
-  PROOF_PHOTOS.forEach((p) => map.set(p.eventId, p.eventName));
-  return Array.from(map.entries()).map(([eventId, eventName]) => ({
-    eventId,
+  PROOF_PHOTOS.forEach((p) => map.set(p.activityId, p.eventName));
+  return Array.from(map.entries()).map(([activityId, eventName]) => ({
+    activityId,
     eventName,
   }));
 }

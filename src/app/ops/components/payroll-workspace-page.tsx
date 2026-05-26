@@ -36,6 +36,12 @@ import { Checkbox } from "@/app/shared/components/ui/checkbox";
 import { Input } from "@/app/shared/components/ui/input";
 import { Card, CardContent } from "@/app/shared/components/ui/card";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/app/shared/components/ui/popover";
+import { ChevronDown } from "lucide-react";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -64,11 +70,12 @@ import {
   TooltipContent,
   TooltipProvider,
 } from "@/app/shared/components/ui/tooltip";
-import { BILLING_ENTITIES } from "@/app/shared/data/billing-types";
+import { ACTIVITY_CATEGORIES } from "@/app/shared/data/billing-types";
 import type {
-  BillingEntity,
+  ActivityCategory,
   GeneratedReport,
   PayrollLineItem,
+  PayrollReviewRequest,
 } from "@/app/shared/data/billing-types";
 import {
   MOCK_PAYROLL_LINE_ITEMS,
@@ -133,15 +140,15 @@ function statusLabel(status: PayrollLineItem["status"]): {
 }
 
 interface FiltersState {
-  billingEntity: BillingEntity | "all";
   manager: string;
+  categories: ActivityCategory[]; // empty = all
   cycleStart: string; // YYYY-MM-DD
   cycleEnd: string; // YYYY-MM-DD
 }
 
 const INITIAL_FILTERS: FiltersState = {
-  billingEntity: "all",
   manager: "all",
+  categories: [],
   cycleStart: "2026-05-08",
   cycleEnd: "2026-05-21",
 };
@@ -157,10 +164,32 @@ export function PayrollWorkspacePage() {
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS);
   const [recalcFor, setRecalcFor] = useState<PayrollLineItem | null>(null);
   const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
+  const [rejectCycleOpen, setRejectCycleOpen] = useState(false);
   const [cycleStatus, setCycleStatus] = useState(CURRENT_PAYROLL_CYCLE.status);
   const [generateOpen, setGenerateOpen] = useState(false);
   const [reports, setReports] =
     useState<GeneratedReport[]>(MOCK_PAYROLL_REPORTS);
+  const [reportPreview, setReportPreview] = useState<string | null>(null);
+  const [reviewRequests, setReviewRequests] = useState<PayrollReviewRequest[]>(
+    [
+      {
+        id: "rev-001",
+        cycleId: CURRENT_PAYROLL_CYCLE.id,
+        reviewer: "Leah Guidarelli",
+        requestedBy: "Larry Golus",
+        territory: "Albany",
+        status: "pending",
+        requestedAt: "2026-05-22T14:00:00Z",
+        note: "Please confirm Upstate brand ambassador pay before I run the export.",
+      },
+    ],
+  );
+  const [requestReviewOpen, setRequestReviewOpen] = useState(false);
+  const [reviewPreviewFor, setReviewPreviewFor] =
+    useState<PayrollReviewRequest | null>(null);
+  const [changesCommentFor, setChangesCommentFor] =
+    useState<PayrollReviewRequest | null>(null);
+  const [changesComment, setChangesComment] = useState("");
 
   function refreshItems() {
     setItems([...MOCK_PAYROLL_LINE_ITEMS]);
@@ -168,12 +197,12 @@ export function PayrollWorkspacePage() {
 
   const filtered = useMemo(() => {
     return items.filter((p) => {
+      if (filters.manager !== "all" && p.manager !== filters.manager) return false;
       if (
-        filters.billingEntity !== "all" &&
-        p.billingEntity !== filters.billingEntity
+        filters.categories.length > 0 &&
+        !filters.categories.includes(p.activityCategory)
       )
         return false;
-      if (filters.manager !== "all" && p.manager !== filters.manager) return false;
       if (p.date < filters.cycleStart || p.date > filters.cycleEnd) return false;
       return true;
     });
@@ -186,8 +215,17 @@ export function PayrollWorkspacePage() {
 
   // ----------------------- KPIs -------------------------------------------
 
+  // P1 review fix — Awaiting display follows filters (lets the operator chase
+  // a manager's batch), but the *export gate* must use unfiltered cycle items
+  // so narrowing filters can't accidentally bypass approvals.
   const awaiting = filtered.filter(
     (p) => p.status === "missing" || p.status === "pending-manager",
+  );
+  const cycleAwaiting = items.filter(
+    (p) =>
+      p.date >= filters.cycleStart &&
+      p.date <= filters.cycleEnd &&
+      (p.status === "missing" || p.status === "pending-manager"),
   );
   const totalPayEstimated = filtered.reduce((s, p) => s + p.finalPay, 0);
   const overrideCount = filtered.filter((p) => !!p.override).length;
@@ -198,7 +236,12 @@ export function PayrollWorkspacePage() {
     filtered.length === 0
       ? 0
       : Math.round((approvedCount / filtered.length) * 100);
-  const canExport = awaiting.length === 0 && cycleStatus !== "exported";
+  const canExport =
+    cycleAwaiting.length === 0 &&
+    cycleStatus !== "exported" &&
+    cycleStatus !== "awaiting-kayla" &&
+    cycleStatus !== "awaiting-accountant" &&
+    cycleStatus !== "complete";
 
   // ----------------------- Handlers ---------------------------------------
 
@@ -244,9 +287,18 @@ export function PayrollWorkspacePage() {
 
   function handleExport() {
     if (!canExport) return;
-    setCycleStatus("exported");
+    // Move cycle to Awaiting Kayla — matches the post-export workflow + toast.
+    setCycleStatus("awaiting-kayla");
     setExportConfirmOpen(false);
     toast.success("Payroll CSV exported · Payroll-lock engaged · Awaiting Kayla");
+  }
+
+  function handleRejectCycle() {
+    setCycleStatus("in-progress");
+    setRejectCycleOpen(false);
+    toast.success(
+      "Cycle re-opened · Payroll-lock cleared · Add missing activities and re-run",
+    );
   }
 
   return (
@@ -271,7 +323,20 @@ export function PayrollWorkspacePage() {
               {CURRENT_PAYROLL_CYCLE.territory}
             </p>
           </div>
-          <PayrollLockBadge status={cycleStatus} />
+          <div className="flex flex-col items-end gap-2">
+            <PayrollLockBadge status={cycleStatus} />
+            {(cycleStatus === "exported" ||
+              cycleStatus === "awaiting-kayla") && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setRejectCycleOpen(true)}
+              >
+                <RotateCcw size={13} className="mr-1.5" />
+                Reject cycle &amp; re-open
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Persistent gate banner — visible while Missing Payments has rows */}
@@ -289,7 +354,7 @@ export function PayrollWorkspacePage() {
                 className="font-medium"
                 style={{ fontSize: "0.875rem", color: "#7F1D1D" }}
               >
-                Cannot export while educators are awaiting approval
+                Cannot export while brandAmbassadors are awaiting approval
               </p>
               <p style={{ fontSize: "0.8125rem", color: "#991B1B" }}>
                 {awaiting.length} item{awaiting.length === 1 ? "" : "s"} sitting
@@ -311,27 +376,6 @@ export function PayrollWorkspacePage() {
               Filters
             </div>
             <Select
-              value={filters.billingEntity}
-              onValueChange={(v) =>
-                setFilters({
-                  ...filters,
-                  billingEntity: v as BillingEntity | "all",
-                })
-              }
-            >
-              <SelectTrigger className="h-9 w-[200px]">
-                <SelectValue placeholder="Billing entity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Hart entities</SelectItem>
-                {BILLING_ENTITIES.map((e) => (
-                  <SelectItem key={e} value={e}>
-                    {e}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
               value={filters.manager}
               onValueChange={(v) => setFilters({ ...filters, manager: v })}
             >
@@ -347,6 +391,10 @@ export function PayrollWorkspacePage() {
                 ))}
               </SelectContent>
             </Select>
+            <CategoryMultiSelect
+              selected={filters.categories}
+              onChange={(next) => setFilters({ ...filters, categories: next })}
+            />
           </div>
 
           {/* Cycle window picker */}
@@ -451,7 +499,7 @@ export function PayrollWorkspacePage() {
             <div className="grid gap-4 md:grid-cols-3">
               <KpiCard
                 icon={AlertTriangle}
-                label="Educators awaiting approval"
+                label="Brand Ambassadors awaiting approval"
                 value={String(awaiting.length)}
                 tone={awaiting.length > 0 ? "warn" : "success"}
               />
@@ -529,7 +577,7 @@ export function PayrollWorkspacePage() {
                     <TableRow>
                       <TableHead>Activity ID</TableHead>
                       <TableHead>Date</TableHead>
-                      <TableHead>Educator</TableHead>
+                      <TableHead>Brand Ambassador</TableHead>
                       <TableHead className="text-right">Pay estimate</TableHead>
                       <TableHead>Manager</TableHead>
                       <TableHead>Status</TableHead>
@@ -543,7 +591,7 @@ export function PayrollWorkspacePage() {
                         <TableRow key={p.id}>
                           <TableCell>{p.activityId}</TableCell>
                           <TableCell>{p.date}</TableCell>
-                          <TableCell>{p.educatorName}</TableCell>
+                          <TableCell>{p.brandAmbassadorName}</TableCell>
                           <TableCell className="text-right">
                             {fmt(p.finalPay)}
                           </TableCell>
@@ -642,7 +690,7 @@ export function PayrollWorkspacePage() {
                   />
                   <ChecklistItem
                     done={filtered.every((p) => p.standardRate > 0)}
-                    label="Every educator has a rate on file"
+                    label="Every brand ambassador has a rate on file"
                   />
                 </ul>
                 <div
@@ -652,7 +700,7 @@ export function PayrollWorkspacePage() {
                   <Download size={14} style={{ color: "#64748B", marginTop: 2 }} />
                   <p style={{ fontSize: "0.75rem", color: "#475569" }}>
                     Export is a native-Excel CSV. After export, the cycle
-                    payroll-locks; you can't add educators or edit pay-relevant
+                    payroll-locks; you can't add brandAmbassadors or edit pay-relevant
                     fields. Cycle moves to <strong>Awaiting Kayla</strong>.
                   </p>
                 </div>
@@ -698,6 +746,186 @@ export function PayrollWorkspacePage() {
 
           {/* --------------- Reports ------------------------------------- */}
           <TabsContent value="reports" className="space-y-4">
+            {/* P3 #9 — Second-eyes manager reviews */}
+            <Card>
+              <CardContent className="p-5 space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3
+                      className="flex items-center gap-2"
+                      style={{ fontSize: "0.9375rem", color: "#0F172A" }}
+                    >
+                      <CheckCircle2 size={16} style={{ color: "#7D152D" }} />
+                      Second-eyes reviews
+                    </h3>
+                    <p
+                      className="mt-0.5"
+                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                    >
+                      Pre-export sanity check — send the report to another
+                      manager before locking the cycle.
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setRequestReviewOpen(true)}
+                  >
+                    <Mail size={13} className="mr-1.5" />
+                    Request review
+                  </Button>
+                </div>
+                {reviewRequests.length === 0 ? (
+                  <p
+                    style={{ fontSize: "0.8125rem", color: "#94A3B8" }}
+                    className="py-2"
+                  >
+                    No pending reviews.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {reviewRequests.map((r) => {
+                      const isPending = r.status === "pending";
+                      const tone =
+                        r.status === "approved"
+                          ? { bg: "#ECFDF5", fg: "#0F766E", label: "Approved" }
+                          : r.status === "changes-requested"
+                            ? {
+                                bg: "#FEF2F2",
+                                fg: "#B91C1C",
+                                label: "Changes requested",
+                              }
+                            : {
+                                bg: "#FFFBEB",
+                                fg: "#92400E",
+                                label: "Pending",
+                              };
+                      return (
+                        <div
+                          key={r.id}
+                          className="rounded-lg border p-3"
+                          style={{ borderColor: "#E2E8F0" }}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div
+                              className="flex items-center gap-2"
+                              style={{ fontSize: "0.875rem", color: "#0F172A" }}
+                            >
+                              <strong>{r.reviewer}</strong>
+                              <span
+                                className="px-1.5 py-0 rounded"
+                                style={{
+                                  fontSize: "0.6875rem",
+                                  background: tone.bg,
+                                  color: tone.fg,
+                                }}
+                              >
+                                {tone.label}
+                              </span>
+                              {r.territory && (
+                                <span
+                                  className="px-1.5 py-0 rounded"
+                                  style={{
+                                    fontSize: "0.6875rem",
+                                    background: "#F1F5F9",
+                                    color: "#475569",
+                                  }}
+                                >
+                                  {r.territory}
+                                </span>
+                              )}
+                            </div>
+                            <div
+                              className="mt-0.5"
+                              style={{ fontSize: "0.75rem", color: "#94A3B8" }}
+                            >
+                              Requested by {r.requestedBy} ·{" "}
+                              {new Date(r.requestedAt).toLocaleString()}
+                            </div>
+                            {r.note && (
+                              <div
+                                className="mt-1"
+                                style={{
+                                  fontSize: "0.75rem",
+                                  color: "#475569",
+                                }}
+                              >
+                                "{r.note}"
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex gap-1.5 flex-shrink-0 items-start">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setReviewPreviewFor(r)}
+                            >
+                              <FileText size={12} className="mr-1.5" />
+                              View report
+                            </Button>
+                            {isPending && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setChangesComment("");
+                                    setChangesCommentFor(r);
+                                  }}
+                                >
+                                  Changes
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    setReviewRequests((prev) =>
+                                      prev.map((x) =>
+                                        x.id === r.id
+                                          ? {
+                                              ...x,
+                                              status: "approved",
+                                              completedAt:
+                                                new Date().toISOString(),
+                                            }
+                                          : x,
+                                      ),
+                                    );
+                                    toast.success(`${r.reviewer} approved`);
+                                  }}
+                                >
+                                  Approve
+                                </Button>
+                              </>
+                            )}
+                          </div>
+                          </div>
+                          {r.reviewerComment && !isPending && (
+                            <div
+                              className="mt-2 rounded-md p-2"
+                              style={{
+                                background:
+                                  r.status === "changes-requested"
+                                    ? "#FEF2F2"
+                                    : "#ECFDF5",
+                                fontSize: "0.75rem",
+                                color:
+                                  r.status === "changes-requested"
+                                    ? "#7F1D1D"
+                                    : "#065F46",
+                              }}
+                            >
+                              <strong>{r.reviewer}:</strong> "{r.reviewerComment}"
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             <div className="flex items-center justify-between">
               <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
                 Reports pull from approved line items in the current cycle.
@@ -716,9 +944,13 @@ export function PayrollWorkspacePage() {
                 >
                   <CardContent
                     className="p-4 flex items-start justify-between gap-3"
-                    onClick={() =>
-                      toast.info(`Opened ${r.name} (mock preview).`)
-                    }
+                    onClick={() => {
+                      if (r.kind === "Master Journal") {
+                        setReportPreview(r.kind);
+                      } else {
+                        toast.info(`Opened ${r.name} (mock preview).`);
+                      }
+                    }}
                   >
                     <div>
                       <div
@@ -750,7 +982,7 @@ export function PayrollWorkspacePage() {
                     <TableRow>
                       <TableHead>Cycle window</TableHead>
                       <TableHead className="text-right">Total pay</TableHead>
-                      <TableHead>Educators paid</TableHead>
+                      <TableHead>Brand Ambassadors paid</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Export timestamp</TableHead>
                     </TableRow>
@@ -764,7 +996,7 @@ export function PayrollWorkspacePage() {
                         <TableCell className="text-right">
                           {c.totalPay ? fmt(c.totalPay) : "—"}
                         </TableCell>
-                        <TableCell>{c.educatorsPaid ?? "—"}</TableCell>
+                        <TableCell>{c.brandAmbassadorsPaid ?? "—"}</TableCell>
                         <TableCell>
                           <PayrollLockBadge status={c.status} />
                         </TableCell>
@@ -796,9 +1028,15 @@ export function PayrollWorkspacePage() {
           onClose={() => setGenerateOpen(false)}
           workspace="payroll"
           cycleId={CURRENT_PAYROLL_CYCLE.id}
+          defaultRange={{
+            start: CURRENT_PAYROLL_CYCLE.windowStart,
+            end: CURRENT_PAYROLL_CYCLE.windowEnd,
+          }}
+          splittableTerritories={Array.from(
+            new Set(filtered.map((p) => p.territory)),
+          ).sort()}
           onGenerate={(report) => {
-            setReports([report, ...reports]);
-            setGenerateOpen(false);
+            setReports((prev) => [report, ...prev]);
             toast.success(`${report.kind} generated · ${report.format}`);
           }}
         />
@@ -820,27 +1058,6 @@ export function PayrollWorkspacePage() {
                 value={String(approvedCount)}
                 emphasise="success"
               />
-              <Row
-                label="By billing entity"
-                value=""
-              />
-              {BILLING_ENTITIES.map((e) => {
-                const subset = filtered.filter((p) => p.billingEntity === e);
-                if (subset.length === 0) return null;
-                const subtotal = subset.reduce((s, p) => s + p.finalPay, 0);
-                return (
-                  <div
-                    key={e}
-                    className="flex items-center justify-between pl-3"
-                    style={{ fontSize: "0.8125rem" }}
-                  >
-                    <span style={{ color: "#64748B" }}>{e}</span>
-                    <strong style={{ color: "#0F172A" }}>
-                      {fmt(subtotal)}
-                    </strong>
-                  </div>
-                );
-              })}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setExportConfirmOpen(false)}>
@@ -853,6 +1070,211 @@ export function PayrollWorkspacePage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={rejectCycleOpen} onOpenChange={setRejectCycleOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reject cycle & re-open?</DialogTitle>
+              <DialogDescription>
+                Use this when an activity was missed from the export (e.g. a
+                forgotten Sunday). Re-opening clears the payroll-lock and lets
+                you add or fix activities, then re-run the export. Kayla will
+                see the cycle return to In-Progress.
+              </DialogDescription>
+            </DialogHeader>
+            <div
+              className="rounded-lg border p-3 flex items-start gap-2"
+              style={{ background: "#FFFBEB", borderColor: "#FDE68A" }}
+            >
+              <AlertTriangle
+                size={14}
+                style={{ color: "#92400E", marginTop: 2 }}
+              />
+              <p style={{ fontSize: "0.8125rem", color: "#92400E" }}>
+                The previous CSV export will be invalidated. Any downstream
+                handoffs (Kayla, accountant) must be informed before re-running.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setRejectCycleOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleRejectCycle}>
+                <RotateCcw size={14} className="mr-1.5" />
+                Reject &amp; re-open
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Request second-eyes review (P3 #9) */}
+        <RequestReviewDialog
+          open={requestReviewOpen}
+          onClose={() => setRequestReviewOpen(false)}
+          territories={Array.from(
+            new Set(filtered.map((p) => p.territory)),
+          ).sort()}
+          onSubmit={(input) => {
+            const next: PayrollReviewRequest = {
+              id: `rev-${Date.now()}`,
+              cycleId: CURRENT_PAYROLL_CYCLE.id,
+              reviewer: input.reviewer,
+              requestedBy: "Hart Ops",
+              status: "pending",
+              requestedAt: new Date().toISOString(),
+              ...(input.territory ? { territory: input.territory } : {}),
+              ...(input.note ? { note: input.note } : {}),
+            };
+            setReviewRequests((prev) => [next, ...prev]);
+            setRequestReviewOpen(false);
+            toast.success(`Review requested from ${input.reviewer}`);
+          }}
+        />
+
+        {/* Review report preview (P3 #9 — open the master journal scoped to the review) */}
+        <Dialog
+          open={!!reviewPreviewFor}
+          onOpenChange={(v) => (v ? null : setReviewPreviewFor(null))}
+        >
+          <DialogContent className="!max-w-[min(96vw,1200px)] w-[min(96vw,1200px)]">
+            <DialogHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <DialogTitle>
+                    Review report{reviewPreviewFor?.territory
+                      ? ` · ${reviewPreviewFor.territory}`
+                      : " · Full cycle"}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Requested by {reviewPreviewFor?.requestedBy}. {reviewPreviewFor?.note ? `"${reviewPreviewFor.note}"` : ""}
+                  </DialogDescription>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.print()}
+                >
+                  <FileText size={13} className="mr-1.5" />
+                  Print
+                </Button>
+              </div>
+            </DialogHeader>
+            <MasterJournalPreview
+              items={
+                reviewPreviewFor?.territory
+                  ? filtered.filter(
+                      (p) => p.territory === reviewPreviewFor.territory,
+                    )
+                  : filtered
+              }
+            />
+          </DialogContent>
+        </Dialog>
+
+        {/* Request changes — comment dialog (P3 #9) */}
+        <Dialog
+          open={!!changesCommentFor}
+          onOpenChange={(v) => (v ? null : setChangesCommentFor(null))}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Request changes</DialogTitle>
+              <DialogDescription>
+                Tell {changesCommentFor?.requestedBy} what needs to change.
+                Comment is recorded on the review.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-1.5">
+              <label
+                htmlFor="changes-comment"
+                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+              >
+                Comment
+              </label>
+              <textarea
+                id="changes-comment"
+                className="w-full rounded-md border px-3 py-2"
+                style={{
+                  fontSize: "0.875rem",
+                  borderColor: "#E2E8F0",
+                  minHeight: 100,
+                  fontFamily: "inherit",
+                }}
+                value={changesComment}
+                onChange={(e) => setChangesComment(e.target.value)}
+                placeholder="e.g. Lisa Thompson's hours look wrong for the May 19 activity — please double-check."
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setChangesCommentFor(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  if (!changesCommentFor) return;
+                  const id = changesCommentFor.id;
+                  const comment = changesComment.trim();
+                  setReviewRequests((prev) =>
+                    prev.map((x) =>
+                      x.id === id
+                        ? {
+                            ...x,
+                            status: "changes-requested",
+                            completedAt: new Date().toISOString(),
+                            ...(comment ? { reviewerComment: comment } : {}),
+                          }
+                        : x,
+                    ),
+                  );
+                  toast.message(
+                    `${changesCommentFor.reviewer} requested changes`,
+                  );
+                  setChangesCommentFor(null);
+                  setChangesComment("");
+                }}
+              >
+                Send changes
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Master Journal printable preview (P3 #7 — Sarah Scott's master) */}
+        <Dialog
+          open={reportPreview === "Master Journal"}
+          onOpenChange={(v) => (v ? null : setReportPreview(null))}
+        >
+          <DialogContent className="!max-w-[min(96vw,1200px)] w-[min(96vw,1200px)]">
+            <DialogHeader>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <DialogTitle>Master Journal · Payroll Cycle</DialogTitle>
+                  <DialogDescription>
+                    {CURRENT_PAYROLL_CYCLE.windowStart} →{" "}
+                    {CURRENT_PAYROLL_CYCLE.windowEnd} · Territory{" "}
+                    {CURRENT_PAYROLL_CYCLE.territory}. Printed and given to
+                    Sarah Scott for oversight per Larry's workflow.
+                  </DialogDescription>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.print()}
+                >
+                  <FileText size={13} className="mr-1.5" />
+                  Print
+                </Button>
+              </div>
+            </DialogHeader>
+            <MasterJournalPreview items={filtered} />
+          </DialogContent>
+        </Dialog>
       </div>
     </TooltipProvider>
   );
@@ -861,6 +1283,16 @@ export function PayrollWorkspacePage() {
 // ---------------------------------------------------------------------------
 // Approve tab — bulk-select, override badge, recurring recalc guard
 // ---------------------------------------------------------------------------
+
+type GroupByKey = "manager" | "category" | "brandAmbassador" | "status" | "none";
+
+const GROUP_BY_OPTIONS: { value: GroupByKey; label: string }[] = [
+  { value: "manager", label: "Manager" },
+  { value: "category", label: "Category" },
+  { value: "brandAmbassador", label: "Brand Ambassador" },
+  { value: "status", label: "Status" },
+  { value: "none", label: "None (flat)" },
+];
 
 function ApproveTab({
   items,
@@ -874,6 +1306,7 @@ function ApproveTab({
   onReject: (id: string) => void;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [groupBy, setGroupBy] = useState<GroupByKey>("manager");
 
   function toggle(id: string) {
     const next = new Set(selected);
@@ -887,25 +1320,67 @@ function ApproveTab({
     setSelected(new Set());
   }
 
-  // Group by manager.
+  function groupKeyOf(p: PayrollLineItem): string {
+    switch (groupBy) {
+      case "manager":
+        return p.manager;
+      case "category":
+        return (
+          ACTIVITY_CATEGORIES.find((c) => c.value === p.activityCategory)
+            ?.label ?? p.activityCategory
+        );
+      case "brandAmbassador":
+        return p.brandAmbassadorName;
+      case "status":
+        return statusLabel(p.status).label;
+      case "none":
+        return "";
+    }
+  }
+
   const grouped = useMemo(() => {
+    if (groupBy === "none") {
+      return [["", items] as [string, PayrollLineItem[]]];
+    }
     const map = new Map<string, PayrollLineItem[]>();
     for (const p of items) {
-      const arr = map.get(p.manager) ?? [];
+      const k = groupKeyOf(p);
+      const arr = map.get(k) ?? [];
       arr.push(p);
-      map.set(p.manager, arr);
+      map.set(k, arr);
     }
-    return Array.from(map.entries());
-  }, [items]);
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, groupBy]);
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
-          {selected.size > 0
-            ? `${selected.size} selected`
-            : "Bulk-approve a manager's batch or approve one at a time."}
-        </p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+            Group by
+          </span>
+          <Select
+            value={groupBy}
+            onValueChange={(v) => setGroupBy(v as GroupByKey)}
+          >
+            <SelectTrigger className="h-8 w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {GROUP_BY_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {selected.size > 0 && (
+            <span style={{ fontSize: "0.8125rem", color: "#64748B" }}>
+              · {selected.size} selected
+            </span>
+          )}
+        </div>
         <Button
           size="sm"
           onClick={approveSelected}
@@ -916,28 +1391,31 @@ function ApproveTab({
         </Button>
       </div>
 
-      {grouped.map(([manager, list]) => (
-        <Card key={manager}>
+      {grouped.map(([groupName, list]) => (
+        <Card key={groupName || "__flat__"}>
           <CardContent className="p-0">
-            <div
-              className="px-4 py-2 border-b"
-              style={{
-                fontSize: "0.8125rem",
-                color: "#64748B",
-                borderColor: "#E2E8F0",
-                background: "#F8FAFC",
-              }}
-            >
-              {manager} · {list.length} line item
-              {list.length === 1 ? "" : "s"}
-            </div>
+            {groupBy !== "none" && (
+              <div
+                className="px-4 py-2 border-b"
+                style={{
+                  fontSize: "0.8125rem",
+                  color: "#64748B",
+                  borderColor: "#E2E8F0",
+                  background: "#F8FAFC",
+                }}
+              >
+                {groupName} · {list.length} line item
+                {list.length === 1 ? "" : "s"}
+              </div>
+            )}
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead style={{ width: 36 }}></TableHead>
                   <TableHead>Activity ID</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Educator</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Brand Ambassador</TableHead>
                   <TableHead className="text-right">Hours</TableHead>
                   <TableHead className="text-right">BA rate</TableHead>
                   <TableHead>Override</TableHead>
@@ -963,8 +1441,52 @@ function ApproveTab({
                       <TableCell>{p.activityId}</TableCell>
                       <TableCell>{p.date}</TableCell>
                       <TableCell>
-                        {p.educatorName}
-                        {p.isCancellation && (
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded-md"
+                          style={{
+                            fontSize: "0.6875rem",
+                            background: "#F1F5F9",
+                            color: "#475569",
+                          }}
+                        >
+                          {ACTIVITY_CATEGORIES.find(
+                            (c) => c.value === p.activityCategory,
+                          )?.label ?? p.activityCategory}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {p.brandAmbassadorName}
+                        {p.isCancellation && p.cancellationBreakdown ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span
+                                className="ml-2 px-1.5 py-0 rounded cursor-help"
+                                style={{
+                                  fontSize: "0.6875rem",
+                                  background: "#F1F5F9",
+                                  color: "#475569",
+                                  borderBottom: "1px dashed #94A3B8",
+                                }}
+                              >
+                                cancellation
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <div className="space-y-0.5">
+                                <div>
+                                  Kit pickup:{" "}
+                                  {fmt(p.cancellationBreakdown.kitPickup)}
+                                </div>
+                                <div>
+                                  Travel: {fmt(p.cancellationBreakdown.travel)}
+                                </div>
+                                <div>
+                                  Time: {fmt(p.cancellationBreakdown.time)}
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : p.isCancellation ? (
                           <span
                             className="ml-2 px-1.5 py-0 rounded"
                             style={{
@@ -975,7 +1497,7 @@ function ApproveTab({
                           >
                             cancellation
                           </span>
-                        )}
+                        ) : null}
                       </TableCell>
                       <TableCell className="text-right">{p.hours}</TableCell>
                       <TableCell className="text-right">
@@ -1028,8 +1550,8 @@ function ApproveTab({
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              Recurring educator count changed — Approve to
-                              recalculate.
+                              Recurring brand ambassador count changed — Approve
+                              to recalculate.
                             </TooltipContent>
                           </Tooltip>
                         ) : (
@@ -1223,5 +1745,327 @@ function PayrollLockBadge({
       <Lock size={11} />
       {s.label}
     </span>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CategoryMultiSelect — Larry's first action on a payroll cycle (00:03:27)
+// ---------------------------------------------------------------------------
+
+function CategoryMultiSelect({
+  selected,
+  onChange,
+}: {
+  selected: ActivityCategory[];
+  onChange: (next: ActivityCategory[]) => void;
+}) {
+  const allSelected = selected.length === 0;
+  const label =
+    selected.length === 0
+      ? "All categories"
+      : selected.length === 1
+        ? ACTIVITY_CATEGORIES.find((c) => c.value === selected[0])?.label ??
+          "1 category"
+        : `${selected.length} categories`;
+
+  function toggle(value: ActivityCategory) {
+    if (selected.includes(value)) {
+      onChange(selected.filter((v) => v !== value));
+    } else {
+      onChange([...selected, value]);
+    }
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-9 w-[220px] justify-between font-normal"
+        >
+          <span
+            className="truncate"
+            style={{ color: allSelected ? "#64748B" : "#0F172A" }}
+          >
+            {label}
+          </span>
+          <ChevronDown size={14} style={{ color: "#94A3B8" }} />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-[260px] p-2"
+        align="start"
+        style={{ background: "white" }}
+      >
+        <div className="flex items-center justify-between px-1 py-1">
+          <span
+            style={{
+              fontSize: "0.6875rem",
+              color: "#94A3B8",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
+            Activity categories
+          </span>
+          {!allSelected && (
+            <button
+              type="button"
+              onClick={() => onChange([])}
+              className="cursor-pointer hover:underline"
+              style={{ fontSize: "0.6875rem", color: "#7D152D" }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <div className="space-y-1 max-h-[260px] overflow-y-auto">
+          {ACTIVITY_CATEGORIES.map((cat) => (
+            <label
+              key={cat.value}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer hover:bg-[#F8FAFC]"
+            >
+              <Checkbox
+                checked={selected.includes(cat.value)}
+                onCheckedChange={() => toggle(cat.value)}
+              />
+              <span style={{ fontSize: "0.8125rem", color: "#0F172A" }}>
+                {cat.label}
+              </span>
+            </label>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RequestReviewDialog — P3 #9. Larry → Leah second-eyes pre-export sanity check.
+// ---------------------------------------------------------------------------
+
+function RequestReviewDialog({
+  open,
+  onClose,
+  territories,
+  onSubmit,
+}: {
+  open: boolean;
+  onClose: () => void;
+  territories: string[];
+  onSubmit: (input: {
+    reviewer: string;
+    territory?: string;
+    note?: string;
+  }) => void;
+}) {
+  const [reviewer, setReviewer] = useState("Leah Guidarelli");
+  const [territory, setTerritory] = useState<string>("");
+  const [note, setNote] = useState("");
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => (v ? null : onClose())}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Request second-eyes review</DialogTitle>
+          <DialogDescription>
+            Sends the selected scope to a reviewer for sign-off before export.
+            Mirrors Larry's "send to Leah for Upstate" step.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="rr-reviewer"
+              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+            >
+              Reviewer
+            </label>
+            <Input
+              id="rr-reviewer"
+              value={reviewer}
+              onChange={(e) => setReviewer(e.target.value)}
+              placeholder="e.g. Leah Guidarelli"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label
+              htmlFor="rr-territory"
+              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+            >
+              Scope (territory)
+            </label>
+            <Select
+              value={territory || "all"}
+              onValueChange={(v) => setTerritory(v === "all" ? "" : v)}
+            >
+              <SelectTrigger id="rr-territory">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Full cycle</SelectItem>
+                {territories.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <label
+              htmlFor="rr-note"
+              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
+            >
+              Note (optional)
+            </label>
+            <Input
+              id="rr-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Why are you asking for review?"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (!reviewer.trim()) return;
+              onSubmit({
+                reviewer: reviewer.trim(),
+                ...(territory ? { territory } : {}),
+                ...(note.trim() ? { note: note.trim() } : {}),
+              });
+            }}
+          >
+            <Mail size={14} className="mr-1.5" />
+            Send request
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// MasterJournalPreview — P3 #7. Printable view grouped by manager/territory,
+// showing every BA's payments in the cycle. Sarah Scott uses this as the
+// physical reconciliation artefact (transcript 00:20:52).
+// ---------------------------------------------------------------------------
+
+function MasterJournalPreview({ items }: { items: PayrollLineItem[] }) {
+  const byManager = useMemo(() => {
+    const map = new Map<string, PayrollLineItem[]>();
+    for (const p of items) {
+      const arr = map.get(p.manager) ?? [];
+      arr.push(p);
+      map.set(p.manager, arr);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [items]);
+
+  const grandTotal = items.reduce((s, p) => s + p.finalPay, 0);
+  const baCount = new Set(items.map((p) => p.brandAmbassadorId)).size;
+
+  return (
+    <div
+      className="space-y-4 overflow-y-auto"
+      style={{ maxHeight: 540, padding: "0 4px" }}
+    >
+      <div
+        className="rounded-md border p-3 grid grid-cols-3 gap-3"
+        style={{ borderColor: "#E2E8F0", background: "#F8FAFC" }}
+      >
+        <div>
+          <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            Grand total
+          </div>
+          <div
+            className="font-semibold"
+            style={{ fontSize: "1.125rem", color: "#0F172A" }}
+          >
+            {fmt(grandTotal)}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            BAs paid
+          </div>
+          <div
+            className="font-semibold"
+            style={{ fontSize: "1.125rem", color: "#0F172A" }}
+          >
+            {baCount}
+          </div>
+        </div>
+        <div>
+          <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+            Line items
+          </div>
+          <div
+            className="font-semibold"
+            style={{ fontSize: "1.125rem", color: "#0F172A" }}
+          >
+            {items.length}
+          </div>
+        </div>
+      </div>
+
+      {byManager.map(([manager, list]) => {
+        const subtotal = list.reduce((s, p) => s + p.finalPay, 0);
+        return (
+          <div
+            key={manager}
+            className="rounded-md border"
+            style={{ borderColor: "#E2E8F0" }}
+          >
+            <div
+              className="px-3 py-2 border-b flex items-center justify-between"
+              style={{
+                borderColor: "#E2E8F0",
+                background: "#F8FAFC",
+                fontSize: "0.8125rem",
+              }}
+            >
+              <strong style={{ color: "#0F172A" }}>{manager}</strong>
+              <span style={{ color: "#64748B" }}>
+                {list.length} item{list.length === 1 ? "" : "s"} ·{" "}
+                <strong style={{ color: "#0F172A" }}>{fmt(subtotal)}</strong>
+              </span>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Brand Ambassador</TableHead>
+                  <TableHead>Activity</TableHead>
+                  <TableHead className="text-right">Hours</TableHead>
+                  <TableHead className="text-right">Pay</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {list.map((p) => (
+                  <TableRow key={p.id}>
+                    <TableCell>{p.date}</TableCell>
+                    <TableCell>{p.brandAmbassadorName}</TableCell>
+                    <TableCell className="max-w-[260px] truncate">
+                      {p.activityName}
+                    </TableCell>
+                    <TableCell className="text-right">{p.hours}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {fmt(p.finalPay)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        );
+      })}
+    </div>
   );
 }
