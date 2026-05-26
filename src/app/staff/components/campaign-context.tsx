@@ -1,5 +1,5 @@
 // =============================================================================
-// Shared React context for campaigns + activities + events state.
+// Shared React context for campaigns + templates + events state.
 // Wraps the layout so both CampaignLibrary and CampaignDetail can read/write.
 // =============================================================================
 
@@ -11,23 +11,23 @@ import {
   type ReactNode,
 } from "react";
 import { INITIAL_CAMPAIGNS, generateId, type Campaign } from "./campaign-data";
-import { INITIAL_EVENTS, generateEventId, type EventItem } from "./event-data";
+import { INITIAL_ACTIVITIES, generateActivityId, type Activity } from "./activity-data";
 import {
-  INITIAL_ACTIVITIES,
-  generateActivityId,
-  type Activity,
-} from "./activity-data";
+  INITIAL_TEMPLATES,
+  generateTemplateId,
+  type Template,
+} from "./template-data";
 
 interface CampaignContextValue {
   campaigns: Campaign[];
-  events: EventItem[];
-  activities: Activity[];
+  events: Activity[];
+  templates: Template[];
   getCampaign: (id: string) => Campaign | undefined;
-  getEvent: (id: string) => EventItem | undefined;
-  getEventsForCampaign: (campaignId: string) => EventItem[];
   getActivity: (id: string) => Activity | undefined;
   getActivitiesForCampaign: (campaignId: string) => Activity[];
-  getEventsForActivity: (activityId: string) => EventItem[];
+  getTemplate: (id: string) => Template | undefined;
+  getTemplatesForCampaign: (campaignId: string) => Template[];
+  getActivitiesForTemplate: (templateId: string) => Activity[];
   createCampaign: (data: {
     name: string;
     description: string;
@@ -39,16 +39,16 @@ interface CampaignContextValue {
     linkedProductIds?: string[] | undefined;
     objectives?: string[] | undefined;
   }) => string | null;
-  createActivity: (data: Omit<Activity, "id" | "createdAt">) => Activity;
-  createEvent: (
-    event: Omit<EventItem, "id" | "createdAt" | "status">,
-  ) => EventItem;
-  updateEventStatus: (eventId: string, status: EventItem["status"]) => void;
-  updateEventFields: (
-    eventId: string,
+  createTemplate: (data: Omit<Template, "id" | "createdAt">) => Template;
+  createActivity: (
+    event: Omit<Activity, "id" | "createdAt" | "status">,
+  ) => Activity;
+  updateActivityStatus: (activityId: string, status: Activity["status"]) => void;
+  updateActivityFields: (
+    activityId: string,
     fields: Partial<
       Pick<
-        EventItem,
+        Activity,
         | "name"
         | "location"
         | "state"
@@ -68,33 +68,33 @@ interface CampaignContextValue {
 // Default context value so components never throw during HMR / React Refresh
 const DEFAULT_VALUE: CampaignContextValue = {
   campaigns: INITIAL_CAMPAIGNS,
-  events: INITIAL_EVENTS,
-  activities: INITIAL_ACTIVITIES,
+  events: INITIAL_ACTIVITIES,
+  templates: INITIAL_TEMPLATES,
   getCampaign: (id) => INITIAL_CAMPAIGNS.find((c) => c.id === id),
-  getEvent: (id) => INITIAL_EVENTS.find((e) => e.id === id),
-  getEventsForCampaign: (cid) =>
-    INITIAL_EVENTS.filter((e) => e.campaignId === cid),
-  getActivity: (id) => INITIAL_ACTIVITIES.find((a) => a.id === id),
+  getActivity: (id) => INITIAL_ACTIVITIES.find((e) => e.id === id),
   getActivitiesForCampaign: (cid) =>
-    INITIAL_ACTIVITIES.filter((a) => a.campaignId === cid),
-  getEventsForActivity: (aid) =>
-    INITIAL_EVENTS.filter((e) => e.activityId === aid),
+    INITIAL_ACTIVITIES.filter((e) => e.campaignId === cid),
+  getTemplate: (id) => INITIAL_TEMPLATES.find((t) => t.id === id),
+  getTemplatesForCampaign: (cid) =>
+    INITIAL_TEMPLATES.filter((t) => t.campaignId === cid),
+  getActivitiesForTemplate: (tid) =>
+    INITIAL_ACTIVITIES.filter((e) => e.templateId === tid),
   createCampaign: () => null,
-  createActivity: (p) =>
+  createTemplate: (p) =>
     ({
       ...p,
       id: "tmp",
       createdAt: new Date().toISOString().slice(0, 10),
-    }) as Activity,
-  createEvent: (p) =>
+    }) as Template,
+  createActivity: (p) =>
     ({
       ...p,
       id: "tmp",
       status: "draft",
       createdAt: new Date().toISOString().slice(0, 10),
-    }) as EventItem,
-  updateEventStatus: () => {},
-  updateEventFields: () => {},
+    }) as Activity,
+  updateActivityStatus: () => {},
+  updateActivityFields: () => {},
   existingCampaignNames: INITIAL_CAMPAIGNS.map((c) => c.name.toLowerCase()),
 };
 
@@ -106,8 +106,8 @@ export function useCampaignContext() {
 
 export function CampaignProvider({ children }: { children: ReactNode }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
-  const [events, setEvents] = useState<EventItem[]>(INITIAL_EVENTS);
-  const [activities, setActivities] = useState<Activity[]>(INITIAL_ACTIVITIES);
+  const [events, setEvents] = useState<Activity[]>(INITIAL_ACTIVITIES);
+  const [templates, setTemplates] = useState<Template[]>(INITIAL_TEMPLATES);
 
   const existingCampaignNames = useMemo(
     () => campaigns.map((c) => c.name.toLowerCase()),
@@ -118,24 +118,24 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     return campaigns.find((c) => c.id === id);
   }
 
-  function getEvent(id: string) {
+  function getActivity(id: string) {
     return events.find((e) => e.id === id);
   }
 
-  function getEventsForCampaign(campaignId: string) {
+  function getActivitiesForCampaign(campaignId: string) {
     return events.filter((e) => e.campaignId === campaignId);
   }
 
-  function getActivity(id: string) {
-    return activities.find((a) => a.id === id);
+  function getTemplate(id: string) {
+    return templates.find((t) => t.id === id);
   }
 
-  function getActivitiesForCampaign(campaignId: string) {
-    return activities.filter((a) => a.campaignId === campaignId);
+  function getTemplatesForCampaign(campaignId: string) {
+    return templates.filter((t) => t.campaignId === campaignId);
   }
 
-  function getEventsForActivity(activityId: string) {
-    return events.filter((e) => e.activityId === activityId);
+  function getActivitiesForTemplate(templateId: string) {
+    return events.filter((e) => e.templateId === templateId);
   }
 
   function createCampaign(data: {
@@ -156,7 +156,7 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
       id: generateId(),
       name: data.name,
       description: data.description,
-      eventCount: 0,
+      activityCount: 0,
       status: "draft",
       createdAt: new Date().toISOString().slice(0, 10),
       ...(data.supplier ? { supplier: data.supplier } : {}),
@@ -177,48 +177,48 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     return null;
   }
 
-  function createActivity(data: Omit<Activity, "id" | "createdAt">): Activity {
-    const newActivity: Activity = {
+  function createTemplate(data: Omit<Template, "id" | "createdAt">): Template {
+    const newTemplate: Template = {
       ...data,
-      id: generateActivityId(),
+      id: generateTemplateId(),
       createdAt: new Date().toISOString().slice(0, 10),
     };
-    setActivities((prev) => [newActivity, ...prev]);
-    return newActivity;
+    setTemplates((prev) => [newTemplate, ...prev]);
+    return newTemplate;
   }
 
-  function createEvent(
-    partial: Omit<EventItem, "id" | "createdAt" | "status">,
-  ): EventItem {
-    const newEvent: EventItem = {
+  function createActivity(
+    partial: Omit<Activity, "id" | "createdAt" | "status">,
+  ): Activity {
+    const newEvent: Activity = {
       ...partial,
-      id: generateEventId(),
+      id: generateActivityId(),
       status: "draft",
       createdAt: new Date().toISOString().slice(0, 10),
     };
     setEvents((prev) => [newEvent, ...prev]);
-    // Increment campaign eventCount
+    // Increment campaign activityCount
     setCampaigns((prev) =>
       prev.map((c) =>
         c.id === partial.campaignId
-          ? { ...c, eventCount: c.eventCount + 1 }
+          ? { ...c, activityCount: c.activityCount + 1 }
           : c,
       ),
     );
     return newEvent;
   }
 
-  function updateEventStatus(eventId: string, status: EventItem["status"]) {
+  function updateActivityStatus(activityId: string, status: Activity["status"]) {
     setEvents((prev) =>
-      prev.map((e) => (e.id === eventId ? { ...e, status } : e)),
+      prev.map((e) => (e.id === activityId ? { ...e, status } : e)),
     );
   }
 
-  function updateEventFields(
-    eventId: string,
+  function updateActivityFields(
+    activityId: string,
     fields: Partial<
       Pick<
-        EventItem,
+        Activity,
         | "name"
         | "location"
         | "state"
@@ -233,25 +233,25 @@ export function CampaignProvider({ children }: { children: ReactNode }) {
     >,
   ) {
     setEvents((prev) =>
-      prev.map((e) => (e.id === eventId ? { ...e, ...fields } : e)),
+      prev.map((e) => (e.id === activityId ? { ...e, ...fields } : e)),
     );
   }
 
   const value: CampaignContextValue = {
     campaigns,
     events,
-    activities,
+    templates,
     getCampaign,
-    getEvent,
-    getEventsForCampaign,
     getActivity,
     getActivitiesForCampaign,
-    getEventsForActivity,
+    getTemplate,
+    getTemplatesForCampaign,
+    getActivitiesForTemplate,
     createCampaign,
+    createTemplate,
     createActivity,
-    createEvent,
-    updateEventStatus,
-    updateEventFields,
+    updateActivityStatus,
+    updateActivityFields,
     existingCampaignNames,
   };
 

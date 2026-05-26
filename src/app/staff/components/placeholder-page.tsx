@@ -11,8 +11,8 @@ const PAGE_META: Record<string, { title: string; description: string }> = {
     title: "Campaigns",
     description: "Manage and monitor your promotional campaigns.",
   },
-  "/staff/events": {
-    title: "Events",
+  "/staff/activities": {
+    title: "Activities",
     description: "Track upcoming and past promotional events.",
   },
   "/staff/reports": {

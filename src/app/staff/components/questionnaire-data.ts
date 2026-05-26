@@ -71,7 +71,7 @@ export const DEFAULT_QUESTIONS: QuestionnaireQuestion[] = [
       "Liquor Store",
       "Grocery/Supermarket",
       "Restaurant",
-      "Event Venue",
+      "Activity Venue",
       "Convenience Store",
       "Other",
     ],
@@ -219,7 +219,7 @@ export const CAMPAIGN_QUESTIONNAIRES: QuestionnaireTemplate[] = [
 
 export const STANDARD_QUESTIONNAIRE: QuestionnaireTemplate = {
   id: "qt-4",
-  name: "Standard Event Questionnaire",
+  name: "Standard Activity Questionnaire",
   description:
     "Default questionnaire applied to events that do not belong to a campaign with a dedicated template.",
   questions: [...DEFAULT_QUESTIONS],

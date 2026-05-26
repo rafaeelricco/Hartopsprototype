@@ -43,7 +43,7 @@ export interface Campaign {
   id: string;
   name: string;
   description: string;
-  eventCount: number;
+  activityCount: number;
   status: "active" | "draft" | "completed";
   createdAt: string;
   // ── Extended context fields (all optional) ──────────────────────────────
@@ -54,6 +54,11 @@ export interface Campaign {
   anticipatedEventCount?: number | undefined;
   linkedProductIds?: string[] | undefined;
   objectives?: string[] | undefined;
+  // Curated billing codes for this campaign. Activities pick from this list at
+  // billing time; restricting edits eliminates the "code worded wrong → goes
+  // on its own bill" pain point Leah raised at 00:19:04. Custom codes are
+  // still allowed but logged as a manual override.
+  billingCodes?: string[] | undefined;
 }
 
 let nextId = 9;
@@ -133,7 +138,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     name: "Summer Seltzer Launch",
     description:
       "Nationwide sampling campaign for the new Hard Seltzer line across 12 metro areas.",
-    eventCount: 18,
+    activityCount: 18,
     status: "active",
     createdAt: "2026-01-15",
     supplier: "Beam Suntory",
@@ -143,13 +148,14 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     anticipatedEventCount: 20,
     linkedProductIds: ["sku-001", "sku-002"],
     objectives: ["brand-awareness", "drive-sales"],
+    billingCodes: ["SLT-LAUNCH-OFF", "SLT-LAUNCH-ON", "SLT-LAUNCH-EVT"],
   },
   {
     id: "camp-2",
     name: "Q1 Retail Activation",
     description:
       "In-store tasting events at partner retail locations to drive trial and purchase.",
-    eventCount: 24,
+    activityCount: 24,
     status: "active",
     createdAt: "2026-01-03",
     supplier: "Pernod Ricard",
@@ -159,13 +165,14 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     anticipatedEventCount: 24,
     linkedProductIds: ["sku-003", "sku-004", "sku-005"],
     objectives: ["drive-sales", "product-education"],
+    billingCodes: ["PRR-Q1-RETAIL", "PRR-Q1-SAMPLING"],
   },
   {
     id: "camp-3",
     name: "Music Festival Sponsorship",
     description:
       "Brand activation booths and sampling at three major music festivals.",
-    eventCount: 6,
+    activityCount: 6,
     status: "active",
     createdAt: "2025-12-20",
     supplier: "Beam Suntory",
@@ -175,13 +182,14 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     anticipatedEventCount: 6,
     linkedProductIds: ["sku-001", "sku-006"],
     objectives: ["brand-awareness", "consumer-engagement", "market-research"],
+    billingCodes: ["MUS-FEST-MAIN", "MUS-FEST-VIP"],
   },
   {
     id: "camp-4",
     name: "Holiday Gift Pack Promo",
     description:
       "Limited-edition holiday gift set promotion with in-store displays and sampling.",
-    eventCount: 32,
+    activityCount: 32,
     status: "completed",
     createdAt: "2025-11-01",
   },
@@ -190,7 +198,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     name: "Campus Ambassador Program",
     description:
       "Recruiting and managing brand ambassadors at university campuses for peer-to-peer marketing.",
-    eventCount: 12,
+    activityCount: 12,
     status: "active",
     createdAt: "2026-02-10",
     supplier: "Diageo",
@@ -206,7 +214,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     name: "Spring Wellness Tour",
     description:
       "Pop-up wellness events pairing new low-cal product line with fitness influencer meetups.",
-    eventCount: 0,
+    activityCount: 0,
     status: "draft",
     createdAt: "2026-02-28",
   },
@@ -215,7 +223,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     name: "NFL Tailgate Series",
     description:
       "Tailgate sampling activations across 8 NFL stadiums during the regular season.",
-    eventCount: 16,
+    activityCount: 16,
     status: "completed",
     createdAt: "2025-09-05",
   },
@@ -224,7 +232,7 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     name: "Craft Cocktail Roadshow",
     description:
       "Traveling mixology experience featuring signature cocktails at premium bars and lounges.",
-    eventCount: 9,
+    activityCount: 9,
     status: "active",
     createdAt: "2026-02-01",
     supplier: "Brown-Forman",
@@ -234,5 +242,6 @@ export const INITIAL_CAMPAIGNS: Campaign[] = [
     anticipatedEventCount: 10,
     linkedProductIds: ["sku-006", "sku-007", "sku-008"],
     objectives: ["brand-awareness", "drive-sales", "consumer-engagement"],
+    billingCodes: ["BF-CRAFT-COCKTAIL", "BF-CRAFT-MIXOLOGY"],
   },
 ];

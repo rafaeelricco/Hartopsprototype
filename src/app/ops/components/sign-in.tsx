@@ -51,7 +51,7 @@ export function SignIn() {
     } else if (email === "ops@gmail.com" && password === "12345678") {
       navigate("/ops/dashboard");
     } else if (email === "manager@gmail.com" && password === "12345678") {
-      navigate("/educator/dashboard");
+      navigate("/market-manager/dashboard");
     } else {
       setErrors({ general: "Invalid email or password. Please try again." });
     }

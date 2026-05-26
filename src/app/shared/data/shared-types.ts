@@ -2,7 +2,9 @@
 /* Shared types used across ops & staff platforms                       */
 /* ------------------------------------------------------------------ */
 
-export type Educator = {
+import type { RateHistoryEntry, RecentOverride } from "./billing-types";
+
+export type BrandAmbassador = {
   id: string;
   name: string;
   city: string;
@@ -13,6 +15,13 @@ export type Educator = {
   eventsCompleted: number;
   specialties: string[];
   lastEventDate: string | null;
+  // R2 — Compensation (mm-ui-008). Optional so legacy mock data still
+  // compiles; consumers that need comp data should rely on the rate fields
+  // below being populated for active brandAmbassadors.
+  standardRate?: number;
+  standardRateEffectiveDate?: string;
+  rateHistory?: RateHistoryEntry[];
+  recentOverrides?: RecentOverride[];
 };
 
 export type QuestionnaireQuestion = {

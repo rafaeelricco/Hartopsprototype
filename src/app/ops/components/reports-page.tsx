@@ -12,7 +12,7 @@ import {
   Megaphone,
   User,
   ArrowUpDown,
-  Activity,
+  Activity as ActivityIcon,
   Users,
   CalendarCheck,
 } from "lucide-react";
@@ -162,7 +162,7 @@ const TOP_CAMPAIGNS = [
   },
 ];
 
-const TOP_EDUCATORS = [
+const TOP_BRAND_AMBASSADORS = [
   {
     rank: 1,
     name: "John Doe",
@@ -640,7 +640,7 @@ export function ReportsPage() {
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex items-center justify-center size-8 rounded-lg bg-[#7D152D]/10">
-                    <Activity className="size-4 text-[#7D152D]" />
+                    <ActivityIcon className="size-4 text-[#7D152D]" />
                   </div>
                   <span
                     className="text-muted-foreground"
@@ -787,7 +787,7 @@ export function ReportsPage() {
                       <Line
                         type="monotone"
                         dataKey="events"
-                        name="Events"
+                        name="Activities"
                         stroke="#7D152D"
                         strokeWidth={2}
                         dot={{ r: 3, fill: "#7D152D" }}
@@ -857,7 +857,7 @@ export function ReportsPage() {
                       <Bar
                         yAxisId="left"
                         dataKey="events"
-                        name="Events"
+                        name="Activities"
                         fill="#7D152D"
                         radius={[4, 4, 0, 0]}
                         barSize={24}
@@ -1051,13 +1051,13 @@ export function ReportsPage() {
                 </CardContent>
               </Card>
 
-              {/* Top Educators — change #4: added Trend column */}
+              {/* Top Brand Ambassadors — change #4: added Trend column */}
               <Card className="gap-0">
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
                     <User className="size-4 text-[#7D152D]" />
                     <CardTitle style={{ fontSize: "0.8125rem" }}>
-                      Top Educators
+                      Top Brand Ambassadors
                     </CardTitle>
                   </div>
                 </CardHeader>
@@ -1075,7 +1075,7 @@ export function ReportsPage() {
                           className="text-left px-4 py-2 text-muted-foreground"
                           style={{ fontSize: "0.6875rem", fontWeight: 500 }}
                         >
-                          Educator
+                          BrandAmbassador
                         </th>
                         <th
                           className="text-right px-4 py-2 text-muted-foreground"
@@ -1092,7 +1092,7 @@ export function ReportsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {TOP_EDUCATORS.map((e) => (
+                      {TOP_BRAND_AMBASSADORS.map((e) => (
                         <tr
                           key={e.rank}
                           className="border-b border-border last:border-0"
@@ -1292,7 +1292,7 @@ export function ReportsPage() {
                         "Photos",
                         "Questions",
                         "Inventory",
-                        "Events",
+                        "Activities",
                         "Trend",
                       ].map((h) => (
                         <th
@@ -1402,7 +1402,7 @@ export function ReportsPage() {
                         "Photos",
                         "Questions",
                         "Inventory",
-                        "Events",
+                        "Activities",
                         "Trend",
                       ].map((h) => (
                         <th

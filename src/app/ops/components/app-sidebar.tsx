@@ -11,6 +11,8 @@ import {
   Store,
   Users,
   CalendarCheck,
+  Receipt,
+  Wallet,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 
@@ -56,8 +58,8 @@ const data = {
       icon: Store,
     },
     {
-      title: "Educators",
-      url: "/ops/dashboard/educators",
+      title: "Brand Ambassadors",
+      url: "/ops/dashboard/brand-ambassadors",
       icon: Users,
     },
     {
@@ -66,14 +68,24 @@ const data = {
       icon: CalendarCheck,
     },
     // {
-    //   title: "Draft Events",
-    //   url: "/ops/dashboard/draft-events",
+    //   title: "Draft Activities",
+    //   url: "/ops/dashboard/draft-activities",
     //   icon: ClipboardCheck,
     // },
     {
-      title: "Events",
-      url: "/ops/dashboard/events",
+      title: "Activities",
+      url: "/ops/dashboard/activities",
       icon: CalendarDays,
+    },
+    {
+      title: "Billing",
+      url: "/ops/dashboard/billing",
+      icon: Receipt,
+    },
+    {
+      title: "Payroll",
+      url: "/ops/dashboard/payroll",
+      icon: Wallet,
     },
     {
       title: "Settings",

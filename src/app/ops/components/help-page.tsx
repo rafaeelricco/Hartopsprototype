@@ -38,8 +38,8 @@ const faqs = [
     id: 2,
     question: "How do I create and manage events?",
     answer:
-      'Go to the Events page and click "Create Event". You can set the event name, date, location, and assign it to an organization. Once created, you can edit or cancel events from the event list.',
-    category: "Events",
+      'Go to the Activities page and click "Create Activity". You can set the event name, date, location, and assign it to an organization. Once created, you can edit or cancel events from the event list.',
+    category: "Activities",
   },
   {
     id: 3,
@@ -85,7 +85,7 @@ const resources = [
     type: "Documentation",
   },
   {
-    title: "Events & Scheduling",
+    title: "Activities & Scheduling",
     description: "Set up events and manage your calendar",
     icon: FileText,
     type: "Documentation",

@@ -1,5 +1,5 @@
 import { CAMPAIGN_METRICS } from "./reports-data";
-import { INITIAL_EVENTS } from "./event-data";
+import { INITIAL_ACTIVITIES } from "./activity-data";
 import { INITIAL_CAMPAIGNS } from "./campaign-data";
 
 /** Let's create proper CSV string escaping for values that might contain commas */
@@ -34,7 +34,7 @@ export function exportCampaignMetricsCSV() {
     "Campaign ID",
     "Campaign Name",
     "Status",
-    "Events Completed",
+    "Activities Completed",
     "Samples Distributed",
     "Consumer Reach",
     "Total Sales",
@@ -74,10 +74,10 @@ export function exportCampaignMetricsCSV() {
 
 export function exportEventDetailsCSV() {
   const headers = [
-    "Event ID",
+    "Activity ID",
     "Campaign ID",
     "Campaign Name",
-    "Event Name",
+    "Activity Name",
     "Date",
     "Location",
     "Venue Type",
@@ -87,7 +87,7 @@ export function exportEventDetailsCSV() {
     "Created At",
   ];
 
-  const rows = INITIAL_EVENTS.map((event) => {
+  const rows = INITIAL_ACTIVITIES.map((event) => {
     // Find the associated campaign to get its name
     const campaign = INITIAL_CAMPAIGNS.find((c) => c.id === event.campaignId);
 
@@ -124,12 +124,12 @@ export function exportEventDetailsCSV() {
 
 export function exportFullDatasetCSV() {
   const headers = [
-    "Event ID",
-    "Event Name",
-    "Event Date",
+    "Activity ID",
+    "Activity Name",
+    "Activity Date",
     "Location",
     "Venue Type",
-    "Event Status",
+    "Activity Status",
     "Objectives",
     "Campaign ID",
     "Campaign Name",
@@ -138,12 +138,12 @@ export function exportFullDatasetCSV() {
     "Target Markets",
     "Channels",
     "Campaign Objectives",
-    "Completed Events (Campaign Total)",
+    "Completed Activities (Campaign Total)",
     "Samples (Campaign Total)",
     "Sales (Campaign Total)",
   ];
 
-  const rows = INITIAL_EVENTS.map((event) => {
+  const rows = INITIAL_ACTIVITIES.map((event) => {
     const campaign = INITIAL_CAMPAIGNS.find((c) => c.id === event.campaignId);
     const metrics = CAMPAIGN_METRICS.find(
       (m) => m.campaignId === event.campaignId,

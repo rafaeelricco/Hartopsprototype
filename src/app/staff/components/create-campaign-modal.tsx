@@ -22,7 +22,7 @@ import { Input } from "@/app/shared/components/ui/input";
 import { Textarea } from "@/app/shared/components/ui/textarea";
 import { Check, Plus, X, AlertCircle, Loader2 } from "lucide-react";
 import { MOCK_PRODUCTS, CHANNEL_OPTIONS } from "./campaign-data";
-import { OBJECTIVES } from "./event-data";
+import { OBJECTIVES } from "./activity-data";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -6,7 +6,7 @@ import {
   TrendingDown,
   ArrowUpRight,
   Users,
-  Activity,
+  Activity as ActivityIcon,
 } from "lucide-react";
 import {
   Card,
@@ -108,14 +108,14 @@ const growthChartConfig: ChartConfig = {
     color: "#7D152D",
   },
   events: {
-    label: "Events",
+    label: "Activities",
     color: "#E2E8F0",
   },
 };
 
 const activityChartConfig: ChartConfig = {
   count: {
-    label: "Events",
+    label: "Activities",
     color: "#7D152D",
   },
 };
@@ -211,7 +211,7 @@ export function Dashboard() {
           trend="up"
         />
         <StatCard
-          title="Active Events"
+          title="Active Activities"
           value="168"
           change="+10.5%"
           changeLabel="from last month"
@@ -227,11 +227,11 @@ export function Dashboard() {
           trend="up"
         />
         <StatCard
-          title="Avg. Events / Org"
+          title="Avg. Activities / Org"
           value="2.6"
           change="-0.3"
           changeLabel="from last month"
-          icon={Activity}
+          icon={ActivityIcon}
           trend="down"
         />
       </div>

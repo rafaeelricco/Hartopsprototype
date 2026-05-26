@@ -222,7 +222,7 @@ export function OrganizationsPage() {
                     "Industry",
                     "Plan",
                     "Status",
-                    "Events",
+                    "Activities",
                     "Members",
                     "Joined",
                   ].map((h) => (

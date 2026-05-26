@@ -329,7 +329,7 @@ export interface FAQItem {
 
 export const FAQ_CATEGORIES = [
   "Product Knowledge",
-  "Event Setup",
+  "Activity Setup",
   "Sampling Guidelines",
   "Compliance",
   "Troubleshooting",
@@ -351,7 +351,7 @@ export const INITIAL_FAQS: FAQItem[] = [
     question: "How do I set up the sampling station?",
     answer:
       "1) Unpack branded tablecloth and display materials first. 2) Position the table at least 6 feet from the store entrance. 3) Arrange product bottles/cans in a triangle formation with labels facing customers. 4) Place sample cups in stacks of 20 with napkins beside them. 5) Set up the iPad with the check-in app. 6) Ensure ice is filled to the top of the cooler.",
-    category: "Event Setup",
+    category: "Activity Setup",
     updatedAt: "2026-03-01T10:15:00Z",
     pushedAt: "2026-03-01T10:30:00Z",
     version: 5,
@@ -391,7 +391,7 @@ export const INITIAL_FAQS: FAQItem[] = [
     question: "How do I handle leftover product at the end of an event?",
     answer:
       "Opened product must be disposed of — do not offer to store staff or take home. Sealed product goes back into the cooler for transport. Log all remaining sealed units in the post-event inventory section of the app. Take a photo of the final inventory count for proof-of-performance.",
-    category: "Event Setup",
+    category: "Activity Setup",
     updatedAt: "2026-02-18T13:45:00Z",
     pushedAt: null,
     version: 1,

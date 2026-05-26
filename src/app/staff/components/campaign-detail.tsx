@@ -1,6 +1,6 @@
 // =============================================================================
-// Campaign Detail — shows campaign header + activities + event list.
-// Hierarchy: Campaign → Activity → Event (MM-UI-003).
+// Campaign Detail — shows campaign header + templates + event list.
+// Hierarchy: Campaign → Template (optional) → Activity (Event | Survey) (MM-UI-003).
 // =============================================================================
 import { useState, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router";
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
 import { useCampaignContext } from "./campaign-context";
-import { OBJECTIVES, type EventItem } from "./event-data";
+import { OBJECTIVES, type Activity } from "./activity-data";
 import { MOCK_PRODUCTS, CHANNEL_OPTIONS } from "./campaign-data";
 import { Input } from "@/app/shared/components/ui/input";
 
@@ -56,7 +56,7 @@ const VENUE_LABELS: Record<string, string> = {
   special: "Special",
 };
 
-const EVENT_STATUS_FILTERS: (EventItem["status"] | "all")[] = [
+const EVENT_STATUS_FILTERS: (Activity["status"] | "all")[] = [
   "all",
   "draft",
   "scheduled",
@@ -71,22 +71,22 @@ export function CampaignDetail() {
   const navigate = useNavigate();
   const {
     getCampaign,
-    getEventsForCampaign,
     getActivitiesForCampaign,
-    getEventsForActivity,
-    createActivity,
+    getTemplatesForCampaign,
+    getActivitiesForTemplate,
+    createTemplate,
   } = useCampaignContext();
 
   // Gap #6: filtering and sorting state
-  const [statusFilter, setStatusFilter] = useState<EventItem["status"] | "all">(
+  const [statusFilter, setStatusFilter] = useState<Activity["status"] | "all">(
     "all",
   );
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [showCreateActivity, setShowCreateActivity] = useState(false);
+  const [showCreateTemplate, setShowCreateTemplate] = useState(false);
 
   const campaign = getCampaign(id ?? "");
-  const allEvents = getEventsForCampaign(id ?? "");
-  const campaignActivities = getActivitiesForCampaign(id ?? "");
+  const allEvents = getActivitiesForCampaign(id ?? "");
+  const campaignTemplates = getTemplatesForCampaign(id ?? "");
 
   // Filtered + sorted events
   const events = useMemo(() => {
@@ -132,8 +132,8 @@ export function CampaignDetail() {
 
   const campStatus = STATUS_LABELS[campaign.status] ?? STATUS_LABELS["draft"];
 
-  // Gap #7: Use campaign.eventCount for total, actual array for detail
-  const totalEventCount = Math.max(campaign.eventCount, allEvents.length);
+  // Gap #7: Use campaign.activityCount for total, actual array for detail
+  const totalEventCount = Math.max(campaign.activityCount, allEvents.length);
   const showingSubset = allEvents.length < totalEventCount;
 
   return (
@@ -199,12 +199,12 @@ export function CampaignDetail() {
           </div>
           <div className="flex-shrink-0">
             <Button
-              onClick={() => navigate(`/staff/events/create?campaign=${id}`)}
+              onClick={() => navigate(`/staff/activities/create?campaign=${id}`)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto w-full sm:w-auto"
               style={{ background: "#7D152D", fontSize: "0.875rem" }}
             >
               <Plus size={16} strokeWidth={2.5} />
-              Create Event
+              Create Activity
             </Button>
           </div>
         </div>
@@ -442,13 +442,13 @@ export function CampaignDetail() {
       /> */}
 
       {/* ---------------------------------------------------------------- */}
-      {/* Activities Section                                                */}
+      {/* Templates Section                                                 */}
       {/* ---------------------------------------------------------------- */}
       <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Layers size={16} style={{ color: "#7D152D" }} />
-            <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Activities</h3>
+            <h3 style={{ fontSize: "1rem", color: "#0F172A" }}>Templates</h3>
             <span
               className="px-2 py-0.5 rounded-md"
               style={{
@@ -457,58 +457,58 @@ export function CampaignDetail() {
                 color: "#64748B",
               }}
             >
-              {campaignActivities.length}
+              {campaignTemplates.length}
             </span>
           </div>
           <Button
             variant="ghost"
-            onClick={() => setShowCreateActivity((p) => !p)}
+            onClick={() => setShowCreateTemplate((p) => !p)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#7D152D] hover:bg-[#7D152D]/5 transition-colors cursor-pointer h-auto"
             style={{ fontSize: "0.8125rem" }}
           >
-            {showCreateActivity ? <X size={14} /> : <Plus size={14} />}
-            {showCreateActivity ? "Cancel" : "Create Activity"}
+            {showCreateTemplate ? <X size={14} /> : <Plus size={14} />}
+            {showCreateTemplate ? "Cancel" : "Create Template"}
           </Button>
         </div>
 
-        {showCreateActivity && (
-          <CreateActivityForm
+        {showCreateTemplate && (
+          <CreateTemplateForm
             campaignId={id!}
             campaignChannels={campaign.channels ?? []}
             campaignProductIds={campaign.linkedProductIds ?? []}
             onCreate={(data) => {
-              createActivity(data);
-              setShowCreateActivity(false);
+              createTemplate(data);
+              setShowCreateTemplate(false);
             }}
           />
         )}
 
-        {campaignActivities.length === 0 && !showCreateActivity ? (
+        {campaignTemplates.length === 0 && !showCreateTemplate ? (
           <div className="text-center py-6">
             <p
               style={{ fontSize: "0.875rem", color: "#94A3B8" }}
               className="mb-1"
             >
-              No activities yet
+              No templates yet
             </p>
             <p style={{ fontSize: "0.8125rem", color: "#CBD5E1" }}>
-              Activities let you template event types with specific product
-              subsets.
+              Templates pre-fill new activities with a set of channels and
+              products from this campaign.
             </p>
           </div>
         ) : (
           <div className="flex flex-col gap-2.5">
-            {campaignActivities.map((activity) => {
-              const actEvents = getEventsForActivity(activity.id);
-              const actProducts = MOCK_PRODUCTS.filter((p) =>
-                activity.linkedProductIds?.includes(p.id),
+            {campaignTemplates.map((template) => {
+              const tplEvents = getActivitiesForTemplate(template.id);
+              const tplProducts = MOCK_PRODUCTS.filter((p) =>
+                template.linkedProductIds?.includes(p.id),
               );
-              const actChannels = CHANNEL_OPTIONS.filter((ch) =>
-                activity.channels?.includes(ch.value),
+              const tplChannels = CHANNEL_OPTIONS.filter((ch) =>
+                template.channels?.includes(ch.value),
               );
               return (
                 <div
-                  key={activity.id}
+                  key={template.id}
                   className="rounded-lg border border-[#E2E8F0] p-4 transition-shadow hover:shadow-sm"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -517,9 +517,9 @@ export function CampaignDetail() {
                         className="truncate mb-1"
                         style={{ fontSize: "0.9375rem", color: "#0F172A" }}
                       >
-                        {activity.name}
+                        {template.name}
                       </p>
-                      {activity.description && (
+                      {template.description && (
                         <p
                           className="line-clamp-2 mb-2"
                           style={{
@@ -528,11 +528,11 @@ export function CampaignDetail() {
                             lineHeight: 1.4,
                           }}
                         >
-                          {activity.description}
+                          {template.description}
                         </p>
                       )}
                       <div className="flex flex-wrap items-center gap-2">
-                        {actChannels.map((ch) => (
+                        {tplChannels.map((ch) => (
                           <span
                             key={ch.value}
                             className="px-2 py-0.5 rounded-md"
@@ -545,7 +545,7 @@ export function CampaignDetail() {
                             {ch.label}
                           </span>
                         ))}
-                        {actProducts.map((p) => (
+                        {tplProducts.map((p) => (
                           <span
                             key={p.id}
                             className="px-2 py-0.5 rounded-md"
@@ -559,8 +559,10 @@ export function CampaignDetail() {
                           </span>
                         ))}
                         <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                          · {actEvents.length} event
-                          {actEvents.length !== 1 ? "s" : ""}
+                          ·{" "}
+                          {tplEvents.length === 1
+                            ? "1 activity"
+                            : `${tplEvents.length} activities`}
                         </span>
                       </div>
                     </div>
@@ -568,14 +570,14 @@ export function CampaignDetail() {
                       variant="ghost"
                       onClick={() =>
                         navigate(
-                          `/staff/events/create?campaign=${id}&activity=${activity.id}`,
+                          `/staff/activities/create?campaign=${id}&template=${template.id}`,
                         )
                       }
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white hover:opacity-90 transition-opacity cursor-pointer h-auto flex-shrink-0"
                       style={{ background: "#7D152D", fontSize: "0.8125rem" }}
                     >
                       <Plus size={13} />
-                      Event
+                      Activity
                     </Button>
                   </div>
                 </div>
@@ -604,12 +606,12 @@ export function CampaignDetail() {
             Create your first event using the guided wizard.
           </p>
           <Button
-            onClick={() => navigate(`/staff/events/create?campaign=${id}`)}
+            onClick={() => navigate(`/staff/activities/create?campaign=${id}`)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto"
             style={{ background: "#7D152D", fontSize: "0.875rem" }}
           >
             <Plus size={16} strokeWidth={2.5} />
-            Create Event
+            Create Activity
           </Button>
         </div>
       ) : (
@@ -697,7 +699,7 @@ export function CampaignDetail() {
 // Event card row
 // ---------------------------------------------------------------------------
 
-function EventCard({ event }: { event: EventItem }) {
+function EventCard({ event }: { event: Activity }) {
   const navigate = useNavigate();
   const status = STATUS_LABELS[event.status] ?? STATUS_LABELS["draft"];
   const objectiveLabels = OBJECTIVES.filter((o) =>
@@ -706,7 +708,7 @@ function EventCard({ event }: { event: EventItem }) {
 
   return (
     <div
-      onClick={() => navigate(`/staff/events/${event.id}`)}
+      onClick={() => navigate(`/staff/activities/${event.id}`)}
       className="bg-white rounded-xl border border-[#E2E8F0] p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-shadow hover:shadow-sm group cursor-pointer"
     >
       {/* Left — icon */}
@@ -813,12 +815,12 @@ function EventCard({ event }: { event: EventItem }) {
 }
 
 // ---------------------------------------------------------------------------
-// Inline Create Activity Form
+// Inline Create Template Form
 // ---------------------------------------------------------------------------
 
-import type { Activity } from "./activity-data";
+import type { Template } from "./template-data";
 
-function CreateActivityForm({
+function CreateTemplateForm({
   campaignId,
   campaignChannels,
   campaignProductIds,
@@ -827,7 +829,7 @@ function CreateActivityForm({
   campaignId: string;
   campaignChannels: string[];
   campaignProductIds: string[];
-  onCreate: (data: Omit<Activity, "id" | "createdAt">) => void;
+  onCreate: (data: Omit<Template, "id" | "createdAt">) => void;
 }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -844,7 +846,7 @@ function CreateActivityForm({
 
   function handleSubmit() {
     if (!name.trim()) {
-      setNameError("Activity name is required.");
+      setNameError("Template name is required.");
       return;
     }
     onCreate({
@@ -865,20 +867,20 @@ function CreateActivityForm({
         style={{ fontSize: "0.875rem", color: "#0F172A", fontWeight: 500 }}
         className="mb-3"
       >
-        New Activity
+        New Template
       </p>
 
       {/* Name */}
       <div className="mb-3">
         <label
-          htmlFor="activity-name"
+          htmlFor="template-name"
           className="block mb-1"
           style={{ fontSize: "0.8125rem", color: "#64748B" }}
         >
           Name <span style={{ color: "#EF4444" }}>*</span>
         </label>
         <Input
-          id="activity-name"
+          id="template-name"
           type="text"
           value={name}
           onChange={(e) => {
@@ -902,14 +904,14 @@ function CreateActivityForm({
       {/* Description */}
       <div className="mb-3">
         <label
-          htmlFor="activity-desc"
+          htmlFor="template-desc"
           className="block mb-1"
           style={{ fontSize: "0.8125rem", color: "#64748B" }}
         >
           Description
         </label>
         <Input
-          id="activity-desc"
+          id="template-desc"
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -1025,7 +1027,7 @@ function CreateActivityForm({
         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90 cursor-pointer h-auto"
         style={{ background: "#7D152D", fontSize: "0.8125rem" }}
       >
-        Create Activity
+        Create Template
       </Button>
     </div>
   );

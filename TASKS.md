@@ -4,9 +4,9 @@ Tasks extracted from the [Hart / Ambar Prototype Walkthrough – 2026-04-02](doc
 
 ## Ops (Operator / Hart Super Admin)
 
-- ~~**Add filters to the Events view**: Right now the operator has to go into each event to see details. Needs filters by organization, region/territory, and assignment status so they can get a bird's-eye view across all agencies. **Phase 1.** _(~00:09:01 – 00:10:58)_~~ **Done — 2026-04-07** — Added Region column + filter (5 territories), Assignment filter (assigned/unassigned/pending), and quick-assign educator dialog with inline table updates.
+- ~~**Add filters to the Activities view**: Right now the operator has to go into each event to see details. Needs filters by organization, region/territory, and assignment status so they can get a bird's-eye view across all agencies. **Phase 1.** _(~00:09:01 – 00:10:58)_~~ **Done — 2026-04-07** — Added Region column + filter (5 territories), Assignment filter (assigned/unassigned/pending), and quick-assign brand ambassador dialog with inline table updates.
 
-- ~~**Add ability to assign/reassign ambassadors**: Luis flagged that the operator level should also have the capability to assign and reassign ambassadors to events (not just the educator manager). Quick-action buttons on the list view. **Phase 1.** _(~00:34:27 – 00:36:47)_~~ **Done — 2026-04-07**
+- ~~**Add ability to assign/reassign ambassadors**: Luis flagged that the operator level should also have the capability to assign and reassign ambassadors to events (not just the market manager). Quick-action buttons on the list view. **Phase 1.** _(~00:34:27 – 00:36:47)_~~ **Done — 2026-04-07**
 
 - ~~**User roles section in capability matrix**: Stephanie asked for a section mapping what each user type can access in Phase 1. Ethan confirmed it'll be added. **Phase 1 (documentation task).** _(~00:03:22 – 00:04:29)_~~ **Done — 2026-04-07** — Added `/ops/dashboard/capability-matrix` page with tabbed role-vs-capability matrix; linked from Help page "Security & Permissions" card.
 
@@ -34,11 +34,11 @@ Tasks extracted from the [Hart / Ambar Prototype Walkthrough – 2026-04-02](doc
 
 - **Automated charging of affiliates**: Billing the agencies that use the SaaS platform. **Phase 2.** _(~01:03:54)_
 
-- **Terminology configurable per agency**: "Educator" → "Ambassador" / "Brand Ambassador." Ethan confirmed each org can choose their own term. **Phase 1 (already accounted for).** _(~00:02:23)_
+- **Terminology configurable per agency**: "Brand Ambassador" → "Ambassador" / "Brand Ambassador." Ethan confirmed each org can choose their own term. **Phase 1 (already accounted for).** _(~00:02:23)_
 
 ---
 
-## Educator Manager
+## Market Manager
 
 - **Same filters as staff view**: Territory, geography, event type, assignment status — so managers only see what they're responsible for (e.g., only Brooklyn, only on-premise). **Phase 1.** _(~00:29:09 – 00:30:10)_
 
@@ -48,6 +48,6 @@ Tasks extracted from the [Hart / Ambar Prototype Walkthrough – 2026-04-02](doc
 
 ---
 
-## Educator (Mobile App)
+## Brand Ambassador (Mobile App)
 
 - **Consumer profiling UX — allow cumulative entry**: Leah raised concern that per-interaction profiling (gender/age) keeps ambassadors on their phones too long, which looks bad on-site. Decision: keep current tap-per-consumer flow for now, but revisit if needed. Sales tracking and venue survey photos remain required before checkout. **Phase 1 (design decision — revisit if feedback warrants).** _(~00:55:07 – 00:57:59)_
