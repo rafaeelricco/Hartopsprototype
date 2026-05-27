@@ -15,6 +15,7 @@ import type {
   Invoice,
   SlaReportRow,
 } from "../../shared/data/billing-types";
+import { isBillingApprovalReady } from "../../shared/data/billing-types";
 
 // ---------------------------------------------------------------------------
 // Current open cycle (the one the operator is working on)
@@ -146,6 +147,13 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     missingReason: "Recurring — brand ambassador count changed",
     slaEligible: true,
     licenceVerified: true,
+    // SLA capture (R2). Manager attached the bar receipt and noted the
+    // ambassador-count change context — the AmEx cardholder was on-site
+    // for the whole shift per the BA mobile completion.
+    receiptUrl: "/templates/receipt-magic-hour-2026-05-17.jpg",
+    clarifyingNotes:
+      "Receipt totals match Square slip. BA count grew from 2 → 3 mid-cycle; recurring instance flagged for recalc.",
+    approvingManager: "Larry Golus",
     recurringInstance: {
       seriesId: "series-avion-sunday",
       originalBrandAmbassadorCount: 2,
@@ -226,6 +234,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     status: "ready-to-bill",
     slaEligible: true,
     licenceVerified: true,
+    receiptUrl: "/templates/receipt-pearl-street-2026-05-19.jpg",
+    clarifyingNotes: "",
+    approvingManager: "Larry Golus",
   },
 
   // 6. Non-event activity — Survey stub. Proves the activity-as-billable
@@ -360,6 +371,7 @@ export const MOCK_SLA_REPORT: SlaReportRow[] = [
     licenceActiveAtEventDate: true,
     executor: "Ana Martinez",
     spendAmount: 864,
+    approvingManager: "Larry Golus",
   },
   {
     activityId: "act-bill-003",
@@ -370,6 +382,10 @@ export const MOCK_SLA_REPORT: SlaReportRow[] = [
     licenceActiveAtEventDate: true,
     executor: "David Kim",
     spendAmount: 902,
+    receiptUrl: "/templates/receipt-magic-hour-2026-05-17.jpg",
+    clarifyingNotes:
+      "Receipt totals match Square slip. BA count grew from 2 → 3 mid-cycle; recurring instance flagged for recalc.",
+    approvingManager: "Larry Golus",
   },
 ];
 
@@ -420,7 +436,9 @@ export function updateBillingActivity(
 
 export function approveBillingActivities(ids: string[]): void {
   MOCK_BILLING_ACTIVITIES = MOCK_BILLING_ACTIVITIES.map((a) =>
-    ids.includes(a.id) ? { ...a, status: "approved" } : a,
+    ids.includes(a.id) && isBillingApprovalReady(a)
+      ? { ...a, status: "approved" }
+      : a,
   );
 }
 

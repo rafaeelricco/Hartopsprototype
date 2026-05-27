@@ -8,9 +8,9 @@ For the mobile surface spec (frame, primitives, screens), see [`educator-mobile.
 
 ## Overview
 
-Hart Agency's design language is deliberately **flat, border-based, elevation-0, left-aligned** — closer to Linear or shadcn-default than to a consumer brand. One brand color (Hart Burgundy `#7D152D`) paired with Tailwind's Gray neutrals, Inter at three weights, and a 1-pixel rule on every container. Two product surfaces share a single token set: **Hart Ops** (desktop web) and **Educator Mobile** (PWA).
+Hart Agency's design language is deliberately **flat, border-based, elevation-0, left-aligned** — closer to Linear or shadcn-default than to a consumer brand. One brand color (Hart Burgundy `#7D152D`) paired with Tailwind's Gray neutrals, Inter at three weights, and a 1-pixel rule on every container. Two product surfaces share a single token set: **Hart Ops** (desktop web) and **Brand Ambassador Mobile** (PWA).
 
-Hart Ops is the internal operations platform (Dashboard, Account Master, Educators, Events, Availability, Organizations, Reports, Settings). Educator Mobile is the field-facing PWA companion running check-ins, live events, and venue intelligence. Both surfaces diverge mainly in frame constants and motion vocabulary.
+Hart Ops is the internal operations platform (Dashboard, Account Master, Brand Ambassadors, Events, Availability, Organizations, Reports, Settings). Brand Ambassador Mobile is the field-facing PWA companion running check-ins, live events, and venue intelligence. Both surfaces diverge mainly in frame constants and motion vocabulary.
 
 ### The eleven non-negotiables
 
@@ -24,7 +24,7 @@ Hart Ops is the internal operations platform (Dashboard, Account Master, Educato
 - **The 1-pixel rule.** Every container uses `1px solid #E5E7EB`.
 - **Corner radius scale.** sm 8 · md 10 · lg 12 · xl 16. Buttons/inputs use md; cards use lg.
 - **4px spacing base.** Dominant rhythms `gap-2` (8) · `gap-4` (16) · `p-6` (24) · `space-y-6`.
-- **Frame constants.** Hart Ops = 256px sidebar + 64px header. Educator Mobile = `max-w-md` (390px).
+- **Frame constants.** Hart Ops = 256px sidebar + 64px header. Brand Ambassador Mobile = `max-w-md` (390px).
 
 ---
 
@@ -56,7 +56,7 @@ Pair with semantic text classes: `text-muted-foreground` for decorative chrome, 
 
 The platform speaks about itself, not to the user. Copy is short, specific, and tool-like — closer to a CLI man page than to marketing. Third-person operational, no "we", minimal "you". No jokes, no exclamation marks, no emoji.
 
-- **Page titles:** noun phrases — "Dashboard", "Account Master", "Educator Detail".
+- **Page titles:** noun phrases — "Dashboard", "Account Master", "Brand Ambassador Detail".
 - **Page subtitles:** one short sentence, sentence case, period — "Platform overview and key metrics at a glance."
 - **Buttons:** verb-first, 1–2 words — "Sign In", "Add Account", "Continue", "Clear filters".
 
@@ -180,7 +180,7 @@ Transparency is expressed via Tailwind modifiers on solid colors — never as se
 
 ### Retired on desktop (do not use on Hart Web)
 
-- `#0F766E` teal — formerly "accent" per older docs. Dropped from [`globals.css`](../app/frontend/src/globals.css); `--color-accent` maps to neutral gray on web. Educator Mobile still uses `--color-teal` — see [`educator-mobile.md`](educator-mobile.md#mobile-only-tokens).
+- `#0F766E` teal — formerly "accent" per older docs. Dropped from [`globals.css`](../app/frontend/src/globals.css); `--color-accent` maps to neutral gray on web. Brand Ambassador Mobile still uses `--color-teal` — see [`educator-mobile.md`](educator-mobile.md#mobile-only-tokens).
 - `--neutral-50…900` warm neutrals — referenced in earlier drafts but never wired. Not present in `globals.css`.
 
 ---
@@ -306,7 +306,7 @@ Hard-coded dimensions, not token-based — anyone re-implementing the frame must
 | Grid at `sm+`             | `grid-cols-2 gap-4`                    |
 | Grid at `lg+`             | `grid-cols-3` or `grid-cols-4` `gap-4` |
 
-**Mobile (Educator Mobile)** — see [`educator-mobile.md`](educator-mobile.md) for the full spec.
+**Mobile (Brand Ambassador Mobile)** — see [`educator-mobile.md`](educator-mobile.md) for the full spec.
 
 ### Breakpoints
 
@@ -514,7 +514,7 @@ All hover/focus/disabled/invalid treatments. **Preview:** [`preview/components-s
 Two surfaces share one token set, diverging mainly in frame constants and motion vocabulary.
 
 - **Hart Ops (desktop).** Collapsible sidebar at 256px (expanded) / 48px (collapsed). Sticky header at 64px with bottom border. Content wrapper `p-6 space-y-6 w-full`. Grid defaults to `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`.
-- **Educator Mobile (PWA).** Single column `w-full max-w-md mx-auto`. Screen header `px-6 pt-14 pb-4` (manual notch allowance). Bottom nav `fixed`, `pb-[max(0.625rem, env(safe-area-inset-bottom))]`. Forward-push transitions at 350ms; bottom-sheet and cross-fade at 300–500ms. Full spec in [`educator-mobile.md`](educator-mobile.md).
+- **Brand Ambassador Mobile (PWA).** Single column `w-full max-w-md mx-auto`. Screen header `px-6 pt-14 pb-4` (manual notch allowance). Bottom nav `fixed`, `pb-[max(0.625rem, env(safe-area-inset-bottom))]`. Forward-push transitions at 350ms; bottom-sheet and cross-fade at 300–500ms. Full spec in [`educator-mobile.md`](educator-mobile.md).
 
 **Imagery.** No custom illustrations in code. No stock photography in chrome. The only image in the running app is the logo on the auth screen. Charts are the primary visual accent — area charts with a burgundy fill ramping from 0.2 opacity → 0.02.
 
@@ -525,8 +525,8 @@ Two surfaces share one token set, diverging mainly in frame constants and motion
 ## Known gaps
 
 - **Mono font.** No custom monospace is loaded; `--font-mono` falls back to the system stack (`ui-monospace, SFMono-Regular, Menlo, monospace`). A branded mono has been discussed but not adopted.
-- **Dark mode.** Not shipped on Hart Web Platforms. The shadcn `.dark` block was removed from `globals.css`; revisit when dark mode is a product requirement. Educator Mobile mirrors light tokens in `theme.ts` (`dark: lightTokens`).
-- **Teal accent (mobile only).** `#0F766E` is retired on desktop — `--color-accent` maps to neutral gray. Educator Mobile keeps `--color-teal` in [`app/mobile/src/global.css`](../../../app/mobile/src/global.css); see [`educator-mobile.md`](educator-mobile.md#mobile-only-tokens).
+- **Dark mode.** Not shipped on Hart Web Platforms. The shadcn `.dark` block was removed from `globals.css`; revisit when dark mode is a product requirement. Brand Ambassador Mobile mirrors light tokens in `theme.ts` (`dark: lightTokens`).
+- **Teal accent (mobile only).** `#0F766E` is retired on desktop — `--color-accent` maps to neutral gray. Brand Ambassador Mobile keeps `--color-teal` in [`app/mobile/src/global.css`](../../../app/mobile/src/global.css); see [`educator-mobile.md`](educator-mobile.md#mobile-only-tokens).
 - **Monogram/favicon.** Not available in supplied material. Current logo is a single horizontal lockup only.
 - **Reduce-motion.** Not yet wired. Behavior when `prefers-reduced-motion` is respected is documented above but not implemented.
 

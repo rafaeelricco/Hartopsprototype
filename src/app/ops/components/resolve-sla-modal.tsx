@@ -115,6 +115,9 @@ export function ResolveSlaModal({
               This activity will appear in the SLA Report submitted back to SGWS.
               Verification covers: licence number, active status on the event
               date, executor (brandAmbassador), and spend amount.
+              <br />
+              <strong>AmEx corporate cardholder must be present for the entire
+              duration of the bar spend.</strong>
             </p>
           </div>
 

@@ -48,8 +48,8 @@ graph TD
   mm4 --> mm5["mm5 Phase 1 Scope"]
   mm5 --> mm6["mm6 Operators Experience"]
   mm6 --> mm7["mm7 Organization Admin Experience"]
-  mm7 --> mm8["mm8 Educator Manager Experience"]
-  mm8 --> mm9["mm9 Educator Mobile Experience"]
+  mm7 --> mm8["mm8 Brand Ambassador Manager Experience"]
+  mm8 --> mm9["mm9 Brand Ambassador Mobile Experience"]
   mm5 --> mm9
 
   subgraph HartOps["ui/hart-ops"]
@@ -72,7 +72,7 @@ graph TD
   subgraph EducatorManager["ui/educator-manager"]
     mgr1["mm-ui-001 Authentication Navigation"]
     mgr2["mm-ui-002 Events Management"]
-    mgr3["mm-ui-003 Educator Roster"]
+    mgr3["mm-ui-003 Brand Ambassador Roster"]
     mgr4["mm-ui-004 Settings Notifications"]
     mgr5["mm-ui-005 Account Management"]
     mgr6["mm-ui-006 Event Lifecycle State Machine"]

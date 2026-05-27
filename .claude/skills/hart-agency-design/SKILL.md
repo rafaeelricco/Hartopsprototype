@@ -1,11 +1,11 @@
 ---
 name: hart-agency-design
-description: Use for any UI work on Hart Agency's two surfaces — Hart Web Platforms or the Educator Mobile App — including building screens, pages, or components, styling forms and layouts, reviewing existing UI, or extending the design system itself. Triggers even when the user says things like "make this look better" or "tweak the header" without mentioning the design system explicitly. Runs a short intake, flags conflicts between design-system / mental-model / prototype sources, and surfaces a plan before building.
+description: Use for any UI work on Hart Agency's two surfaces — Hart Web Platforms or the Brand Ambassador Mobile App — including building screens, pages, or components, styling forms and layouts, reviewing existing UI, or extending the design system itself. Triggers even when the user says things like "make this look better" or "tweak the header" without mentioning the design system explicitly. Runs a short intake, flags conflicts between design-system / mental-model / prototype sources, and surfaces a plan before building.
 ---
 
 # Hart Agency Design System
 
-Hart Agency has two surfaces sharing one token set: **Hart Web Platforms** and the **Educator Mobile App**. Brand is Hart Burgundy `#7D152D` on Tailwind Gray neutrals. Elevation-0 by default (shadow-none). No gradients.
+Hart Agency has two surfaces sharing one token set: **Hart Web Platforms** and the **Brand Ambassador Mobile App**. Brand is Hart Burgundy `#7D152D` on Tailwind Gray neutrals. Elevation-0 by default (shadow-none). No gradients.
 
 Canonical specs:
 
@@ -28,7 +28,7 @@ Skip for backend, data modeling, infra, non-Hart UI, or work that never renders 
 Two things are required before building or reviewing. Ask via `AskUserQuestion` if either is missing:
 
 1. **Scope** — Build · Review · Design-system extension.
-2. **Surface** — Hart Web Platforms · Educator Mobile App.
+2. **Surface** — Hart Web Platforms · Brand Ambassador Mobile App.
 
 Everything below is conditional. Ask only when the answer actually changes the output. If you can propose a sensible default, do that and move on — don't pile up questions.
 
@@ -39,8 +39,8 @@ Everything below is conditional. Ask only when the answer actually changes the o
 **Context artifacts (optional).** If a mental model or prototype would meaningfully help, ask whether the user has one, both, or neither. For locations, suggest likely paths before asking for manual entry:
 
 - Hart Ops: `models/ui/hart-ops/`, `models/experience/mm6-hart-ops-experience.yml`
-- Educator Mobile: `models/ui/educator-mobile/`, `models/experience/mm9-educator-mobile-experience.yml`
-- Educator Manager: `models/ui/educator-manager/`, `models/experience/mm8-educator-manager-experience.yml`
+- Brand Ambassador Mobile: `models/ui/educator-mobile/`, `models/experience/mm9-educator-mobile-experience.yml`
+- Brand Ambassador Manager: `models/ui/educator-manager/`, `models/experience/mm8-educator-manager-experience.yml`
 - Client Staff: `models/ui/client-staff/`, `models/experience/mm7-trial-client-staff-experience.yml`
 
 Prototypes can be a repo URL or a local absolute path (may live outside this repo).
@@ -82,7 +82,7 @@ Before reporting done:
 - [ ] Radius matches the 8 / 10 / 12 / 16 scale.
 - [ ] No shadow unless the element is a popover / dialog / tooltip.
 - [ ] Container borders are `1px solid var(--color-border)`.
-- [ ] Frame matches the surface: 256+64 chrome for Hart Web Platforms, `max-w-md` for Educator Mobile.
+- [ ] Frame matches the surface: 256+64 chrome for Hart Web Platforms, `max-w-md` for Brand Ambassador Mobile.
 - [ ] Built on primitives in `@repo:app/frontend/src/components/ui/` where one fits.
 - [ ] No emoji, no unicode glyph icons, no gradients, no backdrop-blur — these read as "AI-generated UI" and clash with the restrained Hart aesthetic.
 

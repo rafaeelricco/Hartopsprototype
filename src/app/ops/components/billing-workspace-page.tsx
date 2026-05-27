@@ -67,6 +67,8 @@ import {
   SERVICE_FEE_BY_KIND,
   ACTIVITY_CATEGORIES,
   INVOICE_PAYMENT_STATUSES,
+  getBillingApprovalBlockReason,
+  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
@@ -470,9 +472,29 @@ export function BillingWorkspacePage() {
   }
 
   function handleApprove(ids: string[]) {
-    approveBillingActivities(ids);
+    if (ids.length === 0) {
+      toast.message("No activities selected for approval");
+      return;
+    }
+    const approvableIds = ids.filter((id) => {
+      const activity = activities.find((a) => a.id === id);
+      return activity != null && isBillingApprovalReady(activity);
+    });
+    if (approvableIds.length === 0) {
+      toast.error("Complete SLA capture before approving selected activities");
+      return;
+    }
+    approveBillingActivities(approvableIds);
     refreshActivities();
-    toast.success(`Approved ${ids.length} activity${ids.length === 1 ? "" : "s"}`);
+    const skipped = ids.length - approvableIds.length;
+    toast.success(
+      `Approved ${approvableIds.length} activity${approvableIds.length === 1 ? "" : "s"}`,
+    );
+    if (skipped > 0) {
+      toast.message(
+        `${skipped} SLA activit${skipped === 1 ? "y needs" : "ies need"} manager capture before approval`,
+      );
+    }
   }
 
   function handleSavePartialBill(input: {
@@ -1676,7 +1698,7 @@ export function BillingWorkspacePage() {
         open={!!reportPreview}
         onOpenChange={(v) => (v ? null : setReportPreview(null))}
       >
-        <DialogContent className="!max-w-[min(96vw,1100px)] w-[min(96vw,1100px)]">
+        <DialogContent className="!max-w-[min(96vw,1100px)] w-[min(96vw,1100px)] overflow-hidden">
           <DialogHeader>
             <DialogTitle>{reportPreview}</DialogTitle>
             <DialogDescription>
@@ -1859,7 +1881,7 @@ function UpdateBillingTab({
         a.status !== "approved" &&
         a.status !== "billing-locked" &&
         a.status !== "invoiced" &&
-        (!a.slaEligible || a.licenceVerified),
+        isBillingApprovalReady(a),
     )
     .map((a) => a.id);
 
@@ -1914,14 +1936,16 @@ function UpdateBillingTab({
             <TableBody>
               {activities.map((a) => {
                 const badge = statusBadge(a.status);
-                const slaBlock = a.slaEligible && !a.licenceVerified;
+                const approvalBlockReason = getBillingApprovalBlockReason(a);
                 return (
                   <TableRow key={a.id}>
                     <TableCell>
                       <Checkbox
                         checked={selected.has(a.id)}
                         onCheckedChange={() => toggle(a.id)}
-                        disabled={slaBlock || a.status === "approved"}
+                        disabled={
+                          approvalBlockReason != null || a.status === "approved"
+                        }
                       />
                     </TableCell>
                     <TableCell className="max-w-[220px] truncate">
@@ -1986,12 +2010,12 @@ function UpdateBillingTab({
                       >
                         {badge.label}
                       </span>
-                      {slaBlock && (
+                      {approvalBlockReason && (
                         <div
                           className="mt-1"
                           style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
                         >
-                          Resolve SLA first
+                          {approvalBlockReason}
                         </div>
                       )}
                     </TableCell>
@@ -2076,48 +2100,96 @@ function KpiCard({
 
 function SlaReportPreview({ rows }: { rows: SlaReportRow[] }) {
   return (
-    <div
-      className="rounded-lg border"
-      style={{ borderColor: "#E2E8F0", maxHeight: 400, overflow: "auto" }}
-    >
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Activity</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Account</TableHead>
-            <TableHead>Licence</TableHead>
-            <TableHead>Active</TableHead>
-            <TableHead>Executor</TableHead>
-            <TableHead className="text-right">Spend</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((r) => (
-            <TableRow key={r.activityId}>
-              <TableCell className="max-w-[180px] truncate">
-                {r.activityName}
-              </TableCell>
-              <TableCell>{r.date}</TableCell>
-              <TableCell className="max-w-[160px] truncate">
-                {r.accountName}
-              </TableCell>
-              <TableCell>{r.licenceNumber}</TableCell>
-              <TableCell>
-                {r.licenceActiveAtEventDate ? (
-                  <span style={{ color: "#0F766E" }}>Yes</span>
-                ) : (
-                  <span style={{ color: "#B91C1C" }}>No</span>
-                )}
-              </TableCell>
-              <TableCell>{r.executor}</TableCell>
-              <TableCell className="text-right">
-                {fmt(r.spendAmount)}
-              </TableCell>
+    <div className="space-y-3 w-full min-w-0">
+      <p
+        className="rounded-md px-3 py-2"
+        style={{
+          fontSize: "0.75rem",
+          color: "#92400E",
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+        }}
+      >
+        R2 scope: capture only. SLA report output continues on HEMS 1.0 until
+        R3 (Aug). Fields below mirror the SGWS bar-spend form so the existing
+        Azure / Python script can be re-pointed at this data when output
+        migrates.
+      </p>
+      <div
+        className="rounded-lg border w-full"
+        style={{
+          borderColor: "#E2E8F0",
+          maxHeight: 400,
+          overflowY: "auto",
+          overflowX: "auto",
+        }}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Activity</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Account</TableHead>
+              <TableHead>Licence</TableHead>
+              <TableHead>Active</TableHead>
+              <TableHead>Executor</TableHead>
+              <TableHead className="text-right">Total spent</TableHead>
+              <TableHead>Receipt</TableHead>
+              <TableHead>Notes</TableHead>
+              <TableHead>Approver</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {rows.map((r) => (
+              <TableRow key={r.activityId}>
+                <TableCell className="max-w-[180px] truncate">
+                  {r.activityName}
+                </TableCell>
+                <TableCell>{r.date}</TableCell>
+                <TableCell className="max-w-[160px] truncate">
+                  {r.accountName}
+                </TableCell>
+                <TableCell>{r.licenceNumber}</TableCell>
+                <TableCell>
+                  {r.licenceActiveAtEventDate ? (
+                    <span style={{ color: "#0F766E" }}>Yes</span>
+                  ) : (
+                    <span style={{ color: "#B91C1C" }}>No</span>
+                  )}
+                </TableCell>
+                <TableCell>{r.executor}</TableCell>
+                <TableCell className="text-right">
+                  {fmt(r.spendAmount)}
+                </TableCell>
+                <TableCell>
+                  {r.receiptUrl ? (
+                    <span
+                      title={r.receiptUrl}
+                      style={{ color: "#0F766E", fontSize: "0.75rem" }}
+                    >
+                      Attached
+                    </span>
+                  ) : (
+                    <span style={{ color: "#94A3B8", fontSize: "0.75rem" }}>
+                      —
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell
+                  className="max-w-[200px] truncate"
+                  title={r.clarifyingNotes}
+                  style={{ fontSize: "0.75rem", color: "#475569" }}
+                >
+                  {r.clarifyingNotes || "—"}
+                </TableCell>
+                <TableCell style={{ fontSize: "0.75rem" }}>
+                  {r.approvingManager || "—"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

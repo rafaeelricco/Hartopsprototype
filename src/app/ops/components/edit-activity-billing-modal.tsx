@@ -7,7 +7,7 @@
 // =============================================================================
 
 import { useEffect, useState } from "react";
-import { Save, X as XIcon } from "lucide-react";
+import { Save, X as XIcon, ImageIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,8 @@ import {
   BAR_SPEND_CEILING,
   BAR_SPEND_GRATUITY_RATE,
   SERVICE_FEE_BY_KIND,
+  getBillingApprovalBlockReason,
+  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type { BillingActivity } from "@/app/shared/data/billing-types";
 import { INITIAL_CAMPAIGNS } from "@/app/staff/components/campaign-data";
@@ -160,6 +162,7 @@ export function EditActivityBillingModal({
     supplies +
     promPub +
     travelEnt;
+  const approvalBlockReason = getBillingApprovalBlockReason(activity);
 
   function patch(p: Partial<Draft>) {
     setDraft((d) => (d ? { ...d, ...p } : d));
@@ -200,6 +203,7 @@ export function EditActivityBillingModal({
   }
 
   function handleSaveAndApprove() {
+    if (!isBillingApprovalReady(activity!)) return;
     onSave(activity!.id, { ...buildPatch(), status: "ready-to-bill" });
     onApprove(activity!.id);
     onClose();
@@ -377,6 +381,12 @@ export function EditActivityBillingModal({
                     20% gratuity auto-bundled into the invoice line for SLA
                     reporting.
                   </p>
+                  {activity.slaEligible && (
+                    <p style={{ fontSize: "0.6875rem", color: "#92400E" }}>
+                      AmEx corporate cardholder must be present for the entire
+                      duration of the bar spend.
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="eb-max-bar">Max bar spend (budget)</Label>
@@ -450,6 +460,95 @@ export function EditActivityBillingModal({
             </div>
           </div>
 
+          {/* SLA capture (R2) — read-only verification surface. Capture
+              happens upstream: BA mobile at event completion + market
+              manager confirm. Controller verifies only. Output deferred to
+              August / R3. */}
+          {activity.slaEligible && (
+            <div
+              className="rounded-lg border p-4 space-y-3"
+              style={{ borderColor: "#FCD34D", background: "#FFFBEB" }}
+            >
+              <div className="flex items-center justify-between">
+                <div
+                  style={{
+                    fontSize: "0.6875rem",
+                    color: "#92400E",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  SLA capture (SGWS / NY) · Read-only
+                </div>
+                {activity.approvingManager ? (
+                  <span style={{ fontSize: "0.6875rem", color: "#0F766E" }}>
+                    Confirmed by{" "}
+                    <strong>{activity.approvingManager}</strong>
+                  </span>
+                ) : (
+                  <span style={{ fontSize: "0.6875rem", color: "#B91C1C" }}>
+                    Awaiting manager confirmation
+                  </span>
+                )}
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label>Receipt screenshot</Label>
+                  {activity.receiptUrl ? (
+                    <div
+                      className="flex items-center gap-2 rounded-md border bg-white p-2"
+                      style={{ borderColor: "#FCD34D" }}
+                    >
+                      <ImageIcon
+                        size={14}
+                        style={{ color: "#92400E" }}
+                      />
+                      <span
+                        className="truncate"
+                        style={{ fontSize: "0.8125rem", maxWidth: 280 }}
+                      >
+                        {activity.receiptUrl.split("/").pop()}
+                      </span>
+                    </div>
+                  ) : (
+                    <p
+                      className="rounded-md border bg-white p-2"
+                      style={{
+                        borderColor: "#FCD34D",
+                        fontSize: "0.8125rem",
+                        color: "#94A3B8",
+                      }}
+                    >
+                      Not yet attached on manager surface.
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Clarifying notes</Label>
+                  <p
+                    className="rounded-md border bg-white p-2"
+                    style={{
+                      borderColor: "#FCD34D",
+                      fontSize: "0.8125rem",
+                      color: activity.clarifyingNotes ? "#0F172A" : "#94A3B8",
+                      minHeight: 60,
+                    }}
+                  >
+                    {activity.clarifyingNotes || "No notes."}
+                  </p>
+                </div>
+              </div>
+
+              <p style={{ fontSize: "0.6875rem", color: "#92400E" }}>
+                Source: BA mobile (receipt + total) → market manager (confirm).
+                AmEx corporate cardholder must be present for the entire
+                duration of the bar spend. R2 stores the data; report output
+                continues on HEMS 1.0 until R3.
+              </p>
+            </div>
+          )}
+
           {/* Live invoice total */}
           <div
             className="rounded-lg border p-3 flex items-center justify-between"
@@ -480,7 +579,13 @@ export function EditActivityBillingModal({
             <Save size={14} className="mr-1.5" />
             Save edits
           </Button>
-          <Button onClick={handleSaveAndApprove}>Save &amp; Approve</Button>
+          <Button
+            onClick={handleSaveAndApprove}
+            disabled={approvalBlockReason != null}
+            title={approvalBlockReason ?? "Save edits and approve for billing"}
+          >
+            Save &amp; Approve
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

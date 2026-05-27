@@ -185,6 +185,18 @@ export interface Activity {
   finalizedAt?: string | null;
   // Pre-approval checks (manager confirms before finalizing)
   preApprovalChecks?: PreApprovalCheck[];
+  // SLA capture (R2 — SGWS / NY bar-spend events). BA uploads receipt at
+  // event completion on mobile; market manager confirms here. Read-only on
+  // the controller surface. Output (SLA report) deferred to August / R3 —
+  // R2 stores the data only. See feedback_beta_scope + project_sla_capture_flow.
+  slaEligible?: boolean;
+  slaCapture?: {
+    receiptUrl?: string;
+    total?: number; // dollars; single field — no drinks/tax/surcharge breakdown
+    clarifyingNotes?: string;
+    approvingManager?: string; // stamped when manager confirms
+    confirmedAt?: string; // ISO; stamped when manager confirms
+  };
   // Cancellation
   cancellationReason?: CancellationReason;
   cancelledAt?: string;
@@ -730,6 +742,13 @@ export const mockEvents: Activity[] = [
     brandAmbassadorId: "edu-4",
     brandAmbassadorName: "David Kim",
     status: "Completed",
+    slaEligible: true,
+    slaCapture: {
+      receiptUrl: "/uploaded/receipt-chelsea-tasting-2026-03-18.jpg",
+      total: 412,
+      clarifyingNotes:
+        "AmEx held by Larry Golus on-site for entire bar-spend window. Receipt total matches the venue printout.",
+    },
     products: ["Glenlivet 12", "Glenlivet 15 French Oak", "Glenlivet 18"],
     instructions: "Premium setup — use crystal glassware. Neat pours only.",
     goals: "40+ tastings, 8+ bottles sold.",
@@ -1295,4 +1314,21 @@ export function getEventsRequiringAttention(): Activity[] {
       (e.status === "Completed" && !e.finalizedAt) ||
       e.status === "Pending",
   );
+}
+
+// SLA capture mutator. Manager edits the receipt total + clarifying notes,
+// then confirms — Confirm stamps approvingManager + confirmedAt. In-memory
+// only (prototype). Returns the updated activity, or undefined if not found.
+export function updateActivitySlaCapture(
+  id: string,
+  patch: Partial<NonNullable<Activity["slaCapture"]>>,
+): Activity | undefined {
+  const idx = mockEvents.findIndex((e) => e.id === id);
+  if (idx < 0) return undefined;
+  const next = {
+    ...mockEvents[idx]!.slaCapture,
+    ...patch,
+  };
+  mockEvents[idx] = { ...mockEvents[idx]!, slaCapture: next };
+  return mockEvents[idx]!;
 }
