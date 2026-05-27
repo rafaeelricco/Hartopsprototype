@@ -1,6 +1,6 @@
-# Educator Mobile
+# Brand Ambassador Mobile
 
-Educator Mobile is the field-facing PWA companion to Hart Ops. It shares the same token set (`/app/frontend/src/globals.css`) but diverges on **frame**, **primitives**, and **motion**. This file documents those three axes — the desktop design language is specified in [`design-system.md`](design-system.md).
+Brand Ambassador Mobile is the field-facing PWA companion to Hart Ops. It shares the same token set (`/app/frontend/src/globals.css`) but diverges on **frame**, **primitives**, and **motion**. This file documents those three axes — the desktop design language is specified in [`design-system.md`](design-system.md).
 
 The mobile surface is not yet implemented in `/app/frontend/`. Treat this document as the canonical spec until the code ships.
 

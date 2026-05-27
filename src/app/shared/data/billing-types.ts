@@ -193,6 +193,14 @@ export interface BillingActivity {
   barSpend?: number;
   maxBarSpend?: number;
   gratuity: number;
+  // SLA capture (R2). Output formatting (SGWS submission) defers to August /
+  // post-engagement — HEMS 1.0 keeps producing the report. R2 just captures
+  // the receipt artefact + free-text colour so the data is queryable.
+  // Per Chris/Joe 2026-05-27: minimum-promise scope — single total + receipt
+  // image + notes; AmEx-cardholder rule communicated via UI footnote only.
+  receiptUrl?: string;
+  clarifyingNotes?: string;
+  approvingManager?: string; // explicit name captured at bill approval
   // P2 #12 — Post-activity expense columns (Kayla's spreadsheet additions).
   // Stored here so they roll into the invoice and the next billing/payroll export.
   suppliesAmount?: number;
@@ -278,9 +286,10 @@ export interface BillingCycle {
   status: "open" | "in-progress" | "exported" | "complete";
 }
 
-// SLA Report seed artefact (mm11 field set: licence number, active status at
-// event date, executor, spend amount). Rendered as a mock preview from the
-// Reports tab.
+// SLA Report seed artefact. R2 captures these fields against each SLA-eligible
+// activity so HEMS 1.0's existing Python/Azure output script can be re-pointed
+// at the new system later (output migration deferred to August — Chris,
+// 2026-05-27). Rendered as a mock preview from the Reports tab.
 export interface SlaReportRow {
   activityId: string;
   activityName: string;
@@ -289,7 +298,10 @@ export interface SlaReportRow {
   licenceNumber: string;
   licenceActiveAtEventDate: boolean;
   executor: string; // brandAmbassador name
-  spendAmount: number;
+  spendAmount: number; // receipt total
+  receiptUrl?: string; // attached screenshot
+  clarifyingNotes?: string; // free text for problem accounts / receipts
+  approvingManager?: string; // captured at bill approval
 }
 
 // =============================================================================

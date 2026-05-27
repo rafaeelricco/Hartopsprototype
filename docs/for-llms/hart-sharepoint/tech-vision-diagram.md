@@ -24,7 +24,7 @@ graph TB
         P1A["REV – SAVE MAN HOURS"]
         P1B["Internal / Operational Efficiencies"]
         P1C["Foundation / Client Value"]
-        P1_APPS["HART HEMs – Educator Management<br/>HART Ai – Events (Chat / Processing)<br/>HART Ai – Event Deep Insights (Analytics)"]
+        P1_APPS["HART HEMs – Brand Ambassador Management<br/>HART Ai – Events (Chat / Processing)<br/>HART Ai – Event Deep Insights (Analytics)"]
     end
 
     subgraph PILLAR2["🟢 Pillar 2: Client Value – New Revenue"]
@@ -65,12 +65,12 @@ graph TB
     subgraph HEMS_CURRENT["HEMs Application - Current"]
         direction TB
         HEM_WEB["HEM Application Web"]
-        EDU_MGT["Event / Educator Management"]
+        EDU_MGT["Event / Brand Ambassador Management"]
     end
 
     subgraph EVENT_ASSIGNMENT["Market – Event Execution Assignment"]
         direction TB
-        ASSIGN["Assign Event /<br/>Account to Educator / Date"]
+        ASSIGN["Assign Event /<br/>Account to Brand Ambassador / Date"]
         CALENDAR["Calendar –<br/>Date and Time"]
         PROMO_TYPE["Event –<br/>Promotion Type"]
     end
@@ -78,7 +78,7 @@ graph TB
     subgraph EVENT_RESULTS["Event Activities - Data Collection and Event Results"]
         direction TB
         subgraph FIELD_ACTORS["Field Actors"]
-            EDUCATORS["Educators"]
+            EDUCATORS["Brand Ambassadors"]
             RETAIL_OFF["Retail Account<br/>Off Premise"]
             RETAIL_ON["Retail Account<br/>On Premise"]
             CONSUMERS["Consumers Sampling"]
@@ -99,7 +99,7 @@ graph TB
         SUPP_COMMERCIAL["Supplier Commercial Team"]
         DIST_TRADE["Distributor - Trade Development"]
         DIST_SALES["Distributor - Sales Manager"]
-        EDU_MANAGERS["Educator - Managers"]
+        EDU_MANAGERS["Brand Ambassador - Managers"]
         HART_OPS["HART Office Operations"]
     end
 
@@ -145,7 +145,7 @@ graph TB
 
     subgraph HEMS_APP["HEMs Application - Current"]
         HEM_WEB["HEM Application Web"]
-        EDU_MGT["Event / Educator Management"]
+        EDU_MGT["Event / Brand Ambassador Management"]
     end
 
     subgraph HELPDESK["AI Helpdesk Layer (New)"]
@@ -194,9 +194,9 @@ flowchart TB
         ACCT_MASTER[("Account Master")]
     end
 
-    subgraph EDUCATOR_FLOW["Single Account Survey - Educator"]
+    subgraph EDUCATOR_FLOW["Single Account Survey - Brand Ambassador"]
         direction TB
-        E1["Educator Enters Account"]
+        E1["Brand Ambassador Enters Account"]
         E2["Select Account Location"]
         E3["Take Photo"]
         E4["AI Form Fill"]
@@ -311,7 +311,7 @@ flowchart TB
         HUMAN_APPROVAL["HEMs App Human<br/>Management / Approval"]
         MANUAL_EDIT["Human Edit Email /<br/>Field Data"]
         APPROVE{"Approve Event?"}
-        MANUAL_ADD["Manual Add<br/>Educator Assignment"]
+        MANUAL_ADD["Manual Add<br/>Brand Ambassador Assignment"]
     end
 
     MANAGER_LIST --> HUMAN_APPROVAL
@@ -654,10 +654,10 @@ Page 10 provides the section headers that organize the schema into logical domai
 1. **HEMs Application - Support Tables** (lookup/reference)
 2. **Dimensions** (Suppliers, Distributors, Geography)
 3. **Supplier Product - Item**
-4. **Event / Promotion / Billing / HART Org – Educators**
-5. **Account Evaluation – HEMs Educator Results**
-6. **Assets Links – Educators** (Videos, Training, Presentation decks)
-7. **HEMs Educator Profile / Employee Profiles**
+4. **Event / Promotion / Billing / HART Org – Brand Ambassadors**
+5. **Account Evaluation – HEMs Brand Ambassador Results**
+6. **Assets Links – Brand Ambassadors** (Videos, Training, Presentation decks)
+7. **HEMs Brand Ambassador Profile / Employee Profiles**
 8. **Accounts (Retailers)** — Assets Links
 
 ---
@@ -763,12 +763,12 @@ graph TB
         SPECIAL["Special Events<br/>(Trade Shows, etc)"]
     end
 
-    subgraph HEMS_CORE["Event / Educator Management"]
+    subgraph HEMS_CORE["Event / Brand Ambassador Management"]
         HEM_WEB["HEM Application Web"]
-        EDUCATORS["Educators"]
+        EDUCATORS["Brand Ambassadors"]
         CALENDAR["Calendar – Date and Time"]
         PROMO_TYPE["Event – Promotion Type"]
-        AI_EDU["AI Educator Management"]
+        AI_EDU["AI Brand Ambassador Management"]
         BILLING["$ Cost / Billing and Budgets"]
     end
 
@@ -812,15 +812,15 @@ graph TB
     subgraph BACK_MGMT["HEMs Application – Back Management"]
         direction TB
         HEM_WEB["HEM Application Web"]
-        EVT_EDU_MGT["Event / Educator Management"]
+        EVT_EDU_MGT["Event / Brand Ambassador Management"]
 
         subgraph MGMT_ACTORS["Management Actors"]
-            EDU_MANAGERS["Educator - Managers"]
+            EDU_MANAGERS["Brand Ambassador - Managers"]
             HART_OPS["HART Office Operations"]
         end
 
         subgraph MGMT_FUNCTIONS["Management Functions"]
-            ASSIGN["Assign Event / Account<br/>to Educator / Date"]
+            ASSIGN["Assign Event / Account<br/>to Brand Ambassador / Date"]
             CALENDAR["Calendar – Date and Time"]
             PROMO_TYPE["Event – Promotion Type"]
             BILLING["$ Cost / Billing and Budgets"]
@@ -829,9 +829,9 @@ graph TB
 
     subgraph MOBILE_APP["HEM – Apple App / Android App"]
         direction TB
-        subgraph MOBILE_LEVEL["Educator Manager Level"]
-            M_EDUCATORS["Educators"]
-            M_ASSIGN["Assign Event / Account<br/>to Educator / Date"]
+        subgraph MOBILE_LEVEL["Brand Ambassador Manager Level"]
+            M_EDUCATORS["Brand Ambassadors"]
+            M_ASSIGN["Assign Event / Account<br/>to Brand Ambassador / Date"]
             M_CALENDAR["Calendar – Date and Time"]
             M_PROMO["Event – Promotion Type"]
         end
@@ -917,8 +917,8 @@ graph TB
         TDLINK["TDLink / Distributor"]
     end
 
-    subgraph HART_TEAM["HART Educator Team"]
-        EDUCATORS_TBL["HART Educators Table"]
+    subgraph HART_TEAM["HART Brand Ambassador Team"]
+        EDUCATORS_TBL["HART Brand Ambassadors Table"]
         MANAGERS_TBL["HART Manager Table"]
     end
 
@@ -1023,7 +1023,7 @@ flowchart LR
     subgraph PLATFORM["HART Platform"]
         AUTH["Auth & Roles"]
         EVENT_MGT["Event Management"]
-        EDU_MGT["Educator Management"]
+        EDU_MGT["Brand Ambassador Management"]
         ACCOUNT_MGT["Account Management"]
         QUEST["Questionnaire Engine"]
         BILLING_SYS["Billing / QuickBooks"]

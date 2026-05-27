@@ -17,7 +17,7 @@ TABLE OF CONTENTS
 - HART Portal Pilot (Affiliate Build) Outline
 - yourHART Enhancement - Manager Event Cancellation Process
 - yourHART Enhancement - Account Management
-- yourHART Enhancement - Educator Management System
+- yourHART Enhancement - Brand Ambassador Management System
 - HART AI Survey App Outline
 - HART Data Profile Consumer Outline
 - HART Data Profile Accounts Outline
@@ -79,11 +79,11 @@ My Events 7
 Today's event 7
 Event Report 7
 Draft Events 7
-Educators 8
-View all Educators 8
-Add Educator 8
-Export Educators 9
-Educator Availability 9
+Brand Ambassadors 8
+View all Brand Ambassadors 8
+Add Brand Ambassador 8
+Export Brand Ambassadors 9
+Brand Ambassador Availability 9
 Evaluations 11
 Evaluation Approval 11
 Evaluation Detail Page 11
@@ -145,19 +145,19 @@ User Types and Permissions
 There are two main user types within MyHems.
 
     •	Adminstrator
-    •	Educator
+    •	Brand Ambassador
 
 Administrators can define granular access levels in User Access Settings.
 
 Feature / Page
 User type: Admin
-User type: Educator
+User type: Brand Ambassador
 Events
 Full access
 Limited to:
 View all events
 Today's events
-Educator
+Brand Ambassador
 Full access
 No access
 Evaluation
@@ -254,7 +254,7 @@ No
 Wet/Dry
 
 No
-Number of Educators
+Number of Brand Ambassadors
 Total number of educators assigned to the event.
 No
 Date
@@ -355,11 +355,11 @@ This module provides a streamlined interface that lets managers quickly create d
     •	Click Import to upload the template file.
     •	Map template file headers to system fields to populate the appropriate fields with data. 
 
-Educators
-View all Educators
+Brand Ambassadors
+View all Brand Ambassadors
 This module displays all educators in the portal. Use the filters to search by specific criteria.
 
-Add Educator
+Add Brand Ambassador
 This module allows users to create new educators. If an educator has not worked for the company for more than 3 months for an event, they will become inactive.
 
 Field Name
@@ -465,10 +465,10 @@ Have Car
 
 No
 
-Export Educators
+Export Brand Ambassadors
 This button exports all educators within the portal.
 
-Educator Availability
+Brand Ambassador Availability
 This module displays educator availability for managers. Use the filters to search for educators based on specific criteria.
 
 Availability chart:
@@ -509,7 +509,7 @@ The module functions similarly to evaluations but displays only survey-based eve
 Note: Surveys are approved by default to save time.
 
 Multi-stop events
-Educators can now create multi-location events, allowing a single event to span a primary event and multiple secondary venues.
+Brand Ambassadors can now create multi-location events, allowing a single event to span a primary event and multiple secondary venues.
 
 Structural Hierarchy :
 • Primary (P): The starting event or the first location as the Primary (P) stop
@@ -943,7 +943,7 @@ Product Inventory
 The Product Inventory Report is generated with a primary focus on products. This module helps summarize events using the selected product by providing a single consolidated view of the selected reports within a specified date range. The conversion rate is not calculated if any report has not been submitted for review.
 Event report
 This report provides a consolidated report for the select events. Here, the report is downloaded to the user's local machine
-Educator Ratings Report
+Brand Ambassador Ratings Report
 This report provides a quick summary of the educator's rating.
 Company sales report
 The Company Sales Report provides a summary of the total sales conducted under the specified filter conditions
@@ -971,7 +971,7 @@ Settings > Search MyHems and enable/ allow access for Location, Camera, and Noti
 
 Login screen
 The login screen displays the installed version to help with support.
-A singleton login component is shared across all user personas (Educator, Admin, Distributor, Supplier). The following modules are globally accessible to all authenticated sessions:
+A singleton login component is shared across all user personas (Brand Ambassador, Admin, Distributor, Supplier). The following modules are globally accessible to all authenticated sessions:
 • Dashboard
 • Profile
 • Events
@@ -1140,7 +1140,7 @@ No
 Surveys
 Specific events will require a survey to be submitted. The educator will answer specific questions related to the event.
 Evaluation Actions
-Save & Finish Later: Saves the evaluation progress without submitting it for review. Educators can return later to update or complete the evaluation. 
+Save & Finish Later: Saves the evaluation progress without submitting it for review. Brand Ambassadors can return later to update or complete the evaluation. 
 Submit for Approval: Saves the evaluation and submits it for manager review. Once submitted, the evaluation cannot be edited. If changes are required, a new evaluation must be created.
 Ratings
 This tab features an aggregate average rating at the top and event-specific performance data below. Inactive:
@@ -1156,23 +1156,23 @@ Click Add Event from the Events menu, or
 
 Import an event from Events → Draft Events.
 
-2. Scheduling an Educator
+2. Scheduling an Brand Ambassador
 
-Educators can be assigned to an event in two ways:
+Brand Ambassadors can be assigned to an event in two ways:
 
 During event creation on the Create Event page, or
 
 From the Events Listing page:
 
-Select the Schedule Educators checkbox.
+Select the Schedule Brand Ambassadors checkbox.
 
-A green plus (+) icon appears in the Number of Educators column.
+A green plus (+) icon appears in the Number of Brand Ambassadors column.
 
 Click the plus icon to open a pop-up.
 
 Search for and select the required educator.
 
-3. Notifying the Educator
+3. Notifying the Brand Ambassador
 
 Once an educator is assigned:
 
@@ -1180,7 +1180,7 @@ Go to the Events Listing page.
 
 Select the event.
 
-Click Notify Educator.
+Click Notify Brand Ambassador.
 
 The educator will receive:
 
@@ -1190,7 +1190,7 @@ A mobile app notification
 
 An SMS to the registered mobile number
 
-4. Educator Response
+4. Brand Ambassador Response
 
 The educator can accept or reject the event notification using the email or the mobile application
 
@@ -1616,17 +1616,17 @@ Objectives:
 
     •	Add Data Table for Questionnaires and Questions to be handled for the HEM App
     •	Add Questionnaires into Event for Users setting up Events to have visibility
-    •	Add Questionnaires into Events with Picklists for the Educators to fill out for each Event applicable.
-    •	Add Questionnaire to Educator’s Event assignments
+    •	Add Questionnaires into Events with Picklists for the Brand Ambassadors to fill out for each Event applicable.
+    •	Add Questionnaire to Brand Ambassador’s Event assignments
     •	Allow Event Managers to add/New Questionnaires
-    •	Require filling out Questionnaires by assigned Educators with events associated with Questionnaires.
+    •	Require filling out Questionnaires by assigned Brand Ambassadors with events associated with Questionnaires.
 
 Considerations:
 • Questions in the questionnaire will be standardized, however, may change if the client adds new required questions or changes questions.
 • Questionnaire will change every marketing period (6 or 12 months)
 • Consideration for an API Pull from SOHO
 • Consideration to include the Pinata Event Naming and IDs Pull as part of this enhancement
-• Answers by Educators are subjective, in order to ensure these answers are acceptable the answers listed should cover the majority of range.
+• Answers by Brand Ambassadors are subjective, in order to ensure these answers are acceptable the answers listed should cover the majority of range.
 • Questionnaires are depended on Premise of the event, (On Prem and Off Prem will have different questions)
 • Client (Supplier)/Brand/Questionnaire will need to be handled.
 • \*Consider Multiple Questionnaires on one Event. (IE HART Questionnaire and CAMPRI)
@@ -1646,12 +1646,12 @@ This project is accepted when:
     •	HEMs App Adds Questionnaire to the event assigned automatically the selection of the Brand with a Questionnaire.
     •	HEMs App includes Questionnaire into the Event creation, visible on the page
     •	HEMs includes a toggle on/off to include Questionnaire which is assigned via brand.
-    •	HEMs App includes Questionnaire into the Event when App is accessed by the Educator to fillout
-    •	HEMs App Assigns the Questionnaire to the Assigned Educator for the events associated with the brand
-    •	Educators using HEMs App and is able to Answer Questions in Questionnaire with preloaded answers for pick list selections for each question where applicable and a single selection will be provided by the educator to select from if it’s text.
-    •	Educators and Event Users can access Questions with additional information clarifying the question for the Educator (IE Pop up text or Information button with addition information provided in the Questionnaire data)
-    •	Assigned Educator is required to complete all questions in Questionnaire before submitting the Event.  If HEMs allow for saving before submitting event information, a Questionnaire should be included as the saved portion.
-    •	HEMs APP Captured Questionnaire results and push to Crossbox as data with the event ID, Educator ID, Brand, Questionnaire ID, Premise Type)
+    •	HEMs App includes Questionnaire into the Event when App is accessed by the Brand Ambassador to fillout
+    •	HEMs App Assigns the Questionnaire to the Assigned Brand Ambassador for the events associated with the brand
+    •	Brand Ambassadors using HEMs App and is able to Answer Questions in Questionnaire with preloaded answers for pick list selections for each question where applicable and a single selection will be provided by the educator to select from if it’s text.
+    •	Brand Ambassadors and Event Users can access Questions with additional information clarifying the question for the Brand Ambassador (IE Pop up text or Information button with addition information provided in the Questionnaire data)
+    •	Assigned Brand Ambassador is required to complete all questions in Questionnaire before submitting the Event.  If HEMs allow for saving before submitting event information, a Questionnaire should be included as the saved portion.
+    •	HEMs APP Captured Questionnaire results and push to Crossbox as data with the event ID, Brand Ambassador ID, Brand, Questionnaire ID, Premise Type)
 
  
 User Flow Outlines:
@@ -1670,7 +1670,7 @@ HEMs App Event Creation / View
 • Questions populate on Event
 • User Save/Executes Event
 
-User: Educator
+User: Brand Ambassador
 
 HEMs APP at Event
 • User opens app and starts event
@@ -1710,13 +1710,13 @@ Katie logs into the HEMs web portal (using her credentials; she's always auto-lo
 
     •	Dependency: Events must be pre-input by Kim; Katie doesn't add events herself.
 
-    •	Step 1.2: Check Educator Availability
+    •	Step 1.2: Check Brand Ambassador Availability
 
 Using the "availability tab" in HEMs, Katie reviews which educators are available for the event dates/times. This eliminates guessing and ensures staffing feasibility.
 • HEMs Feature: Availability tab (shows who can/can't work specific slots).
 
-    •	Note: Educators are part-time; hiring is handled by managers like Katie, but this occurs outside HEMs (e.g., via interviews).
-    •	Step 1.3: Assign Educators to Events
+    •	Note: Brand Ambassadors are part-time; hiring is handled by managers like Katie, but this occurs outside HEMs (e.g., via interviews).
+    •	Step 1.3: Assign Brand Ambassadors to Events
 
 Katie assigns available educators to events directly in HEMs. Assignments trigger educator access to event details via their app or web login (using personal emails).
 • HEMs Feature: Assignment interface in event details.
@@ -1743,26 +1743,26 @@ Katie assembles kits physically (including samples, swag, uniforms, or special i
 • HEMs Feature: Kit status buttons (K for stock tracking); icons show kit readiness.
 
     •	Note: External elements (e.g., flower shops, dipping programs) are noted in HEMs but assembled offline.
-    •	Step 2.4: Notify Educator of Kit Readiness
+    •	Step 2.4: Notify Brand Ambassador of Kit Readiness
 
 Katie clicks the "K" button next to the educator's name, which sends a notification (text/email, based on educator preferences) that the kit is ready for pickup.
 • HEMs Feature: Notification button (K); integrated messaging for educators.
 
-    •	Dependency: Educators must have HEMs app/web access; notifications keep everything within HEMs (avoids personal phones).
+    •	Dependency: Brand Ambassadors must have HEMs app/web access; notifications keep everything within HEMs (avoids personal phones).
 
     •	Training and Execution
     •	Step 3.1: Ensure Training Resources
 
-Katie verifies/adds product facts, brand knowledge, or cocktail recipes to products in HEMs (if not already attached by Kim or suppliers). Educators access this by clicking products in their assigned event via the app/web. For new/high-end products, she emphasizes reviewing these, plus external research (e.g., brand websites). Broader trainings (e.g., Zoom/in-person on bourbons, wines) are organized outside HEMs but recorded; access to recordings is requested but not currently integrated.
+Katie verifies/adds product facts, brand knowledge, or cocktail recipes to products in HEMs (if not already attached by Kim or suppliers). Brand Ambassadors access this by clicking products in their assigned event via the app/web. For new/high-end products, she emphasizes reviewing these, plus external research (e.g., brand websites). Broader trainings (e.g., Zoom/in-person on bourbons, wines) are organized outside HEMs but recorded; access to recordings is requested but not currently integrated.
 • HEMs Feature: Product attachments (brand facts, notes).
 
     •	Note: Training is part-time focused; mandatory for specific programs if assigned. Hot brands (e.g., Tito's) require less prep due to repetition. 7-10 day lead allows review time.
     •	Step 3.2: Oversee Event Execution
 
-Educators execute the event (consumer interactions, tastings). Katie doesn't directly use HEMs here but monitors via availability and messaging features if needed.
-Educators check in/out via the app, upload photos, and start recaps.
+Brand Ambassadors execute the event (consumer interactions, tastings). Katie doesn't directly use HEMs here but monitors via availability and messaging features if needed.
+Brand Ambassadors check in/out via the app, upload photos, and start recaps.
 
-    •	HEMs Feature: Educator app for check-in, photos (now supports multiple uploads); messaging for manager-educator communication.
+    •	HEMs Feature: Brand Ambassador app for check-in, photos (now supports multiple uploads); messaging for manager-educator communication.
     •	Dependency: App reliability; educators use personal emails for login.
 
     •	Post-Event Review and Approval
@@ -1811,7 +1811,7 @@ Based on a deep review of the transcript, I've summarized key enhancement areas,
 • Technical Considerations: Integrate with existing status buttons (S/K); add backend logic for pay/billing triggers; ensure audit trail for trust (e.g., manager approval required).
 • App Reliability and Data Saving (High Impact)
 
-    •	Description: Educators experience random logouts during recap entry, losing unsaved data (sales, comments, photos, surveys). Requires re-entry 2-3 times; not tied to service issues but possibly memory/app design.
+    •	Description: Brand Ambassadors experience random logouts during recap entry, losing unsaved data (sales, comments, photos, surveys). Requires re-entry 2-3 times; not tied to service issues but possibly memory/app design.
     •	Enhancements Needed: Implement auto-save (e.g., real-time or periodic) during recap input; add session persistence to prevent logouts; feedback loop for bug reporting (in-app button, not just email Heron).
     •	Rationale: Affects post-event closure; frustrates educators and delays approvals.
 
@@ -1872,7 +1872,7 @@ Goals:
 
 Considerations:
 • This release must be MVP and must be business viable.
-• HEMs Mobile App may not need to be cloned but current apps used for Educators and connect the data flow to the Affiliate Program
+• HEMs Mobile App may not need to be cloned but current apps used for Brand Ambassadors and connect the data flow to the Affiliate Program
 • HEMs App is already a Java based Webapp in market.
 • Data needs to feed the application and be stored in another database
 • Current AWS can be used for another Database for the Affiliate Copy however costs need to look at if this is the best way to handle data storage.
@@ -1893,7 +1893,7 @@ This project is accepted when:
 
     •	Clients can create their own access and log into the new Hart Portal: Web-based platform where clients can log in to view/manage their event business, data, photos, and reports.
     •	Client is able to access the Affiliate HEMs App Environment, and all HEMs functions are available and working.
-    •	Affiliate HEMs Web App connects to HEMs Affiliate Mobile and Educators can execute events providing results to the Web App and Crossbox.
+    •	Affiliate HEMs Web App connects to HEMs Affiliate Mobile and Brand Ambassadors can execute events providing results to the Web App and Crossbox.
     •	Automated Reporting: Generate insights on consumer profiles, sales lift, event ROI, and market intelligence.
     •	Provide a full training program for pilot clients to be trained.
     •	Client has a FAQ, access documents, and have a way for any issues to contact Hart Team.
@@ -1917,16 +1917,16 @@ Cancelled events are currently managed in the HEMs application, based on the des
 
 The flow is divided into phases: Notification and Approval, Reporting and Edits, App and Recap Handling, and Review and Submission. Each step includes roles, actions, HEMs involvement (or lack thereof), and any noted pain points.
 
-The Process is between the Educator (in field) using the Mobile App, and the Manager which uses the Mobile App and Web Based HEMs.
+The Process is between the Brand Ambassador (in field) using the Mobile App, and the Manager which uses the Mobile App and Web Based HEMs.
 
-Current HEMs Manager – Educator Event Cancellation Example:
+Current HEMs Manager – Brand Ambassador Event Cancellation Example:
 
 1. Notification and Approval
 
-Step 1.1: Educator Reports the Issue
+Step 1.1: Brand Ambassador Reports the Issue
 The educator arrives at the event location and encounters the cancellation (e.g., retailer says "we don't want you today" or "you're not on my calendar"). The educator notifies Katie (the manager) directly via phone call, text message, or other personal communication (not through HEMs). This is the starting point, as educators do not have a direct cancel option in the app to maintain trust and verification.
 
-Roles: Educator (reporter), Katie (approver).
+Roles: Brand Ambassador (reporter), Katie (approver).
 
 HEMs Involvement: None at this stage; communication is external {personal phones/texts).
 
@@ -1943,7 +1943,7 @@ Roles: Katie (verifier/approver); potentially involves store/rep for confirmatio
 2. HEMs Event Reporting and Edits
 
 Step 2.1: Report Cancellation to Kim
-Katie emails Kim (the event inputter/booker) to notify her of the cancellation. This email includes details like the event ID, reason, and request for billing adjustments (includes: partial billing to supplier, not full event cost and payment for partial time or full to the Educator for Travel even if the event was cancelled)
+Katie emails Kim (the event inputter/booker) to notify her of the cancellation. This email includes details like the event ID, reason, and request for billing adjustments (includes: partial billing to supplier, not full event cost and payment for partial time or full to the Brand Ambassador for Travel even if the event was cancelled)
 
     Roles: Katie (reporter), Kim (receiver for billing).
 
@@ -1965,17 +1965,17 @@ Katie (or Kim) goes into the HEMs web portal, accesses the event booking, and ma
 
 3. App and Recap Handling
 
-Step 3.1: Educator Continues App Process Despite Cancellation
+Step 3.1: Brand Ambassador Continues App Process Despite Cancellation
 
 The educator's mobile app does not update automatically to reflect the cancellation. It still treats the event as active: prompts for check-in (if not already done), check-out, and full recap completion (including photos, sales data, comments, and surveys). The educator must proceed as if the event occurred, but inputs zeros/blanks for sales/photos and adds notes explaining the cancellation (e.g., "Cancelled upon arrival due to retailer decision").
 
-    Roles: Educator (Mobile app user).
+    Roles: Brand Ambassador (Mobile app user).
 
-    HEMs Involvement: Educator app (check-in/out, recap fields); no cancellation flag, so full workflow persists.
+    HEMs Involvement: Brand Ambassador app (check-in/out, recap fields); no cancellation flag, so full workflow persists.
 
     Pain Point: App does not remove or hide the event from the educator's list; forces unnecessary steps, leading to redundant data entry and frustration. No auto-update to skip prompts or pre-fill notes/reason.
 
-Step 3.2: Manager Reviews Educator's Recap
+Step 3.2: Manager Reviews Brand Ambassador's Recap
 
 Katie accesses the recap in the HEMs web portal to review the educator's inputs (blanks/zeros for sales/photos, explanatory notes in comments). She ensures the reason is documented but cannot auto-flag or simplify due to lack of cancellation-specific fields.
 
@@ -2012,15 +2012,15 @@ This current process is manual and inefficient, involving external communication
 
 Objectives:
 
-With the Opportunity to design a new HEMs (aka Platform) and Mobile app the objective to provide a way to account and process cancelled events from Educators. This Process is only for the day of the Event and at the point which the Educator arrives or attempts to arrive at the Event Location.
+With the Opportunity to design a new HEMs (aka Platform) and Mobile app the objective to provide a way to account and process cancelled events from Brand Ambassadors. This Process is only for the day of the Event and at the point which the Brand Ambassador arrives or attempts to arrive at the Event Location.
 
 Goals:
-• Allow for Educator to tag Event as Cancelled “With Manager Approval and
+• Allow for Brand Ambassador to tag Event as Cancelled “With Manager Approval and
 • Force direction communication with Manager to confirm via conversation (text, Phone Call, or chat Only) in order for the Manager to be made immediate aware of the situation.
 • Manager needs formal approval process for the Canceled Event
 • Data Consideration with Cancelled Event
 • Reporting and Client shared Reports handling of Cancelled events
-• Billing for Educator is process is in place
+• Billing for Brand Ambassador is process is in place
 • Supplier / Client Billing for cancelled process
 
 Considerations:
@@ -2043,7 +2043,7 @@ FILE: 1 Technical Outlines/yourHART Additional HEMs Outlines - Enhancements/your
 
 Overview: 
 
-HART leverages it’s own Master Data for Accounts. This master data is used for assigning Educators to Events for execution and need to communicate with Distributor Clients, Supplier Clients and Data provider clients. Communication with clients requires keys to align with their data.
+HART leverages it’s own Master Data for Accounts. This master data is used for assigning Brand Ambassadors to Events for execution and need to communicate with Distributor Clients, Supplier Clients and Data provider clients. Communication with clients requires keys to align with their data.
  Future management of Account is needed to provide syndicated data on Accounts and need to be foundationally developed for Account Profiling, Event Insights, Event Reporting, Campaign reviews.
 
 Currently in HEMs Application
@@ -2067,7 +2067,7 @@ Goals:
 • Account Attributes
 • Data Linkage to Menus, Displays, Executions
 • Weights or value levels assigned to Metrics
-• Performance Optimization – Educator Scores, Rankings, Manager – Educator Reporting
+• Performance Optimization – Brand Ambassador Scores, Rankings, Manager – Brand Ambassador Reporting
 • Categories, Brands
 
 Considerations:
@@ -2075,7 +2075,7 @@ Considerations:
 • Process is not accounted for by HEMs Application
 • Communication / Approvals are handled manually
 • Manager’s Excel Sheet will need to be considered for Metrics
-• Personal information of Educators will be handled
+• Personal information of Brand Ambassadors will be handled
 • Mobile App requires GPS and Time Tracking
 
 Dependencies:
@@ -2094,61 +2094,61 @@ Metrics
 • Retailer Survey Score
 • Cancellation Rating
 Data
-• Educator’s Home Address
-• Manager - Educator Notes
+• Brand Ambassador’s Home Address
+• Manager - Brand Ambassador Notes
 • Shows all the Accounts Executed at
 • Allows for
 • Training Completed for
 • Current Active (booked in the past 3 months)
 •
 
-HEMs App Event Educator Assignment – Auto Suggestion for Managers
-• Uses Address of Educator and Events to provide closest Educator
-• Highlights Educators with Poor Cancellation Rate or Poor Score
-• Considers / Highlights Preferred Category / Brand / Event Type with Educator
+HEMs App Event Brand Ambassador Assignment – Auto Suggestion for Managers
+• Uses Address of Brand Ambassador and Events to provide closest Brand Ambassador
+• Highlights Brand Ambassadors with Poor Cancellation Rate or Poor Score
+• Considers / Highlights Preferred Category / Brand / Event Type with Brand Ambassador
 • Shows Average Sales Rate
 • Shows Manager Notes
-• Allows Manager to Select preferred Educator from Short list or access full list to pick from.
+• Allows Manager to Select preferred Brand Ambassador from Short list or access full list to pick from.
 
-HEMs App Educator Management List
-• Shows full list of Educators
+HEMs App Brand Ambassador Management List
+• Shows full list of Brand Ambassadors
 • Sorts by Areas of Geography aligned by Nieghorhoods (Needs zip codes or reference Table)  
  • Sorts by Manager Geography
 • Allows User to add / modify / remove infomation
 
 ================================================================================
-FILE: 1 Technical Outlines/yourHART Additional HEMs Outlines - Enhancements/yourHART Enhancement - Educator Management System.docx
+FILE: 1 Technical Outlines/yourHART Additional HEMs Outlines - Enhancements/yourHART Enhancement - Brand Ambassador Management System.docx
 ================================================================================
-“YOUR HART” Enhancement – Educator Management Technical Outline
+“YOUR HART” Enhancement – Brand Ambassador Management Technical Outline
 2/24/2025
 
 Overview: 
 
-Educators are the core to the success of HART executing events and are the people for are the true face of the company.
+Brand Ambassadors are the core to the success of HART executing events and are the people for are the true face of the company.
 
-Currently over 1000 Educators are employed and are not managed, rated, or leveraged for their competencies. HART Managers rely on their personal knowledge as to who would work well for an email, the relationship, and a manual spreadsheet which captures recent notes of recent good or poor executions. This includes if the educator has been canceling events, doesn’t show, or is good with Gins, likes to work certain types of events, cannot work certain types of events.
+Currently over 1000 Brand Ambassadors are employed and are not managed, rated, or leveraged for their competencies. HART Managers rely on their personal knowledge as to who would work well for an email, the relationship, and a manual spreadsheet which captures recent notes of recent good or poor executions. This includes if the educator has been canceling events, doesn’t show, or is good with Gins, likes to work certain types of events, cannot work certain types of events.
 
 Objectives:
 
-With the Opportunity to design a new HEMs (aka Platform) and Mobile app the objective to provide a way to provide a Score, capture more information of the educator and automate the Event – Educator assignment by having HEMs auto populate good Educators for events based on geography, knowledge, preferences, and execution history.
+With the Opportunity to design a new HEMs (aka Platform) and Mobile app the objective to provide a way to provide a Score, capture more information of the educator and automate the Event – Brand Ambassador assignment by having HEMs auto populate good Brand Ambassadors for events based on geography, knowledge, preferences, and execution history.
 
 Goals:
 • Foundational Data and Database Tables
-• Metrics to Track for Educators
+• Metrics to Track for Brand Ambassadors
 • Weights or value levels assigned to Metrics
 • Manager Metrics
-• Performance Optimization – Educator Scores, Rankings, Manager – Educator Reporting
+• Performance Optimization – Brand Ambassador Scores, Rankings, Manager – Brand Ambassador Reporting
 • Set Training Programs (Categories, Brands)
-• Add Training Program to Mobile App for Educators
-• HR styled Plan for Educator Retention and Engagement
-• Linkage of Educator Performance Metrics to Platform Event / Educator Auto Assignment
+• Add Training Program to Mobile App for Brand Ambassadors
+• HR styled Plan for Brand Ambassador Retention and Engagement
+• Linkage of Brand Ambassador Performance Metrics to Platform Event / Brand Ambassador Auto Assignment
 
 Considerations:
-• Metrics Tracking will need to be added into the Mobile App for Educators
+• Metrics Tracking will need to be added into the Mobile App for Brand Ambassadors
 • Process is not accounted for by HEMs Application
 • Communication / Approvals are handled manually
 • Manager’s Excel Sheet will need to be considered for Metrics
-• Personal information of Educators will be handled
+• Personal information of Brand Ambassadors will be handled
 • Mobile App requires GPS and Time Tracking
 
 Dependencies:
@@ -2167,24 +2167,24 @@ Metrics
 • Retailer Survey Score
 • Cancellation Rating
 Data
-• Educator’s Home Address
-• Manager - Educator Notes
+• Brand Ambassador’s Home Address
+• Manager - Brand Ambassador Notes
 • Shows all the Accounts Executed at
 • Allows for
 • Training Completed for
 • Current Active (booked in the past 3 months)
 •
 
-HEMs App Event Educator Assignment – Auto Suggestion for Managers
-• Uses Address of Educator and Events to provide closest Educator
-• Highlights Educators with Poor Cancellation Rate or Poor Score
-• Considers / Highlights Preferred Category / Brand / Event Type with Educator
+HEMs App Event Brand Ambassador Assignment – Auto Suggestion for Managers
+• Uses Address of Brand Ambassador and Events to provide closest Brand Ambassador
+• Highlights Brand Ambassadors with Poor Cancellation Rate or Poor Score
+• Considers / Highlights Preferred Category / Brand / Event Type with Brand Ambassador
 • Shows Average Sales Rate
 • Shows Manager Notes
-• Allows Manager to Select preferred Educator from Short list or access full list to pick from.
+• Allows Manager to Select preferred Brand Ambassador from Short list or access full list to pick from.
 
-HEMs App Educator Management List
-• Shows full list of Educators
+HEMs App Brand Ambassador Management List
+• Shows full list of Brand Ambassadors
 • Sorts by Areas of Geography aligned by Nieghorhoods (Needs zip codes or reference Table)  
  • Sorts by Manager Geography
 • Allows User to add / modify / remove infomation
@@ -2214,9 +2214,9 @@ Hart is currently providing surveys manually in retail accounts, bars, restauran
 
 Objectives:
 
-Develop and deploy a fast to market, low build MVP of an Ai Image Supported App which Hart Users (Educators) can use to provide manual survey data via form and take a picture which the HART Ai identifies the brands, pricing, etc in the image to fill in the form and attach the image as meta data.
+Develop and deploy a fast to market, low build MVP of an Ai Image Supported App which Hart Users (Brand Ambassadors) can use to provide manual survey data via form and take a picture which the HART Ai identifies the brands, pricing, etc in the image to fill in the form and attach the image as meta data.
 
-The objective is to leverage Ai for image recognition to quickly fill in the survey data at the account level fills in a form, allow the Hart Educator to confirm the form entries, change any errors, and then submit the results.
+The objective is to leverage Ai for image recognition to quickly fill in the survey data at the account level fills in a form, allow the Hart Brand Ambassador to confirm the form entries, change any errors, and then submit the results.
 
 The Ai Objective is to accurately fill in the form from the image taken, learn from the changes, and in future get to the point where the Ai is near 100% accurate with understanding what it sees and reporting correctly back for a full market roll up.
 
@@ -2258,13 +2258,13 @@ Considerations:
 • Crossbox Data will need new tables added.
 • Crossbox Account / Product Keys need to added to the survey data for future reporting
 • Crossbox Account / Product Master data must be used
-• Need to determine how Educators are assigned Survey
+• Need to determine how Brand Ambassadors are assigned Survey
 •
 
 Dependencies:
 • Current Account Master and Item Master are required to be used.
 • Current data loads are manual, bulk/api Master data will be required.
-• Survey Accuracy is depended on the Educator.
+• Survey Accuracy is depended on the Brand Ambassador.
 • Survey Types are depended on Channel and templates correspond to the channel.
 •
 
@@ -2316,15 +2316,15 @@ If Channel is Off Premise or Off Premise Chain – Account Survey is:
 • Date of Survey Execution is assigned
 • Survey is pushed to Queue for Execution
 • Ai Learns new products listed, webcrawl www.sgproof.com
-• Educator Starts survey at one account
-• Educator selects location (End Cap, coldbox, floor display, counter, window, other)
-• Educator take photo of location (End Cap, coldbox, floor display, counter, window, other)
+• Brand Ambassador Starts survey at one account
+• Brand Ambassador selects location (End Cap, coldbox, floor display, counter, window, other)
+• Brand Ambassador take photo of location (End Cap, coldbox, floor display, counter, window, other)
 • Ai determines what products are there, how many facing total, capture pricing\*
 • Ai Fills in form
-• Educator Accepts or changes with drop down to correct items, pricing, location.
-• Educator Saves and continues Survey of store
-• Educator repeats process for all Survey locations in account
-• Educator completes and submits form data and images.
+• Brand Ambassador Accepts or changes with drop down to correct items, pricing, location.
+• Brand Ambassador Saves and continues Survey of store
+• Brand Ambassador repeats process for all Survey locations in account
+• Brand Ambassador completes and submits form data and images.
 • Crossbox captures, updates tables and survey results.
 • Results are summarized with details and hyperlinks to images
 • Results are shared with Client via Summary Report, with account level detail, hyperlink to photo per account.
@@ -2338,15 +2338,15 @@ If Channel is On Premise – Account Survey is:
 • Date of Survey Execution is assigned
 • Survey is pushed to Queue for Execution
 • Ai Learns new products listed, webcrawl www.sgproof.com
-• Educator Starts survey at one account
-• Educator selects location (Backbar, Food Menu, Cocktail Menu, Drink List, other)
-• Educator take photo of location / item to be scanned (Backbar, Food Menu, Cocktail Menu, Drink List, other)
+• Brand Ambassador Starts survey at one account
+• Brand Ambassador selects location (Backbar, Food Menu, Cocktail Menu, Drink List, other)
+• Brand Ambassador take photo of location / item to be scanned (Backbar, Food Menu, Cocktail Menu, Drink List, other)
 • Ai determines what products are there, how many facing total, capture pricing\*
 • Ai Fills in form
-• Educator Accepts or changes with drop down to correct items, pricing, location.
-• Educator Saves and continues Survey of store
-• Educator repeats process for all Survey locations in account
-• Educator completes and submits form data and images.
+• Brand Ambassador Accepts or changes with drop down to correct items, pricing, location.
+• Brand Ambassador Saves and continues Survey of store
+• Brand Ambassador repeats process for all Survey locations in account
+• Brand Ambassador completes and submits form data and images.
 • Crossbox captures, updates tables and survey results.
 • Results are summarized with details and hyperlinks to images
 • Results are shared with Client via Summary Report, with account level detail, hyperlink to photo per account.
@@ -2360,15 +2360,15 @@ If Channel is Special Event – Account Survey is:
 • Date of Survey Execution is assigned
 • Survey is pushed to Queue for Execution
 • Ai Learns new products listed, webcrawl www.sgproof.com
-• Educator Starts survey at one account
-• Educator selects location (Backbar, Food Menu, Cocktail Menu, Drink List, other)
-• Educator take photo of location / item to be scanned (Backbar, Food Menu, Cocktail Menu, Drink List, other)
+• Brand Ambassador Starts survey at one account
+• Brand Ambassador selects location (Backbar, Food Menu, Cocktail Menu, Drink List, other)
+• Brand Ambassador take photo of location / item to be scanned (Backbar, Food Menu, Cocktail Menu, Drink List, other)
 • Ai determines what products are there, how many facing total, capture pricing\*
 • Ai Fills in form
-• Educator Accepts or changes with drop down to correct items, pricing, location.
-• Educator Saves and continues Survey of store
-• Educator repeats process for all Survey locations in account
-• Educator completes and submits form data and images.
+• Brand Ambassador Accepts or changes with drop down to correct items, pricing, location.
+• Brand Ambassador Saves and continues Survey of store
+• Brand Ambassador repeats process for all Survey locations in account
+• Brand Ambassador completes and submits form data and images.
 • Crossbox captures, updates tables and survey results.
 • Results are summarized with details and hyperlinks to images
 • Results are shared with Client via Summary Report, with account level detail, hyperlink to photo per account.
@@ -2391,7 +2391,7 @@ Hart Client Manager
 • I need an Ongoing Survey which shows a what’s on display, on menus, on backbars in the accounts we service with a week’s noticed
 • I need to have Market survey of displays and menu placed items rolled up within a week of notice from our Clients.
 • I need to communicate what information I need to the educators to provide the correct and accurate market insights.
-Educator
+Brand Ambassador
 • As a field personnel I collect the data requested by the survey. It’s important that this doesn’t take too long and is easy for me to execute without making the retailer.
 • I don’t have a lot of time and owners don’t like me conducting anything that doesn’t provide value to them.
 • I need to collect the survey data quickly.
@@ -2420,7 +2420,7 @@ Hart has a Event Marketing business which services beverage companies by executi
 
 HART is creating deeper insights and ongoing management of data collect by tools HART has and create profiling of the Consumers which HART directly interacts with at event
 
-There is a need to create an ongoing live list of account profiling which is updated / confirmed with each visit by a HART Educator.
+There is a need to create an ongoing live list of account profiling which is updated / confirmed with each visit by a HART Brand Ambassador.
 
 HART needs to collect more Consumer data which our educators interact with, profile this data to provider deeper insights on marketing. Along with providing a event insights the need is to create/capture attributes to Profile the Consumers at the events from educators, while finding ways to package our profile
 
@@ -2436,7 +2436,7 @@ Social / Internet Marketing / eCom Team, has direct interest in any collection o
 
 Standardize Profiling for Accounts which can be leveraged for the Current HEMs app.
 
-Provide a standardized tables of data which “Profiles” the attributes which are collected by Educators via HEMs App and survey app.
+Provide a standardized tables of data which “Profiles” the attributes which are collected by Brand Ambassadors via HEMs App and survey app.
 
 With data collection formally structured we need to create linkage to maintain master data (Account Master), while connecting these account attributes to the data insights we are creating.
 
@@ -2456,7 +2456,7 @@ Considerations:
 • Crossbox Data will need new tables added.
 • Crossbox Account / Product Keys need to added to the survey data for future reporting
 • Crossbox Account / Product Master data must be used
-• Need to determine how Educators are assigned Survey
+• Need to determine how Brand Ambassadors are assigned Survey
 • Considerations for API
 • Consideration to management Master Account Data
 • Connection to Current HEMs App
@@ -2465,7 +2465,7 @@ Considerations:
 Dependencies:
 • Current Account Master and Item Master (Brand Categories) are required to be used.
 • Current data loads are manual, bulk/api Master data will be required.
-• Accuracy depends on the Educator.
+• Accuracy depends on the Brand Ambassador.
 • Attribute Types / Sub Types are depended on Channel.
 
 Acceptance Criteria
@@ -2524,7 +2524,7 @@ Hart Client Manager
 • Clients ask for what accounts have certain attributes and as much as I know the market I cannot memorize every account in my market.
 • Clients request deeper categorization on the what types of accounts are successful and what type of accounts are opportunities.
 • I need to communicate what information I need to the educators to provide the correct and accurate market insights.
-Educator
+Brand Ambassador
 • As a field personnel I collect the data requested by the survey. It’s important that this doesn’t take too long and is easy for me to execute without making the retailer.
 • I don’t have a lot of time and owners don’t like me conducting anything that doesn’t provide value to them.
 • I need to ensure I am at the correct location an sometimes business change their names.
@@ -2557,7 +2557,7 @@ Hart has a Event Marketing business which services beverage companies by executi
 
 HART is creating deeper insights and ongoing management of data collect by tools HART has and create profiling of Accounts which can be used for deeper insights, supporting the app, allowing additional
 
-There is a need to create an ongoing live list of account profiling which is updated / confirmed with each visit by a HART Educator.
+There is a need to create an ongoing live list of account profiling which is updated / confirmed with each visit by a HART Brand Ambassador.
 
 Hart is making investments in other 3rd Party data around marketing, consumers, data gathering, and 3rd Party insights such as Google. Creating linkage to these and our data by packaging them into Account Profiles allows us to provide deeper insights in our results and service our clients with Account data.
 
@@ -2565,7 +2565,7 @@ Objectives:
 
 Standardize Profiling for Accounts which can be leveraged for the Current HEMs app.
 
-Provide a standardized tables of data which “Profiles” the attributes which are collected by Educators via HEMs App and survey app.
+Provide a standardized tables of data which “Profiles” the attributes which are collected by Brand Ambassadors via HEMs App and survey app.
 
 With data collection formally structured we need to create linkage to maintain master data (Account Master), while connecting these account attributes to the data insights we are creating.
 
@@ -2583,7 +2583,7 @@ Considerations:
 • Consider looking at CooperCast Schema
 • Crossbox Account / Product Keys need to added to the survey data for future reporting
 • Crossbox Account / Product Master data must be used
-• Need to determine how Educators are assigned Survey
+• Need to determine how Brand Ambassadors are assigned Survey
 • Considerations for API
 • Consideration to management Master Account Data
 • Connection to Current HEMs App
@@ -2592,7 +2592,7 @@ Considerations:
 Dependencies:
 • Current Account Master and Item Master (Brand Categories) are required to be used.
 • Current data loads are manual, bulk/api Master data will be required.
-• Accuracy depends on the Educator.
+• Accuracy depends on the Brand Ambassador.
 • Attribute Types / Sub Types are depended on Channel.
 
 Acceptance Criteria
@@ -2651,7 +2651,7 @@ Hart Client Manager
 • Clients ask for what accounts have certain attributes and as much as I know the market I cannot memorize every account in my market.
 • Clients request deeper categorization on the what types of accounts are successful and what type of accounts are opportunities.
 • I need to communicate what information I need to the educators to provide the correct and accurate market insights.
-Educator
+Brand Ambassador
 • As a field personnel I collect the data requested by the survey. It’s important that this doesn’t take too long and is easy for me to execute without making the retailer.
 • I don’t have a lot of time and owners don’t like me conducting anything that doesn’t provide value to them.
 • I need to ensure I am at the correct location an sometimes business change their names.
@@ -2965,7 +2965,7 @@ PATH: /Users/ethan/Library/CloudStorage/OneDrive-SharedLibraries-HartAgencyNY/Am
 Sheets: ['Events_011226_073935']
 
 --- Sheet: Events\*011226*073935 (rows: 504, cols: 40) ---
-Event Id | SLA Approve | Event Name | Type | Date | Start Time | End Time | Approved | Distributor | Distributor Contacts | Supplier | Supplier Contacts | Booking Division / Rep | Account | Address | City | State | Zip | Phone | Account Contacts | Region | Territory | Educators | No of Educators | Event Amount | Max Ambassador Amount | Ambassador Amount | Supplemental Finance Charge | Ambassador Expense After QB | Travel Amount | Gratuity | Event Total | Product | Bottles Sold | Consumers Sampled | Southern Id | TD LINKS | Liqour License | Created By | Created Date
+Event Id | SLA Approve | Event Name | Type | Date | Start Time | End Time | Approved | Distributor | Distributor Contacts | Supplier | Supplier Contacts | Booking Division / Rep | Account | Address | City | State | Zip | Phone | Account Contacts | Region | Territory | Brand Ambassadors | No of Brand Ambassadors | Event Amount | Max Ambassador Amount | Ambassador Amount | Supplemental Finance Charge | Ambassador Expense After QB | Travel Amount | Gratuity | Event Total | Product | Bottles Sold | Consumers Sampled | Southern Id | TD LINKS | Liqour License | Created By | Created Date
 531298 | | WAGNER METRO 2025 | Off Premises | 2025-01-04 00:00:00 | 17:00:00 | 20:00:00 | 0 | Southern Glazer’s Wine & Spirits | | Wagner Family Wines | | | PRICE RITE | 689 OLD COUNTRY RD | DIX HILLS | NEW YORK | 11746 | (631) 549-8899 | | Long Island | Suffolk | Helena Diringerova | 1 | 238 | 0 | 0 | 0 | 0 | 0 | 0 | 238 | Conundrum White, Conundrum Red, Bonanza by Chuck Wagner California Cabernet Sauvignon Lot 7, Sea Sun Chardonnay, Caymus Vineyards Cabernet Sauvignon California | 13 | 18 | 1382 | 1410403 | 1146347 | Leah Guidarelli | 2024-12-17 00:00:00
 531299 | | WAGNER METRO 2025 | Off Premises | 2025-01-17 00:00:00 | 17:00:00 | 20:00:00 | 0 | Southern Glazer’s Wine & Spirits | | Wagner Family Wines | | | PRICE RITE | 689 OLD COUNTRY RD | DIX HILLS | NEW YORK | 11746 | (631) 549-8899 | | Long Island | Suffolk | Helena Diringerova | 1 | 238 | 0 | 0 | 0 | 0 | 0 | 0 | 238 | Conundrum White, Conundrum Red, Bonanza by Chuck Wagner California Cabernet Sauvignon Lot 7, Sea Sun Chardonnay, Caymus Vineyards Cabernet Sauvignon California | 21 | 18 | 1382 | 1410403 | 1146347 | Leah Guidarelli | 2024-12-17 00:00:00
 531752 | | WAGNER METRO 2025 | Off Premises | 2025-01-24 00:00:00 | 16:00:00 | 19:00:00 | 0 | Southern Glazer’s Wine & Spirits | | Wagner Family Wines | | | HAPPY LIQUORS | 40-40 COLLEGE POINT BLVD | FLUSHING | NEW YORK | 11354 | (718) 808-5337 | | Metro | Queens | Ashley Jenkins | 1 | 238 | 0 | 0 | 0 | 0 | 0 | 0 | 238 | Red Schooner Voyage 11, Red Schooner Transit 3, Bonanza by Chuck Wagner California Cabernet Sauvignon Lot 7, Caymus-Suisan Walking Fool Red, Caymus Vineyards Cabernet Sauvignon California | 3 | 12 | | | | Leah Guidarelli | 2024-12-30 00:00:00
@@ -3515,7 +3515,7 @@ Sheets: ['Table Data', 'OnPrem Esplon', 'OffPrem Esplon', 'On Prem Campari', 'Of
 
 --- Sheet: Table Data (rows: 8, cols: 6) ---
 | SOHO Questionnaire Table Data | | | |
-| Event ID | Educator ID | Questionnaire ID | Premise | DateCompleted
+| Event ID | Brand Ambassador ID | Questionnaire ID | Premise | DateCompleted
 Selection Type | AUTO | AUTO | AUTO | AUTO | AUTO
 Data Type | | | | | DATE
 Answers | | | | OnPremise |
@@ -3600,7 +3600,7 @@ Sheets: ['Sheet1', '4 Products Dev', 'Sheet2']
 | HEMs App | Event Requests | Manual | | Ai (Pilot) | | Yes (Market Ready) | | | | Native
 | HEMs App | Manager - Process | Yes | | Updated Flow | | Yes (Market Ready) | | | | Native
 | HEMs App | Wizard / Training | No | | Yes (Pilot) | | Yes (Market Ready) | | | | Native
-| HEMs App | Educator Expenses | Manual | | Manual | | Ai Scanning Reciepts | | | | Ai Scanning Reciepts
+| HEMs App | Brand Ambassador Expenses | Manual | | Manual | | Ai Scanning Reciepts | | | | Ai Scanning Reciepts
 | HEMs App | Account Management | Manual / Excel | | Dashboard (Pilot) | | Yes (Market Ready) | | | | Yes
 | HEMs App | Item / Supplier Management | Yes In App | | Dashboard - Enhanced (Pilot) | | Yes (Market Ready) | | | | Yes
 | Internal Processes | Payroll Functionality | Manual | | Manual | | Automations | | | | Automated
@@ -3609,14 +3609,14 @@ Sheets: ['Sheet1', '4 Products Dev', 'Sheet2']
 | Event Evaluation | Samples Setup | Manual | | Pilot | | Ai Leverage | | | | Ai Leverage
 | Event Evaluation | Client Reporting | Manual / Email Share | | API/Manual/Web Access | | Reporting Suite + | | | | Reporting Suite + Data + Commerical Ops
 | HART Operations Mapping | Samples Setup | Manual | | Manual | | New Operations Management | | | | New Operations Management
-| Internal Processes | Educator Managment | No | | Yes (Pilot) | | Yes (Market Ready) | | | | Yes
-| Educator Managmenet | Educator Scores / Auto Assigment | No | | No | | Yes (Pilot) | | | | Yes
-| Educator Managmenet | Event and Educator Matching | Manual | | Yes (Pilot) | | Yes (Market Ready) | | | | Yes
-| Educator Management | Cancellation Process | Manual | | Mobile App (Pilot) | | Yes (Market Ready) | | | | Yes
-| Educator Effectiveness | Educator Brand Learning | Self Directed | | Self Directed | | App Build | | | | Yes
-| Educator Effectiveness | Educator Brand Knowledge Score/Cat | No / Manual | | No / Manual | | Yes | | | | Yes
+| Internal Processes | Brand Ambassador Managment | No | | Yes (Pilot) | | Yes (Market Ready) | | | | Yes
+| Brand Ambassador Managmenet | Brand Ambassador Scores / Auto Assigment | No | | No | | Yes (Pilot) | | | | Yes
+| Brand Ambassador Managmenet | Event and Brand Ambassador Matching | Manual | | Yes (Pilot) | | Yes (Market Ready) | | | | Yes
+| Brand Ambassador Management | Cancellation Process | Manual | | Mobile App (Pilot) | | Yes (Market Ready) | | | | Yes
+| Brand Ambassador Effectiveness | Brand Ambassador Brand Learning | Self Directed | | Self Directed | | App Build | | | | Yes
+| Brand Ambassador Effectiveness | Brand Ambassador Brand Knowledge Score/Cat | No / Manual | | No / Manual | | Yes | | | | Yes
 | HART Manager | Event Cancellation Process | Manual | | Enhancement (Pilot) | | Yes (Market Ready) | | | | Yes
-| HART Manager | Educator Managment | Manual / Excel | | Dashboard (Pilot) | | Yes (Market Ready) | | | | Yes
+| HART Manager | Brand Ambassador Managment | Manual / Excel | | Dashboard (Pilot) | | Yes (Market Ready) | | | | Yes
 | HEMs Platform (Stoli) SaaS | Multi Client (Supplier / Distributor) | No | | Yes (Pilot) | | Yes (Market Ready) | | | | Yes
 | HEMs App (Stoli) | Multi Client (Supplier / Distributor) | No | | Yes (Pilot) | | Yes (Market Ready) | | | | Yes
 | HEMs Platform (Affilate) | Multi Affiliate (Supplier / Distributor) | No | | Yes (Pilot) | | Yes (Market Ready) | | | | Native
@@ -3624,7 +3624,7 @@ Sheets: ['Sheet1', '4 Products Dev', 'Sheet2']
 | Help Desk | Issue / Ticket Support | Internal | | Internal | | Automated Helpdesk | | | | Professional Helpdesk
 | Help Desk | Ai Help Bot | No | | No | | Automated Helpdesk | | | | Professional Helpdesk
 | Mobile App | HEMs Mobile App | Yes | | New (Pilot) | | Yes (Market Ready) | | | | Native
-| | HEMs Mobile App - Educator | Yes | | New (Pilot) - Updated | | Yes (Market Ready) | | | |
+| | HEMs Mobile App - Brand Ambassador | Yes | | New (Pilot) - Updated | | Yes (Market Ready) | | | |
 | Mobile App | Ongoing Surveys - Every Event | No | | New (Pilot) | | Yes (Market Ready) | | | | Native
 | Mobile App | Multiple Client Access | No | | New (Pilot) | | Yes (Market Ready) | | | | Native
 | Events Data | Consumer Collection | No | | Semi | | New (Pilot) | | | | Native
@@ -3687,9 +3687,9 @@ Sheets: ['Sheet1', '4 Products Dev', 'Sheet2']
 | HEMs App | Event Managment | Yes | | Yes | | Yes | | | | Yes | | | Yes
 | HEMs App | Event Entry | Manual | | Semi Auto - AI Leverage | | Ai Leverage + Direct Connection (Dist/Supplier) | | | Semi Auto - AI Leverage | Ai Leverage + Direct Connection (Dist/Supplier) | Event Affliate - Ai Leverage | | Ai Leverage
 | HEMs App | Event Requests | Manual | | Email Ai (Pilot) | | Yes (Market Ready) | | | Email Ai / Client Input | Email Ai / Operations Input | | | Native
-| HEMs App | Manager - Process | Yes | | Updated Flow | | Yes (Market Ready) | | | Manager - Educator Management | Manager - Educator Management | Manager - Educator Management | | Native
+| HEMs App | Manager - Process | Yes | | Updated Flow | | Yes (Market Ready) | | | Manager - Brand Ambassador Management | Manager - Brand Ambassador Management | Manager - Brand Ambassador Management | | Native
 | HEMs App | Wizard / Training | No | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Native
-| HEMs App | Educator Expenses | Manual | | Manual | | Ai Scanning Reciepts | | | | | | | Ai Scanning Reciepts
+| HEMs App | Brand Ambassador Expenses | Manual | | Manual | | Ai Scanning Reciepts | | | | | | | Ai Scanning Reciepts
 | HEMs App | Account Management | Manual / Excel | | Dashboard (Pilot) | | Yes (Market Ready) | | | | | | | Yes
 | HEMs App | Item / Supplier Management | Yes In App | | Dashboard - Enhanced (Pilot) | | Yes (Market Ready) | | | | | | | Yes
 | HEMs App | Payroll | Yes In App | | | | | | | | | | |
@@ -3700,14 +3700,14 @@ Sheets: ['Sheet1', '4 Products Dev', 'Sheet2']
 | Event Evaluation | Samples Setup | Manual | | Pilot | | Ai Leverage | | | | | | | Ai Leverage
 | Event Evaluation | Client Reporting | Manual / Email Share | | API/Manual/Web Access | | Reporting Suite + | | | | | | | Reporting Suite + Data + Commerical Ops
 | HART Operations Mapping | Samples Setup | Manual | | Manual | | New Operations Management | | | | | | | New Operations Management
-| Internal Processes | Educator Managment | No | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Yes
-| Educator Managmenet | Educator Scores / Auto Assigment | No | | No | | Yes (Pilot) | | | | | | | Yes
-| Educator Managmenet | Event and Educator Matching | Manual | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Yes
-| Educator Management | Cancellation Process | Manual | | Mobile App (Pilot) | | Yes (Market Ready) | | | | | | | Yes
-| Educator Effectiveness | Educator Brand Learning | Self Directed | | Self Directed | | App Build | | | | | | | Yes
-| Educator Effectiveness | Educator Brand Knowledge Score/Cat | No / Manual | | No / Manual | | Yes | | | | | | | Yes
+| Internal Processes | Brand Ambassador Managment | No | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Yes
+| Brand Ambassador Managmenet | Brand Ambassador Scores / Auto Assigment | No | | No | | Yes (Pilot) | | | | | | | Yes
+| Brand Ambassador Managmenet | Event and Brand Ambassador Matching | Manual | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Yes
+| Brand Ambassador Management | Cancellation Process | Manual | | Mobile App (Pilot) | | Yes (Market Ready) | | | | | | | Yes
+| Brand Ambassador Effectiveness | Brand Ambassador Brand Learning | Self Directed | | Self Directed | | App Build | | | | | | | Yes
+| Brand Ambassador Effectiveness | Brand Ambassador Brand Knowledge Score/Cat | No / Manual | | No / Manual | | Yes | | | | | | | Yes
 | HART Manager | Event Cancellation Process | Manual | | Enhancement (Pilot) | | Yes (Market Ready) | | | | | | | Yes
-| HART Manager | Educator Managment | Manual / Excel | | Dashboard (Pilot) | | Yes (Market Ready) | | | | | | | Yes
+| HART Manager | Brand Ambassador Managment | Manual / Excel | | Dashboard (Pilot) | | Yes (Market Ready) | | | | | | | Yes
 | HEMs Platform (Stoli) SaaS | Multi Client (Supplier / Distributor) | No | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Yes
 | HEMs App (Stoli) | Multi Client (Supplier / Distributor) | No | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Yes
 | HEMs Platform (Affilate) | Multi Affiliate (Supplier / Distributor) | No | | Yes (Pilot) | | Yes (Market Ready) | | | | | | | Native
@@ -3715,7 +3715,7 @@ Sheets: ['Sheet1', '4 Products Dev', 'Sheet2']
 | Help Desk | Issue / Ticket Support | Internal | | Internal | | Automated Helpdesk | | | | | | | Professional Helpdesk
 | Help Desk | Ai Help Bot | No | | No | | Automated Helpdesk | | | | | | | Professional Helpdesk
 | Mobile App | HEMs Mobile App | Yes | | New (Pilot) | | Yes (Market Ready) | | | | | | | Native
-| | HEMs Mobile App - Educator | Yes | | New (Pilot) - Updated | | Yes (Market Ready) | | | | | | |
+| | HEMs Mobile App - Brand Ambassador | Yes | | New (Pilot) - Updated | | Yes (Market Ready) | | | | | | |
 | Mobile App | Ongoing Surveys - Every Event | No | | New (Pilot) | | Yes (Market Ready) | | | | | | | Native
 | Mobile App | Multiple Client Access | No | | New (Pilot) | | Yes (Market Ready) | | | | | | | Native
 | Events Data | Consumer Collection | No | | Semi | | New (Pilot) | | | | | | | Native
@@ -3925,7 +3925,7 @@ Mission: Leader of consumer education providing brands directed, deep, actionabl
 Vision: Redefine brands competitive advantage fusing in-person experiences, with timely market vision, and digital mastery into actionable insights.
 Strategy — Three areas to attack:
 Pillar 1 (Operations Effectiveness): REV – SAVE MAN HOURS, Internal/Operational Efficiencies, Foundation/Client Value
-Apps: HART HEMs – Educator Management, HART Ai – Events (Chat/Processing), HART Ai – Event Deep Insights (Analytics)
+Apps: HART HEMs – Brand Ambassador Management, HART Ai – Events (Chat/Processing), HART Ai – Event Deep Insights (Analytics)
 Pillar 2 (Client Value – New Revenue): Who do we now serve? How/What do we offer? What makes us more sexy partner?
 Apps: HART Ai – Events Booking Guidance, HART Ai – Analytics, HART Market Guide Data (rev), HART Survey App – Market Data
 Pillar 3 (HEMs Platform / Affiliate Future): Global Suppliers, ALL Distributors, HEMs Platform Transformation
@@ -3933,11 +3933,11 @@ Apps: HART Platform – Event Management, HART Ai – Event Deep Insights, HART 
 
 PAGE 2 — CURRENT HEMS ARCHITECTURE (AS-IS)
 Cloud AWS containing: HEMs App Database, Crossbox Database
-HEMs Application (Current): HEM Application Web, Event/Educator Management
-Market – Event Execution Assignment: Assign Event/Account to Educator/Date, Calendar Date/Time, Event Promotion Type
-Event Activities – Data Collection and Results: Educators, Retail Account Off Premise, Retail Account On Premise, Consumers Sampling, Account Survey, Special Events (Trade Shows)
+HEMs Application (Current): HEM Application Web, Event/Brand Ambassador Management
+Market – Event Execution Assignment: Assign Event/Account to Brand Ambassador/Date, Calendar Date/Time, Event Promotion Type
+Event Activities – Data Collection and Results: Brand Ambassadors, Retail Account Off Premise, Retail Account On Premise, Consumers Sampling, Account Survey, Special Events (Trade Shows)
 Client Layer: Distributor Client, Supplier Client
-Client Roles: Supplier Commercial Team, Distributor Trade Development, Distributor Sales Manager, Educator Managers, HART Office Operations
+Client Roles: Supplier Commercial Team, Distributor Trade Development, Distributor Sales Manager, Brand Ambassador Managers, HART Office Operations
 Billing: Distributor Billing (SLA), Supplier Finance (Billing), Billing and Budgets
 Survey: Retail Data Collection, Survey of Accounts
 
@@ -3951,9 +3951,9 @@ Pre-Execution Product AI Learning:
 - ID Brands to Be Surveyed (e.g., Moet Henn) → Add Data to Master Item Data → SGProof Website Train on Images
 - ID Comp Brands to Be Surveyed (e.g., Mumm) → same pipeline
 - Uses: Item Master, Supplier Master, AI Image Recon Data
-  Single Account Survey – Educator Flow:
+  Single Account Survey – Brand Ambassador Flow:
 
-1. Educator Enters Account → 2. Select Account Location → 3. Take Photo → 4. AI Form Fill → 5. Accept/Change Form Inputs → 6. Select Next Location (in-store) → 7. Repeat for all Tasks on Survey
+1. Brand Ambassador Enters Account → 2. Select Account Location → 3. Take Photo → 4. AI Form Fill → 5. Accept/Change Form Inputs → 6. Select Next Location (in-store) → 7. Repeat for all Tasks on Survey
    Results: Single Location / Single Point in Retail → Survey Results Completed and Verified → Listed Output of Data
    Survey Template Setup → Set Survey Activation Date → Account Master
 
@@ -3988,7 +3988,7 @@ Full AI-powered event creation from email:
    5. Event Updated – need more info
       1a) New Event(s) – Confirmation of Receipt
 9. HEMs Application – Hart Team Event Approval/Management
-   Human Approval → Manual Add Educator Assignment
+   Human Approval → Manual Add Brand Ambassador Assignment
    Or: Human Edit Email/Field Data → loop back to AI extraction
 10. AI Generate Email Response Summary → Email Confirmation
 11. Data: Update Event Data, Update Event Master Data → HEMs App → Crossbox Database
@@ -4009,7 +4009,7 @@ supplier_details: id, user_id, company, private_admin_note, blacklist_status/not
 Additional tables: job_roles, programs, states, promo_codes, divisions, permissions, premises, territories, quickbook_batches, quickbook_options, migrations
 
 PAGE 10 — DATABASE DOMAIN ORGANIZATION
-Domain sections: 1) HEMs Application Support Tables, 2) Dimensions (Suppliers, Distributors, Geography), 3) Supplier Product - Item, 4) Event / Promotion / Billing / HART Org – Educators, 5) Account Evaluation – HEMs Educator Results, 6) Assets Links – Educators (Videos, Training, Presentation decks), 7) HEMs Educator Profile / Employee Profiles, 8) Accounts (Retailers)
+Domain sections: 1) HEMs Application Support Tables, 2) Dimensions (Suppliers, Distributors, Geography), 3) Supplier Product - Item, 4) Event / Promotion / Billing / HART Org – Brand Ambassadors, 5) Account Evaluation – HEMs Brand Ambassador Results, 6) Assets Links – Brand Ambassadors (Videos, Training, Presentation decks), 7) HEMs Brand Ambassador Profile / Employee Profiles, 8) Accounts (Retailers)
 
 PAGE 11 — STRATEGIC PRODUCT MAPPING
 Current clients: SGWS, Pernod mapped to systems: Crossbox, HEMs
@@ -4025,18 +4025,18 @@ HART Management
 
 PAGE 13 — FULL ECOSYSTEM: EVENT EXECUTION + DATA PARTNERS + AI
 Account types: Retailer/Chain/Event/On-Prem Account
-Event/Educator Management: HEM Application Web, Educators, Calendar, Promotion Type, AI Educator Management, $ Cost / Billing
+Event/Brand Ambassador Management: HEM Application Web, Brand Ambassadors, Calendar, Promotion Type, AI Brand Ambassador Management, $ Cost / Billing
 External Data Partners: HIPSTR, Master Visual Item Data, Google Analytics
 Data Outputs: Consumer Data, Survey Data, Retailer Data, Event Execution Data, Retail Depletions Sales Data
 
 PAGES 14-15 — HEMS APPLICATION: BACK MANAGEMENT + MOBILE APP
 Two-tier architecture:
 HEMs Application – Back Management:
-HEM Application Web, Event/Educator Management
-Actors: Educator Managers, HART Office Operations
-Functions: Assign Event/Account to Educator/Date, Calendar, Promotion Type, $ Cost / Billing and Budgets
-HEM – Apple App / Android App (Educator Manager Level):
-Educators, Assign Event/Account to Educator/Date, Calendar, Promotion Type
+HEM Application Web, Event/Brand Ambassador Management
+Actors: Brand Ambassador Managers, HART Office Operations
+Functions: Assign Event/Account to Brand Ambassador/Date, Calendar, Promotion Type, $ Cost / Billing and Budgets
+HEM – Apple App / Android App (Brand Ambassador Manager Level):
+Brand Ambassadors, Assign Event/Account to Brand Ambassador/Date, Calendar, Promotion Type
 Field: Retail On Premise, Retail Off Premise, Special Events, Consumers Sampling, Account Survey
 Both connect to: HEMs App Database → Crossbox Database (Cloud AWS)
 
@@ -4046,7 +4046,7 @@ Product/Account Hierarchy: Distributor Clients → Supplier → Region → Geogr
 Product Classification: Cannabis, Beer, Wine/Spirits, Food, Beverage
 Master Data Sources: State Alcohol Board, Web Scraping Item Port from Distributor, Distributor API/Manual File, Supplier API/Manual File
 Key Identifiers: Distributor and Supplier Item Code, Invoice Market Code/Distributor Warehouse Location, Sales/Supplier ID, TDLink/Distributor
-HART Team: HART Educators Table, HART Manager Table
+HART Team: HART Brand Ambassadors Table, HART Manager Table
 Analytics: Key Account Segmentation + Reporting, Gap Total Account Universe, VIP Universe Outlet File
 Activity: Campaign, Activities (Events/Surveys), Activity Details, Activity Results, Event/Activity Survey
 Performance: Campaign/Event ROI ($ vs Sales), Account Depletions, Distributor Sales Persons

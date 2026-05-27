@@ -1676,7 +1676,7 @@ export function BillingWorkspacePage() {
         open={!!reportPreview}
         onOpenChange={(v) => (v ? null : setReportPreview(null))}
       >
-        <DialogContent className="!max-w-[min(96vw,1100px)] w-[min(96vw,1100px)]">
+        <DialogContent className="!max-w-[min(96vw,1100px)] w-[min(96vw,1100px)] overflow-hidden">
           <DialogHeader>
             <DialogTitle>{reportPreview}</DialogTitle>
             <DialogDescription>
@@ -2076,48 +2076,96 @@ function KpiCard({
 
 function SlaReportPreview({ rows }: { rows: SlaReportRow[] }) {
   return (
-    <div
-      className="rounded-lg border"
-      style={{ borderColor: "#E2E8F0", maxHeight: 400, overflow: "auto" }}
-    >
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Activity</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Account</TableHead>
-            <TableHead>Licence</TableHead>
-            <TableHead>Active</TableHead>
-            <TableHead>Executor</TableHead>
-            <TableHead className="text-right">Spend</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((r) => (
-            <TableRow key={r.activityId}>
-              <TableCell className="max-w-[180px] truncate">
-                {r.activityName}
-              </TableCell>
-              <TableCell>{r.date}</TableCell>
-              <TableCell className="max-w-[160px] truncate">
-                {r.accountName}
-              </TableCell>
-              <TableCell>{r.licenceNumber}</TableCell>
-              <TableCell>
-                {r.licenceActiveAtEventDate ? (
-                  <span style={{ color: "#0F766E" }}>Yes</span>
-                ) : (
-                  <span style={{ color: "#B91C1C" }}>No</span>
-                )}
-              </TableCell>
-              <TableCell>{r.executor}</TableCell>
-              <TableCell className="text-right">
-                {fmt(r.spendAmount)}
-              </TableCell>
+    <div className="space-y-3 w-full min-w-0">
+      <p
+        className="rounded-md px-3 py-2"
+        style={{
+          fontSize: "0.75rem",
+          color: "#92400E",
+          background: "#FFFBEB",
+          border: "1px solid #FCD34D",
+        }}
+      >
+        R2 scope: capture only. SLA report output continues on HEMS 1.0 until
+        R3 (Aug). Fields below mirror the SGWS bar-spend form so the existing
+        Azure / Python script can be re-pointed at this data when output
+        migrates.
+      </p>
+      <div
+        className="rounded-lg border w-full"
+        style={{
+          borderColor: "#E2E8F0",
+          maxHeight: 400,
+          overflowY: "auto",
+          overflowX: "auto",
+        }}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Activity</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Account</TableHead>
+              <TableHead>Licence</TableHead>
+              <TableHead>Active</TableHead>
+              <TableHead>Executor</TableHead>
+              <TableHead className="text-right">Total spent</TableHead>
+              <TableHead>Receipt</TableHead>
+              <TableHead>Notes</TableHead>
+              <TableHead>Approver</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {rows.map((r) => (
+              <TableRow key={r.activityId}>
+                <TableCell className="max-w-[180px] truncate">
+                  {r.activityName}
+                </TableCell>
+                <TableCell>{r.date}</TableCell>
+                <TableCell className="max-w-[160px] truncate">
+                  {r.accountName}
+                </TableCell>
+                <TableCell>{r.licenceNumber}</TableCell>
+                <TableCell>
+                  {r.licenceActiveAtEventDate ? (
+                    <span style={{ color: "#0F766E" }}>Yes</span>
+                  ) : (
+                    <span style={{ color: "#B91C1C" }}>No</span>
+                  )}
+                </TableCell>
+                <TableCell>{r.executor}</TableCell>
+                <TableCell className="text-right">
+                  {fmt(r.spendAmount)}
+                </TableCell>
+                <TableCell>
+                  {r.receiptUrl ? (
+                    <span
+                      title={r.receiptUrl}
+                      style={{ color: "#0F766E", fontSize: "0.75rem" }}
+                    >
+                      Attached
+                    </span>
+                  ) : (
+                    <span style={{ color: "#94A3B8", fontSize: "0.75rem" }}>
+                      —
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell
+                  className="max-w-[200px] truncate"
+                  title={r.clarifyingNotes}
+                  style={{ fontSize: "0.75rem", color: "#475569" }}
+                >
+                  {r.clarifyingNotes || "—"}
+                </TableCell>
+                <TableCell style={{ fontSize: "0.75rem" }}>
+                  {r.approvingManager || "—"}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

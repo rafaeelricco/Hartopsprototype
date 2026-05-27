@@ -7,11 +7,11 @@ This document provides information about Ambar and Hart's engagement. Namely bac
 Hart is a marketing agency focusing on the beverage industry, and working from New York, for customers across the US. Hart executes marketing and sampling events on behalf of clients in the beverage industry. The cycle works like this:
 
 1. A beverage company sends Hart a campaign request via email.
-2. Hart designs a campaign, then reaches out to Educator Managers, who recruit and coordinate Educators (the people who actually show up at supermarkets, bars, and festivals to run the event).
-3. Educators sample products, collect consumer data (names, opinions, photos, sales figures), and send it back to Hart via a mobile app.
-4. Hart pays the Educators and Educator Managers, then delivers campaign results and recommendations to the client.
+2. Hart designs a campaign, then reaches out to Brand Ambassador Managers, who recruit and coordinate Brand Ambassadors (the people who actually show up at supermarkets, bars, and festivals to run the event).
+3. Brand Ambassadors sample products, collect consumer data (names, opinions, photos, sales figures), and send it back to Hart via a mobile app.
+4. Hart pays the Brand Ambassadors and Brand Ambassador Managers, then delivers campaign results and recommendations to the client.
 
-The communication stack today is fragmented: email and phone with clients, a website plus email and phone with Educator Managers, phone and email between Managers and Educators, and a mobile app for Educators to submit data. Hart has existing software, but it was built for internal backend management, not for a multi-tenant or B2B use case. Its workflows, questions, and product configurations are hard-coded, its architecture makes new features painful to ship, and changing it in place would risk Hart's live operations.
+The communication stack today is fragmented: email and phone with clients, a website plus email and phone with Brand Ambassador Managers, phone and email between Managers and Brand Ambassadors, and a mobile app for Brand Ambassadors to submit data. Hart has existing software, but it was built for internal backend management, not for a multi-tenant or B2B use case. Its workflows, questions, and product configurations are hard-coded, its architecture makes new features painful to ship, and changing it in place would risk Hart's live operations.
 
 Hart has been remarkably successful with this model. Now they want to scale it, not just by running more events themselves, but by turning the model into a product others can use. To do that, they need a new platform built from scratch.
 
@@ -66,25 +66,25 @@ Key experiences:
 - **Event monitoring and results.** Before an event, operators see configuration details. During, they see live updates: real-time data, photo uploads, educator progress. After, they see the full picture: inventory, sales, aggregated consumer data, notes, and photos. Event data can be exported.
 - **Brand assets.** A product library where operators add products (manually or via bulk upload with AI-assisted prefill) and a questionnaire template library for reuse across campaigns and events.
 - **Reports.** Campaign-level and cross-campaign analytics with time period selectors, performance trend charts, campaign comparison tables, and exportable reports.
-- **Team management.** Client staff can invite other staff, Educators, and Educator Managers. Depending on the role, the invitation directs to either the web platform or mobile app.
-- **Help resources.** Client staff can create FAQs and resource links that appear in the Help section for their Educators and Educator Managers.
+- **Team management.** Client staff can invite other staff, Brand Ambassadors, and Brand Ambassador Managers. Depending on the role, the invitation directs to either the web platform or mobile app.
+- **Help resources.** Client staff can create FAQs and resource links that appear in the Help section for their Brand Ambassadors and Brand Ambassador Managers.
 
-### **Educator Managers (Web Platform)**
+### **Brand Ambassador Managers (Web Platform)**
 
-Educator Managers are the coordination layer between client staff and the educators on the ground. They view events assigned to them, assign educators, and monitor and finalize event submissions.
+Brand Ambassador Managers are the coordination layer between client staff and the educators on the ground. They view events assigned to them, assign educators, and monitor and finalize event submissions.
 
 Key experiences:
 
 - **Dashboard.** Stats for their assigned events: total this week, active now, events requiring attention. Each stat is clickable and filters into the event list.
 - **Event management.** A list of events (live first, then upcoming, then completed) with search, filters, and calendar view. Event detail pages show pre-event information (product details, instructions, goals, compensation), live data during the event (check-in timestamps, real-time inventory and sales, consumer questionnaire counts, notes, photos), and post-event summaries. Managers can assign or reassign educators to events and finalize completed events with an approve button — finalization locks the event for everyone.
-- **Educator management.** A list of their educators with contact details, event counts, and performance metrics. Educator detail views show stats (total events, average rating, average sales per event) and upcoming assignments.
+- **Brand Ambassador management.** A list of their educators with contact details, event counts, and performance metrics. Brand Ambassador detail views show stats (total events, average rating, average sales per event) and upcoming assignments.
 - **Settings.** Profile, notification preferences (new events, unassigned events, check-in failures, events ready for review), and a help section managed by client staff.
 
 Note: coordination of educator availability (accepting, declining events) happens outside the platform for now. The platform tracks assignment and execution, not scheduling negotiation.
 
-### **Educators (Mobile Application)**
+### **Brand Ambassadors (Mobile Application)**
 
-Educators are the people on the ground. The mobile app is their tool for executing events — checking in, collecting data, and checking out. The app must require minimal attention while facilitating the capture of a lot of information. AI is a key part of this: voice-to-data transcription, photo-based bottle counting, smart contextual notifications, and structured data extraction from freeform inputs.
+Brand Ambassadors are the people on the ground. The mobile app is their tool for executing events — checking in, collecting data, and checking out. The app must require minimal attention while facilitating the capture of a lot of information. AI is a key part of this: voice-to-data transcription, photo-based bottle counting, smart contextual notifications, and structured data extraction from freeform inputs.
 
 Key experiences:
 

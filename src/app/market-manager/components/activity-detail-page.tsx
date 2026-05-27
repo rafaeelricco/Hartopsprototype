@@ -40,6 +40,8 @@ import {
 import { Button } from "@/app/shared/components/ui/button";
 import { Badge } from "@/app/shared/components/ui/badge";
 import { Input } from "@/app/shared/components/ui/input";
+import { Textarea } from "@/app/shared/components/ui/textarea";
+import { Label } from "@/app/shared/components/ui/label";
 import {
   Card,
   CardContent,
@@ -68,6 +70,7 @@ import {
   getLateMinutes,
   getEarlyMinutes,
   getSalesLabel,
+  updateActivitySlaCapture,
   type EventStatus,
   type Activity,
   type CancellationReason,
@@ -655,6 +658,21 @@ export function ActivityDetailPage() {
   );
   // Pre-approval checks state
   const [approvalChecks, setApprovalChecks] = useState<Set<string>>(new Set());
+
+  // SLA capture (R2). Local edit buffer; Confirm stamps approvingManager +
+  // confirmedAt via updateActivitySlaCapture. Initial values pulled from the
+  // activity record (seeded by BA mobile upload in production).
+  const [slaReceiptUrl, setSlaReceiptUrl] = useState<string>(
+    event?.slaCapture?.receiptUrl ?? "",
+  );
+  const [slaTotal, setSlaTotal] = useState<string>(
+    event?.slaCapture?.total != null ? String(event.slaCapture.total) : "",
+  );
+  const [slaNotes, setSlaNotes] = useState<string>(
+    event?.slaCapture?.clarifyingNotes ?? "",
+  );
+  const [slaConfirmTick, setSlaConfirmTick] = useState(0);
+  const slaIsConfirmed = !!event?.slaCapture?.confirmedAt || slaConfirmTick > 0;
 
   if (!event) {
     return (
@@ -2505,6 +2523,211 @@ export function ActivityDetailPage() {
                 </Button>
               </div>
             )}
+
+            {/* SLA Capture (SGWS / NY bar-spend events) — manager confirms
+                the receipt + total + notes uploaded by the BA at event
+                completion. Stamped by Confirm; flows downstream to the
+                controller's billing review as read-only. */}
+            {event.slaEligible &&
+              (event.status === "Completed" ||
+                currentPhase === "Finalized") && (
+                <Card
+                  className="gap-0"
+                  style={{ borderColor: "#FCD34D", background: "#FFFBEB" }}
+                >
+                  <CardHeader className="px-5 pt-5 pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <DollarSign
+                          className="w-4 h-4"
+                          style={{ color: "#92400E" }}
+                        />
+                        <CardTitle
+                          style={{
+                            fontSize: "0.9375rem",
+                            fontWeight: 600,
+                            color: "#92400E",
+                          }}
+                        >
+                          SLA Capture (SGWS / NY)
+                        </CardTitle>
+                      </div>
+                      {slaIsConfirmed && (
+                        <Badge
+                          variant="outline"
+                          style={{
+                            background: "#ECFDF5",
+                            color: "#0F766E",
+                            borderColor: "#A7F3D0",
+                            fontSize: "0.6875rem",
+                          }}
+                        >
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Confirmed
+                        </Badge>
+                      )}
+                    </div>
+                    <CardDescription
+                      style={{ fontSize: "0.75rem", color: "#92400E" }}
+                    >
+                      BA uploaded the receipt at event completion. Confirm the
+                      total and add notes if needed. Manager confirmation is
+                      the approving signature on the SLA report.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-5 pb-5 space-y-3">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <Label>Receipt screenshot</Label>
+                        {slaReceiptUrl ? (
+                          <div
+                            className="flex items-center justify-between gap-2 rounded-md border bg-white p-2"
+                            style={{ borderColor: "#FCD34D" }}
+                          >
+                            <span
+                              className="inline-flex items-center gap-2 truncate"
+                              style={{ fontSize: "0.8125rem" }}
+                            >
+                              <Image
+                                size={14}
+                                style={{ color: "#92400E" }}
+                              />
+                              <span
+                                className="truncate"
+                                style={{ maxWidth: 220 }}
+                              >
+                                {slaReceiptUrl.split("/").pop()}
+                              </span>
+                            </span>
+                            {!slaIsConfirmed && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setSlaReceiptUrl("")}
+                                style={{ color: "#B91C1C" }}
+                                className="cursor-pointer"
+                              >
+                                Remove
+                              </Button>
+                            )}
+                          </div>
+                        ) : (
+                          <label
+                            className="inline-flex items-center gap-1.5 rounded-md border bg-white px-3 py-2 cursor-pointer"
+                            style={{
+                              borderColor: "#FCD34D",
+                              fontSize: "0.8125rem",
+                            }}
+                          >
+                            <Camera size={13} />
+                            Attach receipt
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              disabled={slaIsConfirmed}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file)
+                                  setSlaReceiptUrl(`/uploaded/${file.name}`);
+                              }}
+                            />
+                          </label>
+                        )}
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="sla-total">Total amount spent</Label>
+                        <Input
+                          id="sla-total"
+                          type="number"
+                          min={0}
+                          max={700}
+                          value={slaTotal}
+                          disabled={slaIsConfirmed}
+                          onChange={(e) => setSlaTotal(e.target.value)}
+                          placeholder="0"
+                        />
+                        <p
+                          style={{
+                            fontSize: "0.6875rem",
+                            color: "#94A3B8",
+                          }}
+                        >
+                          Receipt total (≤ $700 platform ceiling).
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="sla-notes">Clarifying notes</Label>
+                      <Textarea
+                        id="sla-notes"
+                        value={slaNotes}
+                        disabled={slaIsConfirmed}
+                        onChange={(e) => setSlaNotes(e.target.value)}
+                        placeholder="Optional. Flag problem accounts or messy receipts."
+                        rows={2}
+                      />
+                    </div>
+
+                    <p
+                      style={{ fontSize: "0.6875rem", color: "#92400E" }}
+                    >
+                      AmEx corporate cardholder must be present for the entire
+                      duration of the bar spend.
+                    </p>
+
+                    {slaIsConfirmed ? (
+                      <div
+                        className="rounded-md p-2"
+                        style={{
+                          background: "#ECFDF5",
+                          fontSize: "0.75rem",
+                          color: "#0F766E",
+                        }}
+                      >
+                        Confirmed by{" "}
+                        <strong>
+                          {event.slaCapture?.approvingManager ??
+                            `${CURRENT_MARKET_MANAGER.firstName} ${CURRENT_MARKET_MANAGER.lastName}`}
+                        </strong>
+                        {event.slaCapture?.confirmedAt && (
+                          <>
+                            {" · "}
+                            {new Date(
+                              event.slaCapture.confirmedAt,
+                            ).toLocaleString()}
+                          </>
+                        )}
+                        . Sent to controller billing review.
+                      </div>
+                    ) : (
+                      <div className="flex justify-end">
+                        <Button
+                          size="sm"
+                          disabled={!slaReceiptUrl || !slaTotal}
+                          onClick={() => {
+                            updateActivitySlaCapture(event.id, {
+                              receiptUrl: slaReceiptUrl,
+                              total: parseFloat(slaTotal) || 0,
+                              clarifyingNotes: slaNotes,
+                              approvingManager: `${CURRENT_MARKET_MANAGER.firstName} ${CURRENT_MARKET_MANAGER.lastName}`,
+                              confirmedAt: new Date().toISOString(),
+                            });
+                            setSlaConfirmTick((t) => t + 1);
+                            setActionFeedback("SLA capture confirmed");
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                          Confirm SLA capture
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
             {/* Pre-Approval Checklist */}
             {event.preApprovalChecks &&
