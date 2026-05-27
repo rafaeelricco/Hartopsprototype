@@ -220,6 +220,26 @@ export interface BillingActivity {
   };
 }
 
+type BillingApprovalInput = Pick<
+  BillingActivity,
+  "slaEligible" | "licenceVerified" | "receiptUrl" | "approvingManager"
+>;
+
+export function getBillingApprovalBlockReason(
+  activity: BillingApprovalInput,
+): string | null {
+  if (!activity.slaEligible) return null;
+  if (activity.licenceVerified !== true) return "Resolve SLA licence first";
+  if (!activity.receiptUrl?.trim() || !activity.approvingManager?.trim()) {
+    return "Complete manager SLA capture first";
+  }
+  return null;
+}
+
+export function isBillingApprovalReady(activity: BillingApprovalInput): boolean {
+  return getBillingApprovalBlockReason(activity) == null;
+}
+
 // Cancellation Adjustment audit entry — written when an operator uses the
 // Set Partial Bill modal. Explicit replacement for the manager-emails-Kim loop.
 export interface CancellationAdjustment {

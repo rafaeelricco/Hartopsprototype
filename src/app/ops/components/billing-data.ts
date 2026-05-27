@@ -15,6 +15,7 @@ import type {
   Invoice,
   SlaReportRow,
 } from "../../shared/data/billing-types";
+import { isBillingApprovalReady } from "../../shared/data/billing-types";
 
 // ---------------------------------------------------------------------------
 // Current open cycle (the one the operator is working on)
@@ -435,7 +436,9 @@ export function updateBillingActivity(
 
 export function approveBillingActivities(ids: string[]): void {
   MOCK_BILLING_ACTIVITIES = MOCK_BILLING_ACTIVITIES.map((a) =>
-    ids.includes(a.id) ? { ...a, status: "approved" } : a,
+    ids.includes(a.id) && isBillingApprovalReady(a)
+      ? { ...a, status: "approved" }
+      : a,
   );
 }
 

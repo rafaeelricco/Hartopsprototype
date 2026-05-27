@@ -30,6 +30,8 @@ import {
   BAR_SPEND_CEILING,
   BAR_SPEND_GRATUITY_RATE,
   SERVICE_FEE_BY_KIND,
+  getBillingApprovalBlockReason,
+  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type { BillingActivity } from "@/app/shared/data/billing-types";
 import { INITIAL_CAMPAIGNS } from "@/app/staff/components/campaign-data";
@@ -160,6 +162,7 @@ export function EditActivityBillingModal({
     supplies +
     promPub +
     travelEnt;
+  const approvalBlockReason = getBillingApprovalBlockReason(activity);
 
   function patch(p: Partial<Draft>) {
     setDraft((d) => (d ? { ...d, ...p } : d));
@@ -200,6 +203,7 @@ export function EditActivityBillingModal({
   }
 
   function handleSaveAndApprove() {
+    if (!isBillingApprovalReady(activity!)) return;
     onSave(activity!.id, { ...buildPatch(), status: "ready-to-bill" });
     onApprove(activity!.id);
     onClose();
@@ -575,7 +579,13 @@ export function EditActivityBillingModal({
             <Save size={14} className="mr-1.5" />
             Save edits
           </Button>
-          <Button onClick={handleSaveAndApprove}>Save &amp; Approve</Button>
+          <Button
+            onClick={handleSaveAndApprove}
+            disabled={approvalBlockReason != null}
+            title={approvalBlockReason ?? "Save edits and approve for billing"}
+          >
+            Save &amp; Approve
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
