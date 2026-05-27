@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router";
 import {
   ArrowLeft,
@@ -673,6 +673,21 @@ export function ActivityDetailPage() {
   );
   const [slaConfirmTick, setSlaConfirmTick] = useState(0);
   const slaIsConfirmed = !!event?.slaCapture?.confirmedAt || slaConfirmTick > 0;
+
+  useEffect(() => {
+    setSlaReceiptUrl(event?.slaCapture?.receiptUrl ?? "");
+    setSlaTotal(
+      event?.slaCapture?.total != null ? String(event.slaCapture.total) : "",
+    );
+    setSlaNotes(event?.slaCapture?.clarifyingNotes ?? "");
+    setSlaConfirmTick(0);
+  }, [
+    event?.id,
+    event?.slaCapture?.receiptUrl,
+    event?.slaCapture?.total,
+    event?.slaCapture?.clarifyingNotes,
+    event?.slaCapture?.confirmedAt,
+  ]);
 
   if (!event) {
     return (
@@ -2708,15 +2723,23 @@ export function ActivityDetailPage() {
                           size="sm"
                           disabled={!slaReceiptUrl || !slaTotal}
                           onClick={() => {
-                            updateActivitySlaCapture(event.id, {
+                            const updated = updateActivitySlaCapture(event.id, {
                               receiptUrl: slaReceiptUrl,
                               total: parseFloat(slaTotal) || 0,
                               clarifyingNotes: slaNotes,
                               approvingManager: `${CURRENT_MARKET_MANAGER.firstName} ${CURRENT_MARKET_MANAGER.lastName}`,
                               confirmedAt: new Date().toISOString(),
                             });
+                            if (!updated) {
+                              setActionFeedback(
+                                "SLA capture could not be saved",
+                              );
+                              setTimeout(() => setActionFeedback(null), 3000);
+                              return;
+                            }
                             setSlaConfirmTick((t) => t + 1);
                             setActionFeedback("SLA capture confirmed");
+                            setTimeout(() => setActionFeedback(null), 3000);
                           }}
                           className="cursor-pointer"
                         >

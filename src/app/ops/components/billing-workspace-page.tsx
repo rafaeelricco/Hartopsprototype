@@ -67,6 +67,8 @@ import {
   SERVICE_FEE_BY_KIND,
   ACTIVITY_CATEGORIES,
   INVOICE_PAYMENT_STATUSES,
+  getBillingApprovalBlockReason,
+  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
@@ -470,9 +472,29 @@ export function BillingWorkspacePage() {
   }
 
   function handleApprove(ids: string[]) {
-    approveBillingActivities(ids);
+    if (ids.length === 0) {
+      toast.message("No activities selected for approval");
+      return;
+    }
+    const approvableIds = ids.filter((id) => {
+      const activity = activities.find((a) => a.id === id);
+      return activity != null && isBillingApprovalReady(activity);
+    });
+    if (approvableIds.length === 0) {
+      toast.error("Complete SLA capture before approving selected activities");
+      return;
+    }
+    approveBillingActivities(approvableIds);
     refreshActivities();
-    toast.success(`Approved ${ids.length} activity${ids.length === 1 ? "" : "s"}`);
+    const skipped = ids.length - approvableIds.length;
+    toast.success(
+      `Approved ${approvableIds.length} activity${approvableIds.length === 1 ? "" : "s"}`,
+    );
+    if (skipped > 0) {
+      toast.message(
+        `${skipped} SLA activit${skipped === 1 ? "y needs" : "ies need"} manager capture before approval`,
+      );
+    }
   }
 
   function handleSavePartialBill(input: {
@@ -1859,7 +1881,7 @@ function UpdateBillingTab({
         a.status !== "approved" &&
         a.status !== "billing-locked" &&
         a.status !== "invoiced" &&
-        (!a.slaEligible || a.licenceVerified),
+        isBillingApprovalReady(a),
     )
     .map((a) => a.id);
 
@@ -1914,14 +1936,16 @@ function UpdateBillingTab({
             <TableBody>
               {activities.map((a) => {
                 const badge = statusBadge(a.status);
-                const slaBlock = a.slaEligible && !a.licenceVerified;
+                const approvalBlockReason = getBillingApprovalBlockReason(a);
                 return (
                   <TableRow key={a.id}>
                     <TableCell>
                       <Checkbox
                         checked={selected.has(a.id)}
                         onCheckedChange={() => toggle(a.id)}
-                        disabled={slaBlock || a.status === "approved"}
+                        disabled={
+                          approvalBlockReason != null || a.status === "approved"
+                        }
                       />
                     </TableCell>
                     <TableCell className="max-w-[220px] truncate">
@@ -1986,12 +2010,12 @@ function UpdateBillingTab({
                       >
                         {badge.label}
                       </span>
-                      {slaBlock && (
+                      {approvalBlockReason && (
                         <div
                           className="mt-1"
                           style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
                         >
-                          Resolve SLA first
+                          {approvalBlockReason}
                         </div>
                       )}
                     </TableCell>
