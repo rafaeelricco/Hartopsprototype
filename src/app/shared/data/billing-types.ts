@@ -181,6 +181,29 @@ export interface BillingCodeDefinition {
 export type BillingChecklistState = Partial<Record<BillingChecklistItem, boolean>>;
 
 // =============================================================================
+// Supplier contacts (brief 2026-06-02 §2)
+// =============================================================================
+// Each supplier carries a delivery recipient + CC template that survives
+// staff changes. Used when sending invoices, SLA reports, and receipt
+// bundles to suppliers via Power Automate / SharePoint / email.
+
+export interface SupplierRecipient {
+  name: string;
+  email: string;
+  role?: string;
+}
+
+export interface SupplierContact {
+  id: string;
+  supplierName: string; // canonical key — e.g. "Pernod Ricard"
+  primaryRecipient: SupplierRecipient;
+  ccRecipients: SupplierRecipient[];
+  notes?: string;
+  active: boolean;
+  createdAt: string;
+}
+
+// =============================================================================
 // Billing workspace (mm-ui-012)
 // =============================================================================
 

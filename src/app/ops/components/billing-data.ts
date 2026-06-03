@@ -16,6 +16,7 @@ import type {
   GeneratedReport,
   Invoice,
   SlaReportRow,
+  SupplierContact,
 } from "../../shared/data/billing-types";
 import { isBillingApprovalReady } from "../../shared/data/billing-types";
 
@@ -93,6 +94,105 @@ export function setBillingCodeActive(code: string, active: boolean): void {
   MOCK_BILLING_CODES = MOCK_BILLING_CODES.map((c) =>
     c.code === code ? { ...c, active } : c,
   );
+}
+
+// ---------------------------------------------------------------------------
+// Supplier contacts (brief 2026-06-02 §2). Per-supplier delivery recipient
+// + CC template, persisted so it survives staff changes.
+// ---------------------------------------------------------------------------
+
+export let MOCK_SUPPLIERS: SupplierContact[] = [
+  {
+    id: "sup-pernod",
+    supplierName: "Pernod Ricard",
+    primaryRecipient: {
+      name: "Diana Reyes",
+      email: "diana.reyes@pernod-ricard.com",
+      role: "Brand Activations Manager",
+    },
+    ccRecipients: [
+      { name: "Mark Hines", email: "mark.hines@pernod-ricard.com" },
+      { name: "Hart Finance", email: "ar@hartagency.com" },
+    ],
+    notes: "Invoices delivered weekly. Diana approves SLA reports.",
+    active: true,
+    createdAt: "2026-01-10T09:00:00Z",
+  },
+  {
+    id: "sup-enj",
+    supplierName: "ENJ Gallo",
+    primaryRecipient: {
+      name: "Tom Karras",
+      email: "tom.karras@enjgallo.com",
+      role: "Regional Activation Lead",
+    },
+    ccRecipients: [
+      { name: "Hart Finance", email: "ar@hartagency.com" },
+    ],
+    notes: "Bi-weekly delivery preferred.",
+    active: true,
+    createdAt: "2026-02-05T09:00:00Z",
+  },
+  {
+    id: "sup-beam",
+    supplierName: "Beam Suntory",
+    primaryRecipient: {
+      name: "Jen Park",
+      email: "jen.park@beamsuntory.com",
+    },
+    ccRecipients: [],
+    notes: "",
+    active: true,
+    createdAt: "2026-03-12T09:00:00Z",
+  },
+];
+
+export function upsertSupplier(s: SupplierContact): void {
+  const idx = MOCK_SUPPLIERS.findIndex((x) => x.id === s.id);
+  if (idx >= 0) {
+    MOCK_SUPPLIERS = MOCK_SUPPLIERS.map((x, i) => (i === idx ? s : x));
+  } else {
+    MOCK_SUPPLIERS = [s, ...MOCK_SUPPLIERS];
+  }
+}
+
+export function setSupplierActive(id: string, active: boolean): void {
+  MOCK_SUPPLIERS = MOCK_SUPPLIERS.map((s) =>
+    s.id === id ? { ...s, active } : s,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Document tagging taxonomy (brief 2026-06-02 §2). Stable strings Power
+// Automate can consume to group bundles. Ambar exposes the tags;
+// bundling lives in Hart's Power Automate flow.
+//
+// Format: <artefact-kind>-<cycle>-<key>
+// Examples:
+//   invoice-2026-05a-INV-13302
+//   sla-2026-05a-act-bill-003
+//   receipt-2026-05a-act-bill-005
+//   manager-report-2026-05a-larry-golus
+// ---------------------------------------------------------------------------
+
+export type ArtefactKind = "invoice" | "sla" | "receipt" | "manager-report";
+
+export function formatArtefactTag(
+  kind: ArtefactKind,
+  ctx: {
+    cycleId?: string;
+    invoiceNumber?: string;
+    activityId?: string;
+    managerSlug?: string;
+  },
+): string {
+  const cycle = (ctx.cycleId ?? "no-cycle").replace(/^bcyc-/, "");
+  const tail =
+    ctx.invoiceNumber ??
+    ctx.activityId ??
+    ctx.managerSlug ??
+    "untagged";
+  return `${kind}-${cycle}-${tail}`;
 }
 
 // Compute which checklist items are still missing for an activity, given

@@ -100,6 +100,7 @@ import {
   updateInvoicePayment,
   getBillingCodeDefinition,
   getMissingChecklistItems,
+  formatArtefactTag,
 } from "./billing-data";
 import { SetPartialBillModal } from "./set-partial-bill-modal";
 import { ResolveSlaModal } from "./resolve-sla-modal";
@@ -1943,7 +1944,24 @@ export function BillingWorkspacePage() {
                               : i.cycleId}
                           </TableCell>
                           <TableCell>
-                            <strong>{i.invoiceNumber}</strong>
+                            <div>
+                              <strong>{i.invoiceNumber}</strong>
+                            </div>
+                            <div
+                              className="mt-0.5"
+                              style={{
+                                fontSize: "0.625rem",
+                                fontFamily:
+                                  "ui-monospace, SFMono-Regular, Menlo, monospace",
+                                color: "#94A3B8",
+                              }}
+                              title="Power Automate bundling tag"
+                            >
+                              #{formatArtefactTag("invoice", {
+                                cycleId: i.cycleId,
+                                invoiceNumber: i.invoiceNumber,
+                              })}
+                            </div>
                           </TableCell>
                           <TableCell
                             className="max-w-[260px] truncate"
