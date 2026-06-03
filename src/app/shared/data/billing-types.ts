@@ -40,6 +40,36 @@ export const BAR_SPEND_GRATUITY_RATE = 0.2;
 // calc that adds to BA payroll. IRS 2026 standard mileage rate seeded as
 // default; configurable per BA / territory in production.
 export const DEFAULT_MILEAGE_RATE = 0.67; // $/mi
+
+// Standard hours per channel (brief 2026-06-02 §2). Used to convert
+// shift-based pay to hourly. Editable in Settings when the surface grows,
+// but locked in code for the prototype.
+export type ActivityChannel = "upstate" | "metro-on-premise" | "off-premise";
+
+export const STANDARD_HOURS_BY_CHANNEL: Record<ActivityChannel, number> = {
+  upstate: 2,
+  "metro-on-premise": 2.5,
+  "off-premise": 3,
+};
+
+export const ACTIVITY_CHANNEL_LABELS: Record<ActivityChannel, string> = {
+  upstate: "Upstate",
+  "metro-on-premise": "Metro on-premise",
+  "off-premise": "Off-premise",
+};
+
+// Derive an activity channel from its category + region. Used as the
+// auto-fill key on the edit-rate modal.
+export function inferActivityChannel(opts: {
+  category?: string;
+  region?: string;
+}): ActivityChannel {
+  const cat = (opts.category ?? "").toLowerCase();
+  const region = (opts.region ?? "").toLowerCase();
+  if (region.includes("upstate") || region.includes("albany")) return "upstate";
+  if (cat.startsWith("off-")) return "off-premise";
+  return "metro-on-premise";
+}
 export interface TravelComponent {
   miles: number;
   ratePerMile: number; // $/mi
@@ -55,6 +85,7 @@ export type OverrideReason =
   | "Extended Event"
   | "Travel"
   | "Special Skill"
+  | "Location Premium"
   | "Cancellation Rate"
   | "Other";
 
@@ -62,9 +93,36 @@ export const OVERRIDE_REASONS: OverrideReason[] = [
   "Extended Event",
   "Travel",
   "Special Skill",
+  "Location Premium",
   "Cancellation Rate",
   "Other",
 ];
+
+// Location-premium tier pattern (brief 2026-06-02 §2). Hamptons / Fire Island
+// $50/hr for first 3 hours, $32/hr after. Modelled as a per-event override
+// pattern the operator can apply; the tiered amount is computed and stored
+// in `final_pay` (no new schema). Surfaced as a helper in the edit-rate
+// modal and on the payroll line so the operator can sanity-check the math.
+export interface LocationPremiumTier {
+  highRate: number;          // $/hr for tier-1 hours
+  highRateHours: number;     // tier-1 cap
+  standardRate: number;      // $/hr after tier-1 cap
+}
+
+export const HAMPTONS_PREMIUM: LocationPremiumTier = {
+  highRate: 50,
+  highRateHours: 3,
+  standardRate: 32,
+};
+
+export function computeLocationPremiumPay(
+  hours: number,
+  tier: LocationPremiumTier,
+): number {
+  const tier1 = Math.min(hours, tier.highRateHours) * tier.highRate;
+  const tier2 = Math.max(0, hours - tier.highRateHours) * tier.standardRate;
+  return tier1 + tier2;
+}
 
 // Activity types that flow through billing/payroll. R2 supports Event today;
 // Survey is included as a seed/stub to prove the activity-as-billable
@@ -406,6 +464,29 @@ export interface SlaReportRow {
   receiptUrl?: string; // attached screenshot
   clarifyingNotes?: string; // free text for problem accounts / receipts
   approvingManager?: string; // captured at bill approval
+}
+
+// =============================================================================
+// Payroll adjustments (brief 2026-06-02 §2)
+// =============================================================================
+// Prior-period corrections processed in the next batch. A correction posts
+// into HEMS as an "ADP pay" line on the individual's pay record — modelled
+// here as a separate adjustment row that gets applied to a payroll cycle.
+
+export type PayrollAdjustmentStatus = "pending" | "applied" | "voided";
+
+export interface PayrollAdjustment {
+  id: string;
+  brandAmbassadorId: string;
+  brandAmbassadorName: string;
+  amount: number;          // signed; positive = pay correction owed, negative = recovery
+  reason: string;
+  priorCycleId?: string;   // which prior cycle the correction reconciles
+  status: PayrollAdjustmentStatus;
+  createdAt: string;       // ISO
+  createdBy: string;       // operator
+  appliedToCycleId?: string; // populated when status becomes "applied"
+  appliedAt?: string;        // ISO
 }
 
 // =============================================================================
