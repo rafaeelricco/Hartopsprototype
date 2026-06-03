@@ -299,7 +299,9 @@ export function PayrollWorkspacePage() {
     // Move cycle to Awaiting Kayla — matches the post-export workflow + toast.
     setCycleStatus("awaiting-kayla");
     setExportConfirmOpen(false);
-    toast.success("Payroll CSV exported · Payroll-lock engaged · Awaiting Kayla");
+    toast.success(
+      "ADP-compatible payroll CSV exported · Payroll-lock engaged · Awaiting Kayla",
+    );
   }
 
   function handleRejectCycle() {
@@ -714,9 +716,11 @@ export function PayrollWorkspacePage() {
                 >
                   <Download size={14} style={{ color: "#64748B", marginTop: 2 }} />
                   <p style={{ fontSize: "0.75rem", color: "#475569" }}>
-                    Export is a native-Excel CSV. After export, the cycle
-                    payroll-locks; you can't add brandAmbassadors or edit pay-relevant
-                    fields. Cycle moves to <strong>Awaiting Kayla</strong>.
+                    Export is an <strong>ADP-compatible CSV</strong> (one row
+                    per BA per cycle, including any queued Adjustments as ADP
+                    pay lines). After export, the cycle payroll-locks; you
+                    can't add brand ambassadors or edit pay-relevant fields.
+                    Cycle moves to <strong>Awaiting Kayla</strong>.
                   </p>
                 </div>
                 <div className="flex items-center justify-between">

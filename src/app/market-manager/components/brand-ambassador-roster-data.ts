@@ -74,6 +74,13 @@ export interface BrandAmbassador {
   standardRateEffectiveDate: string; // YYYY-MM-DD
   rateHistory: RateHistoryEntry[];
   recentOverrides: RecentOverride[];
+
+  // HOLD — Educator master file / "mini-HR portal" (brief 2026-06-02 §4).
+  // The rate fields above are in scope. The full HR-portal scope — employee
+  // ID, pay method, I-9 / W-9 document storage, field-level access control
+  // on rates / pay / bank — is unconfirmed pending the 2026-06-03 Chris
+  // follow-up. Extend this interface (and the BA detail page) here when
+  // confirmed. Until then: do not add tax-doc storage or pay-method fields.
 }
 
 // Generate availability for a 14-day window starting 2026-03-18
