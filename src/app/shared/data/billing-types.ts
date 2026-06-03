@@ -258,12 +258,14 @@ export interface CancellationAdjustment {
   bookerNotified: boolean;
 }
 
-// Payment status — Ivie's ask at 00:25:32 for visibility on money-in.
+// Payment / AR status — Ivie's ask at 00:25:32 for visibility on money-in.
+// Brief 2026-06-02: simple AR statuses only — full aging dashboard depends on
+// the deferred two-way QB sync (out-of-scope per the 2026-06-01 Chris call).
 export type InvoicePaymentStatus =
   | "open"
   | "partially-paid"
   | "paid"
-  | "overdue";
+  | "disputed";
 
 export const INVOICE_PAYMENT_STATUSES: {
   value: InvoicePaymentStatus;
@@ -272,7 +274,7 @@ export const INVOICE_PAYMENT_STATUSES: {
   { value: "open", label: "Open" },
   { value: "partially-paid", label: "Partially paid" },
   { value: "paid", label: "Paid" },
-  { value: "overdue", label: "Overdue" },
+  { value: "disputed", label: "Disputed" },
 ];
 
 export interface Invoice {
@@ -288,7 +290,16 @@ export interface Invoice {
   generatedAt: string; // ISO
   total: number;
   activityIds: string[];
-  status: "draft" | "exported" | "locked";
+  // Invoice lifecycle (brief 2026-06-02 §2):
+  //   draft               → generated, controller hasn't reviewed yet
+  //   approved-for-sending → controller signed off, ready to push to QB
+  //   exported            → pushed to QuickBooks (one-way push)
+  //   locked              → no further edits permitted
+  status: "draft" | "approved-for-sending" | "exported" | "locked";
+  // Stamped when controller marks "approved for sending". Audit trail for the
+  // new invoice approval gate.
+  approvedForSendingAt?: string; // ISO
+  approvedForSendingBy?: string; // operator name
   qbSyncedAt?: string;
   sharepointSentAt?: string;
   // Payment tracking (Ivie's expanded-tracking ask, May-26).

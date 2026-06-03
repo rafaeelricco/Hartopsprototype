@@ -231,6 +231,52 @@ export function EditActivityBillingModal({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Attention flags (brief 2026-06-02 §2) — surface anything that
+              should block approval prominently at the top of the modal. */}
+          {(activity.recurringInstance?.requiresRecalc ||
+            (activity.slaEligible && !activity.licenceVerified)) && (
+            <div
+              className="rounded-md border p-3 space-y-1.5"
+              style={{ borderColor: "#FCA5A5", background: "#FEF2F2" }}
+            >
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#B91C1C",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                Attention required before approval
+              </div>
+              <ul
+                className="list-disc pl-5"
+                style={{ fontSize: "0.8125rem", color: "#7F1D1D" }}
+              >
+                {activity.recurringInstance?.requiresRecalc && (
+                  <li>
+                    Recurring instance — BA count changed from{" "}
+                    <strong>
+                      {activity.recurringInstance.originalBrandAmbassadorCount}
+                    </strong>{" "}
+                    to{" "}
+                    <strong>
+                      {activity.recurringInstance.currentBrandAmbassadorCount}
+                    </strong>
+                    . Recalculate amounts before approving.
+                  </li>
+                )}
+                {activity.slaEligible && !activity.licenceVerified && (
+                  <li>
+                    SLA-eligible (SGWS / NY) — liquor licence not yet verified.
+                    Resolve SLA before approving.
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+
           {/* Row 1 — Billing identifiers */}
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1.5">

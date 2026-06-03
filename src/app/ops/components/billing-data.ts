@@ -335,7 +335,7 @@ export let MOCK_INVOICES: Invoice[] = [
     status: "locked",
     qbSyncedAt: "2026-04-08T14:30:00Z",
     sharepointSentAt: "2026-04-08T14:35:00Z",
-    paymentStatus: "overdue",
+    paymentStatus: "disputed",
     paymentDueAt: "2026-05-08",
   },
 ];

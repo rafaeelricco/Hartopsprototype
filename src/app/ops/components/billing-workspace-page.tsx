@@ -158,7 +158,7 @@ function PaymentStatusBadge({
       label: "Partially paid",
     },
     paid: { bg: "#ECFDF5", fg: "#0F766E", label: "Paid" },
-    overdue: { bg: "#FEF2F2", fg: "#B91C1C", label: "Overdue" },
+    disputed: { bg: "#FEF2F2", fg: "#B91C1C", label: "Disputed" },
   };
   const s = map[status];
   return (
@@ -172,6 +172,119 @@ function PaymentStatusBadge({
       }}
     >
       {s.label}
+    </span>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Three-status chip group (brief 2026-06-02 §2) — activity · invoice · payment.
+// Renders the three independent tracks for one billing row so the controller
+// can see at a glance where the activity sits across the full lifecycle.
+// ---------------------------------------------------------------------------
+
+interface ThreeStatusTracksProps {
+  activity: BillingActivity;
+  invoice?: Invoice | undefined; // matching invoice if one has been generated
+}
+
+function ThreeStatusTracks({ activity, invoice }: ThreeStatusTracksProps) {
+  // Activity track: rolled up to a binary (completed if it's in the billing
+  // queue at all; otherwise we wouldn't see it here).
+  const activityTrack: { label: string; bg: string; fg: string } =
+    activity.status === "missing" && activity.missingReason
+      ? { label: "Completed · awaiting bill", bg: "#FFFBEB", fg: "#92400E" }
+      : { label: "Completed", bg: "#ECFDF5", fg: "#0F766E" };
+
+  // Invoice track: not-yet (no invoice or activity status === missing),
+  // ready (ready-to-bill/approved), draft/approved-for-sending/exported/locked
+  // from the actual Invoice row.
+  let invoiceTrack: { label: string; bg: string; fg: string };
+  if (!invoice) {
+    if (activity.status === "missing") {
+      invoiceTrack = { label: "Not ready", bg: "#FEF2F2", fg: "#B91C1C" };
+    } else if (activity.status === "ready-to-bill") {
+      invoiceTrack = { label: "Ready", bg: "#FFFBEB", fg: "#92400E" };
+    } else if (activity.status === "approved") {
+      invoiceTrack = { label: "Approved", bg: "#ECFDF5", fg: "#0F766E" };
+    } else {
+      invoiceTrack = { label: "Not yet", bg: "#F1F5F9", fg: "#475569" };
+    }
+  } else {
+    switch (invoice.status) {
+      case "draft":
+        invoiceTrack = { label: "Drafted", bg: "#FFFBEB", fg: "#92400E" };
+        break;
+      case "approved-for-sending":
+        invoiceTrack = {
+          label: "Approved to send",
+          bg: "#ECFDF5",
+          fg: "#0F766E",
+        };
+        break;
+      case "exported":
+        invoiceTrack = { label: "Exported", bg: "#EFF6FF", fg: "#1D4ED8" };
+        break;
+      case "locked":
+        invoiceTrack = { label: "Locked", bg: "#F1F5F9", fg: "#475569" };
+        break;
+    }
+  }
+
+  // Payment track: only meaningful once an invoice exists.
+  let paymentTrack: { label: string; bg: string; fg: string };
+  if (!invoice) {
+    paymentTrack = { label: "—", bg: "#F8FAFC", fg: "#94A3B8" };
+  } else {
+    const map: Record<
+      InvoicePaymentStatus,
+      { label: string; bg: string; fg: string }
+    > = {
+      open: { label: "Open", bg: "#FFFBEB", fg: "#92400E" },
+      "partially-paid": {
+        label: "Partial",
+        bg: "#EFF6FF",
+        fg: "#1D4ED8",
+      },
+      paid: { label: "Paid", bg: "#ECFDF5", fg: "#0F766E" },
+      disputed: { label: "Disputed", bg: "#FEF2F2", fg: "#B91C1C" },
+    };
+    paymentTrack = map[invoice.paymentStatus];
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1 flex-wrap">
+      <TrackChip prefix="A" {...activityTrack} />
+      <TrackChip prefix="I" {...invoiceTrack} />
+      <TrackChip prefix="P" {...paymentTrack} />
+    </div>
+  );
+}
+
+function TrackChip({
+  prefix,
+  label,
+  bg,
+  fg,
+}: {
+  prefix: string;
+  label: string;
+  bg: string;
+  fg: string;
+}) {
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded"
+      style={{
+        fontSize: "0.625rem",
+        background: bg,
+        color: fg,
+        fontWeight: 500,
+        letterSpacing: "0.01em",
+      }}
+      title={`${prefix === "A" ? "Activity" : prefix === "I" ? "Invoice" : "Payment"} status`}
+    >
+      <span style={{ opacity: 0.7 }}>{prefix}</span>
+      {label}
     </span>
   );
 }
@@ -403,6 +516,12 @@ export function BillingWorkspacePage() {
   const [billingPeriodEnd, setBillingPeriodEnd] = useState(
     CURRENT_BILLING_CYCLE.windowEnd,
   );
+  // Aggregation cadence (brief 2026-06-02 §2). The window dates drive
+  // weekly / bi-weekly; "per-event" overrides aggregation so each approved
+  // activity becomes its own invoice.
+  const [aggregationCadence, setAggregationCadence] = useState<
+    "weekly" | "bi-weekly" | "per-event"
+  >("bi-weekly");
   const [excludedActivityIds, setExcludedActivityIds] = useState<Set<string>>(
     new Set(),
   );
@@ -710,8 +829,9 @@ export function BillingWorkspacePage() {
       ? 0
       : Math.round((lockedActivities / totalCycleActivities) * 100);
 
-  // Invoice groups — grouped by Billed To only (post-consolidation: there's a
-  // single Hart entity now, so no cross-entity split rule).
+  // Invoice groups — grouped by Billed To (post-consolidation: single Hart
+  // entity, no cross-entity split). Per-event cadence (brief 2026-06-02 §2)
+  // overrides aggregation so each activity becomes its own invoice row.
   const invoiceGroups = useMemo(() => {
     const approved = filtered.filter(
       (a) =>
@@ -729,7 +849,9 @@ export function BillingWorkspacePage() {
       }
     >();
     for (const a of approved) {
-      const key = a.billedTo;
+      // Per-event: group key is the activity id so each forms its own invoice.
+      // Otherwise: group by Billed To (weekly / bi-weekly aggregation).
+      const key = aggregationCadence === "per-event" ? a.id : a.billedTo;
       const existing = map.get(key);
       if (existing) {
         existing.activities.push(a);
@@ -744,7 +866,13 @@ export function BillingWorkspacePage() {
       }
     }
     return Array.from(map.values());
-  }, [filtered, billingPeriodStart, billingPeriodEnd, excludedActivityIds]);
+  }, [
+    filtered,
+    billingPeriodStart,
+    billingPeriodEnd,
+    excludedActivityIds,
+    aggregationCadence,
+  ]);
 
   return (
     <div className="p-6 space-y-6 font-[Inter]">
@@ -1055,6 +1183,7 @@ export function BillingWorkspacePage() {
             activities={filtered.filter(
               (a) => a.status !== "missing" && a.status !== "billing-locked",
             )}
+            invoices={invoices}
             onApprove={handleApprove}
             onEdit={(a) => setEditActivityFor(a)}
           />
@@ -1133,6 +1262,35 @@ export function BillingWorkspacePage() {
                 >
                   This month
                 </Button>
+              </div>
+              <div
+                className="flex items-center gap-1.5 ml-2 pl-3 border-l"
+                style={{ borderColor: "#E2E8F0" }}
+              >
+                <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  Aggregation
+                </span>
+                {(
+                  ["weekly", "bi-weekly", "per-event"] as const
+                ).map((m) => (
+                  <Button
+                    key={m}
+                    size="sm"
+                    variant={aggregationCadence === m ? "default" : "outline"}
+                    onClick={() => setAggregationCadence(m)}
+                    title={
+                      m === "per-event"
+                        ? "Each activity becomes its own invoice"
+                        : `Aggregate activities into a ${m} invoice per billed party`
+                    }
+                  >
+                    {m === "bi-weekly"
+                      ? "Bi-weekly"
+                      : m === "weekly"
+                        ? "Weekly"
+                        : "Per-event"}
+                  </Button>
+                ))}
               </div>
               {excludedActivityIds.size > 0 && (
                 <button
@@ -1552,7 +1710,7 @@ export function BillingWorkspacePage() {
                             style={{
                               fontSize: "0.75rem",
                               color:
-                                i.paymentStatus === "overdue"
+                                i.paymentStatus === "disputed"
                                   ? "#B91C1C"
                                   : "#64748B",
                             }}
@@ -1854,13 +2012,21 @@ export function BillingWorkspacePage() {
 
 function UpdateBillingTab({
   activities,
+  invoices,
   onApprove,
   onEdit,
 }: {
   activities: BillingActivity[];
+  invoices: Invoice[];
   onApprove: (ids: string[]) => void;
   onEdit: (activity: BillingActivity) => void;
 }) {
+  // For the three-status chip group: look up the invoice that contains this
+  // activity (if one has been generated).
+  const invoiceByActivityId = new Map<string, Invoice>();
+  invoices.forEach((inv) => {
+    inv.activityIds.forEach((id) => invoiceByActivityId.set(id, inv));
+  });
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function toggle(id: string) {
@@ -2000,24 +2166,29 @@ function UpdateBillingTab({
                       {fmt(a.expectedAmount)}
                     </TableCell>
                     <TableCell>
-                      <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
-                        style={{
-                          fontSize: "0.6875rem",
-                          background: badge.bg,
-                          color: badge.fg,
-                        }}
-                      >
-                        {badge.label}
-                      </span>
-                      {approvalBlockReason && (
-                        <div
-                          className="mt-1"
-                          style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md w-fit"
+                          style={{
+                            fontSize: "0.6875rem",
+                            background: badge.bg,
+                            color: badge.fg,
+                          }}
                         >
-                          {approvalBlockReason}
-                        </div>
-                      )}
+                          {badge.label}
+                        </span>
+                        <ThreeStatusTracks
+                          activity={a}
+                          invoice={invoiceByActivityId.get(a.id)}
+                        />
+                        {approvalBlockReason && (
+                          <div
+                            style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+                          >
+                            {approvalBlockReason}
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right whitespace-nowrap">
                       <Button
