@@ -731,8 +731,9 @@ export function PayrollWorkspacePage() {
                 </h3>
                 <ul className="space-y-2">
                   <ChecklistItem
-                    done={awaiting.length === 0}
+                    done={cycleAwaiting.length === 0}
                     label="No items in Missing Payments"
+                    note={`${cycleAwaiting.length} blocking cycle export`}
                   />
                   <ChecklistItem
                     done={overrideCount === 0 || true}
