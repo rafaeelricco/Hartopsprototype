@@ -136,6 +136,51 @@ export interface LiquorLicence {
 }
 
 // =============================================================================
+// Billing-code eligibility checklist (brief 2026-06-02 §2)
+// =============================================================================
+//
+// Each billing code carries a required-fields config. Before an invoice can
+// generate for an activity, the corresponding fields must be complete on
+// that activity. The "Events Ready to Bill" dashboard surfaces missing
+// requirements grouped by billing code.
+//
+// Codes are created and edited in HEMS — see the Billing Code Management
+// page. Power Automate consumes the resulting taggable artefacts; bundling
+// logic lives outside Ambar's stack.
+
+export type BillingChecklistItem =
+  | "recap"           // event recap submitted by manager
+  | "photos"          // BA mobile uploaded photo evidence
+  | "bar-spend"       // bar-spend receipt + total captured (SLA flow)
+  | "travel"          // travel expenses logged where applicable
+  | "supplier-approval"; // supplier sign-off (if the billing code requires it)
+
+export const BILLING_CHECKLIST_LABELS: Record<BillingChecklistItem, string> = {
+  recap: "Recap",
+  photos: "Photos",
+  "bar-spend": "Bar spend",
+  travel: "Travel",
+  "supplier-approval": "Supplier approval",
+};
+
+// Billing-code definition. Lives in the Billing Code Management page in HEMS;
+// modelled here in-memory for the prototype.
+export interface BillingCodeDefinition {
+  code: string;            // unique identifier (string key)
+  description?: string;    // human-readable label
+  campaignId?: string;     // optional: pin the code to a campaign
+  requiredFields: BillingChecklistItem[];
+  active: boolean;         // toggle to retire a code without deleting
+  createdAt: string;       // ISO
+  createdBy?: string;
+}
+
+// Per-activity completion booleans. Derived where possible from existing
+// activity state (e.g. `bar-spend` is true when `barSpend > 0`); manager
+// can override the derived value to acknowledge an exception.
+export type BillingChecklistState = Partial<Record<BillingChecklistItem, boolean>>;
+
+// =============================================================================
 // Billing workspace (mm-ui-012)
 // =============================================================================
 
@@ -201,6 +246,11 @@ export interface BillingActivity {
   receiptUrl?: string;
   clarifyingNotes?: string;
   approvingManager?: string; // explicit name captured at bill approval
+  // Billing eligibility checklist (brief 2026-06-02 §2). Items required by
+  // the activity's billing code; each can be ticked manually or derived
+  // from activity state. Missing items appear in the Events Ready to Bill
+  // dashboard.
+  billingChecklist?: BillingChecklistState;
   // P2 #12 — Post-activity expense columns (Kayla's spreadsheet additions).
   // Stored here so they roll into the invoice and the next billing/payroll export.
   suppliesAmount?: number;

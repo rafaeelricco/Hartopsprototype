@@ -9,6 +9,8 @@
 
 import type {
   BillingActivity,
+  BillingChecklistItem,
+  BillingCodeDefinition,
   BillingCycle,
   CancellationAdjustment,
   GeneratedReport,
@@ -16,6 +18,93 @@ import type {
   SlaReportRow,
 } from "../../shared/data/billing-types";
 import { isBillingApprovalReady } from "../../shared/data/billing-types";
+
+// ---------------------------------------------------------------------------
+// Billing-code definitions (brief 2026-06-02 §2). HEMS is source of truth.
+// Each code carries required fields that drive the Events Ready to Bill
+// dashboard's eligibility check.
+// ---------------------------------------------------------------------------
+
+export let MOCK_BILLING_CODES: BillingCodeDefinition[] = [
+  {
+    code: "SLT-LAUNCH-ON",
+    description: "Summer Seltzer Launch · On-premise",
+    campaignId: "camp-1",
+    requiredFields: ["recap", "photos", "bar-spend"],
+    active: true,
+    createdAt: "2026-04-01T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "BF-CRAFT-COCKTAIL",
+    description: "Craft Cocktail Roadshow · Cocktail",
+    campaignId: "camp-8",
+    requiredFields: ["recap", "photos", "bar-spend", "travel"],
+    active: true,
+    createdAt: "2026-04-08T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "BF-CRAFT-MIXOLOGY",
+    description: "Craft Cocktail Roadshow · Mixology",
+    campaignId: "camp-8",
+    requiredFields: ["recap", "photos", "bar-spend"],
+    active: true,
+    createdAt: "2026-04-08T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "PRR-Q1-RETAIL",
+    description: "Pernod Q1 Retail Activation",
+    campaignId: "camp-2",
+    requiredFields: ["recap", "photos", "supplier-approval"],
+    active: true,
+    createdAt: "2026-01-10T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "PRR-Q1-SAMPLING",
+    description: "Pernod Q1 Sampling Survey",
+    campaignId: "camp-2",
+    requiredFields: ["recap"],
+    active: true,
+    createdAt: "2026-01-10T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+];
+
+export function getBillingCodeDefinition(
+  code: string | undefined,
+): BillingCodeDefinition | undefined {
+  if (!code) return undefined;
+  return MOCK_BILLING_CODES.find((c) => c.code === code);
+}
+
+export function upsertBillingCode(def: BillingCodeDefinition): void {
+  const idx = MOCK_BILLING_CODES.findIndex((c) => c.code === def.code);
+  if (idx >= 0) {
+    MOCK_BILLING_CODES = MOCK_BILLING_CODES.map((c, i) => (i === idx ? def : c));
+  } else {
+    MOCK_BILLING_CODES = [def, ...MOCK_BILLING_CODES];
+  }
+}
+
+export function setBillingCodeActive(code: string, active: boolean): void {
+  MOCK_BILLING_CODES = MOCK_BILLING_CODES.map((c) =>
+    c.code === code ? { ...c, active } : c,
+  );
+}
+
+// Compute which checklist items are still missing for an activity, given
+// its current state and the billing code's required-fields config.
+export function getMissingChecklistItems(
+  activity: BillingActivity,
+): BillingChecklistItem[] {
+  const def = getBillingCodeDefinition(activity.billingCode);
+  if (!def) return [];
+  const state = activity.billingChecklist ?? {};
+  return def.requiredFields.filter((item) => state[item] !== true);
+}
 
 // ---------------------------------------------------------------------------
 // Current open cycle (the one the operator is working on)
@@ -74,6 +163,14 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     missingReason: "SLA — licence not verified",
     slaEligible: true,
     licenceVerified: false,
+    // Billing checklist (brief 2026-06-02): code SLT-LAUNCH-ON requires
+    // recap / photos / bar-spend. Recap landed; photos partially captured;
+    // bar-spend not yet logged — blocks Ready-to-Bill.
+    billingChecklist: {
+      recap: true,
+      photos: false,
+      "bar-spend": false,
+    },
   },
 
   // 2. Cancelled event — awaiting Set Partial Bill.
@@ -154,6 +251,14 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     clarifyingNotes:
       "Receipt totals match Square slip. BA count grew from 2 → 3 mid-cycle; recurring instance flagged for recalc.",
     approvingManager: "Larry Golus",
+    // Code BF-CRAFT-MIXOLOGY requires recap / photos / bar-spend. Bar-spend
+    // captured via SLA flow; recap + photos complete. Recalc still blocks
+    // approval (see attention banner) but the checklist is green.
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "bar-spend": true,
+    },
     recurringInstance: {
       seriesId: "series-avion-sunday",
       originalBrandAmbassadorCount: 2,
@@ -194,6 +299,13 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     status: "ready-to-bill",
     slaEligible: true,
     licenceVerified: true,
+    // Code PRR-Q1-RETAIL requires recap / photos / supplier-approval.
+    // Supplier (Pernod Ricard) has signed off via email.
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "supplier-approval": true,
+    },
   },
 
   // 5. Upstate NY entity row.
@@ -237,6 +349,13 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     receiptUrl: "/templates/receipt-pearl-street-2026-05-19.jpg",
     clarifyingNotes: "",
     approvingManager: "Larry Golus",
+    // Code BF-CRAFT-COCKTAIL requires recap / photos / bar-spend / travel.
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "bar-spend": true,
+      travel: true,
+    },
   },
 
   // 6. Non-event activity — Survey stub. Proves the activity-as-billable
@@ -268,6 +387,10 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     expectedAmount: 120,
     status: "ready-to-bill",
     slaEligible: false,
+    // Code PRR-Q1-SAMPLING requires only recap. Survey wave submitted.
+    billingChecklist: {
+      recap: true,
+    },
   },
 ];
 
@@ -471,6 +594,22 @@ export function updateInvoicePayment(
 ): void {
   MOCK_INVOICES = MOCK_INVOICES.map((i) =>
     i.id === id ? { ...i, ...patch } : i,
+  );
+}
+
+// Invoice approval gate (brief 2026-06-02 §2). Flips a draft invoice into
+// `approved-for-sending` and stamps the audit fields. Caller still calls
+// lockInvoice / QB-export separately to push the invoice downstream.
+export function approveInvoiceForSending(id: string, operator: string): void {
+  MOCK_INVOICES = MOCK_INVOICES.map((i) =>
+    i.id === id
+      ? {
+          ...i,
+          status: "approved-for-sending",
+          approvedForSendingAt: new Date().toISOString(),
+          approvedForSendingBy: operator,
+        }
+      : i,
   );
 }
 

@@ -80,6 +80,7 @@ import type {
   ServiceFeeKind,
   SlaReportRow,
 } from "@/app/shared/data/billing-types";
+import { BILLING_CHECKLIST_LABELS } from "@/app/shared/data/billing-types";
 import {
   MOCK_BILLING_ACTIVITIES,
   MOCK_INVOICES,
@@ -97,6 +98,8 @@ import {
   peekNextInvoiceNumber,
   consumeNextInvoiceNumber,
   updateInvoicePayment,
+  getBillingCodeDefinition,
+  getMissingChecklistItems,
 } from "./billing-data";
 import { SetPartialBillModal } from "./set-partial-bill-modal";
 import { ResolveSlaModal } from "./resolve-sla-modal";
@@ -286,6 +289,248 @@ function TrackChip({
       <span style={{ opacity: 0.7 }}>{prefix}</span>
       {label}
     </span>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Events Ready to Bill — billing-code grouped dashboard (brief 2026-06-02 §2).
+// Sits at the top of the Ready to Bill tab. Summarises activities by their
+// billing code so the controller can see at a glance which codes have
+// activities blocked by which missing requirements. Replaces HEMS 1.0's
+// "Missing Bill" report — same population, sharper organisation.
+// ---------------------------------------------------------------------------
+
+interface ReadyToBillCodeGroup {
+  code: string;
+  description: string;
+  total: number;
+  ready: number; // activities with all checklist items + status === "ready-to-bill"
+  blockedByChecklist: number;
+  blockedOther: number; // SLA, cancellation, recurring recalc, etc.
+  missingItemsByLabel: Map<string, number>; // checklist item → count blocking
+}
+
+function buildReadyToBillGroups(
+  activities: BillingActivity[],
+): ReadyToBillCodeGroup[] {
+  const groups = new Map<string, ReadyToBillCodeGroup>();
+  for (const a of activities) {
+    // Only count activities that aren't already invoiced / locked.
+    if (a.status === "invoiced" || a.status === "billing-locked") continue;
+    const code = a.billingCode ?? "(no code)";
+    const def = getBillingCodeDefinition(a.billingCode);
+    if (!groups.has(code)) {
+      groups.set(code, {
+        code,
+        description: def?.description ?? "Unassigned",
+        total: 0,
+        ready: 0,
+        blockedByChecklist: 0,
+        blockedOther: 0,
+        missingItemsByLabel: new Map(),
+      });
+    }
+    const g = groups.get(code)!;
+    g.total += 1;
+
+    const missing = getMissingChecklistItems(a);
+    const hasOtherBlock =
+      (a.slaEligible === true && a.licenceVerified !== true) ||
+      a.recurringInstance?.requiresRecalc === true ||
+      a.status === "missing";
+
+    if (missing.length === 0 && !hasOtherBlock) {
+      g.ready += 1;
+    } else {
+      if (missing.length > 0) {
+        g.blockedByChecklist += 1;
+        for (const item of missing) {
+          const label = BILLING_CHECKLIST_LABELS[item];
+          g.missingItemsByLabel.set(
+            label,
+            (g.missingItemsByLabel.get(label) ?? 0) + 1,
+          );
+        }
+      }
+      if (hasOtherBlock && missing.length === 0) {
+        g.blockedOther += 1;
+      }
+    }
+  }
+  return Array.from(groups.values()).sort((a, b) => {
+    // Surface codes with blockers first
+    const aBlocked = a.blockedByChecklist + a.blockedOther;
+    const bBlocked = b.blockedByChecklist + b.blockedOther;
+    if (aBlocked !== bBlocked) return bBlocked - aBlocked;
+    return a.code.localeCompare(b.code);
+  });
+}
+
+function ReadyToBillDashboard({
+  activities,
+}: {
+  activities: BillingActivity[];
+}) {
+  const groups = useMemo(() => buildReadyToBillGroups(activities), [activities]);
+
+  const totals = useMemo(() => {
+    return groups.reduce(
+      (acc, g) => {
+        acc.total += g.total;
+        acc.ready += g.ready;
+        acc.blockedByChecklist += g.blockedByChecklist;
+        acc.blockedOther += g.blockedOther;
+        return acc;
+      },
+      { total: 0, ready: 0, blockedByChecklist: 0, blockedOther: 0 },
+    );
+  }, [groups]);
+
+  if (totals.total === 0) {
+    return null;
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+              Events ready to bill
+            </h3>
+            <p style={{ fontSize: "0.75rem", color: "#64748B" }}>
+              Grouped by billing code · replaces the HEMS 1.0 Missing Bill
+              report.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <DashboardKpi
+              label="Total"
+              value={String(totals.total)}
+              color="#475569"
+            />
+            <DashboardKpi
+              label="Ready"
+              value={String(totals.ready)}
+              color="#0F766E"
+            />
+            <DashboardKpi
+              label="Missing fields"
+              value={String(totals.blockedByChecklist)}
+              color="#92400E"
+            />
+            <DashboardKpi
+              label="Other blocks"
+              value={String(totals.blockedOther)}
+              color="#B91C1C"
+            />
+          </div>
+        </div>
+        <div className="grid gap-2 md:grid-cols-2">
+          {groups.map((g) => (
+            <ReadyToBillCodeCard key={g.code} group={g} />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DashboardKpi({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <div className="flex flex-col items-end">
+      <span style={{ fontSize: "1.125rem", fontWeight: 600, color }}>
+        {value}
+      </span>
+      <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{label}</span>
+    </div>
+  );
+}
+
+function ReadyToBillCodeCard({ group }: { group: ReadyToBillCodeGroup }) {
+  return (
+    <div
+      className="rounded-md border p-3 space-y-2"
+      style={{ borderColor: "#E2E8F0", background: "#FAFAFA" }}
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <div className="min-w-0">
+          <div
+            className="truncate"
+            style={{
+              fontSize: "0.8125rem",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontWeight: 600,
+              color: "#0F172A",
+            }}
+            title={group.code}
+          >
+            {group.code}
+          </div>
+          <div
+            className="truncate"
+            style={{ fontSize: "0.6875rem", color: "#64748B" }}
+            title={group.description}
+          >
+            {group.description}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 whitespace-nowrap">
+          <span
+            style={{
+              fontSize: "0.6875rem",
+              color: "#0F766E",
+              background: "#ECFDF5",
+              padding: "1px 6px",
+              borderRadius: 4,
+              fontWeight: 500,
+            }}
+            title="Ready to invoice"
+          >
+            {group.ready}/{group.total} ready
+          </span>
+        </div>
+      </div>
+      {group.missingItemsByLabel.size > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span style={{ fontSize: "0.6875rem", color: "#92400E" }}>
+            Missing:
+          </span>
+          {Array.from(group.missingItemsByLabel.entries()).map(
+            ([label, count]) => (
+              <span
+                key={label}
+                className="px-1.5 py-0 rounded"
+                style={{
+                  fontSize: "0.6875rem",
+                  background: "#FFFBEB",
+                  color: "#92400E",
+                  fontWeight: 500,
+                }}
+              >
+                {label} · {count}
+              </span>
+            ),
+          )}
+        </div>
+      )}
+      {group.blockedOther > 0 && (
+        <div
+          className="flex items-center gap-1.5"
+          style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+        >
+          {group.blockedOther} blocked on SLA / recalc / approval
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -776,6 +1021,12 @@ export function BillingWorkspacePage() {
     // Default to net-30 from today. Ivie can update later.
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 30);
+    // Invoice approval gate (brief 2026-06-02 §2). Confirming this dialog
+    // implicitly approves the invoice for sending AND pushes it to QB in one
+    // controller action — both audit timestamps are recorded so the gate is
+    // present in the data trail even though the action is combined for the
+    // prototype's bi-weekly batch flow.
+    const nowIso = new Date().toISOString();
     const invoice: Invoice = {
       id: `inv-${Date.now()}`,
       invoiceNumber: input.invoiceNumber,
@@ -788,12 +1039,14 @@ export function BillingWorkspacePage() {
       distributorIdUsed: input.distributorIdUsed,
       licenceVerified: input.licenceVerified,
       cycleId: CURRENT_BILLING_CYCLE.id,
-      generatedAt: new Date().toISOString(),
+      generatedAt: nowIso,
       total: qbExportFor.total,
       activityIds: qbExportFor.activityIds,
       status: "locked",
-      qbSyncedAt: new Date().toISOString(),
-      sharepointSentAt: new Date().toISOString(),
+      approvedForSendingAt: nowIso,
+      approvedForSendingBy: "Ivie (Controller)",
+      qbSyncedAt: nowIso,
+      sharepointSentAt: nowIso,
     };
     addInvoice(invoice);
     lockInvoice(invoice.id);
@@ -908,7 +1161,7 @@ export function BillingWorkspacePage() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="missing">
-            Missing Bills
+            Ready to Bill
             {kpiAwaiting > 0 && (
               <span
                 className="ml-2 px-1.5 py-0 rounded-full"
@@ -1004,8 +1257,17 @@ export function BillingWorkspacePage() {
           )}
         </TabsContent>
 
-        {/* --------------- Missing Bills -------------------------------- */}
+        {/* --------------- Ready to Bill -------------------------------- */}
         <TabsContent value="missing" className="space-y-3">
+          {/* Events Ready to Bill dashboard (brief 2026-06-02 §2) — billing-
+              code grouped summary above the detail table. Replaces HEMS 1.0's
+              Missing Bill report. */}
+          <ReadyToBillDashboard
+            activities={filtered.filter(
+              (a) =>
+                a.status !== "billing-locked" && a.status !== "invoiced",
+            )}
+          />
           <div className="flex items-center justify-between">
             <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
               Each row must be resolved before it can be approved for billing.
@@ -1449,9 +1711,10 @@ export function BillingWorkspacePage() {
                           })
                         }
                         disabled={g.includedActivities.length === 0}
+                        title="Approve this invoice for sending and push it to QuickBooks in a single confirmation step (brief 2026-06-02 §2 invoice approval gate)."
                       >
                         <Send size={13} className="mr-1.5" />
-                        Export to QuickBooks
+                        Approve & Send to QuickBooks
                       </Button>
                       <Button
                         size="sm"
