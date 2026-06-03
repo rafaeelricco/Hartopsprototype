@@ -18,7 +18,6 @@ import {
   RefreshCcw,
   Send,
   Download,
-  Lock,
   Filter,
   Pencil,
 } from "lucide-react";
