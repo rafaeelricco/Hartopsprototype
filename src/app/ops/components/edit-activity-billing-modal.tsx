@@ -30,12 +30,11 @@ import {
   BAR_SPEND_CEILING,
   BAR_SPEND_GRATUITY_RATE,
   SERVICE_FEE_BY_KIND,
-  getBillingApprovalBlockReason,
-  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type { BillingActivity } from "@/app/shared/data/billing-types";
 import { INITIAL_CAMPAIGNS } from "@/app/staff/components/campaign-data";
 import { CampaignTag } from "./campaign-tag";
+import { getBillingActivityBlockReasons } from "./billing-data";
 
 function fmt(n: number): string {
   return n.toLocaleString("en-US", {
@@ -162,7 +161,7 @@ export function EditActivityBillingModal({
     supplies +
     promPub +
     travelEnt;
-  const approvalBlockReason = getBillingApprovalBlockReason(activity);
+  const approvalBlockReason = getBillingActivityBlockReasons(activity)[0];
 
   function patch(p: Partial<Draft>) {
     setDraft((d) => (d ? { ...d, ...p } : d));
@@ -203,7 +202,7 @@ export function EditActivityBillingModal({
   }
 
   function handleSaveAndApprove() {
-    if (!isBillingApprovalReady(activity!)) return;
+    if (getBillingActivityBlockReasons(activity!).length > 0) return;
     onSave(activity!.id, { ...buildPatch(), status: "ready-to-bill" });
     onApprove(activity!.id);
     onClose();

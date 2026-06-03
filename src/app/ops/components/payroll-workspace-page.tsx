@@ -79,6 +79,7 @@ import { ACTIVITY_CATEGORIES } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
   GeneratedReport,
+  PayrollAdjustment,
   PayrollLineItem,
   PayrollReviewRequest,
 } from "@/app/shared/data/billing-types";
@@ -162,6 +163,16 @@ const INITIAL_FILTERS: FiltersState = {
   cycleEnd: "2026-05-21",
 };
 
+function isAdjustmentQueuedForCycle(
+  adjustment: PayrollAdjustment,
+  cycleId: string,
+): boolean {
+  return (
+    adjustment.status === "pending" ||
+    (adjustment.status === "applied" && adjustment.appliedToCycleId === cycleId)
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
@@ -179,6 +190,9 @@ export function PayrollWorkspacePage() {
   const [reports, setReports] =
     useState<GeneratedReport[]>(MOCK_PAYROLL_REPORTS);
   const [reportPreview, setReportPreview] = useState<string | null>(null);
+  const [adjustments, setAdjustments] = useState<PayrollAdjustment[]>([
+    ...MOCK_PAYROLL_ADJUSTMENTS,
+  ]);
   const [reviewRequests, setReviewRequests] = useState<PayrollReviewRequest[]>(
     [
       {
@@ -202,6 +216,10 @@ export function PayrollWorkspacePage() {
 
   function refreshItems() {
     setItems([...MOCK_PAYROLL_LINE_ITEMS]);
+  }
+
+  function refreshAdjustments() {
+    setAdjustments([...MOCK_PAYROLL_ADJUSTMENTS]);
   }
 
   const filtered = useMemo(() => {
@@ -236,7 +254,15 @@ export function PayrollWorkspacePage() {
       p.date <= filters.cycleEnd &&
       (p.status === "missing" || p.status === "pending-manager"),
   );
-  const totalPayEstimated = filtered.reduce((s, p) => s + p.finalPay, 0);
+  const filteredLineItemTotal = filtered.reduce((s, p) => s + p.finalPay, 0);
+  const cycleAdjustmentLines = adjustments.filter((a) =>
+    isAdjustmentQueuedForCycle(a, CURRENT_PAYROLL_CYCLE.id),
+  );
+  const cycleAdjustmentTotal = cycleAdjustmentLines.reduce(
+    (s, a) => s + a.amount,
+    0,
+  );
+  const totalPayEstimated = filteredLineItemTotal + cycleAdjustmentTotal;
   const overrideCount = filtered.filter((p) => !!p.override).length;
 
   // Cycle progress
@@ -296,6 +322,10 @@ export function PayrollWorkspacePage() {
 
   function handleExport() {
     if (!canExport) return;
+    adjustments
+      .filter((a) => a.status === "pending")
+      .forEach((a) => applyPayrollAdjustment(a.id, CURRENT_PAYROLL_CYCLE.id));
+    refreshAdjustments();
     // Move cycle to Awaiting Kayla — matches the post-export workflow + toast.
     setCycleStatus("awaiting-kayla");
     setExportConfirmOpen(false);
@@ -682,7 +712,11 @@ export function PayrollWorkspacePage() {
 
           {/* --------------- Adjustments -------------------------------- */}
           <TabsContent value="adjustments" className="space-y-4">
-            <PayrollAdjustmentsTab cycleId={CURRENT_PAYROLL_CYCLE.id} />
+            <PayrollAdjustmentsTab
+              cycleId={CURRENT_PAYROLL_CYCLE.id}
+              adjustments={adjustments}
+              onAdjustmentsChange={setAdjustments}
+            />
           </TabsContent>
 
           {/* --------------- Export -------------------------------------- */}
@@ -739,6 +773,16 @@ export function PayrollWorkspacePage() {
                       {filtered.length} line items · territory{" "}
                       {CURRENT_PAYROLL_CYCLE.territory}
                     </div>
+                    {cycleAdjustmentLines.length > 0 && (
+                      <div
+                        className="mt-0.5"
+                        style={{ fontSize: "0.75rem", color: "#64748B" }}
+                      >
+                        Includes {cycleAdjustmentLines.length} adjustment
+                        {cycleAdjustmentLines.length === 1 ? "" : "s"} ·{" "}
+                        {fmt(cycleAdjustmentTotal)}
+                      </div>
+                    )}
                   </div>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1072,6 +1116,10 @@ export function PayrollWorkspacePage() {
             <div className="space-y-2">
               <Row label="Total pay" value={fmt(totalPayEstimated)} bold />
               <Row label="Line items" value={String(filtered.length)} />
+              <Row
+                label="Adjustments"
+                value={`${cycleAdjustmentLines.length} · ${fmt(cycleAdjustmentTotal)}`}
+              />
               <Row
                 label="Approved"
                 value={String(approvedCount)}
@@ -2095,8 +2143,15 @@ function MasterJournalPreview({ items }: { items: PayrollLineItem[] }) {
 // into HEMS as an "ADP pay" line on the individual's pay record.
 // ---------------------------------------------------------------------------
 
-function PayrollAdjustmentsTab({ cycleId }: { cycleId: string }) {
-  const [adjustments, setAdjustments] = useState([...MOCK_PAYROLL_ADJUSTMENTS]);
+function PayrollAdjustmentsTab({
+  cycleId,
+  adjustments,
+  onAdjustmentsChange,
+}: {
+  cycleId: string;
+  adjustments: PayrollAdjustment[];
+  onAdjustmentsChange: (adjustments: PayrollAdjustment[]) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [draftBa, setDraftBa] = useState("");
   const [draftAmount, setDraftAmount] = useState("");
@@ -2104,7 +2159,7 @@ function PayrollAdjustmentsTab({ cycleId }: { cycleId: string }) {
   const [draftPriorCycle, setDraftPriorCycle] = useState("");
 
   function refresh() {
-    setAdjustments([...MOCK_PAYROLL_ADJUSTMENTS]);
+    onAdjustmentsChange([...MOCK_PAYROLL_ADJUSTMENTS]);
   }
 
   function resetDraft() {

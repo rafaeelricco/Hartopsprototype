@@ -67,8 +67,6 @@ import {
   SERVICE_FEE_BY_KIND,
   ACTIVITY_CATEGORIES,
   INVOICE_PAYMENT_STATUSES,
-  getBillingApprovalBlockReason,
-  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
@@ -100,6 +98,8 @@ import {
   updateInvoicePayment,
   getBillingCodeDefinition,
   getMissingChecklistItems,
+  getBillingActivityBlockReasons,
+  isBillingActivityReadyForInvoice,
   formatArtefactTag,
 } from "./billing-data";
 import { SetPartialBillModal } from "./set-partial-bill-modal";
@@ -841,12 +841,16 @@ export function BillingWorkspacePage() {
       toast.message("No activities selected for approval");
       return;
     }
-    const approvableIds = ids.filter((id) => {
-      const activity = activities.find((a) => a.id === id);
-      return activity != null && isBillingApprovalReady(activity);
-    });
+    const selectedActivities = ids
+      .map((id) => activities.find((a) => a.id === id))
+      .filter((a): a is BillingActivity => a != null);
+    const approvableIds = selectedActivities
+      .filter(isBillingActivityReadyForInvoice)
+      .map((a) => a.id);
     if (approvableIds.length === 0) {
-      toast.error("Complete SLA capture before approving selected activities");
+      const firstBlocker =
+        selectedActivities.flatMap(getBillingActivityBlockReasons)[0];
+      toast.error(firstBlocker ?? "Resolve billing requirements before approval");
       return;
     }
     approveBillingActivities(approvableIds);
@@ -857,7 +861,7 @@ export function BillingWorkspacePage() {
     );
     if (skipped > 0) {
       toast.message(
-        `${skipped} SLA activit${skipped === 1 ? "y needs" : "ies need"} manager capture before approval`,
+        `${skipped} activit${skipped === 1 ? "y has" : "ies have"} unresolved billing requirements`,
       );
     }
   }
@@ -999,6 +1003,15 @@ export function BillingWorkspacePage() {
     distributor: string;
     activities: BillingActivity[];
   }) {
+    const blocked = group.activities.filter(
+      (a) => !isBillingActivityReadyForInvoice(a),
+    );
+    if (blocked.length > 0) {
+      toast.error(
+        `${blocked.length} activit${blocked.length === 1 ? "y has" : "ies have"} unresolved billing requirements`,
+      );
+      return;
+    }
     const total = group.activities.reduce((s, a) => s + a.expectedAmount, 0);
     setQbExportFor({
       billedTo: group.billedTo,
@@ -1014,6 +1027,28 @@ export function BillingWorkspacePage() {
     licenceVerified: boolean;
   }) {
     if (!qbExportFor) return;
+    const exportActivities = qbExportFor.activityIds
+      .map((id) => activities.find((a) => a.id === id))
+      .filter((a): a is BillingActivity => a != null);
+    if (exportActivities.length !== qbExportFor.activityIds.length) {
+      toast.error("Refresh billing activities before exporting this invoice");
+      setQbExportFor(null);
+      return;
+    }
+    const blocked = exportActivities.filter(
+      (a) => !isBillingActivityReadyForInvoice(a),
+    );
+    if (blocked.length > 0) {
+      toast.error(
+        `${blocked.length} activit${blocked.length === 1 ? "y has" : "ies have"} unresolved billing requirements`,
+      );
+      setQbExportFor(null);
+      return;
+    }
+    const exportTotal = exportActivities.reduce(
+      (s, a) => s + a.expectedAmount,
+      0,
+    );
     // Commit the auto-number from the counter — invoiceCounter only advances
     // when an invoice is actually created, not on every render of the Invoices
     // tab.
@@ -1041,7 +1076,7 @@ export function BillingWorkspacePage() {
       licenceVerified: input.licenceVerified,
       cycleId: CURRENT_BILLING_CYCLE.id,
       generatedAt: nowIso,
-      total: qbExportFor.total,
+      total: exportTotal,
       activityIds: qbExportFor.activityIds,
       status: "locked",
       approvedForSendingAt: nowIso,
@@ -1091,7 +1126,8 @@ export function BillingWorkspacePage() {
       (a) =>
         (a.status === "approved" || a.status === "ready-to-bill") &&
         a.date >= billingPeriodStart &&
-        a.date <= billingPeriodEnd,
+        a.date <= billingPeriodEnd &&
+        isBillingActivityReadyForInvoice(a),
     );
     const map = new Map<
       string,
@@ -1391,6 +1427,10 @@ export function BillingWorkspacePage() {
                                     updateBillingActivity(a.id, {
                                       brandAmbassadorCount:
                                         a.recurringInstance.currentBrandAmbassadorCount,
+                                      recurringInstance: {
+                                        ...a.recurringInstance,
+                                        requiresRecalc: false,
+                                      },
                                       status: "ready-to-bill",
                                     });
                                     // Drop the missing reason via the index
@@ -2328,7 +2368,7 @@ function UpdateBillingTab({
         a.status !== "approved" &&
         a.status !== "billing-locked" &&
         a.status !== "invoiced" &&
-        isBillingApprovalReady(a),
+        isBillingActivityReadyForInvoice(a),
     )
     .map((a) => a.id);
 
@@ -2383,7 +2423,8 @@ function UpdateBillingTab({
             <TableBody>
               {activities.map((a) => {
                 const badge = statusBadge(a.status);
-                const approvalBlockReason = getBillingApprovalBlockReason(a);
+                const approvalBlockReason =
+                  getBillingActivityBlockReasons(a)[0];
                 return (
                   <TableRow key={a.id}>
                     <TableCell>

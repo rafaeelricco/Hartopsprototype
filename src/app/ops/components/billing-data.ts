@@ -18,7 +18,10 @@ import type {
   SlaReportRow,
   SupplierContact,
 } from "../../shared/data/billing-types";
-import { isBillingApprovalReady } from "../../shared/data/billing-types";
+import {
+  BILLING_CHECKLIST_LABELS,
+  getBillingApprovalBlockReason,
+} from "../../shared/data/billing-types";
 
 // ---------------------------------------------------------------------------
 // Billing-code definitions (brief 2026-06-02 §2). HEMS is source of truth.
@@ -204,6 +207,35 @@ export function getMissingChecklistItems(
   if (!def) return [];
   const state = activity.billingChecklist ?? {};
   return def.requiredFields.filter((item) => state[item] !== true);
+}
+
+export function getBillingActivityBlockReasons(
+  activity: BillingActivity,
+): string[] {
+  const reasons: string[] = [];
+  const approvalBlockReason = getBillingApprovalBlockReason(activity);
+  if (approvalBlockReason) reasons.push(approvalBlockReason);
+
+  const missingChecklistItems = getMissingChecklistItems(activity);
+  if (missingChecklistItems.length > 0) {
+    reasons.push(
+      `Complete required billing fields: ${missingChecklistItems
+        .map((item) => BILLING_CHECKLIST_LABELS[item])
+        .join(", ")}`,
+    );
+  }
+
+  if (activity.recurringInstance?.requiresRecalc) {
+    reasons.push("Recalculate recurring BA count first");
+  }
+
+  return reasons;
+}
+
+export function isBillingActivityReadyForInvoice(
+  activity: BillingActivity,
+): boolean {
+  return getBillingActivityBlockReasons(activity).length === 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -659,7 +691,7 @@ export function updateBillingActivity(
 
 export function approveBillingActivities(ids: string[]): void {
   MOCK_BILLING_ACTIVITIES = MOCK_BILLING_ACTIVITIES.map((a) =>
-    ids.includes(a.id) && isBillingApprovalReady(a)
+    ids.includes(a.id) && isBillingActivityReadyForInvoice(a)
       ? { ...a, status: "approved" }
       : a,
   );
