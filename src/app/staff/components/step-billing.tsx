@@ -547,39 +547,60 @@ export function StepBilling({
             ))}
           </div>
 
-          {isBarVenue && (
-            <div className="space-y-1.5 pt-2 sm:max-w-[50%]">
-              <Label htmlFor="max-bar-spend" style={{ fontSize: "0.8125rem" }}>
-                Max bar spend ($)
+          <div className="grid gap-4 pt-2 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="travel" style={{ fontSize: "0.8125rem" }}>
+                Travel ($)
               </Label>
               <Input
-                id="max-bar-spend"
+                id="travel"
                 type="number"
                 min={0}
-                max={BAR_SPEND_CEILING}
-                value={billing.maxBarSpend}
-                onChange={(e) => {
-                  const raw = parseFloat(e.target.value) || 0;
-                  const capped = Math.min(
-                    Math.max(raw, 0),
-                    BAR_SPEND_CEILING,
-                  );
-                  patch("maxBarSpend", capped);
-                }}
+                value={billing.travel}
+                onChange={(e) =>
+                  patch("travel", Math.max(parseFloat(e.target.value) || 0, 0))
+                }
               />
               <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-                Budget ceiling only · ${BAR_SPEND_CEILING} platform max with
-                20% gratuity bundled. Actual bar spend is logged after the
-                activity from receipts — the 10% service fee and final invoice
-                line both recalculate from that figure, not from this estimate.
+                BA travel reimbursement (flat amount for quoting). Upstate
+                mileage × rate is logged post-activity from the BA mobile
+                check-in.
               </p>
-              {billing.maxBarSpend > BAR_SPEND_CEILING && (
-                <p style={{ fontSize: "0.6875rem", color: "#B91C1C" }}>
-                  Capped at the ${BAR_SPEND_CEILING} platform ceiling.
-                </p>
-              )}
             </div>
-          )}
+            {isBarVenue && (
+              <div className="space-y-1.5">
+                <Label htmlFor="max-bar-spend" style={{ fontSize: "0.8125rem" }}>
+                  Max bar spend ($)
+                </Label>
+                <Input
+                  id="max-bar-spend"
+                  type="number"
+                  min={0}
+                  max={BAR_SPEND_CEILING}
+                  value={billing.maxBarSpend}
+                  onChange={(e) => {
+                    const raw = parseFloat(e.target.value) || 0;
+                    const capped = Math.min(
+                      Math.max(raw, 0),
+                      BAR_SPEND_CEILING,
+                    );
+                    patch("maxBarSpend", capped);
+                  }}
+                />
+                <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                  Budget ceiling only · ${BAR_SPEND_CEILING} platform max with
+                  20% gratuity bundled. Actual bar spend is logged after the
+                  activity from receipts — the 10% service fee and final invoice
+                  line both recalculate from that figure, not from this estimate.
+                </p>
+                {billing.maxBarSpend > BAR_SPEND_CEILING && (
+                  <p style={{ fontSize: "0.6875rem", color: "#B91C1C" }}>
+                    Capped at the ${BAR_SPEND_CEILING} platform ceiling.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

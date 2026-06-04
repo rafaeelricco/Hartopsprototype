@@ -1308,24 +1308,29 @@ export function BillingWorkspacePage() {
             <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
               Each row must be resolved before it can be approved for billing.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                handleApprove(
-                  filtered
-                    .filter(
-                      (a) =>
-                        a.status === "missing" &&
-                        a.missingReason === "Awaiting approval",
-                    )
-                    .map((a) => a.id),
-                )
-              }
-            >
-              <CheckCircle2 size={14} className="mr-1.5" />
-              Bulk approve all
-            </Button>
+            {(() => {
+              const readyMissing = filtered.filter(
+                (a) =>
+                  a.status === "missing" && isBillingActivityReadyForInvoice(a),
+              );
+              return (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={readyMissing.length === 0}
+                  onClick={() => handleApprove(readyMissing.map((a) => a.id))}
+                  title={
+                    readyMissing.length === 0
+                      ? "No rows are currently ready — resolve blockers above first."
+                      : `Approve ${readyMissing.length} ready row${readyMissing.length === 1 ? "" : "s"}`
+                  }
+                >
+                  <CheckCircle2 size={14} className="mr-1.5" />
+                  Bulk approve ready (
+                  {readyMissing.length})
+                </Button>
+              );
+            })()}
           </div>
           <Card>
             <CardContent className="p-0">
@@ -1754,7 +1759,7 @@ export function BillingWorkspacePage() {
                         title="Approve this invoice for sending and push it to QuickBooks in a single confirmation step (brief 2026-06-02 §2 invoice approval gate)."
                       >
                         <Send size={13} className="mr-1.5" />
-                        Approve & Send to QuickBooks
+                        Approve &amp; Export for QuickBooks
                       </Button>
                       <Button
                         size="sm"

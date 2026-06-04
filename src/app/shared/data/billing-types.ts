@@ -423,8 +423,9 @@ export interface Invoice {
   activityIds: string[];
   // Invoice lifecycle (brief 2026-06-02 §2):
   //   draft               → generated, controller hasn't reviewed yet
-  //   approved-for-sending → controller signed off, ready to push to QB
-  //   exported            → pushed to QuickBooks (one-way push)
+  //   approved-for-sending → controller signed off, ready to export
+  //   exported            → QBXML written; controller imports into QuickBooks
+  //                         manually (one-way export only — no two-way sync)
   //   locked              → no further edits permitted
   status: "draft" | "approved-for-sending" | "exported" | "locked";
   // Stamped when controller marks "approved for sending". Audit trail for the
