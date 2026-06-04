@@ -332,6 +332,12 @@ export interface BillingActivity {
   // from activity state. Missing items appear in the Events Ready to Bill
   // dashboard.
   billingChecklist?: BillingChecklistState;
+  // Three independent status tracks (brief 2026-06-02 §2). Controller
+  // edits these directly on the row; defaults are derived from workflow
+  // state in the seed.
+  activityTrackStatus?: ActivityTrackStatus;
+  invoiceTrackStatus?: InvoiceTrackStatus;
+  paymentTrackStatus?: PaymentTrackStatus;
   // P2 #12 — Post-activity expense columns (Kayla's spreadsheet additions).
   // Stored here so they roll into the invoice and the next billing/payroll export.
   suppliesAmount?: number;
@@ -394,6 +400,7 @@ export interface CancellationAdjustment {
 // the deferred two-way QB sync (out-of-scope per the 2026-06-01 Chris call).
 export type InvoicePaymentStatus =
   | "open"
+  | "unpaid"
   | "partially-paid"
   | "paid"
   | "disputed";
@@ -403,10 +410,41 @@ export const INVOICE_PAYMENT_STATUSES: {
   label: string;
 }[] = [
   { value: "open", label: "Open" },
+  { value: "unpaid", label: "Unpaid" },
   { value: "partially-paid", label: "Partially paid" },
   { value: "paid", label: "Paid" },
   { value: "disputed", label: "Disputed" },
 ];
+
+// =============================================================================
+// Three independent status tracks (brief 2026-06-02 §2)
+// =============================================================================
+// Operator-editable status per row. Defaults are derived from workflow state
+// in the seed, but the controller can override directly on the row or in the
+// Edit modal — the tracks are independent by design.
+
+export type ActivityTrackStatus = "completed" | "not-completed";
+export const ACTIVITY_TRACK_STATUSES: {
+  value: ActivityTrackStatus;
+  label: string;
+}[] = [
+  { value: "completed", label: "Completed" },
+  { value: "not-completed", label: "Not completed" },
+];
+
+export type InvoiceTrackStatus = "ready" | "not-ready";
+export const INVOICE_TRACK_STATUSES: {
+  value: InvoiceTrackStatus;
+  label: string;
+}[] = [
+  { value: "ready", label: "Ready" },
+  { value: "not-ready", label: "Not ready" },
+];
+
+// Re-export `InvoicePaymentStatus` as the canonical payment-track type so the
+// three tracks reference one taxonomy and the dropdown / chip code can share
+// a single value set per track.
+export type PaymentTrackStatus = InvoicePaymentStatus;
 
 export interface Invoice {
   id: string;

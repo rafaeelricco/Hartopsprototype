@@ -303,6 +303,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       photos: false,
       "bar-spend": false,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "not-ready",
+    paymentTrackStatus: "open",
   },
 
   // 2. Cancelled event — awaiting Set Partial Bill.
@@ -343,6 +346,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       partialSupplierAmount: 0,
       bookerNotified: false,
     },
+    activityTrackStatus: "not-completed",
+    invoiceTrackStatus: "not-ready",
+    paymentTrackStatus: "open",
   },
 
   // 3. Recurring event with brandAmbassador-count regression.
@@ -397,6 +403,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       currentBrandAmbassadorCount: 3,
       requiresRecalc: true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "not-ready",
+    paymentTrackStatus: "open",
   },
 
   // 4. Cross-entity invoice group: Hart Agency activity at Dead Rabbit (above)
@@ -438,6 +447,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       photos: true,
       "supplier-approval": true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 
   // 5. Upstate NY entity row.
@@ -488,6 +500,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       "bar-spend": true,
       travel: true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 
   // 6. Non-event activity — Survey stub. Proves the activity-as-billable
@@ -523,6 +538,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingChecklist: {
       recap: true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 
   // 7. Missing → ready row. Demonstrates Bulk Approve Ready on the Ready
@@ -563,6 +581,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       photos: true,
       "supplier-approval": true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
   {
     id: "act-bill-008",
@@ -597,6 +618,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       photos: true,
       "supplier-approval": true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 ];
 

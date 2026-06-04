@@ -74,10 +74,15 @@ import type {
   CancellationAdjustment,
   GeneratedReport,
   Invoice,
-  ServiceFeeKind,
   SlaReportRow,
+  ActivityTrackStatus,
+  InvoiceTrackStatus,
 } from "@/app/shared/data/billing-types";
-import { BILLING_CHECKLIST_LABELS } from "@/app/shared/data/billing-types";
+import {
+  BILLING_CHECKLIST_LABELS,
+  ACTIVITY_TRACK_STATUSES,
+  INVOICE_TRACK_STATUSES,
+} from "@/app/shared/data/billing-types";
 import {
   MOCK_BILLING_ACTIVITIES,
   MOCK_INVOICES,
@@ -124,10 +129,6 @@ function fmt(n: number): string {
   });
 }
 
-function feeLabel(kind: ServiceFeeKind): string {
-  return `${(SERVICE_FEE_BY_KIND[kind] * 100).toFixed(0)}% (${kind})`;
-}
-
 function statusBadge(
   status: BillingActivity["status"],
 ): { bg: string; fg: string; label: string } {
@@ -155,6 +156,7 @@ function PaymentStatusBadge({
     { bg: string; fg: string; label: string }
   > = {
     open: { bg: "#FFFBEB", fg: "#92400E", label: "Open" },
+    unpaid: { bg: "#FEF2F2", fg: "#B91C1C", label: "Unpaid" },
     "partially-paid": {
       bg: "#EFF6FF",
       fg: "#1D4ED8",
@@ -180,115 +182,119 @@ function PaymentStatusBadge({
 }
 
 // ---------------------------------------------------------------------------
-// Three-status chip group (brief 2026-06-02 §2) — activity · invoice · payment.
-// Renders the three independent tracks for one billing row so the controller
-// can see at a glance where the activity sits across the full lifecycle.
+// Status track pickers (brief 2026-06-02 §2). Inline editable dropdowns on
+// each Update Billing row — the controller can override the three tracks
+// independently. Defaults come from the seed; edits mutate the activity
+// directly via updateBillingActivity.
 // ---------------------------------------------------------------------------
 
-interface ThreeStatusTracksProps {
-  activity: BillingActivity;
-  invoice?: Invoice | undefined; // matching invoice if one has been generated
-}
-
-function ThreeStatusTracks({ activity, invoice }: ThreeStatusTracksProps) {
-  // Activity track: rolled up to a binary (completed if it's in the billing
-  // queue at all; otherwise we wouldn't see it here).
-  const activityTrack: { label: string; bg: string; fg: string } =
-    activity.status === "missing" && activity.missingReason
-      ? { label: "Completed · awaiting bill", bg: "#FFFBEB", fg: "#92400E" }
-      : { label: "Completed", bg: "#ECFDF5", fg: "#0F766E" };
-
-  // Invoice track: not-yet (no invoice or activity status === missing),
-  // ready (ready-to-bill/approved), draft/approved-for-sending/exported/locked
-  // from the actual Invoice row.
-  let invoiceTrack: { label: string; bg: string; fg: string };
-  if (!invoice) {
-    if (activity.status === "missing") {
-      invoiceTrack = { label: "Not ready", bg: "#FEF2F2", fg: "#B91C1C" };
-    } else if (activity.status === "ready-to-bill") {
-      invoiceTrack = { label: "Ready", bg: "#FFFBEB", fg: "#92400E" };
-    } else if (activity.status === "approved") {
-      invoiceTrack = { label: "Approved", bg: "#ECFDF5", fg: "#0F766E" };
-    } else {
-      invoiceTrack = { label: "Not yet", bg: "#F1F5F9", fg: "#475569" };
-    }
-  } else {
-    switch (invoice.status) {
-      case "draft":
-        invoiceTrack = { label: "Drafted", bg: "#FFFBEB", fg: "#92400E" };
-        break;
-      case "approved-for-sending":
-        invoiceTrack = {
-          label: "Approved to send",
-          bg: "#ECFDF5",
-          fg: "#0F766E",
-        };
-        break;
-      case "exported":
-        invoiceTrack = { label: "Exported", bg: "#EFF6FF", fg: "#1D4ED8" };
-        break;
-      case "locked":
-        invoiceTrack = { label: "Locked", bg: "#F1F5F9", fg: "#475569" };
-        break;
-    }
-  }
-
-  // Payment track: only meaningful once an invoice exists.
-  let paymentTrack: { label: string; bg: string; fg: string };
-  if (!invoice) {
-    paymentTrack = { label: "—", bg: "#F8FAFC", fg: "#94A3B8" };
-  } else {
-    const map: Record<
-      InvoicePaymentStatus,
-      { label: string; bg: string; fg: string }
-    > = {
-      open: { label: "Open", bg: "#FFFBEB", fg: "#92400E" },
-      "partially-paid": {
-        label: "Partial",
-        bg: "#EFF6FF",
-        fg: "#1D4ED8",
-      },
-      paid: { label: "Paid", bg: "#ECFDF5", fg: "#0F766E" },
-      disputed: { label: "Disputed", bg: "#FEF2F2", fg: "#B91C1C" },
-    };
-    paymentTrack = map[invoice.paymentStatus];
-  }
-
+function TrackPickerShell({
+  value,
+  options,
+  toneFor,
+  onChange,
+}: {
+  value: string;
+  options: { value: string; label: string }[];
+  toneFor: (v: string) => { bg: string; fg: string };
+  onChange: (next: string) => void;
+}) {
+  const tone = toneFor(value);
   return (
-    <div className="inline-flex items-center gap-1 flex-wrap">
-      <TrackChip prefix="A" {...activityTrack} />
-      <TrackChip prefix="I" {...invoiceTrack} />
-      <TrackChip prefix="P" {...paymentTrack} />
-    </div>
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded-md border h-7 px-2 cursor-pointer"
+      style={{
+        fontSize: "0.6875rem",
+        background: tone.bg,
+        color: tone.fg,
+        borderColor: tone.fg + "33",
+        fontWeight: 500,
+        minWidth: 120,
+      }}
+    >
+      {options.map((o) => (
+        <option
+          key={o.value}
+          value={o.value}
+          style={{ background: "white", color: "#0F172A" }}
+        >
+          {o.label}
+        </option>
+      ))}
+    </select>
   );
 }
 
-function TrackChip({
-  prefix,
-  label,
-  bg,
-  fg,
-}: {
-  prefix: string;
-  label: string;
-  bg: string;
-  fg: string;
-}) {
+function ActivityTrackPicker({ activity }: { activity: BillingActivity }) {
+  const value: ActivityTrackStatus =
+    activity.activityTrackStatus ??
+    (activity.status === "missing" ? "not-completed" : "completed");
   return (
-    <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded"
-      style={{
-        fontSize: "0.625rem",
-        background: bg,
-        color: fg,
-        fontWeight: 500,
-        letterSpacing: "0.01em",
+    <TrackPickerShell
+      value={value}
+      options={ACTIVITY_TRACK_STATUSES}
+      toneFor={(v) =>
+        v === "completed"
+          ? { bg: "#ECFDF5", fg: "#0F766E" }
+          : { bg: "#FFFBEB", fg: "#92400E" }
+      }
+      onChange={(next) => {
+        updateBillingActivity(activity.id, {
+          activityTrackStatus: next as ActivityTrackStatus,
+        });
       }}
-      title={`${prefix === "A" ? "Activity" : prefix === "I" ? "Invoice" : "Payment"} status`}
-    >
-      <span style={{ opacity: 0.7 }}>{prefix}</span>
-      {label}
-    </span>
+    />
+  );
+}
+
+function InvoiceTrackPicker({ activity }: { activity: BillingActivity }) {
+  const value: InvoiceTrackStatus =
+    activity.invoiceTrackStatus ??
+    (activity.status === "missing" ? "not-ready" : "ready");
+  return (
+    <TrackPickerShell
+      value={value}
+      options={INVOICE_TRACK_STATUSES}
+      toneFor={(v) =>
+        v === "ready"
+          ? { bg: "#ECFDF5", fg: "#0F766E" }
+          : { bg: "#FEF2F2", fg: "#B91C1C" }
+      }
+      onChange={(next) => {
+        updateBillingActivity(activity.id, {
+          invoiceTrackStatus: next as InvoiceTrackStatus,
+        });
+      }}
+    />
+  );
+}
+
+function PaymentTrackPicker({ activity }: { activity: BillingActivity }) {
+  const value: InvoicePaymentStatus =
+    activity.paymentTrackStatus ?? "open";
+  const toneByPayment: Record<
+    InvoicePaymentStatus,
+    { bg: string; fg: string }
+  > = {
+    open: { bg: "#FFFBEB", fg: "#92400E" },
+    unpaid: { bg: "#FEF2F2", fg: "#B91C1C" },
+    "partially-paid": { bg: "#EFF6FF", fg: "#1D4ED8" },
+    paid: { bg: "#ECFDF5", fg: "#0F766E" },
+    disputed: { bg: "#FEF2F2", fg: "#B91C1C" },
+  };
+  return (
+    <TrackPickerShell
+      value={value}
+      options={INVOICE_PAYMENT_STATUSES}
+      toneFor={(v) => toneByPayment[v as InvoicePaymentStatus]}
+      onChange={(next) => {
+        updateBillingActivity(activity.id, {
+          paymentTrackStatus: next as InvoicePaymentStatus,
+        });
+      }}
+    />
   );
 }
 
@@ -1164,7 +1170,7 @@ export function BillingWorkspacePage() {
   ]);
 
   return (
-    <div className="p-6 space-y-6 font-[Inter]">
+    <div className="p-6 space-y-6 font-[Inter] w-full min-w-0 max-w-full overflow-x-hidden">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -1333,7 +1339,7 @@ export function BillingWorkspacePage() {
             })()}
           </div>
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="p-0 overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1490,7 +1496,6 @@ export function BillingWorkspacePage() {
             activities={filtered.filter(
               (a) => a.status !== "missing" && a.status !== "billing-locked",
             )}
-            invoices={invoices}
             onApprove={handleApprove}
             onEdit={(a) => setEditActivityFor(a)}
           />
@@ -1951,7 +1956,7 @@ export function BillingWorkspacePage() {
             </Select>
           </div>
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="p-0 overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -2337,21 +2342,13 @@ export function BillingWorkspacePage() {
 
 function UpdateBillingTab({
   activities,
-  invoices,
   onApprove,
   onEdit,
 }: {
   activities: BillingActivity[];
-  invoices: Invoice[];
   onApprove: (ids: string[]) => void;
   onEdit: (activity: BillingActivity) => void;
 }) {
-  // For the three-status chip group: look up the invoice that contains this
-  // activity (if one has been generated).
-  const invoiceByActivityId = new Map<string, Invoice>();
-  invoices.forEach((inv) => {
-    inv.activityIds.forEach((id) => invoiceByActivityId.set(id, inv));
-  });
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function toggle(id: string) {
@@ -2412,26 +2409,31 @@ function UpdateBillingTab({
                 <TableHead>Campaign</TableHead>
                 <TableHead>Billing code</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
                 <TableHead>Account</TableHead>
                 <TableHead>Billed To</TableHead>
-                <TableHead>Service fee</TableHead>
-                <TableHead className="text-right">Activity $</TableHead>
-                <TableHead className="text-right">BA $</TableHead>
-                <TableHead className="text-right">Travel</TableHead>
                 <TableHead className="text-right">Invoice total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Activity</TableHead>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Payment</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {activities.map((a) => {
-                const badge = statusBadge(a.status);
                 const approvalBlockReason =
                   getBillingActivityBlockReasons(a)[0];
                 return (
-                  <TableRow key={a.id}>
-                    <TableCell>
+                  <TableRow
+                    key={a.id}
+                    onClick={(e) => {
+                      // Don't open the modal when interacting with row
+                      // controls (checkbox, status dropdowns).
+                      const target = e.target as HTMLElement;
+                      if (target.closest("[data-row-control]")) return;
+                      onEdit(a);
+                    }}
+                    className="cursor-pointer hover:bg-slate-50"
+                  >
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selected.has(a.id)}
                         onCheckedChange={() => toggle(a.id)}
@@ -2442,6 +2444,14 @@ function UpdateBillingTab({
                     </TableCell>
                     <TableCell className="max-w-[220px] truncate">
                       {a.name}
+                      {approvalBlockReason && (
+                        <div
+                          className="mt-0.5"
+                          style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+                        >
+                          {approvalBlockReason}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <CampaignTag
@@ -2460,11 +2470,6 @@ function UpdateBillingTab({
                       {a.billingCode ?? "—"}
                     </TableCell>
                     <TableCell>{a.date}</TableCell>
-                    <TableCell
-                      style={{ fontSize: "0.75rem", color: "#64748B" }}
-                    >
-                      {a.type}
-                    </TableCell>
                     <TableCell className="max-w-[180px] truncate">
                       {a.accountName}
                     </TableCell>
@@ -2474,58 +2479,17 @@ function UpdateBillingTab({
                     >
                       {a.billedTo}
                     </TableCell>
-                    <TableCell
-                      style={{ fontSize: "0.75rem", color: "#64748B" }}
-                    >
-                      {feeLabel(a.serviceFeeKind)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.eventAmount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.ambassadorAmount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.travel)}
-                    </TableCell>
                     <TableCell className="text-right font-medium">
                       {fmt(a.expectedAmount)}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md w-fit"
-                          style={{
-                            fontSize: "0.6875rem",
-                            background: badge.bg,
-                            color: badge.fg,
-                          }}
-                        >
-                          {badge.label}
-                        </span>
-                        <ThreeStatusTracks
-                          activity={a}
-                          invoice={invoiceByActivityId.get(a.id)}
-                        />
-                        {approvalBlockReason && (
-                          <div
-                            style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
-                          >
-                            {approvalBlockReason}
-                          </div>
-                        )}
-                      </div>
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
+                      <ActivityTrackPicker activity={a} />
                     </TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onEdit(a)}
-                        title="Edit billing details before approving"
-                      >
-                        <Pencil size={13} className="mr-1" />
-                        Edit
-                      </Button>
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
+                      <InvoiceTrackPicker activity={a} />
+                    </TableCell>
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
+                      <PaymentTrackPicker activity={a} />
                     </TableCell>
                   </TableRow>
                 );
@@ -2533,7 +2497,7 @@ function UpdateBillingTab({
               {activities.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={15}
+                    colSpan={11}
                     className="text-center py-8"
                     style={{ color: "#94A3B8" }}
                   >
