@@ -169,10 +169,14 @@ export function StepBilling({
     ? eventAmount + maxBarSpendCapped + maxGratuity
     : eventAmount;
 
+  // Travel × BA count (brief 2026-06-04 follow-up): travel is captured per
+  // brand ambassador; the invoice line multiplies by the assigned BA count.
+  const travelTotal = billing.travel * Math.max(1, billing.bas.length);
+
   const total =
     eventAmount +
     serviceFeeAmount +
-    billing.travel +
+    travelTotal +
     (isBarVenue ? maxBarSpendCapped + maxGratuity : 0);
 
   function patch<K extends keyof BillingStepData>(
@@ -550,7 +554,7 @@ export function StepBilling({
           <div className="grid gap-4 pt-2 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="travel" style={{ fontSize: "0.8125rem" }}>
-                Travel ($)
+                Travel per BA ($)
               </Label>
               <Input
                 id="travel"
@@ -562,9 +566,9 @@ export function StepBilling({
                 }
               />
               <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
-                BA travel reimbursement (flat amount for quoting). Upstate
-                mileage × rate is logged post-activity from the BA mobile
-                check-in.
+                Per brand ambassador. Invoice line multiplies by the assigned
+                BA count. Upstate mileage × rate is logged post-activity from
+                the BA mobile check-in.
               </p>
             </div>
             {isBarVenue && (
@@ -725,8 +729,12 @@ export function StepBilling({
           </div>
           {billing.travel > 0 && (
             <div className="flex items-center justify-between">
-              <span style={{ color: "#64748B" }}>Travel</span>
-              <span style={{ color: "#0F172A" }}>{fmtMoney(billing.travel)}</span>
+              <span style={{ color: "#64748B" }}>
+                Travel · {fmtMoney(billing.travel)} ×{" "}
+                {Math.max(1, billing.bas.length)} BA
+                {billing.bas.length === 1 ? "" : "s"}
+              </span>
+              <span style={{ color: "#0F172A" }}>{fmtMoney(travelTotal)}</span>
             </div>
           )}
           {isBarVenue && maxBarSpendCapped > 0 && (

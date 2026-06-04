@@ -957,8 +957,11 @@ export function BillingWorkspacePage() {
       (existing.suppliesAmount ?? 0) +
       (existing.promotionPublicityAmount ?? 0) +
       (existing.travelEntertainmentAmount ?? 0);
+    // Travel × BA count (Joe 2026-06-04).
+    const travelTotal =
+      travel * Math.max(1, existing.brandAmbassadorCount ?? 1);
     const expected =
-      eventAmount + fee + travel + barSpend + gratuity + expenseTotals;
+      eventAmount + fee + travelTotal + barSpend + gratuity + expenseTotals;
     updateBillingActivity(id, {
       eventAmount,
       travel,
@@ -1170,7 +1173,7 @@ export function BillingWorkspacePage() {
   ]);
 
   return (
-    <div className="p-6 space-y-6 font-[Inter] w-full min-w-0 max-w-full overflow-x-hidden">
+    <div className="p-6 space-y-6 font-[Inter] min-w-0">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>

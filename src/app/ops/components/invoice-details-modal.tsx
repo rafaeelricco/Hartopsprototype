@@ -134,7 +134,14 @@ export function InvoiceDetailsModal({
                 <TableHead>Date</TableHead>
                 <TableHead>Account</TableHead>
                 <TableHead className="text-right">Activity $</TableHead>
-                <TableHead className="text-right">Travel</TableHead>
+                <TableHead className="text-right">
+                  Travel
+                  <div
+                    style={{ fontSize: "0.625rem", color: "#94A3B8" }}
+                  >
+                    per-BA × count
+                  </div>
+                </TableHead>
                 <TableHead className="text-right">Line total</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -196,7 +203,21 @@ export function InvoiceDetailsModal({
                           }
                         />
                       ) : (
-                        fmt(a.travel)
+                        <div>
+                          <div>
+                            {fmt(a.travel * Math.max(1, a.brandAmbassadorCount))}
+                          </div>
+                          {a.brandAmbassadorCount > 1 && (
+                            <div
+                              style={{
+                                fontSize: "0.625rem",
+                                color: "#94A3B8",
+                              }}
+                            >
+                              {fmt(a.travel)} × {a.brandAmbassadorCount}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </TableCell>
                     <TableCell className="text-right font-medium">

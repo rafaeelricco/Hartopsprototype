@@ -344,7 +344,7 @@ export function PayrollWorkspacePage() {
 
   return (
     <TooltipProvider>
-      <div className="p-6 space-y-6 font-[Inter]">
+      <div className="p-6 space-y-6 font-[Inter] min-w-0">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>

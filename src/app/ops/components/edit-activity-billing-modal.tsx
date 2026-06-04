@@ -155,7 +155,11 @@ export function EditActivityBillingModal({
     draft.billingCode !== "" && !campaignCodes.includes(draft.billingCode);
 
   const eventAmt = parseFloat(draft.eventAmount) || 0;
-  const travelAmt = parseFloat(draft.travel) || 0;
+  // Travel is per-BA (Joe 2026-06-04). Invoice line multiplies by the
+  // assigned brand-ambassador count.
+  const travelPerBa = parseFloat(draft.travel) || 0;
+  const baCount = Math.max(1, activity.brandAmbassadorCount ?? 1);
+  const travelTotal = travelPerBa * baCount;
   const barSpendAmt = parseFloat(draft.barSpend) || 0;
   const cappedBarSpend = Math.min(Math.max(barSpendAmt, 0), BAR_SPEND_CEILING);
   const computedGratuity = isBar
@@ -176,7 +180,7 @@ export function EditActivityBillingModal({
   const previewTotal =
     eventAmt +
     serviceFee +
-    travelAmt +
+    travelTotal +
     cappedBarSpend +
     computedGratuity +
     supplies +
@@ -204,7 +208,7 @@ export function EditActivityBillingModal({
     if (eventAmt !== activity.eventAmount) out.eventAmount = eventAmt;
     const ambAmt = parseFloat(draft!.ambassadorAmount) || 0;
     if (ambAmt !== activity.ambassadorAmount) out.ambassadorAmount = ambAmt;
-    if (travelAmt !== activity.travel) out.travel = travelAmt;
+    if (travelPerBa !== activity.travel) out.travel = travelPerBa;
     if (isBar) {
       out.barSpend = cappedBarSpend;
       out.maxBarSpend = parseFloat(draft!.maxBarSpend) || 0;
@@ -424,13 +428,17 @@ export function EditActivityBillingModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="eb-travel">Travel</Label>
+                <Label htmlFor="eb-travel">Travel per BA</Label>
                 <Input
                   id="eb-travel"
                   type="number"
                   value={draft.travel}
                   onChange={(e) => patch({ travel: e.target.value })}
                 />
+                <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                  Invoice line = {fmt(travelPerBa)} × {baCount} BA
+                  {baCount === 1 ? "" : "s"} = <strong>{fmt(travelTotal)}</strong>
+                </p>
               </div>
               <div className="space-y-1.5">
                 <Label>Service fee ({(feeRate * 100).toFixed(0)}%)</Label>

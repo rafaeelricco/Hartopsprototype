@@ -373,11 +373,12 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     serviceFeeKind: "bar",
     eventAmount: 720,
     ambassadorAmount: 480,
+    // Travel is per-BA (Joe 2026-06-04). $60 × 3 BAs = $180 on invoice.
     travel: 60,
     barSpend: 250,
     maxBarSpend: 500,
     gratuity: 50, // 20% × $250 bar spend
-    expectedAmount: 720 + 25 + 60 + 250 + 50, // event + 10% × barSpend + travel + barSpend + grat
+    expectedAmount: 720 + 25 + 180 + 250 + 50, // event + 10% × barSpend + (travel × 3 BAs) + barSpend + grat
     status: "missing",
     missingReason: "Recurring — brand ambassador count changed",
     slaEligible: true,

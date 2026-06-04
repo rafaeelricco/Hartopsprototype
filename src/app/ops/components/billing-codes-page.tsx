@@ -169,7 +169,7 @@ export function BillingCodesPage() {
   }
 
   return (
-    <div className="p-6 space-y-5 font-[Inter]">
+    <div className="p-6 space-y-5 font-[Inter] min-w-0">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1

@@ -41,6 +41,16 @@ export const BAR_SPEND_GRATUITY_RATE = 0.2;
 // default; configurable per BA / territory in production.
 export const DEFAULT_MILEAGE_RATE = 0.67; // $/mi
 
+// Travel semantics (Joe 2026-06-04): travel is captured as a per-BA amount.
+// The invoice line and totals multiply by the brand-ambassador count, so a
+// $45 travel input across 3 BAs becomes $135 on the bill.
+export function travelInvoiceTotal(opts: {
+  travel: number;
+  brandAmbassadorCount: number;
+}): number {
+  return (opts.travel ?? 0) * Math.max(1, opts.brandAmbassadorCount ?? 0);
+}
+
 // Standard hours per channel (brief 2026-06-02 §2). Used to convert
 // shift-based pay to hourly. Editable in Settings when the surface grows,
 // but locked in code for the prototype.
