@@ -40,6 +40,46 @@ export const BAR_SPEND_GRATUITY_RATE = 0.2;
 // calc that adds to BA payroll. IRS 2026 standard mileage rate seeded as
 // default; configurable per BA / territory in production.
 export const DEFAULT_MILEAGE_RATE = 0.67; // $/mi
+
+// Travel semantics (Joe 2026-06-04): travel is captured as a per-BA amount.
+// The invoice line and totals multiply by the brand-ambassador count, so a
+// $45 travel input across 3 BAs becomes $135 on the bill.
+export function travelInvoiceTotal(opts: {
+  travel: number;
+  brandAmbassadorCount: number;
+}): number {
+  return (opts.travel ?? 0) * Math.max(1, opts.brandAmbassadorCount ?? 0);
+}
+
+// Standard hours per channel (brief 2026-06-02 §2). Used to convert
+// shift-based pay to hourly. Editable in Settings when the surface grows,
+// but locked in code for the prototype.
+export type ActivityChannel = "upstate" | "metro-on-premise" | "off-premise";
+
+export const STANDARD_HOURS_BY_CHANNEL: Record<ActivityChannel, number> = {
+  upstate: 2,
+  "metro-on-premise": 2.5,
+  "off-premise": 3,
+};
+
+export const ACTIVITY_CHANNEL_LABELS: Record<ActivityChannel, string> = {
+  upstate: "Upstate",
+  "metro-on-premise": "Metro on-premise",
+  "off-premise": "Off-premise",
+};
+
+// Derive an activity channel from its category + region. Used as the
+// auto-fill key on the edit-rate modal.
+export function inferActivityChannel(opts: {
+  category?: string;
+  region?: string;
+}): ActivityChannel {
+  const cat = (opts.category ?? "").toLowerCase();
+  const region = (opts.region ?? "").toLowerCase();
+  if (region.includes("upstate") || region.includes("albany")) return "upstate";
+  if (cat.startsWith("off-")) return "off-premise";
+  return "metro-on-premise";
+}
 export interface TravelComponent {
   miles: number;
   ratePerMile: number; // $/mi
@@ -55,6 +95,7 @@ export type OverrideReason =
   | "Extended Event"
   | "Travel"
   | "Special Skill"
+  | "Location Premium"
   | "Cancellation Rate"
   | "Other";
 
@@ -62,9 +103,36 @@ export const OVERRIDE_REASONS: OverrideReason[] = [
   "Extended Event",
   "Travel",
   "Special Skill",
+  "Location Premium",
   "Cancellation Rate",
   "Other",
 ];
+
+// Location-premium tier pattern (brief 2026-06-02 §2). Hamptons / Fire Island
+// $50/hr for first 3 hours, $32/hr after. Modelled as a per-event override
+// pattern the operator can apply; the tiered amount is computed and stored
+// in `final_pay` (no new schema). Surfaced as a helper in the edit-rate
+// modal and on the payroll line so the operator can sanity-check the math.
+export interface LocationPremiumTier {
+  highRate: number;          // $/hr for tier-1 hours
+  highRateHours: number;     // tier-1 cap
+  standardRate: number;      // $/hr after tier-1 cap
+}
+
+export const HAMPTONS_PREMIUM: LocationPremiumTier = {
+  highRate: 50,
+  highRateHours: 3,
+  standardRate: 32,
+};
+
+export function computeLocationPremiumPay(
+  hours: number,
+  tier: LocationPremiumTier,
+): number {
+  const tier1 = Math.min(hours, tier.highRateHours) * tier.highRate;
+  const tier2 = Math.max(0, hours - tier.highRateHours) * tier.standardRate;
+  return tier1 + tier2;
+}
 
 // Activity types that flow through billing/payroll. R2 supports Event today;
 // Survey is included as a seed/stub to prove the activity-as-billable
@@ -136,6 +204,74 @@ export interface LiquorLicence {
 }
 
 // =============================================================================
+// Billing-code eligibility checklist (brief 2026-06-02 §2)
+// =============================================================================
+//
+// Each billing code carries a required-fields config. Before an invoice can
+// generate for an activity, the corresponding fields must be complete on
+// that activity. The "Events Ready to Bill" dashboard surfaces missing
+// requirements grouped by billing code.
+//
+// Codes are created and edited in HEMS — see the Billing Code Management
+// page. Power Automate consumes the resulting taggable artefacts; bundling
+// logic lives outside Ambar's stack.
+
+export type BillingChecklistItem =
+  | "recap"           // event recap submitted by manager
+  | "photos"          // BA mobile uploaded photo evidence
+  | "bar-spend"       // bar-spend receipt + total captured (SLA flow)
+  | "travel"          // travel expenses logged where applicable
+  | "supplier-approval"; // supplier sign-off (if the billing code requires it)
+
+export const BILLING_CHECKLIST_LABELS: Record<BillingChecklistItem, string> = {
+  recap: "Recap",
+  photos: "Photos",
+  "bar-spend": "Bar spend",
+  travel: "Travel",
+  "supplier-approval": "Supplier approval",
+};
+
+// Billing-code definition. Lives in the Billing Code Management page in HEMS;
+// modelled here in-memory for the prototype.
+export interface BillingCodeDefinition {
+  code: string;            // unique identifier (string key)
+  description?: string;    // human-readable label
+  campaignId?: string;     // optional: pin the code to a campaign
+  requiredFields: BillingChecklistItem[];
+  active: boolean;         // toggle to retire a code without deleting
+  createdAt: string;       // ISO
+  createdBy?: string;
+}
+
+// Per-activity completion booleans. Derived where possible from existing
+// activity state (e.g. `bar-spend` is true when `barSpend > 0`); manager
+// can override the derived value to acknowledge an exception.
+export type BillingChecklistState = Partial<Record<BillingChecklistItem, boolean>>;
+
+// =============================================================================
+// Supplier contacts (brief 2026-06-02 §2)
+// =============================================================================
+// Each supplier carries a delivery recipient + CC template that survives
+// staff changes. Used when sending invoices, SLA reports, and receipt
+// bundles to suppliers via Power Automate / SharePoint / email.
+
+export interface SupplierRecipient {
+  name: string;
+  email: string;
+  role?: string;
+}
+
+export interface SupplierContact {
+  id: string;
+  supplierName: string; // canonical key — e.g. "Pernod Ricard"
+  primaryRecipient: SupplierRecipient;
+  ccRecipients: SupplierRecipient[];
+  notes?: string;
+  active: boolean;
+  createdAt: string;
+}
+
+// =============================================================================
 // Billing workspace (mm-ui-012)
 // =============================================================================
 
@@ -201,6 +337,17 @@ export interface BillingActivity {
   receiptUrl?: string;
   clarifyingNotes?: string;
   approvingManager?: string; // explicit name captured at bill approval
+  // Billing eligibility checklist (brief 2026-06-02 §2). Items required by
+  // the activity's billing code; each can be ticked manually or derived
+  // from activity state. Missing items appear in the Events Ready to Bill
+  // dashboard.
+  billingChecklist?: BillingChecklistState;
+  // Three independent status tracks (brief 2026-06-02 §2). Controller
+  // edits these directly on the row; defaults are derived from workflow
+  // state in the seed.
+  activityTrackStatus?: ActivityTrackStatus;
+  invoiceTrackStatus?: InvoiceTrackStatus;
+  paymentTrackStatus?: PaymentTrackStatus;
   // P2 #12 — Post-activity expense columns (Kayla's spreadsheet additions).
   // Stored here so they roll into the invoice and the next billing/payroll export.
   suppliesAmount?: number;
@@ -258,22 +405,56 @@ export interface CancellationAdjustment {
   bookerNotified: boolean;
 }
 
-// Payment status — Ivie's ask at 00:25:32 for visibility on money-in.
+// Payment / AR status — Ivie's ask at 00:25:32 for visibility on money-in.
+// Brief 2026-06-02: simple AR statuses only — full aging dashboard depends on
+// the deferred two-way QB sync (out-of-scope per the 2026-06-01 Chris call).
 export type InvoicePaymentStatus =
   | "open"
+  | "unpaid"
   | "partially-paid"
   | "paid"
-  | "overdue";
+  | "disputed";
 
 export const INVOICE_PAYMENT_STATUSES: {
   value: InvoicePaymentStatus;
   label: string;
 }[] = [
   { value: "open", label: "Open" },
+  { value: "unpaid", label: "Unpaid" },
   { value: "partially-paid", label: "Partially paid" },
   { value: "paid", label: "Paid" },
-  { value: "overdue", label: "Overdue" },
+  { value: "disputed", label: "Disputed" },
 ];
+
+// =============================================================================
+// Three independent status tracks (brief 2026-06-02 §2)
+// =============================================================================
+// Operator-editable status per row. Defaults are derived from workflow state
+// in the seed, but the controller can override directly on the row or in the
+// Edit modal — the tracks are independent by design.
+
+export type ActivityTrackStatus = "completed" | "not-completed";
+export const ACTIVITY_TRACK_STATUSES: {
+  value: ActivityTrackStatus;
+  label: string;
+}[] = [
+  { value: "completed", label: "Completed" },
+  { value: "not-completed", label: "Not completed" },
+];
+
+export type InvoiceTrackStatus = "ready" | "not-ready";
+export const INVOICE_TRACK_STATUSES: {
+  value: InvoiceTrackStatus;
+  label: string;
+}[] = [
+  { value: "ready", label: "Ready" },
+  { value: "not-ready", label: "Not ready" },
+];
+
+// Re-export `InvoicePaymentStatus` as the canonical payment-track type so the
+// three tracks reference one taxonomy and the dropdown / chip code can share
+// a single value set per track.
+export type PaymentTrackStatus = InvoicePaymentStatus;
 
 export interface Invoice {
   id: string;
@@ -288,7 +469,17 @@ export interface Invoice {
   generatedAt: string; // ISO
   total: number;
   activityIds: string[];
-  status: "draft" | "exported" | "locked";
+  // Invoice lifecycle (brief 2026-06-02 §2):
+  //   draft               → generated, controller hasn't reviewed yet
+  //   approved-for-sending → controller signed off, ready to export
+  //   exported            → QBXML written; controller imports into QuickBooks
+  //                         manually (one-way export only — no two-way sync)
+  //   locked              → no further edits permitted
+  status: "draft" | "approved-for-sending" | "exported" | "locked";
+  // Stamped when controller marks "approved for sending". Audit trail for the
+  // new invoice approval gate.
+  approvedForSendingAt?: string; // ISO
+  approvedForSendingBy?: string; // operator name
   qbSyncedAt?: string;
   sharepointSentAt?: string;
   // Payment tracking (Ivie's expanded-tracking ask, May-26).
@@ -322,6 +513,29 @@ export interface SlaReportRow {
   receiptUrl?: string; // attached screenshot
   clarifyingNotes?: string; // free text for problem accounts / receipts
   approvingManager?: string; // captured at bill approval
+}
+
+// =============================================================================
+// Payroll adjustments (brief 2026-06-02 §2)
+// =============================================================================
+// Prior-period corrections processed in the next batch. A correction posts
+// into HEMS as an "ADP pay" line on the individual's pay record — modelled
+// here as a separate adjustment row that gets applied to a payroll cycle.
+
+export type PayrollAdjustmentStatus = "pending" | "applied" | "voided";
+
+export interface PayrollAdjustment {
+  id: string;
+  brandAmbassadorId: string;
+  brandAmbassadorName: string;
+  amount: number;          // signed; positive = pay correction owed, negative = recovery
+  reason: string;
+  priorCycleId?: string;   // which prior cycle the correction reconciles
+  status: PayrollAdjustmentStatus;
+  createdAt: string;       // ISO
+  createdBy: string;       // operator
+  appliedToCycleId?: string; // populated when status becomes "applied"
+  appliedAt?: string;        // ISO
 }
 
 // =============================================================================

@@ -259,6 +259,56 @@ export function CompensationPanel({
         </div>
       </div>
 
+      {/* Rate-management reference (brief 2026-06-02 §2). Standard hours
+          per channel for shift→hourly conversion + the Hamptons location-
+          premium tier. Read-only reference; non-standard rates flow through
+          the per-event override mechanism. */}
+      <div
+        className="rounded-md border p-3 space-y-2"
+        style={{ borderColor: "#E2E8F0", background: "#F8FAFC" }}
+      >
+        <div
+          style={{
+            fontSize: "0.6875rem",
+            color: "#94A3B8",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+          }}
+        >
+          Rate references
+        </div>
+        <div
+          className="grid gap-2 md:grid-cols-2"
+          style={{ fontSize: "0.75rem", color: "#475569" }}
+        >
+          <div>
+            <div style={{ fontWeight: 600, color: "#0F172A" }}>
+              Standard hours by channel
+            </div>
+            <ul className="list-disc pl-5 mt-1 space-y-0.5">
+              <li>Upstate · 2h</li>
+              <li>Metro on-premise · 2.5h</li>
+              <li>Off-premise · 3h</li>
+            </ul>
+          </div>
+          <div>
+            <div style={{ fontWeight: 600, color: "#0F172A" }}>
+              Location premium · Hamptons / Fire Island
+            </div>
+            <ul className="list-disc pl-5 mt-1 space-y-0.5">
+              <li>$50/h · first 3h</li>
+              <li>$32/h · remainder</li>
+            </ul>
+            <div
+              className="mt-1"
+              style={{ fontSize: "0.6875rem", color: "#94A3B8" }}
+            >
+              Apply via per-event override · reason "Location Premium".
+            </div>
+          </div>
+        </div>
+      </div>
+
       <EditRateModal
         open={editOpen}
         onClose={() => setEditOpen(false)}

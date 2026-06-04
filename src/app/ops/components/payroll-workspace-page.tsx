@@ -23,6 +23,9 @@ import {
   Filter,
   Mail,
   CalendarRange,
+  Plus,
+  ArrowRight,
+  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -35,6 +38,8 @@ import { Button } from "@/app/shared/components/ui/button";
 import { Checkbox } from "@/app/shared/components/ui/checkbox";
 import { Input } from "@/app/shared/components/ui/input";
 import { Card, CardContent } from "@/app/shared/components/ui/card";
+import { Label } from "@/app/shared/components/ui/label";
+import { Textarea } from "@/app/shared/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
@@ -74,17 +79,22 @@ import { ACTIVITY_CATEGORIES } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
   GeneratedReport,
+  PayrollAdjustment,
   PayrollLineItem,
   PayrollReviewRequest,
 } from "@/app/shared/data/billing-types";
 import {
   MOCK_PAYROLL_LINE_ITEMS,
+  MOCK_PAYROLL_ADJUSTMENTS,
   CURRENT_PAYROLL_CYCLE,
   HISTORICAL_PAYROLL_CYCLES,
   MOCK_PAYROLL_REPORTS,
   approvePayrollItems,
   rejectPayrollItem,
   acknowledgeRecurringRecalc,
+  createPayrollAdjustment,
+  applyPayrollAdjustment,
+  voidPayrollAdjustment,
 } from "./payroll-data";
 import { RecurringRecalcDialog } from "./recurring-recalc-dialog";
 import { GenerateReportDialog } from "./generate-report-dialog";
@@ -153,6 +163,16 @@ const INITIAL_FILTERS: FiltersState = {
   cycleEnd: "2026-05-21",
 };
 
+function isAdjustmentQueuedForCycle(
+  adjustment: PayrollAdjustment,
+  cycleId: string,
+): boolean {
+  return (
+    adjustment.status === "pending" ||
+    (adjustment.status === "applied" && adjustment.appliedToCycleId === cycleId)
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
@@ -170,6 +190,9 @@ export function PayrollWorkspacePage() {
   const [reports, setReports] =
     useState<GeneratedReport[]>(MOCK_PAYROLL_REPORTS);
   const [reportPreview, setReportPreview] = useState<string | null>(null);
+  const [adjustments, setAdjustments] = useState<PayrollAdjustment[]>([
+    ...MOCK_PAYROLL_ADJUSTMENTS,
+  ]);
   const [reviewRequests, setReviewRequests] = useState<PayrollReviewRequest[]>(
     [
       {
@@ -193,6 +216,10 @@ export function PayrollWorkspacePage() {
 
   function refreshItems() {
     setItems([...MOCK_PAYROLL_LINE_ITEMS]);
+  }
+
+  function refreshAdjustments() {
+    setAdjustments([...MOCK_PAYROLL_ADJUSTMENTS]);
   }
 
   const filtered = useMemo(() => {
@@ -227,7 +254,15 @@ export function PayrollWorkspacePage() {
       p.date <= filters.cycleEnd &&
       (p.status === "missing" || p.status === "pending-manager"),
   );
-  const totalPayEstimated = filtered.reduce((s, p) => s + p.finalPay, 0);
+  const filteredLineItemTotal = filtered.reduce((s, p) => s + p.finalPay, 0);
+  const cycleAdjustmentLines = adjustments.filter((a) =>
+    isAdjustmentQueuedForCycle(a, CURRENT_PAYROLL_CYCLE.id),
+  );
+  const cycleAdjustmentTotal = cycleAdjustmentLines.reduce(
+    (s, a) => s + a.amount,
+    0,
+  );
+  const totalPayEstimated = filteredLineItemTotal + cycleAdjustmentTotal;
   const overrideCount = filtered.filter((p) => !!p.override).length;
 
   // Cycle progress
@@ -287,10 +322,16 @@ export function PayrollWorkspacePage() {
 
   function handleExport() {
     if (!canExport) return;
+    adjustments
+      .filter((a) => a.status === "pending")
+      .forEach((a) => applyPayrollAdjustment(a.id, CURRENT_PAYROLL_CYCLE.id));
+    refreshAdjustments();
     // Move cycle to Awaiting Kayla — matches the post-export workflow + toast.
     setCycleStatus("awaiting-kayla");
     setExportConfirmOpen(false);
-    toast.success("Payroll CSV exported · Payroll-lock engaged · Awaiting Kayla");
+    toast.success(
+      "ADP-compatible payroll CSV exported · Payroll-lock engaged · Awaiting Kayla",
+    );
   }
 
   function handleRejectCycle() {
@@ -303,7 +344,7 @@ export function PayrollWorkspacePage() {
 
   return (
     <TooltipProvider>
-      <div className="p-6 space-y-6 font-[Inter]">
+      <div className="p-6 space-y-6 font-[Inter] min-w-0">
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -489,6 +530,7 @@ export function PayrollWorkspacePage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="approve">Approve</TabsTrigger>
+            <TabsTrigger value="adjustments">Adjustments</TabsTrigger>
             <TabsTrigger value="export">Export</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
@@ -668,6 +710,15 @@ export function PayrollWorkspacePage() {
             />
           </TabsContent>
 
+          {/* --------------- Adjustments -------------------------------- */}
+          <TabsContent value="adjustments" className="space-y-4">
+            <PayrollAdjustmentsTab
+              cycleId={CURRENT_PAYROLL_CYCLE.id}
+              adjustments={adjustments}
+              onAdjustmentsChange={setAdjustments}
+            />
+          </TabsContent>
+
           {/* --------------- Export -------------------------------------- */}
           <TabsContent value="export" className="space-y-4">
             <Card>
@@ -680,8 +731,9 @@ export function PayrollWorkspacePage() {
                 </h3>
                 <ul className="space-y-2">
                   <ChecklistItem
-                    done={awaiting.length === 0}
+                    done={cycleAwaiting.length === 0}
                     label="No items in Missing Payments"
+                    note={`${cycleAwaiting.length} blocking cycle export`}
                   />
                   <ChecklistItem
                     done={overrideCount === 0 || true}
@@ -699,9 +751,11 @@ export function PayrollWorkspacePage() {
                 >
                   <Download size={14} style={{ color: "#64748B", marginTop: 2 }} />
                   <p style={{ fontSize: "0.75rem", color: "#475569" }}>
-                    Export is a native-Excel CSV. After export, the cycle
-                    payroll-locks; you can't add brandAmbassadors or edit pay-relevant
-                    fields. Cycle moves to <strong>Awaiting Kayla</strong>.
+                    Export is an <strong>ADP-compatible CSV</strong> (one row
+                    per BA per cycle, including any queued Adjustments as ADP
+                    pay lines). After export, the cycle payroll-locks; you
+                    can't add brand ambassadors or edit pay-relevant fields.
+                    Cycle moves to <strong>Awaiting Kayla</strong>.
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
@@ -720,6 +774,16 @@ export function PayrollWorkspacePage() {
                       {filtered.length} line items · territory{" "}
                       {CURRENT_PAYROLL_CYCLE.territory}
                     </div>
+                    {cycleAdjustmentLines.length > 0 && (
+                      <div
+                        className="mt-0.5"
+                        style={{ fontSize: "0.75rem", color: "#64748B" }}
+                      >
+                        Includes {cycleAdjustmentLines.length} adjustment
+                        {cycleAdjustmentLines.length === 1 ? "" : "s"} ·{" "}
+                        {fmt(cycleAdjustmentTotal)}
+                      </div>
+                    )}
                   </div>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -1053,6 +1117,10 @@ export function PayrollWorkspacePage() {
             <div className="space-y-2">
               <Row label="Total pay" value={fmt(totalPayEstimated)} bold />
               <Row label="Line items" value={String(filtered.length)} />
+              <Row
+                label="Adjustments"
+                value={`${cycleAdjustmentLines.length} · ${fmt(cycleAdjustmentTotal)}`}
+              />
               <Row
                 label="Approved"
                 value={String(approvedCount)}
@@ -2066,6 +2134,319 @@ function MasterJournalPreview({ items }: { items: PayrollLineItem[] }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Payroll Adjustments tab (brief 2026-06-02 §2)
+// Prior-period corrections processed in the next batch. A correction posts
+// into HEMS as an "ADP pay" line on the individual's pay record.
+// ---------------------------------------------------------------------------
+
+function PayrollAdjustmentsTab({
+  cycleId,
+  adjustments,
+  onAdjustmentsChange,
+}: {
+  cycleId: string;
+  adjustments: PayrollAdjustment[];
+  onAdjustmentsChange: (adjustments: PayrollAdjustment[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draftBa, setDraftBa] = useState("");
+  const [draftAmount, setDraftAmount] = useState("");
+  const [draftReason, setDraftReason] = useState("");
+  const [draftPriorCycle, setDraftPriorCycle] = useState("");
+
+  function refresh() {
+    onAdjustmentsChange([...MOCK_PAYROLL_ADJUSTMENTS]);
+  }
+
+  function resetDraft() {
+    setDraftBa("");
+    setDraftAmount("");
+    setDraftReason("");
+    setDraftPriorCycle("");
+  }
+
+  // BA list from current cycle (so the dropdown matches who's billable).
+  const baOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const p of MOCK_PAYROLL_LINE_ITEMS) {
+      if (!seen.has(p.brandAmbassadorId))
+        seen.set(p.brandAmbassadorId, p.brandAmbassadorName);
+    }
+    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
+  }, []);
+
+  function handleCreate() {
+    if (!draftBa) {
+      toast.error("Select a brand ambassador");
+      return;
+    }
+    const amt = parseFloat(draftAmount);
+    if (Number.isNaN(amt) || amt === 0) {
+      toast.error("Enter a non-zero amount (negative for recovery)");
+      return;
+    }
+    if (!draftReason.trim()) {
+      toast.error("Enter a reason");
+      return;
+    }
+    const ba = baOptions.find((o) => o.id === draftBa);
+    createPayrollAdjustment({
+      brandAmbassadorId: draftBa,
+      brandAmbassadorName: ba?.name ?? draftBa,
+      amount: amt,
+      reason: draftReason.trim(),
+      ...(draftPriorCycle ? { priorCycleId: draftPriorCycle } : {}),
+      createdBy: "Ivie (Controller)",
+    });
+    refresh();
+    setOpen(false);
+    resetDraft();
+    toast.success(
+      `Adjustment queued for next batch (${amt > 0 ? "+" : ""}${fmt(amt)}).`,
+    );
+  }
+
+  function apply(id: string) {
+    applyPayrollAdjustment(id, cycleId);
+    refresh();
+    toast.success(`Adjustment applied to current cycle as ADP pay line.`);
+  }
+
+  function voidAdj(id: string) {
+    voidPayrollAdjustment(id);
+    refresh();
+    toast.success(`Adjustment voided.`);
+  }
+
+  const pending = adjustments.filter((a) => a.status === "pending");
+  const applied = adjustments.filter((a) => a.status === "applied");
+  const voided = adjustments.filter((a) => a.status === "voided");
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
+            Prior-period corrections processed in the next batch.
+          </p>
+          <p style={{ fontSize: "0.75rem", color: "#64748B" }}>
+            Each correction posts into HEMS as an ADP pay line on the
+            individual's pay record.
+          </p>
+        </div>
+        <Button onClick={() => setOpen(true)}>
+          <Plus size={14} className="mr-1.5" />
+          New adjustment
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Brand Ambassador</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Prior cycle</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...pending, ...applied, ...voided].map((a) => (
+                <TableRow key={a.id}>
+                  <TableCell style={{ fontWeight: 600 }}>
+                    {a.brandAmbassadorName}
+                  </TableCell>
+                  <TableCell
+                    className="text-right"
+                    style={{
+                      color: a.amount >= 0 ? "#0F766E" : "#B91C1C",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {a.amount > 0 ? "+" : ""}
+                    {fmt(a.amount)}
+                  </TableCell>
+                  <TableCell
+                    className="max-w-[280px] truncate"
+                    title={a.reason}
+                    style={{ fontSize: "0.8125rem" }}
+                  >
+                    {a.reason}
+                  </TableCell>
+                  <TableCell
+                    style={{ fontSize: "0.75rem", color: "#64748B" }}
+                  >
+                    {a.priorCycleId ?? "—"}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
+                      style={{
+                        fontSize: "0.6875rem",
+                        background:
+                          a.status === "applied"
+                            ? "#ECFDF5"
+                            : a.status === "voided"
+                              ? "#F1F5F9"
+                              : "#FFFBEB",
+                        color:
+                          a.status === "applied"
+                            ? "#0F766E"
+                            : a.status === "voided"
+                              ? "#64748B"
+                              : "#92400E",
+                      }}
+                    >
+                      {a.status === "applied" && (
+                        <CheckCircle2 size={11} />
+                      )}
+                      {a.status}
+                    </span>
+                    {a.appliedAt && (
+                      <div
+                        className="mt-0.5"
+                        style={{ fontSize: "0.625rem", color: "#94A3B8" }}
+                      >
+                        applied {new Date(a.appliedAt).toLocaleDateString()}
+                        {a.appliedToCycleId
+                          ? ` · ${a.appliedToCycleId.replace(/^pcyc-/, "")}`
+                          : ""}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right whitespace-nowrap">
+                    {a.status === "pending" && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => apply(a.id)}
+                          title={`Apply to current cycle (${cycleId})`}
+                        >
+                          <ArrowRight size={13} className="mr-1" />
+                          Apply
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => voidAdj(a.id)}
+                          style={{ color: "#B91C1C" }}
+                        >
+                          <Ban size={13} className="mr-1" />
+                          Void
+                        </Button>
+                      </>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {adjustments.length === 0 && (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="py-8 text-center"
+                    style={{ color: "#94A3B8" }}
+                  >
+                    No payroll adjustments. Click{" "}
+                    <strong>New adjustment</strong> to queue one for the next
+                    batch.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={open}
+        onOpenChange={(v) => {
+          if (!v) {
+            setOpen(false);
+            resetDraft();
+          }
+        }}
+      >
+        <DialogContent className="!max-w-md">
+          <DialogHeader>
+            <DialogTitle>New payroll adjustment</DialogTitle>
+            <DialogDescription>
+              Posts into HEMS as an ADP pay line on the BA's pay record.
+              Apply when the next batch is opened.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="adj-ba">Brand Ambassador</Label>
+              <select
+                id="adj-ba"
+                value={draftBa}
+                onChange={(e) => setDraftBa(e.target.value)}
+                className="rounded-md border h-9 w-full px-3"
+                style={{ borderColor: "#E2E8F0", fontSize: "0.875rem" }}
+              >
+                <option value="">— Select —</option>
+                {baOptions.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="adj-amount">
+                Amount ($) · negative for recovery
+              </Label>
+              <Input
+                id="adj-amount"
+                type="number"
+                value={draftAmount}
+                onChange={(e) => setDraftAmount(e.target.value)}
+                placeholder="80 or -45"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="adj-cycle">Prior cycle (optional)</Label>
+              <Input
+                id="adj-cycle"
+                value={draftPriorCycle}
+                onChange={(e) => setDraftPriorCycle(e.target.value)}
+                placeholder="e.g. pcyc-2026-04b"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="adj-reason">Reason</Label>
+              <Textarea
+                id="adj-reason"
+                rows={3}
+                value={draftReason}
+                onChange={(e) => setDraftReason(e.target.value)}
+                placeholder="What needs correcting and why."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+                resetDraft();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleCreate}>Queue for next batch</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

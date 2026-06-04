@@ -9,13 +9,234 @@
 
 import type {
   BillingActivity,
+  BillingChecklistItem,
+  BillingCodeDefinition,
   BillingCycle,
   CancellationAdjustment,
   GeneratedReport,
   Invoice,
   SlaReportRow,
+  SupplierContact,
 } from "../../shared/data/billing-types";
-import { isBillingApprovalReady } from "../../shared/data/billing-types";
+import {
+  BILLING_CHECKLIST_LABELS,
+  getBillingApprovalBlockReason,
+} from "../../shared/data/billing-types";
+
+// ---------------------------------------------------------------------------
+// Billing-code definitions (brief 2026-06-02 §2). HEMS is source of truth.
+// Each code carries required fields that drive the Events Ready to Bill
+// dashboard's eligibility check.
+// ---------------------------------------------------------------------------
+
+export let MOCK_BILLING_CODES: BillingCodeDefinition[] = [
+  {
+    code: "SLT-LAUNCH-ON",
+    description: "Summer Seltzer Launch · On-premise",
+    campaignId: "camp-1",
+    requiredFields: ["recap", "photos", "bar-spend"],
+    active: true,
+    createdAt: "2026-04-01T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "BF-CRAFT-COCKTAIL",
+    description: "Craft Cocktail Roadshow · Cocktail",
+    campaignId: "camp-8",
+    requiredFields: ["recap", "photos", "bar-spend", "travel"],
+    active: true,
+    createdAt: "2026-04-08T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "BF-CRAFT-MIXOLOGY",
+    description: "Craft Cocktail Roadshow · Mixology",
+    campaignId: "camp-8",
+    requiredFields: ["recap", "photos", "bar-spend"],
+    active: true,
+    createdAt: "2026-04-08T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "PRR-Q1-RETAIL",
+    description: "Pernod Q1 Retail Activation",
+    campaignId: "camp-2",
+    requiredFields: ["recap", "photos", "supplier-approval"],
+    active: true,
+    createdAt: "2026-01-10T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+  {
+    code: "PRR-Q1-SAMPLING",
+    description: "Pernod Q1 Sampling Survey",
+    campaignId: "camp-2",
+    requiredFields: ["recap"],
+    active: true,
+    createdAt: "2026-01-10T09:00:00Z",
+    createdBy: "Ivie (Controller)",
+  },
+];
+
+export function getBillingCodeDefinition(
+  code: string | undefined,
+): BillingCodeDefinition | undefined {
+  if (!code) return undefined;
+  return MOCK_BILLING_CODES.find((c) => c.code === code);
+}
+
+export function upsertBillingCode(def: BillingCodeDefinition): void {
+  const idx = MOCK_BILLING_CODES.findIndex((c) => c.code === def.code);
+  if (idx >= 0) {
+    MOCK_BILLING_CODES = MOCK_BILLING_CODES.map((c, i) => (i === idx ? def : c));
+  } else {
+    MOCK_BILLING_CODES = [def, ...MOCK_BILLING_CODES];
+  }
+}
+
+export function setBillingCodeActive(code: string, active: boolean): void {
+  MOCK_BILLING_CODES = MOCK_BILLING_CODES.map((c) =>
+    c.code === code ? { ...c, active } : c,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Supplier contacts (brief 2026-06-02 §2). Per-supplier delivery recipient
+// + CC template, persisted so it survives staff changes.
+// ---------------------------------------------------------------------------
+
+export let MOCK_SUPPLIERS: SupplierContact[] = [
+  {
+    id: "sup-pernod",
+    supplierName: "Pernod Ricard",
+    primaryRecipient: {
+      name: "Diana Reyes",
+      email: "diana.reyes@pernod-ricard.com",
+      role: "Brand Activations Manager",
+    },
+    ccRecipients: [
+      { name: "Mark Hines", email: "mark.hines@pernod-ricard.com" },
+      { name: "Hart Finance", email: "ar@hartagency.com" },
+    ],
+    notes: "Invoices delivered weekly. Diana approves SLA reports.",
+    active: true,
+    createdAt: "2026-01-10T09:00:00Z",
+  },
+  {
+    id: "sup-enj",
+    supplierName: "ENJ Gallo",
+    primaryRecipient: {
+      name: "Tom Karras",
+      email: "tom.karras@enjgallo.com",
+      role: "Regional Activation Lead",
+    },
+    ccRecipients: [
+      { name: "Hart Finance", email: "ar@hartagency.com" },
+    ],
+    notes: "Bi-weekly delivery preferred.",
+    active: true,
+    createdAt: "2026-02-05T09:00:00Z",
+  },
+  {
+    id: "sup-beam",
+    supplierName: "Beam Suntory",
+    primaryRecipient: {
+      name: "Jen Park",
+      email: "jen.park@beamsuntory.com",
+    },
+    ccRecipients: [],
+    notes: "",
+    active: true,
+    createdAt: "2026-03-12T09:00:00Z",
+  },
+];
+
+export function upsertSupplier(s: SupplierContact): void {
+  const idx = MOCK_SUPPLIERS.findIndex((x) => x.id === s.id);
+  if (idx >= 0) {
+    MOCK_SUPPLIERS = MOCK_SUPPLIERS.map((x, i) => (i === idx ? s : x));
+  } else {
+    MOCK_SUPPLIERS = [s, ...MOCK_SUPPLIERS];
+  }
+}
+
+export function setSupplierActive(id: string, active: boolean): void {
+  MOCK_SUPPLIERS = MOCK_SUPPLIERS.map((s) =>
+    s.id === id ? { ...s, active } : s,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Document tagging taxonomy (brief 2026-06-02 §2). Stable strings Power
+// Automate can consume to group bundles. Ambar exposes the tags;
+// bundling lives in Hart's Power Automate flow.
+//
+// Format: <artefact-kind>-<cycle>-<key>
+// Examples:
+//   invoice-2026-05a-INV-13302
+//   sla-2026-05a-act-bill-003
+//   receipt-2026-05a-act-bill-005
+//   manager-report-2026-05a-larry-golus
+// ---------------------------------------------------------------------------
+
+export type ArtefactKind = "invoice" | "sla" | "receipt" | "manager-report";
+
+export function formatArtefactTag(
+  kind: ArtefactKind,
+  ctx: {
+    cycleId?: string;
+    invoiceNumber?: string;
+    activityId?: string;
+    managerSlug?: string;
+  },
+): string {
+  const cycle = (ctx.cycleId ?? "no-cycle").replace(/^bcyc-/, "");
+  const tail =
+    ctx.invoiceNumber ??
+    ctx.activityId ??
+    ctx.managerSlug ??
+    "untagged";
+  return `${kind}-${cycle}-${tail}`;
+}
+
+// Compute which checklist items are still missing for an activity, given
+// its current state and the billing code's required-fields config.
+export function getMissingChecklistItems(
+  activity: BillingActivity,
+): BillingChecklistItem[] {
+  const def = getBillingCodeDefinition(activity.billingCode);
+  if (!def) return [];
+  const state = activity.billingChecklist ?? {};
+  return def.requiredFields.filter((item) => state[item] !== true);
+}
+
+export function getBillingActivityBlockReasons(
+  activity: BillingActivity,
+): string[] {
+  const reasons: string[] = [];
+  const approvalBlockReason = getBillingApprovalBlockReason(activity);
+  if (approvalBlockReason) reasons.push(approvalBlockReason);
+
+  const missingChecklistItems = getMissingChecklistItems(activity);
+  if (missingChecklistItems.length > 0) {
+    reasons.push(
+      `Complete required billing fields: ${missingChecklistItems
+        .map((item) => BILLING_CHECKLIST_LABELS[item])
+        .join(", ")}`,
+    );
+  }
+
+  if (activity.recurringInstance?.requiresRecalc) {
+    reasons.push("Recalculate recurring BA count first");
+  }
+
+  return reasons;
+}
+
+export function isBillingActivityReadyForInvoice(
+  activity: BillingActivity,
+): boolean {
+  return getBillingActivityBlockReasons(activity).length === 0;
+}
 
 // ---------------------------------------------------------------------------
 // Current open cycle (the one the operator is working on)
@@ -74,6 +295,17 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     missingReason: "SLA — licence not verified",
     slaEligible: true,
     licenceVerified: false,
+    // Billing checklist (brief 2026-06-02): code SLT-LAUNCH-ON requires
+    // recap / photos / bar-spend. Recap landed; photos partially captured;
+    // bar-spend not yet logged — blocks Ready-to-Bill.
+    billingChecklist: {
+      recap: true,
+      photos: false,
+      "bar-spend": false,
+    },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "not-ready",
+    paymentTrackStatus: "open",
   },
 
   // 2. Cancelled event — awaiting Set Partial Bill.
@@ -114,6 +346,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
       partialSupplierAmount: 0,
       bookerNotified: false,
     },
+    activityTrackStatus: "not-completed",
+    invoiceTrackStatus: "not-ready",
+    paymentTrackStatus: "open",
   },
 
   // 3. Recurring event with brandAmbassador-count regression.
@@ -138,11 +373,12 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     serviceFeeKind: "bar",
     eventAmount: 720,
     ambassadorAmount: 480,
+    // Travel is per-BA (Joe 2026-06-04). $60 × 3 BAs = $180 on invoice.
     travel: 60,
     barSpend: 250,
     maxBarSpend: 500,
     gratuity: 50, // 20% × $250 bar spend
-    expectedAmount: 720 + 25 + 60 + 250 + 50, // event + 10% × barSpend + travel + barSpend + grat
+    expectedAmount: 720 + 25 + 180 + 250 + 50, // event + 10% × barSpend + (travel × 3 BAs) + barSpend + grat
     status: "missing",
     missingReason: "Recurring — brand ambassador count changed",
     slaEligible: true,
@@ -154,12 +390,23 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     clarifyingNotes:
       "Receipt totals match Square slip. BA count grew from 2 → 3 mid-cycle; recurring instance flagged for recalc.",
     approvingManager: "Larry Golus",
+    // Code BF-CRAFT-MIXOLOGY requires recap / photos / bar-spend. Bar-spend
+    // captured via SLA flow; recap + photos complete. Recalc still blocks
+    // approval (see attention banner) but the checklist is green.
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "bar-spend": true,
+    },
     recurringInstance: {
       seriesId: "series-avion-sunday",
       originalBrandAmbassadorCount: 2,
       currentBrandAmbassadorCount: 3,
       requiresRecalc: true,
     },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "not-ready",
+    paymentTrackStatus: "open",
   },
 
   // 4. Cross-entity invoice group: Hart Agency activity at Dead Rabbit (above)
@@ -194,6 +441,16 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     status: "ready-to-bill",
     slaEligible: true,
     licenceVerified: true,
+    // Code PRR-Q1-RETAIL requires recap / photos / supplier-approval.
+    // Supplier (Pernod Ricard) has signed off via email.
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "supplier-approval": true,
+    },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 
   // 5. Upstate NY entity row.
@@ -237,6 +494,16 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     receiptUrl: "/templates/receipt-pearl-street-2026-05-19.jpg",
     clarifyingNotes: "",
     approvingManager: "Larry Golus",
+    // Code BF-CRAFT-COCKTAIL requires recap / photos / bar-spend / travel.
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "bar-spend": true,
+      travel: true,
+    },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 
   // 6. Non-event activity — Survey stub. Proves the activity-as-billable
@@ -268,6 +535,93 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     expectedAmount: 120,
     status: "ready-to-bill",
     slaEligible: false,
+    // Code PRR-Q1-SAMPLING requires only recap. Survey wave submitted.
+    billingChecklist: {
+      recap: true,
+    },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
+  },
+
+  // 7. Missing → ready row. Demonstrates Bulk Approve Ready on the Ready
+  //    to Bill tab: status is "missing" (still in the queue, not yet
+  //    moved to ready-to-bill) but the checklist + SLA gate are clear,
+  //    so the dashboard says READY and the bulk-approve action picks it
+  //    up. Two of these so the count is visible in the button.
+  {
+    id: "act-bill-007",
+    type: "event",
+    category: "off-premise",
+    campaignId: "camp-2",
+    campaignName: "Q1 Retail Activation",
+    billingCode: "PRR-Q1-RETAIL",
+    supplier: "Pernod Ricard",
+    name: "Glenlivet 12 Tasting — Whole Foods Tribeca",
+    date: "2026-05-20",
+    accountId: "acc-3",
+    accountName: "Whole Foods Market — Tribeca",
+    distributor: "Southern Glazer's Wine & Spirits",
+    billedTo: "Southern Glazer's Wine & Spirits, 313 Underhill Blvd, Syosset NY",
+    billingEntity: "Hart Agency",
+    region: "Metro NY",
+    territory: "Manhattan",
+    brandAmbassadorCount: 1,
+    brandAmbassadorIds: ["edu-1"],
+    serviceFeeKind: "trade",
+    eventAmount: 280,
+    ambassadorAmount: 140,
+    travel: 18,
+    gratuity: 0,
+    expectedAmount: 280 + 56 + 18,
+    status: "missing",
+    missingReason: "Awaiting approval",
+    slaEligible: false,
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "supplier-approval": true,
+    },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
+  },
+  {
+    id: "act-bill-008",
+    type: "event",
+    category: "off-premise",
+    campaignId: "camp-2",
+    campaignName: "Q1 Retail Activation",
+    billingCode: "PRR-Q1-RETAIL",
+    supplier: "Pernod Ricard",
+    name: "Glenlivet 15 Tasting — Eataly Flatiron",
+    date: "2026-05-20",
+    accountId: "acc-3",
+    accountName: "Eataly — Flatiron",
+    distributor: "Southern Glazer's Wine & Spirits",
+    billedTo: "Southern Glazer's Wine & Spirits, 313 Underhill Blvd, Syosset NY",
+    billingEntity: "Hart Agency",
+    region: "Metro NY",
+    territory: "Manhattan",
+    brandAmbassadorCount: 1,
+    brandAmbassadorIds: ["edu-4"],
+    serviceFeeKind: "trade",
+    eventAmount: 320,
+    ambassadorAmount: 160,
+    travel: 22,
+    gratuity: 0,
+    expectedAmount: 320 + 64 + 22,
+    status: "missing",
+    missingReason: "Awaiting approval",
+    slaEligible: false,
+    billingChecklist: {
+      recap: true,
+      photos: true,
+      "supplier-approval": true,
+    },
+    activityTrackStatus: "completed",
+    invoiceTrackStatus: "ready",
+    paymentTrackStatus: "open",
   },
 ];
 
@@ -335,7 +689,7 @@ export let MOCK_INVOICES: Invoice[] = [
     status: "locked",
     qbSyncedAt: "2026-04-08T14:30:00Z",
     sharepointSentAt: "2026-04-08T14:35:00Z",
-    paymentStatus: "overdue",
+    paymentStatus: "disputed",
     paymentDueAt: "2026-05-08",
   },
 ];
@@ -436,7 +790,7 @@ export function updateBillingActivity(
 
 export function approveBillingActivities(ids: string[]): void {
   MOCK_BILLING_ACTIVITIES = MOCK_BILLING_ACTIVITIES.map((a) =>
-    ids.includes(a.id) && isBillingApprovalReady(a)
+    ids.includes(a.id) && isBillingActivityReadyForInvoice(a)
       ? { ...a, status: "approved" }
       : a,
   );
@@ -471,6 +825,22 @@ export function updateInvoicePayment(
 ): void {
   MOCK_INVOICES = MOCK_INVOICES.map((i) =>
     i.id === id ? { ...i, ...patch } : i,
+  );
+}
+
+// Invoice approval gate (brief 2026-06-02 §2). Flips a draft invoice into
+// `approved-for-sending` and stamps the audit fields. Caller still calls
+// lockInvoice / QB-export separately to push the invoice downstream.
+export function approveInvoiceForSending(id: string, operator: string): void {
+  MOCK_INVOICES = MOCK_INVOICES.map((i) =>
+    i.id === id
+      ? {
+          ...i,
+          status: "approved-for-sending",
+          approvedForSendingAt: new Date().toISOString(),
+          approvedForSendingBy: operator,
+        }
+      : i,
   );
 }
 

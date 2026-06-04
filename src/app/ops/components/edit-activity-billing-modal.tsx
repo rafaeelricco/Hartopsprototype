@@ -30,12 +30,19 @@ import {
   BAR_SPEND_CEILING,
   BAR_SPEND_GRATUITY_RATE,
   SERVICE_FEE_BY_KIND,
-  getBillingApprovalBlockReason,
-  isBillingApprovalReady,
+  ACTIVITY_TRACK_STATUSES,
+  INVOICE_TRACK_STATUSES,
+  INVOICE_PAYMENT_STATUSES,
 } from "@/app/shared/data/billing-types";
-import type { BillingActivity } from "@/app/shared/data/billing-types";
+import type {
+  ActivityTrackStatus,
+  BillingActivity,
+  InvoicePaymentStatus,
+  InvoiceTrackStatus,
+} from "@/app/shared/data/billing-types";
 import { INITIAL_CAMPAIGNS } from "@/app/staff/components/campaign-data";
 import { CampaignTag } from "./campaign-tag";
+import { getBillingActivityBlockReasons } from "./billing-data";
 
 function fmt(n: number): string {
   return n.toLocaleString("en-US", {
@@ -61,6 +68,9 @@ export interface EditActivityBillingPatch {
   travelEntertainmentAmount?: number;
   expectedAmount?: number;
   status?: BillingActivity["status"];
+  activityTrackStatus?: ActivityTrackStatus;
+  invoiceTrackStatus?: InvoiceTrackStatus;
+  paymentTrackStatus?: InvoicePaymentStatus;
 }
 
 interface Props {
@@ -83,6 +93,9 @@ interface Draft {
   suppliesAmount: string;
   promotionPublicityAmount: string;
   travelEntertainmentAmount: string;
+  activityTrackStatus: ActivityTrackStatus;
+  invoiceTrackStatus: InvoiceTrackStatus;
+  paymentTrackStatus: InvoicePaymentStatus;
 }
 
 function makeDraft(a: BillingActivity): Draft {
@@ -105,6 +118,13 @@ function makeDraft(a: BillingActivity): Draft {
       a.travelEntertainmentAmount != null
         ? String(a.travelEntertainmentAmount)
         : "",
+    activityTrackStatus:
+      a.activityTrackStatus ??
+      (a.status === "missing" ? "not-completed" : "completed"),
+    invoiceTrackStatus:
+      a.invoiceTrackStatus ??
+      (a.status === "missing" ? "not-ready" : "ready"),
+    paymentTrackStatus: a.paymentTrackStatus ?? "open",
   };
 }
 
@@ -135,7 +155,11 @@ export function EditActivityBillingModal({
     draft.billingCode !== "" && !campaignCodes.includes(draft.billingCode);
 
   const eventAmt = parseFloat(draft.eventAmount) || 0;
-  const travelAmt = parseFloat(draft.travel) || 0;
+  // Travel is per-BA (Joe 2026-06-04). Invoice line multiplies by the
+  // assigned brand-ambassador count.
+  const travelPerBa = parseFloat(draft.travel) || 0;
+  const baCount = Math.max(1, activity.brandAmbassadorCount ?? 1);
+  const travelTotal = travelPerBa * baCount;
   const barSpendAmt = parseFloat(draft.barSpend) || 0;
   const cappedBarSpend = Math.min(Math.max(barSpendAmt, 0), BAR_SPEND_CEILING);
   const computedGratuity = isBar
@@ -156,13 +180,13 @@ export function EditActivityBillingModal({
   const previewTotal =
     eventAmt +
     serviceFee +
-    travelAmt +
+    travelTotal +
     cappedBarSpend +
     computedGratuity +
     supplies +
     promPub +
     travelEnt;
-  const approvalBlockReason = getBillingApprovalBlockReason(activity);
+  const approvalBlockReason = getBillingActivityBlockReasons(activity)[0];
 
   function patch(p: Partial<Draft>) {
     setDraft((d) => (d ? { ...d, ...p } : d));
@@ -184,7 +208,7 @@ export function EditActivityBillingModal({
     if (eventAmt !== activity.eventAmount) out.eventAmount = eventAmt;
     const ambAmt = parseFloat(draft!.ambassadorAmount) || 0;
     if (ambAmt !== activity.ambassadorAmount) out.ambassadorAmount = ambAmt;
-    if (travelAmt !== activity.travel) out.travel = travelAmt;
+    if (travelPerBa !== activity.travel) out.travel = travelPerBa;
     if (isBar) {
       out.barSpend = cappedBarSpend;
       out.maxBarSpend = parseFloat(draft!.maxBarSpend) || 0;
@@ -194,6 +218,12 @@ export function EditActivityBillingModal({
     out.promotionPublicityAmount = promPub;
     out.travelEntertainmentAmount = travelEnt;
     out.expectedAmount = previewTotal;
+    if (draft!.activityTrackStatus !== activity.activityTrackStatus)
+      out.activityTrackStatus = draft!.activityTrackStatus;
+    if (draft!.invoiceTrackStatus !== activity.invoiceTrackStatus)
+      out.invoiceTrackStatus = draft!.invoiceTrackStatus;
+    if (draft!.paymentTrackStatus !== activity.paymentTrackStatus)
+      out.paymentTrackStatus = draft!.paymentTrackStatus;
     return out;
   }
 
@@ -203,7 +233,7 @@ export function EditActivityBillingModal({
   }
 
   function handleSaveAndApprove() {
-    if (!isBillingApprovalReady(activity!)) return;
+    if (getBillingActivityBlockReasons(activity!).length > 0) return;
     onSave(activity!.id, { ...buildPatch(), status: "ready-to-bill" });
     onApprove(activity!.id);
     onClose();
@@ -231,6 +261,52 @@ export function EditActivityBillingModal({
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Attention flags (brief 2026-06-02 §2) — surface anything that
+              should block approval prominently at the top of the modal. */}
+          {(activity.recurringInstance?.requiresRecalc ||
+            (activity.slaEligible && !activity.licenceVerified)) && (
+            <div
+              className="rounded-md border p-3 space-y-1.5"
+              style={{ borderColor: "#FCA5A5", background: "#FEF2F2" }}
+            >
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#B91C1C",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                Attention required before approval
+              </div>
+              <ul
+                className="list-disc pl-5"
+                style={{ fontSize: "0.8125rem", color: "#7F1D1D" }}
+              >
+                {activity.recurringInstance?.requiresRecalc && (
+                  <li>
+                    Recurring instance — BA count changed from{" "}
+                    <strong>
+                      {activity.recurringInstance.originalBrandAmbassadorCount}
+                    </strong>{" "}
+                    to{" "}
+                    <strong>
+                      {activity.recurringInstance.currentBrandAmbassadorCount}
+                    </strong>
+                    . Recalculate amounts before approving.
+                  </li>
+                )}
+                {activity.slaEligible && !activity.licenceVerified && (
+                  <li>
+                    SLA-eligible (SGWS / NY) — liquor licence not yet verified.
+                    Resolve SLA before approving.
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+
           {/* Row 1 — Billing identifiers */}
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1.5">
@@ -352,13 +428,17 @@ export function EditActivityBillingModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="eb-travel">Travel</Label>
+                <Label htmlFor="eb-travel">Travel per BA</Label>
                 <Input
                   id="eb-travel"
                   type="number"
                   value={draft.travel}
                   onChange={(e) => patch({ travel: e.target.value })}
                 />
+                <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                  Invoice line = {fmt(travelPerBa)} × {baCount} BA
+                  {baCount === 1 ? "" : "s"} = <strong>{fmt(travelTotal)}</strong>
+                </p>
               </div>
               <div className="space-y-1.5">
                 <Label>Service fee ({(feeRate * 100).toFixed(0)}%)</Label>
@@ -548,6 +628,89 @@ export function EditActivityBillingModal({
               </p>
             </div>
           )}
+
+          {/* Status tracks (brief 2026-06-02 §2). Three independent tracks
+              editable here as well as on the row. */}
+          <div
+            className="rounded-lg border p-4 space-y-3"
+            style={{ borderColor: "#E2E8F0", background: "#F8FAFC" }}
+          >
+            <div
+              style={{
+                fontSize: "0.6875rem",
+                color: "#94A3B8",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
+              Status tracks
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="eb-activity-track">Activity</Label>
+                <select
+                  id="eb-activity-track"
+                  value={draft.activityTrackStatus}
+                  onChange={(e) =>
+                    patch({
+                      activityTrackStatus:
+                        e.target.value as Draft["activityTrackStatus"],
+                    })
+                  }
+                  className="rounded-md border h-9 w-full px-3"
+                  style={{ borderColor: "#E2E8F0", fontSize: "0.875rem" }}
+                >
+                  {ACTIVITY_TRACK_STATUSES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="eb-invoice-track">Invoice</Label>
+                <select
+                  id="eb-invoice-track"
+                  value={draft.invoiceTrackStatus}
+                  onChange={(e) =>
+                    patch({
+                      invoiceTrackStatus:
+                        e.target.value as Draft["invoiceTrackStatus"],
+                    })
+                  }
+                  className="rounded-md border h-9 w-full px-3"
+                  style={{ borderColor: "#E2E8F0", fontSize: "0.875rem" }}
+                >
+                  {INVOICE_TRACK_STATUSES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="eb-payment-track">Payment</Label>
+                <select
+                  id="eb-payment-track"
+                  value={draft.paymentTrackStatus}
+                  onChange={(e) =>
+                    patch({
+                      paymentTrackStatus:
+                        e.target.value as Draft["paymentTrackStatus"],
+                    })
+                  }
+                  className="rounded-md border h-9 w-full px-3"
+                  style={{ borderColor: "#E2E8F0", fontSize: "0.875rem" }}
+                >
+                  {INVOICE_PAYMENT_STATUSES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
 
           {/* Live invoice total */}
           <div

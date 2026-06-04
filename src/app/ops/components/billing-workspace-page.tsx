@@ -18,7 +18,6 @@ import {
   RefreshCcw,
   Send,
   Download,
-  Lock,
   Filter,
   Pencil,
 } from "lucide-react";
@@ -67,8 +66,6 @@ import {
   SERVICE_FEE_BY_KIND,
   ACTIVITY_CATEGORIES,
   INVOICE_PAYMENT_STATUSES,
-  getBillingApprovalBlockReason,
-  isBillingApprovalReady,
 } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
@@ -77,8 +74,14 @@ import type {
   CancellationAdjustment,
   GeneratedReport,
   Invoice,
-  ServiceFeeKind,
   SlaReportRow,
+  ActivityTrackStatus,
+  InvoiceTrackStatus,
+} from "@/app/shared/data/billing-types";
+import {
+  BILLING_CHECKLIST_LABELS,
+  ACTIVITY_TRACK_STATUSES,
+  INVOICE_TRACK_STATUSES,
 } from "@/app/shared/data/billing-types";
 import {
   MOCK_BILLING_ACTIVITIES,
@@ -97,6 +100,11 @@ import {
   peekNextInvoiceNumber,
   consumeNextInvoiceNumber,
   updateInvoicePayment,
+  getBillingCodeDefinition,
+  getMissingChecklistItems,
+  getBillingActivityBlockReasons,
+  isBillingActivityReadyForInvoice,
+  formatArtefactTag,
 } from "./billing-data";
 import { SetPartialBillModal } from "./set-partial-bill-modal";
 import { ResolveSlaModal } from "./resolve-sla-modal";
@@ -119,10 +127,6 @@ function fmt(n: number): string {
     currency: "USD",
     minimumFractionDigits: 0,
   });
-}
-
-function feeLabel(kind: ServiceFeeKind): string {
-  return `${(SERVICE_FEE_BY_KIND[kind] * 100).toFixed(0)}% (${kind})`;
 }
 
 function statusBadge(
@@ -152,13 +156,14 @@ function PaymentStatusBadge({
     { bg: string; fg: string; label: string }
   > = {
     open: { bg: "#FFFBEB", fg: "#92400E", label: "Open" },
+    unpaid: { bg: "#FEF2F2", fg: "#B91C1C", label: "Unpaid" },
     "partially-paid": {
       bg: "#EFF6FF",
       fg: "#1D4ED8",
       label: "Partially paid",
     },
     paid: { bg: "#ECFDF5", fg: "#0F766E", label: "Paid" },
-    overdue: { bg: "#FEF2F2", fg: "#B91C1C", label: "Overdue" },
+    disputed: { bg: "#FEF2F2", fg: "#B91C1C", label: "Disputed" },
   };
   const s = map[status];
   return (
@@ -173,6 +178,365 @@ function PaymentStatusBadge({
     >
       {s.label}
     </span>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Status track pickers (brief 2026-06-02 §2). Inline editable dropdowns on
+// each Update Billing row — the controller can override the three tracks
+// independently. Defaults come from the seed; edits mutate the activity
+// directly via updateBillingActivity.
+// ---------------------------------------------------------------------------
+
+function TrackPickerShell({
+  value,
+  options,
+  toneFor,
+  onChange,
+}: {
+  value: string;
+  options: { value: string; label: string }[];
+  toneFor: (v: string) => { bg: string; fg: string };
+  onChange: (next: string) => void;
+}) {
+  const tone = toneFor(value);
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded-md border h-7 px-2 cursor-pointer"
+      style={{
+        fontSize: "0.6875rem",
+        background: tone.bg,
+        color: tone.fg,
+        borderColor: tone.fg + "33",
+        fontWeight: 500,
+        minWidth: 120,
+      }}
+    >
+      {options.map((o) => (
+        <option
+          key={o.value}
+          value={o.value}
+          style={{ background: "white", color: "#0F172A" }}
+        >
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function ActivityTrackPicker({ activity }: { activity: BillingActivity }) {
+  const value: ActivityTrackStatus =
+    activity.activityTrackStatus ??
+    (activity.status === "missing" ? "not-completed" : "completed");
+  return (
+    <TrackPickerShell
+      value={value}
+      options={ACTIVITY_TRACK_STATUSES}
+      toneFor={(v) =>
+        v === "completed"
+          ? { bg: "#ECFDF5", fg: "#0F766E" }
+          : { bg: "#FFFBEB", fg: "#92400E" }
+      }
+      onChange={(next) => {
+        updateBillingActivity(activity.id, {
+          activityTrackStatus: next as ActivityTrackStatus,
+        });
+      }}
+    />
+  );
+}
+
+function InvoiceTrackPicker({ activity }: { activity: BillingActivity }) {
+  const value: InvoiceTrackStatus =
+    activity.invoiceTrackStatus ??
+    (activity.status === "missing" ? "not-ready" : "ready");
+  return (
+    <TrackPickerShell
+      value={value}
+      options={INVOICE_TRACK_STATUSES}
+      toneFor={(v) =>
+        v === "ready"
+          ? { bg: "#ECFDF5", fg: "#0F766E" }
+          : { bg: "#FEF2F2", fg: "#B91C1C" }
+      }
+      onChange={(next) => {
+        updateBillingActivity(activity.id, {
+          invoiceTrackStatus: next as InvoiceTrackStatus,
+        });
+      }}
+    />
+  );
+}
+
+function PaymentTrackPicker({ activity }: { activity: BillingActivity }) {
+  const value: InvoicePaymentStatus =
+    activity.paymentTrackStatus ?? "open";
+  const toneByPayment: Record<
+    InvoicePaymentStatus,
+    { bg: string; fg: string }
+  > = {
+    open: { bg: "#FFFBEB", fg: "#92400E" },
+    unpaid: { bg: "#FEF2F2", fg: "#B91C1C" },
+    "partially-paid": { bg: "#EFF6FF", fg: "#1D4ED8" },
+    paid: { bg: "#ECFDF5", fg: "#0F766E" },
+    disputed: { bg: "#FEF2F2", fg: "#B91C1C" },
+  };
+  return (
+    <TrackPickerShell
+      value={value}
+      options={INVOICE_PAYMENT_STATUSES}
+      toneFor={(v) => toneByPayment[v as InvoicePaymentStatus]}
+      onChange={(next) => {
+        updateBillingActivity(activity.id, {
+          paymentTrackStatus: next as InvoicePaymentStatus,
+        });
+      }}
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Events Ready to Bill — billing-code grouped dashboard (brief 2026-06-02 §2).
+// Sits at the top of the Ready to Bill tab. Summarises activities by their
+// billing code so the controller can see at a glance which codes have
+// activities blocked by which missing requirements. Replaces HEMS 1.0's
+// "Missing Bill" report — same population, sharper organisation.
+// ---------------------------------------------------------------------------
+
+interface ReadyToBillCodeGroup {
+  code: string;
+  description: string;
+  total: number;
+  ready: number; // activities with all checklist items + status === "ready-to-bill"
+  blockedByChecklist: number;
+  blockedOther: number; // SLA, cancellation, recurring recalc, etc.
+  missingItemsByLabel: Map<string, number>; // checklist item → count blocking
+}
+
+function buildReadyToBillGroups(
+  activities: BillingActivity[],
+): ReadyToBillCodeGroup[] {
+  const groups = new Map<string, ReadyToBillCodeGroup>();
+  for (const a of activities) {
+    // Only count activities that aren't already invoiced / locked.
+    if (a.status === "invoiced" || a.status === "billing-locked") continue;
+    const code = a.billingCode ?? "(no code)";
+    const def = getBillingCodeDefinition(a.billingCode);
+    if (!groups.has(code)) {
+      groups.set(code, {
+        code,
+        description: def?.description ?? "Unassigned",
+        total: 0,
+        ready: 0,
+        blockedByChecklist: 0,
+        blockedOther: 0,
+        missingItemsByLabel: new Map(),
+      });
+    }
+    const g = groups.get(code)!;
+    g.total += 1;
+
+    const missing = getMissingChecklistItems(a);
+    const hasOtherBlock =
+      (a.slaEligible === true && a.licenceVerified !== true) ||
+      a.recurringInstance?.requiresRecalc === true ||
+      a.status === "missing";
+
+    if (missing.length === 0 && !hasOtherBlock) {
+      g.ready += 1;
+    } else {
+      if (missing.length > 0) {
+        g.blockedByChecklist += 1;
+        for (const item of missing) {
+          const label = BILLING_CHECKLIST_LABELS[item];
+          g.missingItemsByLabel.set(
+            label,
+            (g.missingItemsByLabel.get(label) ?? 0) + 1,
+          );
+        }
+      }
+      if (hasOtherBlock && missing.length === 0) {
+        g.blockedOther += 1;
+      }
+    }
+  }
+  return Array.from(groups.values()).sort((a, b) => {
+    // Surface codes with blockers first
+    const aBlocked = a.blockedByChecklist + a.blockedOther;
+    const bBlocked = b.blockedByChecklist + b.blockedOther;
+    if (aBlocked !== bBlocked) return bBlocked - aBlocked;
+    return a.code.localeCompare(b.code);
+  });
+}
+
+function ReadyToBillDashboard({
+  activities,
+}: {
+  activities: BillingActivity[];
+}) {
+  const groups = useMemo(() => buildReadyToBillGroups(activities), [activities]);
+
+  const totals = useMemo(() => {
+    return groups.reduce(
+      (acc, g) => {
+        acc.total += g.total;
+        acc.ready += g.ready;
+        acc.blockedByChecklist += g.blockedByChecklist;
+        acc.blockedOther += g.blockedOther;
+        return acc;
+      },
+      { total: 0, ready: 0, blockedByChecklist: 0, blockedOther: 0 },
+    );
+  }, [groups]);
+
+  if (totals.total === 0) {
+    return null;
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 style={{ fontSize: "0.9375rem", fontWeight: 600 }}>
+              Events ready to bill
+            </h3>
+            <p style={{ fontSize: "0.75rem", color: "#64748B" }}>
+              Grouped by billing code · replaces the HEMS 1.0 Missing Bill
+              report.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <DashboardKpi
+              label="Total"
+              value={String(totals.total)}
+              color="#475569"
+            />
+            <DashboardKpi
+              label="Ready"
+              value={String(totals.ready)}
+              color="#0F766E"
+            />
+            <DashboardKpi
+              label="Missing fields"
+              value={String(totals.blockedByChecklist)}
+              color="#92400E"
+            />
+            <DashboardKpi
+              label="Other blocks"
+              value={String(totals.blockedOther)}
+              color="#B91C1C"
+            />
+          </div>
+        </div>
+        <div className="grid gap-2 md:grid-cols-2">
+          {groups.map((g) => (
+            <ReadyToBillCodeCard key={g.code} group={g} />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DashboardKpi({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <div className="flex flex-col items-end">
+      <span style={{ fontSize: "1.125rem", fontWeight: 600, color }}>
+        {value}
+      </span>
+      <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>{label}</span>
+    </div>
+  );
+}
+
+function ReadyToBillCodeCard({ group }: { group: ReadyToBillCodeGroup }) {
+  return (
+    <div
+      className="rounded-md border p-3 space-y-2"
+      style={{ borderColor: "#E2E8F0", background: "#FAFAFA" }}
+    >
+      <div className="flex items-baseline justify-between gap-2">
+        <div className="min-w-0">
+          <div
+            className="truncate"
+            style={{
+              fontSize: "0.8125rem",
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+              fontWeight: 600,
+              color: "#0F172A",
+            }}
+            title={group.code}
+          >
+            {group.code}
+          </div>
+          <div
+            className="truncate"
+            style={{ fontSize: "0.6875rem", color: "#64748B" }}
+            title={group.description}
+          >
+            {group.description}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 whitespace-nowrap">
+          <span
+            style={{
+              fontSize: "0.6875rem",
+              color: "#0F766E",
+              background: "#ECFDF5",
+              padding: "1px 6px",
+              borderRadius: 4,
+              fontWeight: 500,
+            }}
+            title="Ready to invoice"
+          >
+            {group.ready}/{group.total} ready
+          </span>
+        </div>
+      </div>
+      {group.missingItemsByLabel.size > 0 && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span style={{ fontSize: "0.6875rem", color: "#92400E" }}>
+            Missing:
+          </span>
+          {Array.from(group.missingItemsByLabel.entries()).map(
+            ([label, count]) => (
+              <span
+                key={label}
+                className="px-1.5 py-0 rounded"
+                style={{
+                  fontSize: "0.6875rem",
+                  background: "#FFFBEB",
+                  color: "#92400E",
+                  fontWeight: 500,
+                }}
+              >
+                {label} · {count}
+              </span>
+            ),
+          )}
+        </div>
+      )}
+      {group.blockedOther > 0 && (
+        <div
+          className="flex items-center gap-1.5"
+          style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+        >
+          {group.blockedOther} blocked on SLA / recalc / approval
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -403,6 +767,12 @@ export function BillingWorkspacePage() {
   const [billingPeriodEnd, setBillingPeriodEnd] = useState(
     CURRENT_BILLING_CYCLE.windowEnd,
   );
+  // Aggregation cadence (brief 2026-06-02 §2). The window dates drive
+  // weekly / bi-weekly; "per-event" overrides aggregation so each approved
+  // activity becomes its own invoice.
+  const [aggregationCadence, setAggregationCadence] = useState<
+    "weekly" | "bi-weekly" | "per-event"
+  >("bi-weekly");
   const [excludedActivityIds, setExcludedActivityIds] = useState<Set<string>>(
     new Set(),
   );
@@ -476,12 +846,16 @@ export function BillingWorkspacePage() {
       toast.message("No activities selected for approval");
       return;
     }
-    const approvableIds = ids.filter((id) => {
-      const activity = activities.find((a) => a.id === id);
-      return activity != null && isBillingApprovalReady(activity);
-    });
+    const selectedActivities = ids
+      .map((id) => activities.find((a) => a.id === id))
+      .filter((a): a is BillingActivity => a != null);
+    const approvableIds = selectedActivities
+      .filter(isBillingActivityReadyForInvoice)
+      .map((a) => a.id);
     if (approvableIds.length === 0) {
-      toast.error("Complete SLA capture before approving selected activities");
+      const firstBlocker =
+        selectedActivities.flatMap(getBillingActivityBlockReasons)[0];
+      toast.error(firstBlocker ?? "Resolve billing requirements before approval");
       return;
     }
     approveBillingActivities(approvableIds);
@@ -492,7 +866,7 @@ export function BillingWorkspacePage() {
     );
     if (skipped > 0) {
       toast.message(
-        `${skipped} SLA activit${skipped === 1 ? "y needs" : "ies need"} manager capture before approval`,
+        `${skipped} activit${skipped === 1 ? "y has" : "ies have"} unresolved billing requirements`,
       );
     }
   }
@@ -583,8 +957,11 @@ export function BillingWorkspacePage() {
       (existing.suppliesAmount ?? 0) +
       (existing.promotionPublicityAmount ?? 0) +
       (existing.travelEntertainmentAmount ?? 0);
+    // Travel × BA count (Joe 2026-06-04).
+    const travelTotal =
+      travel * Math.max(1, existing.brandAmbassadorCount ?? 1);
     const expected =
-      eventAmount + fee + travel + barSpend + gratuity + expenseTotals;
+      eventAmount + fee + travelTotal + barSpend + gratuity + expenseTotals;
     updateBillingActivity(id, {
       eventAmount,
       travel,
@@ -634,6 +1011,15 @@ export function BillingWorkspacePage() {
     distributor: string;
     activities: BillingActivity[];
   }) {
+    const blocked = group.activities.filter(
+      (a) => !isBillingActivityReadyForInvoice(a),
+    );
+    if (blocked.length > 0) {
+      toast.error(
+        `${blocked.length} activit${blocked.length === 1 ? "y has" : "ies have"} unresolved billing requirements`,
+      );
+      return;
+    }
     const total = group.activities.reduce((s, a) => s + a.expectedAmount, 0);
     setQbExportFor({
       billedTo: group.billedTo,
@@ -649,6 +1035,28 @@ export function BillingWorkspacePage() {
     licenceVerified: boolean;
   }) {
     if (!qbExportFor) return;
+    const exportActivities = qbExportFor.activityIds
+      .map((id) => activities.find((a) => a.id === id))
+      .filter((a): a is BillingActivity => a != null);
+    if (exportActivities.length !== qbExportFor.activityIds.length) {
+      toast.error("Refresh billing activities before exporting this invoice");
+      setQbExportFor(null);
+      return;
+    }
+    const blocked = exportActivities.filter(
+      (a) => !isBillingActivityReadyForInvoice(a),
+    );
+    if (blocked.length > 0) {
+      toast.error(
+        `${blocked.length} activit${blocked.length === 1 ? "y has" : "ies have"} unresolved billing requirements`,
+      );
+      setQbExportFor(null);
+      return;
+    }
+    const exportTotal = exportActivities.reduce(
+      (s, a) => s + a.expectedAmount,
+      0,
+    );
     // Commit the auto-number from the counter — invoiceCounter only advances
     // when an invoice is actually created, not on every render of the Invoices
     // tab.
@@ -657,6 +1065,12 @@ export function BillingWorkspacePage() {
     // Default to net-30 from today. Ivie can update later.
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + 30);
+    // Invoice approval gate (brief 2026-06-02 §2). Confirming this dialog
+    // implicitly approves the invoice for sending AND pushes it to QB in one
+    // controller action — both audit timestamps are recorded so the gate is
+    // present in the data trail even though the action is combined for the
+    // prototype's bi-weekly batch flow.
+    const nowIso = new Date().toISOString();
     const invoice: Invoice = {
       id: `inv-${Date.now()}`,
       invoiceNumber: input.invoiceNumber,
@@ -669,12 +1083,14 @@ export function BillingWorkspacePage() {
       distributorIdUsed: input.distributorIdUsed,
       licenceVerified: input.licenceVerified,
       cycleId: CURRENT_BILLING_CYCLE.id,
-      generatedAt: new Date().toISOString(),
-      total: qbExportFor.total,
+      generatedAt: nowIso,
+      total: exportTotal,
       activityIds: qbExportFor.activityIds,
       status: "locked",
-      qbSyncedAt: new Date().toISOString(),
-      sharepointSentAt: new Date().toISOString(),
+      approvedForSendingAt: nowIso,
+      approvedForSendingBy: "Ivie (Controller)",
+      qbSyncedAt: nowIso,
+      sharepointSentAt: nowIso,
     };
     addInvoice(invoice);
     lockInvoice(invoice.id);
@@ -710,14 +1126,16 @@ export function BillingWorkspacePage() {
       ? 0
       : Math.round((lockedActivities / totalCycleActivities) * 100);
 
-  // Invoice groups — grouped by Billed To only (post-consolidation: there's a
-  // single Hart entity now, so no cross-entity split rule).
+  // Invoice groups — grouped by Billed To (post-consolidation: single Hart
+  // entity, no cross-entity split). Per-event cadence (brief 2026-06-02 §2)
+  // overrides aggregation so each activity becomes its own invoice row.
   const invoiceGroups = useMemo(() => {
     const approved = filtered.filter(
       (a) =>
         (a.status === "approved" || a.status === "ready-to-bill") &&
         a.date >= billingPeriodStart &&
-        a.date <= billingPeriodEnd,
+        a.date <= billingPeriodEnd &&
+        isBillingActivityReadyForInvoice(a),
     );
     const map = new Map<
       string,
@@ -729,7 +1147,9 @@ export function BillingWorkspacePage() {
       }
     >();
     for (const a of approved) {
-      const key = a.billedTo;
+      // Per-event: group key is the activity id so each forms its own invoice.
+      // Otherwise: group by Billed To (weekly / bi-weekly aggregation).
+      const key = aggregationCadence === "per-event" ? a.id : a.billedTo;
       const existing = map.get(key);
       if (existing) {
         existing.activities.push(a);
@@ -744,10 +1164,16 @@ export function BillingWorkspacePage() {
       }
     }
     return Array.from(map.values());
-  }, [filtered, billingPeriodStart, billingPeriodEnd, excludedActivityIds]);
+  }, [
+    filtered,
+    billingPeriodStart,
+    billingPeriodEnd,
+    excludedActivityIds,
+    aggregationCadence,
+  ]);
 
   return (
-    <div className="p-6 space-y-6 font-[Inter]">
+    <div className="p-6 space-y-6 font-[Inter] min-w-0">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -780,7 +1206,7 @@ export function BillingWorkspacePage() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="missing">
-            Missing Bills
+            Ready to Bill
             {kpiAwaiting > 0 && (
               <span
                 className="ml-2 px-1.5 py-0 rounded-full"
@@ -876,33 +1302,47 @@ export function BillingWorkspacePage() {
           )}
         </TabsContent>
 
-        {/* --------------- Missing Bills -------------------------------- */}
+        {/* --------------- Ready to Bill -------------------------------- */}
         <TabsContent value="missing" className="space-y-3">
+          {/* Events Ready to Bill dashboard (brief 2026-06-02 §2) — billing-
+              code grouped summary above the detail table. Replaces HEMS 1.0's
+              Missing Bill report. */}
+          <ReadyToBillDashboard
+            activities={filtered.filter(
+              (a) =>
+                a.status !== "billing-locked" && a.status !== "invoiced",
+            )}
+          />
           <div className="flex items-center justify-between">
             <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
               Each row must be resolved before it can be approved for billing.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                handleApprove(
-                  filtered
-                    .filter(
-                      (a) =>
-                        a.status === "missing" &&
-                        a.missingReason === "Awaiting approval",
-                    )
-                    .map((a) => a.id),
-                )
-              }
-            >
-              <CheckCircle2 size={14} className="mr-1.5" />
-              Bulk approve all
-            </Button>
+            {(() => {
+              const readyMissing = filtered.filter(
+                (a) =>
+                  a.status === "missing" && isBillingActivityReadyForInvoice(a),
+              );
+              return (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={readyMissing.length === 0}
+                  onClick={() => handleApprove(readyMissing.map((a) => a.id))}
+                  title={
+                    readyMissing.length === 0
+                      ? "No rows are currently ready — resolve blockers above first."
+                      : `Approve ${readyMissing.length} ready row${readyMissing.length === 1 ? "" : "s"}`
+                  }
+                >
+                  <CheckCircle2 size={14} className="mr-1.5" />
+                  Bulk approve ready (
+                  {readyMissing.length})
+                </Button>
+              );
+            })()}
           </div>
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="p-0 overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1000,6 +1440,10 @@ export function BillingWorkspacePage() {
                                     updateBillingActivity(a.id, {
                                       brandAmbassadorCount:
                                         a.recurringInstance.currentBrandAmbassadorCount,
+                                      recurringInstance: {
+                                        ...a.recurringInstance,
+                                        requiresRecalc: false,
+                                      },
                                       status: "ready-to-bill",
                                     });
                                     // Drop the missing reason via the index
@@ -1133,6 +1577,35 @@ export function BillingWorkspacePage() {
                 >
                   This month
                 </Button>
+              </div>
+              <div
+                className="flex items-center gap-1.5 ml-2 pl-3 border-l"
+                style={{ borderColor: "#E2E8F0" }}
+              >
+                <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
+                  Aggregation
+                </span>
+                {(
+                  ["weekly", "bi-weekly", "per-event"] as const
+                ).map((m) => (
+                  <Button
+                    key={m}
+                    size="sm"
+                    variant={aggregationCadence === m ? "default" : "outline"}
+                    onClick={() => setAggregationCadence(m)}
+                    title={
+                      m === "per-event"
+                        ? "Each activity becomes its own invoice"
+                        : `Aggregate activities into a ${m} invoice per billed party`
+                    }
+                  >
+                    {m === "bi-weekly"
+                      ? "Bi-weekly"
+                      : m === "weekly"
+                        ? "Weekly"
+                        : "Per-event"}
+                  </Button>
+                ))}
               </div>
               {excludedActivityIds.size > 0 && (
                 <button
@@ -1291,9 +1764,10 @@ export function BillingWorkspacePage() {
                           })
                         }
                         disabled={g.includedActivities.length === 0}
+                        title="Approve this invoice for sending and push it to QuickBooks in a single confirmation step (brief 2026-06-02 §2 invoice approval gate)."
                       >
                         <Send size={13} className="mr-1.5" />
-                        Export to QuickBooks
+                        Approve &amp; Export for QuickBooks
                       </Button>
                       <Button
                         size="sm"
@@ -1485,7 +1959,7 @@ export function BillingWorkspacePage() {
             </Select>
           </div>
           <Card>
-            <CardContent className="p-0">
+            <CardContent className="p-0 overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -1522,7 +1996,24 @@ export function BillingWorkspacePage() {
                               : i.cycleId}
                           </TableCell>
                           <TableCell>
-                            <strong>{i.invoiceNumber}</strong>
+                            <div>
+                              <strong>{i.invoiceNumber}</strong>
+                            </div>
+                            <div
+                              className="mt-0.5"
+                              style={{
+                                fontSize: "0.625rem",
+                                fontFamily:
+                                  "ui-monospace, SFMono-Regular, Menlo, monospace",
+                                color: "#94A3B8",
+                              }}
+                              title="Power Automate bundling tag"
+                            >
+                              #{formatArtefactTag("invoice", {
+                                cycleId: i.cycleId,
+                                invoiceNumber: i.invoiceNumber,
+                              })}
+                            </div>
                           </TableCell>
                           <TableCell
                             className="max-w-[260px] truncate"
@@ -1552,7 +2043,7 @@ export function BillingWorkspacePage() {
                             style={{
                               fontSize: "0.75rem",
                               color:
-                                i.paymentStatus === "overdue"
+                                i.paymentStatus === "disputed"
                                   ? "#B91C1C"
                                   : "#64748B",
                             }}
@@ -1881,7 +2372,7 @@ function UpdateBillingTab({
         a.status !== "approved" &&
         a.status !== "billing-locked" &&
         a.status !== "invoiced" &&
-        isBillingApprovalReady(a),
+        isBillingActivityReadyForInvoice(a),
     )
     .map((a) => a.id);
 
@@ -1921,25 +2412,31 @@ function UpdateBillingTab({
                 <TableHead>Campaign</TableHead>
                 <TableHead>Billing code</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Type</TableHead>
                 <TableHead>Account</TableHead>
                 <TableHead>Billed To</TableHead>
-                <TableHead>Service fee</TableHead>
-                <TableHead className="text-right">Activity $</TableHead>
-                <TableHead className="text-right">BA $</TableHead>
-                <TableHead className="text-right">Travel</TableHead>
                 <TableHead className="text-right">Invoice total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Activity</TableHead>
+                <TableHead>Invoice</TableHead>
+                <TableHead>Payment</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {activities.map((a) => {
-                const badge = statusBadge(a.status);
-                const approvalBlockReason = getBillingApprovalBlockReason(a);
+                const approvalBlockReason =
+                  getBillingActivityBlockReasons(a)[0];
                 return (
-                  <TableRow key={a.id}>
-                    <TableCell>
+                  <TableRow
+                    key={a.id}
+                    onClick={(e) => {
+                      // Don't open the modal when interacting with row
+                      // controls (checkbox, status dropdowns).
+                      const target = e.target as HTMLElement;
+                      if (target.closest("[data-row-control]")) return;
+                      onEdit(a);
+                    }}
+                    className="cursor-pointer hover:bg-slate-50"
+                  >
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
                       <Checkbox
                         checked={selected.has(a.id)}
                         onCheckedChange={() => toggle(a.id)}
@@ -1950,6 +2447,14 @@ function UpdateBillingTab({
                     </TableCell>
                     <TableCell className="max-w-[220px] truncate">
                       {a.name}
+                      {approvalBlockReason && (
+                        <div
+                          className="mt-0.5"
+                          style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
+                        >
+                          {approvalBlockReason}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
                       <CampaignTag
@@ -1968,11 +2473,6 @@ function UpdateBillingTab({
                       {a.billingCode ?? "—"}
                     </TableCell>
                     <TableCell>{a.date}</TableCell>
-                    <TableCell
-                      style={{ fontSize: "0.75rem", color: "#64748B" }}
-                    >
-                      {a.type}
-                    </TableCell>
                     <TableCell className="max-w-[180px] truncate">
                       {a.accountName}
                     </TableCell>
@@ -1982,53 +2482,17 @@ function UpdateBillingTab({
                     >
                       {a.billedTo}
                     </TableCell>
-                    <TableCell
-                      style={{ fontSize: "0.75rem", color: "#64748B" }}
-                    >
-                      {feeLabel(a.serviceFeeKind)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.eventAmount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.ambassadorAmount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {fmt(a.travel)}
-                    </TableCell>
                     <TableCell className="text-right font-medium">
                       {fmt(a.expectedAmount)}
                     </TableCell>
-                    <TableCell>
-                      <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
-                        style={{
-                          fontSize: "0.6875rem",
-                          background: badge.bg,
-                          color: badge.fg,
-                        }}
-                      >
-                        {badge.label}
-                      </span>
-                      {approvalBlockReason && (
-                        <div
-                          className="mt-1"
-                          style={{ fontSize: "0.6875rem", color: "#B91C1C" }}
-                        >
-                          {approvalBlockReason}
-                        </div>
-                      )}
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
+                      <ActivityTrackPicker activity={a} />
                     </TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onEdit(a)}
-                        title="Edit billing details before approving"
-                      >
-                        <Pencil size={13} className="mr-1" />
-                        Edit
-                      </Button>
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
+                      <InvoiceTrackPicker activity={a} />
+                    </TableCell>
+                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
+                      <PaymentTrackPicker activity={a} />
                     </TableCell>
                   </TableRow>
                 );
@@ -2036,7 +2500,7 @@ function UpdateBillingTab({
               {activities.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={15}
+                    colSpan={11}
                     className="text-center py-8"
                     style={{ color: "#94A3B8" }}
                   >

@@ -127,10 +127,13 @@ export function QbExportDialog({
             style={{ background: "#F1F5F9" }}
           >
             <Database size={14} style={{ color: "#64748B", marginTop: 2 }} />
-            <p style={{ fontSize: "0.75rem", color: "#475569" }}>
-              QB XMLT export + invoice PDF to SharePoint. Invoice locks
-              immediately after export.
-            </p>
+            <div style={{ fontSize: "0.75rem", color: "#475569" }}>
+              <strong>Export only.</strong> HEMS writes a QBXML file and the
+              invoice PDF to SharePoint; the controller imports the QBXML
+              into QuickBooks manually (no two-way sync). Invoice locks
+              immediately after export. Approval-for-sending audit is
+              recorded with this action.
+            </div>
           </div>
         </div>
 
@@ -140,7 +143,7 @@ export function QbExportDialog({
           </Button>
           <Button onClick={handleConfirm}>
             <FileText size={14} className="mr-1.5" />
-            Export & lock
+            Approve, export QBXML &amp; lock
           </Button>
         </DialogFooter>
       </DialogContent>
