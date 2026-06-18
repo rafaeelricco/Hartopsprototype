@@ -23,9 +23,6 @@ import {
   Filter,
   Mail,
   CalendarRange,
-  Plus,
-  ArrowRight,
-  Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -38,8 +35,6 @@ import { Button } from "@/app/shared/components/ui/button";
 import { Checkbox } from "@/app/shared/components/ui/checkbox";
 import { Input } from "@/app/shared/components/ui/input";
 import { Card, CardContent } from "@/app/shared/components/ui/card";
-import { Label } from "@/app/shared/components/ui/label";
-import { Textarea } from "@/app/shared/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
@@ -79,24 +74,16 @@ import { ACTIVITY_CATEGORIES } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
   GeneratedReport,
-  PayrollAdjustment,
   PayrollLineItem,
-  PayrollReviewRequest,
 } from "@/app/shared/data/billing-types";
 import {
   MOCK_PAYROLL_LINE_ITEMS,
-  MOCK_PAYROLL_ADJUSTMENTS,
   CURRENT_PAYROLL_CYCLE,
   HISTORICAL_PAYROLL_CYCLES,
   MOCK_PAYROLL_REPORTS,
   approvePayrollItems,
   rejectPayrollItem,
-  acknowledgeRecurringRecalc,
-  createPayrollAdjustment,
-  applyPayrollAdjustment,
-  voidPayrollAdjustment,
 } from "./payroll-data";
-import { RecurringRecalcDialog } from "./recurring-recalc-dialog";
 import { GenerateReportDialog } from "./generate-report-dialog";
 
 // ---------------------------------------------------------------------------
@@ -163,16 +150,6 @@ const INITIAL_FILTERS: FiltersState = {
   cycleEnd: "2026-05-21",
 };
 
-function isAdjustmentQueuedForCycle(
-  adjustment: PayrollAdjustment,
-  cycleId: string,
-): boolean {
-  return (
-    adjustment.status === "pending" ||
-    (adjustment.status === "applied" && adjustment.appliedToCycleId === cycleId)
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
@@ -182,7 +159,6 @@ export function PayrollWorkspacePage() {
     MOCK_PAYROLL_LINE_ITEMS,
   );
   const [filters, setFilters] = useState<FiltersState>(INITIAL_FILTERS);
-  const [recalcFor, setRecalcFor] = useState<PayrollLineItem | null>(null);
   const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
   const [rejectCycleOpen, setRejectCycleOpen] = useState(false);
   const [cycleStatus, setCycleStatus] = useState(CURRENT_PAYROLL_CYCLE.status);
@@ -190,36 +166,8 @@ export function PayrollWorkspacePage() {
   const [reports, setReports] =
     useState<GeneratedReport[]>(MOCK_PAYROLL_REPORTS);
   const [reportPreview, setReportPreview] = useState<string | null>(null);
-  const [adjustments, setAdjustments] = useState<PayrollAdjustment[]>([
-    ...MOCK_PAYROLL_ADJUSTMENTS,
-  ]);
-  const [reviewRequests, setReviewRequests] = useState<PayrollReviewRequest[]>(
-    [
-      {
-        id: "rev-001",
-        cycleId: CURRENT_PAYROLL_CYCLE.id,
-        reviewer: "Leah Guidarelli",
-        requestedBy: "Larry Golus",
-        territory: "Albany",
-        status: "pending",
-        requestedAt: "2026-05-22T14:00:00Z",
-        note: "Please confirm Upstate brand ambassador pay before I run the export.",
-      },
-    ],
-  );
-  const [requestReviewOpen, setRequestReviewOpen] = useState(false);
-  const [reviewPreviewFor, setReviewPreviewFor] =
-    useState<PayrollReviewRequest | null>(null);
-  const [changesCommentFor, setChangesCommentFor] =
-    useState<PayrollReviewRequest | null>(null);
-  const [changesComment, setChangesComment] = useState("");
-
   function refreshItems() {
     setItems([...MOCK_PAYROLL_LINE_ITEMS]);
-  }
-
-  function refreshAdjustments() {
-    setAdjustments([...MOCK_PAYROLL_ADJUSTMENTS]);
   }
 
   const filtered = useMemo(() => {
@@ -254,15 +202,7 @@ export function PayrollWorkspacePage() {
       p.date <= filters.cycleEnd &&
       (p.status === "missing" || p.status === "pending-manager"),
   );
-  const filteredLineItemTotal = filtered.reduce((s, p) => s + p.finalPay, 0);
-  const cycleAdjustmentLines = adjustments.filter((a) =>
-    isAdjustmentQueuedForCycle(a, CURRENT_PAYROLL_CYCLE.id),
-  );
-  const cycleAdjustmentTotal = cycleAdjustmentLines.reduce(
-    (s, a) => s + a.amount,
-    0,
-  );
-  const totalPayEstimated = filteredLineItemTotal + cycleAdjustmentTotal;
+  const totalPayEstimated = filtered.reduce((s, p) => s + p.finalPay, 0);
   const overrideCount = filtered.filter((p) => !!p.override).length;
 
   // Cycle progress
@@ -281,26 +221,12 @@ export function PayrollWorkspacePage() {
   // ----------------------- Handlers ---------------------------------------
 
   function approveOne(id: string) {
-    const item = items.find((p) => p.id === id);
-    if (item?.recurringRecalcRequired) {
-      setRecalcFor(item);
-      return;
-    }
     approvePayrollItems([id]);
     refreshItems();
     toast.success("Approved");
   }
 
   function approveMany(ids: string[]) {
-    // Filter out items that require recalc — surface them one at a time.
-    const blocking = ids.find(
-      (id) => items.find((p) => p.id === id)?.recurringRecalcRequired,
-    );
-    if (blocking) {
-      const item = items.find((p) => p.id === blocking) || null;
-      setRecalcFor(item);
-      return;
-    }
     approvePayrollItems(ids);
     refreshItems();
     toast.success(`Approved ${ids.length} item${ids.length === 1 ? "" : "s"}`);
@@ -312,20 +238,8 @@ export function PayrollWorkspacePage() {
     toast.message("Marked rejected");
   }
 
-  function confirmRecalc(id: string) {
-    acknowledgeRecurringRecalc(id);
-    approvePayrollItems([id]);
-    refreshItems();
-    setRecalcFor(null);
-    toast.success("Recalculated & approved");
-  }
-
   function handleExport() {
     if (!canExport) return;
-    adjustments
-      .filter((a) => a.status === "pending")
-      .forEach((a) => applyPayrollAdjustment(a.id, CURRENT_PAYROLL_CYCLE.id));
-    refreshAdjustments();
     // Move cycle to Awaiting Kayla — matches the post-export workflow + toast.
     setCycleStatus("awaiting-kayla");
     setExportConfirmOpen(false);
@@ -530,7 +444,6 @@ export function PayrollWorkspacePage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="approve">Approve</TabsTrigger>
-            <TabsTrigger value="adjustments">Adjustments</TabsTrigger>
             <TabsTrigger value="export">Export</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
@@ -710,15 +623,6 @@ export function PayrollWorkspacePage() {
             />
           </TabsContent>
 
-          {/* --------------- Adjustments -------------------------------- */}
-          <TabsContent value="adjustments" className="space-y-4">
-            <PayrollAdjustmentsTab
-              cycleId={CURRENT_PAYROLL_CYCLE.id}
-              adjustments={adjustments}
-              onAdjustmentsChange={setAdjustments}
-            />
-          </TabsContent>
-
           {/* --------------- Export -------------------------------------- */}
           <TabsContent value="export" className="space-y-4">
             <Card>
@@ -752,10 +656,9 @@ export function PayrollWorkspacePage() {
                   <Download size={14} style={{ color: "#64748B", marginTop: 2 }} />
                   <p style={{ fontSize: "0.75rem", color: "#475569" }}>
                     Export is an <strong>ADP-compatible CSV</strong> (one row
-                    per BA per cycle, including any queued Adjustments as ADP
-                    pay lines). After export, the cycle payroll-locks; you
-                    can't add brand ambassadors or edit pay-relevant fields.
-                    Cycle moves to <strong>Awaiting Kayla</strong>.
+                    per BA per cycle). After export, the cycle payroll-locks;
+                    you can't add brand ambassadors or edit pay-relevant
+                    fields. Cycle moves to <strong>Awaiting Kayla</strong>.
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
@@ -774,16 +677,6 @@ export function PayrollWorkspacePage() {
                       {filtered.length} line items · territory{" "}
                       {CURRENT_PAYROLL_CYCLE.territory}
                     </div>
-                    {cycleAdjustmentLines.length > 0 && (
-                      <div
-                        className="mt-0.5"
-                        style={{ fontSize: "0.75rem", color: "#64748B" }}
-                      >
-                        Includes {cycleAdjustmentLines.length} adjustment
-                        {cycleAdjustmentLines.length === 1 ? "" : "s"} ·{" "}
-                        {fmt(cycleAdjustmentTotal)}
-                      </div>
-                    )}
                   </div>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -810,186 +703,6 @@ export function PayrollWorkspacePage() {
 
           {/* --------------- Reports ------------------------------------- */}
           <TabsContent value="reports" className="space-y-4">
-            {/* P3 #9 — Second-eyes manager reviews */}
-            <Card>
-              <CardContent className="p-5 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3
-                      className="flex items-center gap-2"
-                      style={{ fontSize: "0.9375rem", color: "#0F172A" }}
-                    >
-                      <CheckCircle2 size={16} style={{ color: "#7D152D" }} />
-                      Second-eyes reviews
-                    </h3>
-                    <p
-                      className="mt-0.5"
-                      style={{ fontSize: "0.75rem", color: "#94A3B8" }}
-                    >
-                      Pre-export sanity check — send the report to another
-                      manager before locking the cycle.
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setRequestReviewOpen(true)}
-                  >
-                    <Mail size={13} className="mr-1.5" />
-                    Request review
-                  </Button>
-                </div>
-                {reviewRequests.length === 0 ? (
-                  <p
-                    style={{ fontSize: "0.8125rem", color: "#94A3B8" }}
-                    className="py-2"
-                  >
-                    No pending reviews.
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {reviewRequests.map((r) => {
-                      const isPending = r.status === "pending";
-                      const tone =
-                        r.status === "approved"
-                          ? { bg: "#ECFDF5", fg: "#0F766E", label: "Approved" }
-                          : r.status === "changes-requested"
-                            ? {
-                                bg: "#FEF2F2",
-                                fg: "#B91C1C",
-                                label: "Changes requested",
-                              }
-                            : {
-                                bg: "#FFFBEB",
-                                fg: "#92400E",
-                                label: "Pending",
-                              };
-                      return (
-                        <div
-                          key={r.id}
-                          className="rounded-lg border p-3"
-                          style={{ borderColor: "#E2E8F0" }}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1">
-                            <div
-                              className="flex items-center gap-2"
-                              style={{ fontSize: "0.875rem", color: "#0F172A" }}
-                            >
-                              <strong>{r.reviewer}</strong>
-                              <span
-                                className="px-1.5 py-0 rounded"
-                                style={{
-                                  fontSize: "0.6875rem",
-                                  background: tone.bg,
-                                  color: tone.fg,
-                                }}
-                              >
-                                {tone.label}
-                              </span>
-                              {r.territory && (
-                                <span
-                                  className="px-1.5 py-0 rounded"
-                                  style={{
-                                    fontSize: "0.6875rem",
-                                    background: "#F1F5F9",
-                                    color: "#475569",
-                                  }}
-                                >
-                                  {r.territory}
-                                </span>
-                              )}
-                            </div>
-                            <div
-                              className="mt-0.5"
-                              style={{ fontSize: "0.75rem", color: "#94A3B8" }}
-                            >
-                              Requested by {r.requestedBy} ·{" "}
-                              {new Date(r.requestedAt).toLocaleString()}
-                            </div>
-                            {r.note && (
-                              <div
-                                className="mt-1"
-                                style={{
-                                  fontSize: "0.75rem",
-                                  color: "#475569",
-                                }}
-                              >
-                                "{r.note}"
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex gap-1.5 flex-shrink-0 items-start">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setReviewPreviewFor(r)}
-                            >
-                              <FileText size={12} className="mr-1.5" />
-                              View report
-                            </Button>
-                            {isPending && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    setChangesComment("");
-                                    setChangesCommentFor(r);
-                                  }}
-                                >
-                                  Changes
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  onClick={() => {
-                                    setReviewRequests((prev) =>
-                                      prev.map((x) =>
-                                        x.id === r.id
-                                          ? {
-                                              ...x,
-                                              status: "approved",
-                                              completedAt:
-                                                new Date().toISOString(),
-                                            }
-                                          : x,
-                                      ),
-                                    );
-                                    toast.success(`${r.reviewer} approved`);
-                                  }}
-                                >
-                                  Approve
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                          </div>
-                          {r.reviewerComment && !isPending && (
-                            <div
-                              className="mt-2 rounded-md p-2"
-                              style={{
-                                background:
-                                  r.status === "changes-requested"
-                                    ? "#FEF2F2"
-                                    : "#ECFDF5",
-                                fontSize: "0.75rem",
-                                color:
-                                  r.status === "changes-requested"
-                                    ? "#7F1D1D"
-                                    : "#065F46",
-                              }}
-                            >
-                              <strong>{r.reviewer}:</strong> "{r.reviewerComment}"
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
             <div className="flex items-center justify-between">
               <p style={{ fontSize: "0.875rem", color: "#64748B" }}>
                 Reports pull from approved line items in the current cycle.
@@ -1080,13 +793,6 @@ export function PayrollWorkspacePage() {
           </TabsContent>
         </Tabs>
 
-        <RecurringRecalcDialog
-          open={!!recalcFor}
-          onClose={() => setRecalcFor(null)}
-          item={recalcFor}
-          onConfirm={confirmRecalc}
-        />
-
         <GenerateReportDialog
           open={generateOpen}
           onClose={() => setGenerateOpen(false)}
@@ -1117,10 +823,6 @@ export function PayrollWorkspacePage() {
             <div className="space-y-2">
               <Row label="Total pay" value={fmt(totalPayEstimated)} bold />
               <Row label="Line items" value={String(filtered.length)} />
-              <Row
-                label="Adjustments"
-                value={`${cycleAdjustmentLines.length} · ${fmt(cycleAdjustmentTotal)}`}
-              />
               <Row
                 label="Approved"
                 value={String(approvedCount)}
@@ -1173,141 +875,6 @@ export function PayrollWorkspacePage() {
               <Button onClick={handleRejectCycle}>
                 <RotateCcw size={14} className="mr-1.5" />
                 Reject &amp; re-open
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Request second-eyes review (P3 #9) */}
-        <RequestReviewDialog
-          open={requestReviewOpen}
-          onClose={() => setRequestReviewOpen(false)}
-          territories={Array.from(
-            new Set(filtered.map((p) => p.territory)),
-          ).sort()}
-          onSubmit={(input) => {
-            const next: PayrollReviewRequest = {
-              id: `rev-${Date.now()}`,
-              cycleId: CURRENT_PAYROLL_CYCLE.id,
-              reviewer: input.reviewer,
-              requestedBy: "Hart Ops",
-              status: "pending",
-              requestedAt: new Date().toISOString(),
-              ...(input.territory ? { territory: input.territory } : {}),
-              ...(input.note ? { note: input.note } : {}),
-            };
-            setReviewRequests((prev) => [next, ...prev]);
-            setRequestReviewOpen(false);
-            toast.success(`Review requested from ${input.reviewer}`);
-          }}
-        />
-
-        {/* Review report preview (P3 #9 — open the master journal scoped to the review) */}
-        <Dialog
-          open={!!reviewPreviewFor}
-          onOpenChange={(v) => (v ? null : setReviewPreviewFor(null))}
-        >
-          <DialogContent className="!max-w-[min(96vw,1200px)] w-[min(96vw,1200px)]">
-            <DialogHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <DialogTitle>
-                    Review report{reviewPreviewFor?.territory
-                      ? ` · ${reviewPreviewFor.territory}`
-                      : " · Full cycle"}
-                  </DialogTitle>
-                  <DialogDescription>
-                    Requested by {reviewPreviewFor?.requestedBy}. {reviewPreviewFor?.note ? `"${reviewPreviewFor.note}"` : ""}
-                  </DialogDescription>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => window.print()}
-                >
-                  <FileText size={13} className="mr-1.5" />
-                  Print
-                </Button>
-              </div>
-            </DialogHeader>
-            <MasterJournalPreview
-              items={
-                reviewPreviewFor?.territory
-                  ? filtered.filter(
-                      (p) => p.territory === reviewPreviewFor.territory,
-                    )
-                  : filtered
-              }
-            />
-          </DialogContent>
-        </Dialog>
-
-        {/* Request changes — comment dialog (P3 #9) */}
-        <Dialog
-          open={!!changesCommentFor}
-          onOpenChange={(v) => (v ? null : setChangesCommentFor(null))}
-        >
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Request changes</DialogTitle>
-              <DialogDescription>
-                Tell {changesCommentFor?.requestedBy} what needs to change.
-                Comment is recorded on the review.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-1.5">
-              <label
-                htmlFor="changes-comment"
-                style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-              >
-                Comment
-              </label>
-              <textarea
-                id="changes-comment"
-                className="w-full rounded-md border px-3 py-2"
-                style={{
-                  fontSize: "0.875rem",
-                  borderColor: "#E2E8F0",
-                  minHeight: 100,
-                  fontFamily: "inherit",
-                }}
-                value={changesComment}
-                onChange={(e) => setChangesComment(e.target.value)}
-                placeholder="e.g. Lisa Thompson's hours look wrong for the May 19 activity — please double-check."
-              />
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setChangesCommentFor(null)}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  if (!changesCommentFor) return;
-                  const id = changesCommentFor.id;
-                  const comment = changesComment.trim();
-                  setReviewRequests((prev) =>
-                    prev.map((x) =>
-                      x.id === id
-                        ? {
-                            ...x,
-                            status: "changes-requested",
-                            completedAt: new Date().toISOString(),
-                            ...(comment ? { reviewerComment: comment } : {}),
-                          }
-                        : x,
-                    ),
-                  );
-                  toast.message(
-                    `${changesCommentFor.reviewer} requested changes`,
-                  );
-                  setChangesCommentFor(null);
-                  setChangesComment("");
-                }}
-              >
-                Send changes
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1524,37 +1091,7 @@ function ApproveTab({
                       </TableCell>
                       <TableCell>
                         {p.brandAmbassadorName}
-                        {p.isCancellation && p.cancellationBreakdown ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span
-                                className="ml-2 px-1.5 py-0 rounded cursor-help"
-                                style={{
-                                  fontSize: "0.6875rem",
-                                  background: "#F1F5F9",
-                                  color: "#475569",
-                                  borderBottom: "1px dashed #94A3B8",
-                                }}
-                              >
-                                cancellation
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <div className="space-y-0.5">
-                                <div>
-                                  Kit pickup:{" "}
-                                  {fmt(p.cancellationBreakdown.kitPickup)}
-                                </div>
-                                <div>
-                                  Travel: {fmt(p.cancellationBreakdown.travel)}
-                                </div>
-                                <div>
-                                  Time: {fmt(p.cancellationBreakdown.time)}
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : p.isCancellation ? (
+                        {p.isCancellation ? (
                           <span
                             className="ml-2 px-1.5 py-0 rounded"
                             style={{
@@ -1605,26 +1142,7 @@ function ApproveTab({
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        {p.recurringRecalcRequired ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span
-                                style={{
-                                  borderBottom: "1px dashed #D97706",
-                                  color: "#D97706",
-                                }}
-                              >
-                                {fmt(p.finalPay)} ⚠
-                              </span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              Recurring brand ambassador count changed — Approve
-                              to recalculate.
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          fmt(p.finalPay)
-                        )}
+                        {fmt(p.finalPay)}
                       </TableCell>
                       <TableCell>
                         <span
@@ -1910,116 +1428,6 @@ function CategoryMultiSelect({
 }
 
 // ---------------------------------------------------------------------------
-// RequestReviewDialog — P3 #9. Larry → Leah second-eyes pre-export sanity check.
-// ---------------------------------------------------------------------------
-
-function RequestReviewDialog({
-  open,
-  onClose,
-  territories,
-  onSubmit,
-}: {
-  open: boolean;
-  onClose: () => void;
-  territories: string[];
-  onSubmit: (input: {
-    reviewer: string;
-    territory?: string;
-    note?: string;
-  }) => void;
-}) {
-  const [reviewer, setReviewer] = useState("Leah Guidarelli");
-  const [territory, setTerritory] = useState<string>("");
-  const [note, setNote] = useState("");
-
-  return (
-    <Dialog open={open} onOpenChange={(v) => (v ? null : onClose())}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Request second-eyes review</DialogTitle>
-          <DialogDescription>
-            Sends the selected scope to a reviewer for sign-off before export.
-            Mirrors Larry's "send to Leah for Upstate" step.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <label
-              htmlFor="rr-reviewer"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-            >
-              Reviewer
-            </label>
-            <Input
-              id="rr-reviewer"
-              value={reviewer}
-              onChange={(e) => setReviewer(e.target.value)}
-              placeholder="e.g. Leah Guidarelli"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label
-              htmlFor="rr-territory"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-            >
-              Scope (territory)
-            </label>
-            <Select
-              value={territory || "all"}
-              onValueChange={(v) => setTerritory(v === "all" ? "" : v)}
-            >
-              <SelectTrigger id="rr-territory">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Full cycle</SelectItem>
-                {territories.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <label
-              htmlFor="rr-note"
-              style={{ fontSize: "0.8125rem", color: "#0F172A" }}
-            >
-              Note (optional)
-            </label>
-            <Input
-              id="rr-note"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Why are you asking for review?"
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              if (!reviewer.trim()) return;
-              onSubmit({
-                reviewer: reviewer.trim(),
-                ...(territory ? { territory } : {}),
-                ...(note.trim() ? { note: note.trim() } : {}),
-              });
-            }}
-          >
-            <Mail size={14} className="mr-1.5" />
-            Send request
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // MasterJournalPreview — P3 #7. Printable view grouped by manager/territory,
 // showing every BA's payments in the cycle. Sarah Scott uses this as the
 // physical reconciliation artefact (transcript 00:20:52).
@@ -2134,319 +1542,6 @@ function MasterJournalPreview({ items }: { items: PayrollLineItem[] }) {
           </div>
         );
       })}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Payroll Adjustments tab (brief 2026-06-02 §2)
-// Prior-period corrections processed in the next batch. A correction posts
-// into HEMS as an "ADP pay" line on the individual's pay record.
-// ---------------------------------------------------------------------------
-
-function PayrollAdjustmentsTab({
-  cycleId,
-  adjustments,
-  onAdjustmentsChange,
-}: {
-  cycleId: string;
-  adjustments: PayrollAdjustment[];
-  onAdjustmentsChange: (adjustments: PayrollAdjustment[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [draftBa, setDraftBa] = useState("");
-  const [draftAmount, setDraftAmount] = useState("");
-  const [draftReason, setDraftReason] = useState("");
-  const [draftPriorCycle, setDraftPriorCycle] = useState("");
-
-  function refresh() {
-    onAdjustmentsChange([...MOCK_PAYROLL_ADJUSTMENTS]);
-  }
-
-  function resetDraft() {
-    setDraftBa("");
-    setDraftAmount("");
-    setDraftReason("");
-    setDraftPriorCycle("");
-  }
-
-  // BA list from current cycle (so the dropdown matches who's billable).
-  const baOptions = useMemo(() => {
-    const seen = new Map<string, string>();
-    for (const p of MOCK_PAYROLL_LINE_ITEMS) {
-      if (!seen.has(p.brandAmbassadorId))
-        seen.set(p.brandAmbassadorId, p.brandAmbassadorName);
-    }
-    return Array.from(seen.entries()).map(([id, name]) => ({ id, name }));
-  }, []);
-
-  function handleCreate() {
-    if (!draftBa) {
-      toast.error("Select a brand ambassador");
-      return;
-    }
-    const amt = parseFloat(draftAmount);
-    if (Number.isNaN(amt) || amt === 0) {
-      toast.error("Enter a non-zero amount (negative for recovery)");
-      return;
-    }
-    if (!draftReason.trim()) {
-      toast.error("Enter a reason");
-      return;
-    }
-    const ba = baOptions.find((o) => o.id === draftBa);
-    createPayrollAdjustment({
-      brandAmbassadorId: draftBa,
-      brandAmbassadorName: ba?.name ?? draftBa,
-      amount: amt,
-      reason: draftReason.trim(),
-      ...(draftPriorCycle ? { priorCycleId: draftPriorCycle } : {}),
-      createdBy: "Ivie (Controller)",
-    });
-    refresh();
-    setOpen(false);
-    resetDraft();
-    toast.success(
-      `Adjustment queued for next batch (${amt > 0 ? "+" : ""}${fmt(amt)}).`,
-    );
-  }
-
-  function apply(id: string) {
-    applyPayrollAdjustment(id, cycleId);
-    refresh();
-    toast.success(`Adjustment applied to current cycle as ADP pay line.`);
-  }
-
-  function voidAdj(id: string) {
-    voidPayrollAdjustment(id);
-    refresh();
-    toast.success(`Adjustment voided.`);
-  }
-
-  const pending = adjustments.filter((a) => a.status === "pending");
-  const applied = adjustments.filter((a) => a.status === "applied");
-  const voided = adjustments.filter((a) => a.status === "voided");
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p style={{ fontSize: "0.875rem", color: "#0F172A" }}>
-            Prior-period corrections processed in the next batch.
-          </p>
-          <p style={{ fontSize: "0.75rem", color: "#64748B" }}>
-            Each correction posts into HEMS as an ADP pay line on the
-            individual's pay record.
-          </p>
-        </div>
-        <Button onClick={() => setOpen(true)}>
-          <Plus size={14} className="mr-1.5" />
-          New adjustment
-        </Button>
-      </div>
-
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Brand Ambassador</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Prior cycle</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[...pending, ...applied, ...voided].map((a) => (
-                <TableRow key={a.id}>
-                  <TableCell style={{ fontWeight: 600 }}>
-                    {a.brandAmbassadorName}
-                  </TableCell>
-                  <TableCell
-                    className="text-right"
-                    style={{
-                      color: a.amount >= 0 ? "#0F766E" : "#B91C1C",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {a.amount > 0 ? "+" : ""}
-                    {fmt(a.amount)}
-                  </TableCell>
-                  <TableCell
-                    className="max-w-[280px] truncate"
-                    title={a.reason}
-                    style={{ fontSize: "0.8125rem" }}
-                  >
-                    {a.reason}
-                  </TableCell>
-                  <TableCell
-                    style={{ fontSize: "0.75rem", color: "#64748B" }}
-                  >
-                    {a.priorCycleId ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md"
-                      style={{
-                        fontSize: "0.6875rem",
-                        background:
-                          a.status === "applied"
-                            ? "#ECFDF5"
-                            : a.status === "voided"
-                              ? "#F1F5F9"
-                              : "#FFFBEB",
-                        color:
-                          a.status === "applied"
-                            ? "#0F766E"
-                            : a.status === "voided"
-                              ? "#64748B"
-                              : "#92400E",
-                      }}
-                    >
-                      {a.status === "applied" && (
-                        <CheckCircle2 size={11} />
-                      )}
-                      {a.status}
-                    </span>
-                    {a.appliedAt && (
-                      <div
-                        className="mt-0.5"
-                        style={{ fontSize: "0.625rem", color: "#94A3B8" }}
-                      >
-                        applied {new Date(a.appliedAt).toLocaleDateString()}
-                        {a.appliedToCycleId
-                          ? ` · ${a.appliedToCycleId.replace(/^pcyc-/, "")}`
-                          : ""}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right whitespace-nowrap">
-                    {a.status === "pending" && (
-                      <>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => apply(a.id)}
-                          title={`Apply to current cycle (${cycleId})`}
-                        >
-                          <ArrowRight size={13} className="mr-1" />
-                          Apply
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => voidAdj(a.id)}
-                          style={{ color: "#B91C1C" }}
-                        >
-                          <Ban size={13} className="mr-1" />
-                          Void
-                        </Button>
-                      </>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {adjustments.length === 0 && (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="py-8 text-center"
-                    style={{ color: "#94A3B8" }}
-                  >
-                    No payroll adjustments. Click{" "}
-                    <strong>New adjustment</strong> to queue one for the next
-                    batch.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-
-      <Dialog
-        open={open}
-        onOpenChange={(v) => {
-          if (!v) {
-            setOpen(false);
-            resetDraft();
-          }
-        }}
-      >
-        <DialogContent className="!max-w-md">
-          <DialogHeader>
-            <DialogTitle>New payroll adjustment</DialogTitle>
-            <DialogDescription>
-              Posts into HEMS as an ADP pay line on the BA's pay record.
-              Apply when the next batch is opened.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="adj-ba">Brand Ambassador</Label>
-              <select
-                id="adj-ba"
-                value={draftBa}
-                onChange={(e) => setDraftBa(e.target.value)}
-                className="rounded-md border h-9 w-full px-3"
-                style={{ borderColor: "#E2E8F0", fontSize: "0.875rem" }}
-              >
-                <option value="">— Select —</option>
-                {baOptions.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="adj-amount">
-                Amount ($) · negative for recovery
-              </Label>
-              <Input
-                id="adj-amount"
-                type="number"
-                value={draftAmount}
-                onChange={(e) => setDraftAmount(e.target.value)}
-                placeholder="80 or -45"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="adj-cycle">Prior cycle (optional)</Label>
-              <Input
-                id="adj-cycle"
-                value={draftPriorCycle}
-                onChange={(e) => setDraftPriorCycle(e.target.value)}
-                placeholder="e.g. pcyc-2026-04b"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="adj-reason">Reason</Label>
-              <Textarea
-                id="adj-reason"
-                rows={3}
-                value={draftReason}
-                onChange={(e) => setDraftReason(e.target.value)}
-                placeholder="What needs correcting and why."
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setOpen(false);
-                resetDraft();
-              }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleCreate}>Queue for next batch</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

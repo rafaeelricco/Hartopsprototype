@@ -66,6 +66,7 @@ import {
   SERVICE_FEE_BY_KIND,
   ACTIVITY_CATEGORIES,
   INVOICE_PAYMENT_STATUSES,
+  formatEventDuration,
 } from "@/app/shared/data/billing-types";
 import type {
   ActivityCategory,
@@ -227,25 +228,33 @@ function TrackPickerShell({
   );
 }
 
-function ActivityTrackPicker({ activity }: { activity: BillingActivity }) {
+// Activity track is read-only (brief 2026-06-12): inherited from the event
+// lifecycle, not set by the controller. Rendered as a static badge.
+function ActivityTrackBadge({ activity }: { activity: BillingActivity }) {
   const value: ActivityTrackStatus =
     activity.activityTrackStatus ??
     (activity.status === "missing" ? "not-completed" : "completed");
+  const label =
+    ACTIVITY_TRACK_STATUSES.find((o) => o.value === value)?.label ?? value;
+  const tone =
+    value === "completed"
+      ? { bg: "#ECFDF5", fg: "#0F766E" }
+      : { bg: "#FFFBEB", fg: "#92400E" };
   return (
-    <TrackPickerShell
-      value={value}
-      options={ACTIVITY_TRACK_STATUSES}
-      toneFor={(v) =>
-        v === "completed"
-          ? { bg: "#ECFDF5", fg: "#0F766E" }
-          : { bg: "#FFFBEB", fg: "#92400E" }
-      }
-      onChange={(next) => {
-        updateBillingActivity(activity.id, {
-          activityTrackStatus: next as ActivityTrackStatus,
-        });
+    <span
+      className="inline-flex items-center rounded-md border h-7 px-2"
+      title="Inherited from the event lifecycle"
+      style={{
+        fontSize: "0.6875rem",
+        background: tone.bg,
+        color: tone.fg,
+        borderColor: tone.fg + "33",
+        fontWeight: 500,
+        minWidth: 120,
       }}
-    />
+    >
+      {label}
+    </span>
   );
 }
 
@@ -767,12 +776,6 @@ export function BillingWorkspacePage() {
   const [billingPeriodEnd, setBillingPeriodEnd] = useState(
     CURRENT_BILLING_CYCLE.windowEnd,
   );
-  // Aggregation cadence (brief 2026-06-02 §2). The window dates drive
-  // weekly / bi-weekly; "per-event" overrides aggregation so each approved
-  // activity becomes its own invoice.
-  const [aggregationCadence, setAggregationCadence] = useState<
-    "weekly" | "bi-weekly" | "per-event"
-  >("bi-weekly");
   const [excludedActivityIds, setExcludedActivityIds] = useState<Set<string>>(
     new Set(),
   );
@@ -954,7 +957,6 @@ export function BillingWorkspacePage() {
     const barSpend = existing.barSpend ?? 0;
     const gratuity = existing.serviceFeeKind === "bar" ? barSpend * 0.2 : 0;
     const expenseTotals =
-      (existing.suppliesAmount ?? 0) +
       (existing.promotionPublicityAmount ?? 0) +
       (existing.travelEntertainmentAmount ?? 0);
     // Travel × BA count (Joe 2026-06-04).
@@ -1126,9 +1128,8 @@ export function BillingWorkspacePage() {
       ? 0
       : Math.round((lockedActivities / totalCycleActivities) * 100);
 
-  // Invoice groups — grouped by Billed To (post-consolidation: single Hart
-  // entity, no cross-entity split). Per-event cadence (brief 2026-06-02 §2)
-  // overrides aggregation so each activity becomes its own invoice row.
+  // Invoice groups — per-event invoicing (brief 2026-06-12): each approved
+  // activity becomes its own invoice row. No period aggregation.
   const invoiceGroups = useMemo(() => {
     const approved = filtered.filter(
       (a) =>
@@ -1147,9 +1148,9 @@ export function BillingWorkspacePage() {
       }
     >();
     for (const a of approved) {
-      // Per-event: group key is the activity id so each forms its own invoice.
-      // Otherwise: group by Billed To (weekly / bi-weekly aggregation).
-      const key = aggregationCadence === "per-event" ? a.id : a.billedTo;
+      // Per-event invoicing: group key is the activity id so each forms its
+      // own invoice.
+      const key = a.id;
       const existing = map.get(key);
       if (existing) {
         existing.activities.push(a);
@@ -1169,7 +1170,6 @@ export function BillingWorkspacePage() {
     billingPeriodStart,
     billingPeriodEnd,
     excludedActivityIds,
-    aggregationCadence,
   ]);
 
   return (
@@ -1349,6 +1349,9 @@ export function BillingWorkspacePage() {
                     <TableHead>Activity</TableHead>
                     <TableHead>Campaign</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead>Start</TableHead>
+                    <TableHead>End</TableHead>
+                    <TableHead>Duration</TableHead>
                     <TableHead>Account</TableHead>
                     <TableHead>Distributor</TableHead>
                     <TableHead>Brand Ambassadors</TableHead>
@@ -1392,6 +1395,11 @@ export function BillingWorkspacePage() {
                             />
                           </TableCell>
                           <TableCell>{a.date}</TableCell>
+                          <TableCell>{a.startTime ?? "—"}</TableCell>
+                          <TableCell>{a.endTime ?? "—"}</TableCell>
+                          <TableCell>
+                            {formatEventDuration(a.startTime, a.endTime) || "—"}
+                          </TableCell>
                           <TableCell>{a.accountName}</TableCell>
                           <TableCell>{a.distributor}</TableCell>
                           <TableCell>{a.brandAmbassadorCount}</TableCell>
@@ -1479,7 +1487,7 @@ export function BillingWorkspacePage() {
                     0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={9}
+                        colSpan={12}
                         className="text-center py-8"
                         style={{ color: "#94A3B8" }}
                       >
@@ -1506,7 +1514,7 @@ export function BillingWorkspacePage() {
 
         {/* --------------- Invoices ------------------------------------- */}
         <TabsContent value="invoices" className="space-y-4">
-          {/* Billing-period filter (Ivie May-26). Default bi-weekly. */}
+          {/* Billing-period filter (Ivie May-26). Per-event invoicing. */}
           <Card>
             <CardContent className="p-4 flex flex-wrap items-center gap-3">
               <div
@@ -1577,35 +1585,6 @@ export function BillingWorkspacePage() {
                 >
                   This month
                 </Button>
-              </div>
-              <div
-                className="flex items-center gap-1.5 ml-2 pl-3 border-l"
-                style={{ borderColor: "#E2E8F0" }}
-              >
-                <span style={{ fontSize: "0.75rem", color: "#94A3B8" }}>
-                  Aggregation
-                </span>
-                {(
-                  ["weekly", "bi-weekly", "per-event"] as const
-                ).map((m) => (
-                  <Button
-                    key={m}
-                    size="sm"
-                    variant={aggregationCadence === m ? "default" : "outline"}
-                    onClick={() => setAggregationCadence(m)}
-                    title={
-                      m === "per-event"
-                        ? "Each activity becomes its own invoice"
-                        : `Aggregate activities into a ${m} invoice per billed party`
-                    }
-                  >
-                    {m === "bi-weekly"
-                      ? "Bi-weekly"
-                      : m === "weekly"
-                        ? "Weekly"
-                        : "Per-event"}
-                  </Button>
-                ))}
               </div>
               {excludedActivityIds.size > 0 && (
                 <button
@@ -2412,6 +2391,9 @@ function UpdateBillingTab({
                 <TableHead>Campaign</TableHead>
                 <TableHead>Billing code</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Start</TableHead>
+                <TableHead>End</TableHead>
+                <TableHead>Duration</TableHead>
                 <TableHead>Account</TableHead>
                 <TableHead>Billed To</TableHead>
                 <TableHead className="text-right">Invoice total</TableHead>
@@ -2473,6 +2455,11 @@ function UpdateBillingTab({
                       {a.billingCode ?? "—"}
                     </TableCell>
                     <TableCell>{a.date}</TableCell>
+                    <TableCell>{a.startTime ?? "—"}</TableCell>
+                    <TableCell>{a.endTime ?? "—"}</TableCell>
+                    <TableCell>
+                      {formatEventDuration(a.startTime, a.endTime) || "—"}
+                    </TableCell>
                     <TableCell className="max-w-[180px] truncate">
                       {a.accountName}
                     </TableCell>
@@ -2485,8 +2472,8 @@ function UpdateBillingTab({
                     <TableCell className="text-right font-medium">
                       {fmt(a.expectedAmount)}
                     </TableCell>
-                    <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
-                      <ActivityTrackPicker activity={a} />
+                    <TableCell>
+                      <ActivityTrackBadge activity={a} />
                     </TableCell>
                     <TableCell data-row-control onClick={(e) => e.stopPropagation()}>
                       <InvoiceTrackPicker activity={a} />
@@ -2500,7 +2487,7 @@ function UpdateBillingTab({
               {activities.length === 0 && (
                 <TableRow>
                   <TableCell
-                    colSpan={11}
+                    colSpan={14}
                     className="text-center py-8"
                     style={{ color: "#94A3B8" }}
                   >

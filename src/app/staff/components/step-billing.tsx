@@ -13,7 +13,7 @@ import {
   Building2,
   FileBadge,
   AlertCircle,
-  Receipt,
+  Calculator,
   Plus,
   Trash2,
   Users,
@@ -657,61 +657,84 @@ export function StepBilling({
         </div>
       )}
 
-      {/* Live total preview */}
+      {/* Internal cost summary — a reference check on the costs expected to be
+          invoiced, not a rendered invoice. */}
       <div
         className="rounded-xl border p-4 space-y-2"
-        style={{ borderColor: "#7D152D33", background: "#7D152D08" }}
+        style={{ borderColor: "#E2E8F0", background: "#F8FAFC" }}
       >
         <div
           className="flex items-center gap-1.5"
-          style={{ fontSize: "0.75rem", color: "#7D152D" }}
+          style={{ fontSize: "0.75rem", color: "#475569", fontWeight: 600 }}
         >
-          <Receipt size={13} />
-          Live invoice preview
+          <Calculator size={13} />
+          Summary of expected costs
         </div>
+        <p style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+          Internal reference — the total costs expected to be invoiced. Not a
+          rendered invoice.
+        </p>
         <div className="grid gap-1.5" style={{ fontSize: "0.875rem" }}>
+          {/* Brand-ambassador pay — itemised, then subtotalled. */}
           {billing.activityType === "event" ? (
-            baRows.map((row) => (
+            <>
               <div
-                key={row.rowId}
-                className="flex items-center justify-between"
+                style={{
+                  fontSize: "0.6875rem",
+                  color: "#94A3B8",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                }}
               >
-                <span style={{ color: "#64748B" }}>
-                  {row.brandAmbassador?.name ?? "Unassigned"} ·{" "}
-                  {fmtMoney(row.effectiveRate)} × {row.hours}h
-                  {row.isOverridden && (
-                    <span style={{ color: "#D97706" }}>
-                      {" "}
-                      · {row.overrideReason || "override"}
-                    </span>
-                  )}
-                </span>
-                <span style={{ color: "#0F172A" }}>
-                  {fmtMoney(row.subtotal)}
-                </span>
+                Brand-ambassador pay
               </div>
-            ))
+              {baRows.map((row) => (
+                <div
+                  key={row.rowId}
+                  className="flex items-center justify-between pl-3"
+                >
+                  <span style={{ color: "#64748B" }}>
+                    {row.brandAmbassador?.name ?? "Unassigned"} ·{" "}
+                    {fmtMoney(row.effectiveRate)} × {row.hours}h
+                    {row.isOverridden && (
+                      <span style={{ color: "#D97706" }}>
+                        {" "}
+                        · {row.overrideReason || "override"}
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color: "#0F172A" }}>
+                    {fmtMoney(row.subtotal)}
+                  </span>
+                </div>
+              ))}
+              <div
+                className="flex items-center justify-between pt-1.5"
+                style={{ borderTop: "1px dashed #CBD5E1" }}
+              >
+                <span style={{ color: "#475569", fontWeight: 500 }}>
+                  Brand-ambassador pay subtotal
+                </span>
+                <strong style={{ color: "#0F172A" }}>
+                  {fmtMoney(eventAmount)}
+                </strong>
+              </div>
+            </>
           ) : (
             <div className="flex items-center justify-between">
-              <span style={{ color: "#64748B" }}>
-                {billing.expectedCompletions} ×{" "}
+              <span style={{ color: "#475569", fontWeight: 500 }}>
+                Completions · {billing.expectedCompletions} ×{" "}
                 {fmtMoney(billing.perCompletionRate)}
               </span>
               <strong style={{ color: "#0F172A" }}>{fmtMoney(eventAmount)}</strong>
             </div>
           )}
 
-          {billing.activityType === "event" && (
-            <div
-              className="flex items-center justify-between pt-1"
-              style={{ borderTop: "1px dashed #7D152D33" }}
-            >
-              <span style={{ color: "#475569" }}>BA pay subtotal</span>
-              <strong style={{ color: "#0F172A" }}>{fmtMoney(eventAmount)}</strong>
-            </div>
-          )}
+          {/* Additive cost lines — each prefixed "+" so the total is easy to
+              trace: subtotal + service fee + travel + bar spend = total. */}
           <div className="flex items-center justify-between">
             <span style={{ color: "#64748B" }}>
+              <span style={{ color: "#94A3B8" }}>+ </span>
               Service fee ({(feeRate * 100).toFixed(0)}% — {feeKind})
               {isBarVenue && (
                 <span
@@ -730,6 +753,7 @@ export function StepBilling({
           {billing.travel > 0 && (
             <div className="flex items-center justify-between">
               <span style={{ color: "#64748B" }}>
+                <span style={{ color: "#94A3B8" }}>+ </span>
                 Travel · {fmtMoney(billing.travel)} ×{" "}
                 {Math.max(1, billing.bas.length)} BA
                 {billing.bas.length === 1 ? "" : "s"}
@@ -738,40 +762,51 @@ export function StepBilling({
             </div>
           )}
           {isBarVenue && maxBarSpendCapped > 0 && (
-            <>
-              <div className="flex items-center justify-between">
-                <span style={{ color: "#64748B" }}>
-                  Max bar spend (ceiling ${BAR_SPEND_CEILING}, includes 20% grat.)
-                </span>
-                <span style={{ color: "#0F172A" }}>
-                  {fmtMoney(maxBarSpendCapped + maxGratuity)}
-                </span>
-              </div>
-              <div
-                className="flex items-center justify-between pt-1 mt-1"
-                style={{ borderTop: "1px dashed #7D152D33" }}
-              >
-                <span style={{ color: "#7D152D" }}>
-                  Max Ambassador Expense (budgeting ceiling)
-                </span>
-                <strong style={{ color: "#7D152D" }}>
-                  {fmtMoney(maxAmbassadorExpense)}
-                </strong>
-              </div>
-            </>
+            <div className="flex items-center justify-between">
+              <span style={{ color: "#64748B" }}>
+                <span style={{ color: "#94A3B8" }}>+ </span>
+                Max bar spend (ceiling ${BAR_SPEND_CEILING}, incl. 20% grat.)
+              </span>
+              <span style={{ color: "#0F172A" }}>
+                {fmtMoney(maxBarSpendCapped + maxGratuity)}
+              </span>
+            </div>
           )}
           <div
             className="pt-2 mt-1 flex items-center justify-between"
-            style={{ borderTop: "1px solid #7D152D33" }}
+            style={{ borderTop: "2px solid #CBD5E1" }}
           >
-            <span style={{ color: "#7D152D", fontWeight: 500 }}>
-              <DollarSign size={13} className="inline" /> Total invoice
+            <span style={{ color: "#0F172A", fontWeight: 600 }}>
+              <DollarSign size={13} className="inline" /> Total expected cost
             </span>
-            <strong style={{ color: "#7D152D", fontSize: "1.125rem" }}>
+            <strong style={{ color: "#0F172A", fontSize: "1.125rem" }}>
               {fmtMoney(total)}
             </strong>
           </div>
         </div>
+
+        {/* Budgeting reference — a separate worst-case figure, NOT part of the
+            total above. Kept apart so the total's arithmetic stays clean. */}
+        {isBarVenue && maxBarSpendCapped > 0 && (
+          <div
+            className="rounded-lg p-2.5 flex items-start justify-between gap-3"
+            style={{ background: "#FFFFFF", border: "1px dashed #CBD5E1" }}
+          >
+            <div>
+              <div style={{ fontSize: "0.8125rem", color: "#475569", fontWeight: 500 }}>
+                Max Ambassador Expense (budgeting ceiling)
+              </div>
+              <div style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                Worst-case BA cost — labour ({fmtMoney(eventAmount)}) + max bar
+                spend incl. gratuity ({fmtMoney(maxBarSpendCapped + maxGratuity)}).
+                Reference only.
+              </div>
+            </div>
+            <strong style={{ color: "#475569", whiteSpace: "nowrap" }}>
+              {fmtMoney(maxAmbassadorExpense)}
+            </strong>
+          </div>
+        )}
       </div>
 
       {!account && (

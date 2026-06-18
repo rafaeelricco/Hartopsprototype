@@ -2,14 +2,12 @@
 // R2 — Payroll workspace seed data
 // Feeds the Hart Ops Payroll Workspace (mm-ui-013). Seed shapes a complete
 // bi-weekly cycle: Missing Payments → Approve → Export → Locked + Awaiting
-// Kayla. Includes one override badge (links to mm-ui-008 override reason), one
-// cancellation pay row, and one recurring-event regression requiring inline
-// recalc confirmation.
+// Kayla. Includes one override badge (links to mm-ui-008 override reason) and
+// one cancellation pay row (handled via the rate-override mechanism).
 // =============================================================================
 
 import type {
   GeneratedReport,
-  PayrollAdjustment,
   PayrollCycle,
   PayrollLineItem,
 } from "../../shared/data/billing-types";
@@ -101,13 +99,8 @@ export let MOCK_PAYROLL_LINE_ITEMS: PayrollLineItem[] = [
     billingEntity: "Hart Agency",
     status: "pending-manager",
     isCancellation: true,
-    cancellationBreakdown: {
-      kitPickup: 20,
-      travel: 15,
-      time: 15,
-    },
   },
-  // 4. Recurring-event regression — Approve must trigger inline recalc.
+  // 4. Recurring-event line (Avion Sunday tasting).
   {
     id: "pli-004",
     activityId: "act-bill-003",
@@ -126,12 +119,6 @@ export let MOCK_PAYROLL_LINE_ITEMS: PayrollLineItem[] = [
     territory: "Manhattan",
     billingEntity: "Hart Agency",
     status: "missing",
-    recurringRecalcRequired: {
-      previousBrandAmbassadorCount: 2,
-      currentBrandAmbassadorCount: 3,
-      previousFinalPay: 240, // when 2 brandAmbassadors split a single bonus pool
-      newFinalPay: 160,
-    },
   },
   // 5. Second brandAmbassador on recurring event, also unapproved.
   {
@@ -505,92 +492,3 @@ export function rejectPayrollItem(id: string): void {
   );
 }
 
-export function acknowledgeRecurringRecalc(id: string): void {
-  MOCK_PAYROLL_LINE_ITEMS = MOCK_PAYROLL_LINE_ITEMS.map((p) => {
-    if (p.id !== id || !p.recurringRecalcRequired) return p;
-    const { recurringRecalcRequired, ...rest } = p;
-    return {
-      ...rest,
-      finalPay: recurringRecalcRequired.newFinalPay,
-    };
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Payroll adjustments (brief 2026-06-02 §2). Prior-period corrections that
-// post into the next batch as ADP pay lines.
-// ---------------------------------------------------------------------------
-
-export let MOCK_PAYROLL_ADJUSTMENTS: PayrollAdjustment[] = [
-  {
-    id: "padj-001",
-    brandAmbassadorId: "edu-2",
-    brandAmbassadorName: "Marcus Bennett",
-    amount: 80,
-    reason:
-      "Missed Sunday tasting (2026-04-13) reconciled after Larry flagged it.",
-    priorCycleId: "pcyc-2026-04a",
-    status: "pending",
-    createdAt: "2026-05-09T14:20:00Z",
-    createdBy: "Ivie (Controller)",
-  },
-  {
-    id: "padj-002",
-    brandAmbassadorId: "edu-1",
-    brandAmbassadorName: "Ana Martinez",
-    amount: -45,
-    reason:
-      "Overpaid travel on the Whole Foods Brooklyn activation (cycle 2026-04b). Recovery on next batch.",
-    priorCycleId: "pcyc-2026-04b",
-    status: "pending",
-    createdAt: "2026-05-12T11:05:00Z",
-    createdBy: "Ivie (Controller)",
-  },
-  {
-    id: "padj-003",
-    brandAmbassadorId: "edu-4",
-    brandAmbassadorName: "David Kim",
-    amount: 120,
-    reason:
-      "Hamptons location-premium pay missed on 2026-04-26 — paid as standard rate.",
-    priorCycleId: "pcyc-2026-04b",
-    status: "applied",
-    appliedToCycleId: "pcyc-2026-05a",
-    appliedAt: "2026-05-08T09:00:00Z",
-    createdAt: "2026-05-01T16:30:00Z",
-    createdBy: "Ivie (Controller)",
-  },
-];
-
-export function createPayrollAdjustment(
-  input: Omit<PayrollAdjustment, "id" | "createdAt" | "status">,
-): PayrollAdjustment {
-  const adj: PayrollAdjustment = {
-    ...input,
-    id: `padj-${Date.now()}`,
-    createdAt: new Date().toISOString(),
-    status: "pending",
-  };
-  MOCK_PAYROLL_ADJUSTMENTS = [adj, ...MOCK_PAYROLL_ADJUSTMENTS];
-  return adj;
-}
-
-export function applyPayrollAdjustment(id: string, cycleId: string): void {
-  const nowIso = new Date().toISOString();
-  MOCK_PAYROLL_ADJUSTMENTS = MOCK_PAYROLL_ADJUSTMENTS.map((a) =>
-    a.id === id
-      ? {
-          ...a,
-          status: "applied",
-          appliedToCycleId: cycleId,
-          appliedAt: nowIso,
-        }
-      : a,
-  );
-}
-
-export function voidPayrollAdjustment(id: string): void {
-  MOCK_PAYROLL_ADJUSTMENTS = MOCK_PAYROLL_ADJUSTMENTS.map((a) =>
-    a.id === id ? { ...a, status: "voided" } : a,
-  );
-}

@@ -16,7 +16,6 @@ import type {
   GeneratedReport,
   Invoice,
   SlaReportRow,
-  SupplierContact,
 } from "../../shared/data/billing-types";
 import {
   BILLING_CHECKLIST_LABELS,
@@ -96,72 +95,6 @@ export function upsertBillingCode(def: BillingCodeDefinition): void {
 export function setBillingCodeActive(code: string, active: boolean): void {
   MOCK_BILLING_CODES = MOCK_BILLING_CODES.map((c) =>
     c.code === code ? { ...c, active } : c,
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Supplier contacts (brief 2026-06-02 §2). Per-supplier delivery recipient
-// + CC template, persisted so it survives staff changes.
-// ---------------------------------------------------------------------------
-
-export let MOCK_SUPPLIERS: SupplierContact[] = [
-  {
-    id: "sup-pernod",
-    supplierName: "Pernod Ricard",
-    primaryRecipient: {
-      name: "Diana Reyes",
-      email: "diana.reyes@pernod-ricard.com",
-      role: "Brand Activations Manager",
-    },
-    ccRecipients: [
-      { name: "Mark Hines", email: "mark.hines@pernod-ricard.com" },
-      { name: "Hart Finance", email: "ar@hartagency.com" },
-    ],
-    notes: "Invoices delivered weekly. Diana approves SLA reports.",
-    active: true,
-    createdAt: "2026-01-10T09:00:00Z",
-  },
-  {
-    id: "sup-enj",
-    supplierName: "ENJ Gallo",
-    primaryRecipient: {
-      name: "Tom Karras",
-      email: "tom.karras@enjgallo.com",
-      role: "Regional Activation Lead",
-    },
-    ccRecipients: [
-      { name: "Hart Finance", email: "ar@hartagency.com" },
-    ],
-    notes: "Bi-weekly delivery preferred.",
-    active: true,
-    createdAt: "2026-02-05T09:00:00Z",
-  },
-  {
-    id: "sup-beam",
-    supplierName: "Beam Suntory",
-    primaryRecipient: {
-      name: "Jen Park",
-      email: "jen.park@beamsuntory.com",
-    },
-    ccRecipients: [],
-    notes: "",
-    active: true,
-    createdAt: "2026-03-12T09:00:00Z",
-  },
-];
-
-export function upsertSupplier(s: SupplierContact): void {
-  const idx = MOCK_SUPPLIERS.findIndex((x) => x.id === s.id);
-  if (idx >= 0) {
-    MOCK_SUPPLIERS = MOCK_SUPPLIERS.map((x, i) => (i === idx ? s : x));
-  } else {
-    MOCK_SUPPLIERS = [s, ...MOCK_SUPPLIERS];
-  }
-}
-
-export function setSupplierActive(id: string, active: boolean): void {
-  MOCK_SUPPLIERS = MOCK_SUPPLIERS.map((s) =>
-    s.id === id ? { ...s, active } : s,
   );
 }
 
@@ -276,6 +209,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     supplier: "ENJ Gallo",
     name: "Absolut Vodka Tasting — Total Wine NY",
     date: "2026-05-12",
+    startTime: "17:00",
+    endTime: "20:00",
     accountId: "acc-1",
     accountName: "Total Wine & More",
     distributor: "Southern Glazer's Wine & Spirits",
@@ -318,6 +253,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingCode: "BF-CRAFT-COCKTAIL",
     name: "Jameson Whiskey Promo — Dead Rabbit",
     date: "2026-05-14",
+    startTime: "18:00",
+    endTime: "21:00",
     accountId: "acc-2",
     accountName: "The Dead Rabbit",
     distributor: "Empire Merchants",
@@ -361,6 +298,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingCode: "BF-CRAFT-MIXOLOGY",
     name: "Avion Tequila — Recurring Sunday Tasting",
     date: "2026-05-17",
+    startTime: "14:00",
+    endTime: "17:00",
     accountId: "acc-5",
     accountName: "Moxy Times Square (Magic Hour)",
     distributor: "Southern Glazer's Wine & Spirits",
@@ -423,6 +362,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     supplier: "Pernod Ricard",
     name: "Glenlivet Founders Reserve — Whole Foods",
     date: "2026-05-15",
+    startTime: "16:00",
+    endTime: "19:30",
     accountId: "acc-3",
     accountName: "Whole Foods Market — Brooklyn",
     distributor: "Southern Glazer's Wine & Spirits",
@@ -463,6 +404,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     billingCode: "BF-CRAFT-COCKTAIL",
     name: "Avion Reposado — Pearl Street Pub",
     date: "2026-05-19",
+    startTime: "18:00",
+    endTime: "21:00",
     accountId: "acc-7",
     accountName: "Pearl Street Pub",
     distributor: "Southern Glazer's Wine & Spirits",
@@ -484,10 +427,9 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     barSpend: 180,
     maxBarSpend: 300,
     gratuity: 36, // 20% × $180 bar spend
-    suppliesAmount: 24,
-    promotionPublicityAmount: 15,
+    promotionPublicityAmount: 39, // 15 promotion + 24 folded-in supplies
     travelEntertainmentAmount: 0,
-    expectedAmount: 280 + 18 + 75 + 180 + 36 + 24 + 15, // event + 10% × barSpend + travel + bar + grat + supplies + promPub
+    expectedAmount: 280 + 18 + 75 + 180 + 36 + 39, // event + 10% × barSpend + travel + bar + grat + promotion
     status: "ready-to-bill",
     slaEligible: true,
     licenceVerified: true,
@@ -559,6 +501,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     supplier: "Pernod Ricard",
     name: "Glenlivet 12 Tasting — Whole Foods Tribeca",
     date: "2026-05-20",
+    startTime: "17:00",
+    endTime: "20:00",
     accountId: "acc-3",
     accountName: "Whole Foods Market — Tribeca",
     distributor: "Southern Glazer's Wine & Spirits",
@@ -596,6 +540,8 @@ export let MOCK_BILLING_ACTIVITIES: BillingActivity[] = [
     supplier: "Pernod Ricard",
     name: "Glenlivet 15 Tasting — Eataly Flatiron",
     date: "2026-05-20",
+    startTime: "16:30",
+    endTime: "19:30",
     accountId: "acc-3",
     accountName: "Eataly — Flatiron",
     distributor: "Southern Glazer's Wine & Spirits",

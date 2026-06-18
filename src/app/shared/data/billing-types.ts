@@ -51,6 +51,32 @@ export function travelInvoiceTotal(opts: {
   return (opts.travel ?? 0) * Math.max(1, opts.brandAmbassadorCount ?? 0);
 }
 
+// Event duration is derived from start/end times, never stored. Returns a
+// short label like "3h 30m" (or "3h" on the hour); empty string if either
+// time is missing. Overnight spans (end < start) wrap past midnight.
+export function formatEventDuration(
+  startTime?: string,
+  endTime?: string,
+): string {
+  if (!startTime || !endTime) return "";
+  const toMinutes = (t: string) => {
+    const parts = t.split(":");
+    const h = parseInt(parts[0] ?? "", 10);
+    const m = parseInt(parts[1] ?? "", 10);
+    if (Number.isNaN(h) || Number.isNaN(m)) return null;
+    return h * 60 + m;
+  };
+  const start = toMinutes(startTime);
+  const end = toMinutes(endTime);
+  if (start == null || end == null) return "";
+  let mins = end - start;
+  if (mins < 0) mins += 24 * 60; // wrap past midnight
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h === 0) return `${m}m`;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}
+
 // Standard hours per channel (brief 2026-06-02 §2). Used to convert
 // shift-based pay to hourly. Editable in Settings when the surface grows,
 // but locked in code for the prototype.
@@ -249,29 +275,6 @@ export interface BillingCodeDefinition {
 export type BillingChecklistState = Partial<Record<BillingChecklistItem, boolean>>;
 
 // =============================================================================
-// Supplier contacts (brief 2026-06-02 §2)
-// =============================================================================
-// Each supplier carries a delivery recipient + CC template that survives
-// staff changes. Used when sending invoices, SLA reports, and receipt
-// bundles to suppliers via Power Automate / SharePoint / email.
-
-export interface SupplierRecipient {
-  name: string;
-  email: string;
-  role?: string;
-}
-
-export interface SupplierContact {
-  id: string;
-  supplierName: string; // canonical key — e.g. "Pernod Ricard"
-  primaryRecipient: SupplierRecipient;
-  ccRecipients: SupplierRecipient[];
-  notes?: string;
-  active: boolean;
-  createdAt: string;
-}
-
-// =============================================================================
 // Billing workspace (mm-ui-012)
 // =============================================================================
 
@@ -296,6 +299,8 @@ export interface BillingActivity {
   category: ActivityCategory;
   name: string;
   date: string; // YYYY-MM-DD
+  startTime?: string; // "HH:MM" 24h — event start
+  endTime?: string; // "HH:MM" 24h — event end; duration is derived, never stored
   accountId: string;
   accountName: string;
   distributor: string;
@@ -348,9 +353,9 @@ export interface BillingActivity {
   activityTrackStatus?: ActivityTrackStatus;
   invoiceTrackStatus?: InvoiceTrackStatus;
   paymentTrackStatus?: PaymentTrackStatus;
-  // P2 #12 — Post-activity expense columns (Kayla's spreadsheet additions).
-  // Stored here so they roll into the invoice and the next billing/payroll export.
-  suppliesAmount?: number;
+  // P2 #12 — Post-activity expense reimbursements (Kayla's spreadsheet
+  // additions). Two categories: promotion and travel. They roll into the
+  // single "Promotion reimbursements" line on the invoice and the next export.
   promotionPublicityAmount?: number;
   travelEntertainmentAmount?: number;
   expectedAmount: number; // total invoice line
@@ -516,29 +521,6 @@ export interface SlaReportRow {
 }
 
 // =============================================================================
-// Payroll adjustments (brief 2026-06-02 §2)
-// =============================================================================
-// Prior-period corrections processed in the next batch. A correction posts
-// into HEMS as an "ADP pay" line on the individual's pay record — modelled
-// here as a separate adjustment row that gets applied to a payroll cycle.
-
-export type PayrollAdjustmentStatus = "pending" | "applied" | "voided";
-
-export interface PayrollAdjustment {
-  id: string;
-  brandAmbassadorId: string;
-  brandAmbassadorName: string;
-  amount: number;          // signed; positive = pay correction owed, negative = recovery
-  reason: string;
-  priorCycleId?: string;   // which prior cycle the correction reconciles
-  status: PayrollAdjustmentStatus;
-  createdAt: string;       // ISO
-  createdBy: string;       // operator
-  appliedToCycleId?: string; // populated when status becomes "applied"
-  appliedAt?: string;        // ISO
-}
-
-// =============================================================================
 // Payroll workspace (mm-ui-013)
 // =============================================================================
 
@@ -566,12 +548,6 @@ export interface PayrollLineItem {
   cycleId?: string; // populated for historical rows; current cycle is implicit
   territory: string; // P3 #8 — used for territory split-print reports
   travelComponent?: TravelComponent; // P1 #3 — mileage × rate added to final pay
-  // P2 #6 — Cancellation pay breakdown mirroring the billing SetPartialBill modal.
-  cancellationBreakdown?: {
-    kitPickup: number;
-    travel: number;
-    time: number;
-  };
   date: string; // YYYY-MM-DD
   accountName: string;
   brandAmbassadorId: string;
@@ -588,12 +564,6 @@ export interface PayrollLineItem {
   manager: string;
   billingEntity: BillingEntity;
   status: PayrollApprovalStatus;
-  recurringRecalcRequired?: {
-    previousBrandAmbassadorCount: number;
-    currentBrandAmbassadorCount: number;
-    previousFinalPay: number;
-    newFinalPay: number;
-  };
   isCancellation?: boolean;
 }
 
@@ -606,21 +576,6 @@ export interface PayrollCycle {
   exportedAt?: string;
   totalPay?: number;
   brandAmbassadorsPaid?: number;
-}
-
-// Second-eyes manager review (P3 #9). Larry asks Leah to review the Upstate
-// roster before he runs the final export (transcript 00:23:22).
-export interface PayrollReviewRequest {
-  id: string;
-  cycleId: string;
-  reviewer: string; // who's being asked
-  requestedBy: string; // who's asking
-  territory?: string; // optional scope — empty = full cycle
-  status: "pending" | "approved" | "changes-requested";
-  requestedAt: string;
-  completedAt?: string;
-  note?: string; // initial note from the requester
-  reviewerComment?: string; // comment from the reviewer on Approve / Changes
 }
 
 export interface GeneratedReport {

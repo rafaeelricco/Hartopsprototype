@@ -24,7 +24,6 @@ import { HelpPage } from "./ops/components/help-page";
 import { CapabilityMatrixPage } from "./ops/components/capability-matrix-page";
 import { BillingWorkspacePage } from "./ops/components/billing-workspace-page";
 import { BillingCodesPage } from "./ops/components/billing-codes-page";
-import { SuppliersPage } from "./ops/components/suppliers-page";
 import { PayrollWorkspacePage } from "./ops/components/payroll-workspace-page";
 import { TermsOfServicePage } from "./ops/components/terms-of-service";
 import { PrivacyPolicyPage } from "./ops/components/privacy-policy";
@@ -81,7 +80,6 @@ export const router = createBrowserRouter([
       { path: "activities/:activityId", Component: OpsActivityDetailPage },
       { path: "billing", Component: BillingWorkspacePage },
       { path: "billing-codes", Component: BillingCodesPage },
-      { path: "suppliers", Component: SuppliersPage },
       { path: "payroll", Component: PayrollWorkspacePage },
       { path: "reports", Component: OpsReportsPage },
       { path: "settings", Component: OpsSettingsPage },
