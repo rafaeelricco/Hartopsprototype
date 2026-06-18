@@ -63,7 +63,6 @@ export interface EditActivityBillingPatch {
   barSpend?: number;
   maxBarSpend?: number;
   gratuity?: number;
-  suppliesAmount?: number;
   promotionPublicityAmount?: number;
   travelEntertainmentAmount?: number;
   expectedAmount?: number;
@@ -90,7 +89,6 @@ interface Draft {
   travel: string;
   barSpend: string;
   maxBarSpend: string;
-  suppliesAmount: string;
   promotionPublicityAmount: string;
   travelEntertainmentAmount: string;
   activityTrackStatus: ActivityTrackStatus;
@@ -108,8 +106,6 @@ function makeDraft(a: BillingActivity): Draft {
     travel: String(a.travel),
     barSpend: a.barSpend != null ? String(a.barSpend) : "",
     maxBarSpend: a.maxBarSpend != null ? String(a.maxBarSpend) : "",
-    suppliesAmount:
-      a.suppliesAmount != null ? String(a.suppliesAmount) : "",
     promotionPublicityAmount:
       a.promotionPublicityAmount != null
         ? String(a.promotionPublicityAmount)
@@ -165,7 +161,6 @@ export function EditActivityBillingModal({
   const computedGratuity = isBar
     ? cappedBarSpend * BAR_SPEND_GRATUITY_RATE
     : 0;
-  const supplies = parseFloat(draft.suppliesAmount) || 0;
   const promPub = parseFloat(draft.promotionPublicityAmount) || 0;
   const travelEnt = parseFloat(draft.travelEntertainmentAmount) || 0;
   // Service fee math (May-26 fix per Leah):
@@ -183,7 +178,6 @@ export function EditActivityBillingModal({
     travelTotal +
     cappedBarSpend +
     computedGratuity +
-    supplies +
     promPub +
     travelEnt;
   const approvalBlockReason = getBillingActivityBlockReasons(activity)[0];
@@ -214,12 +208,10 @@ export function EditActivityBillingModal({
       out.maxBarSpend = parseFloat(draft!.maxBarSpend) || 0;
       out.gratuity = computedGratuity;
     }
-    out.suppliesAmount = supplies;
     out.promotionPublicityAmount = promPub;
     out.travelEntertainmentAmount = travelEnt;
     out.expectedAmount = previewTotal;
-    if (draft!.activityTrackStatus !== activity.activityTrackStatus)
-      out.activityTrackStatus = draft!.activityTrackStatus;
+    // Activity track is read-only (inherited from the event lifecycle) — not saved here.
     if (draft!.invoiceTrackStatus !== activity.invoiceTrackStatus)
       out.invoiceTrackStatus = draft!.invoiceTrackStatus;
     if (draft!.paymentTrackStatus !== activity.paymentTrackStatus)
@@ -503,18 +495,7 @@ export function EditActivityBillingModal({
             >
               Post-activity expenses (Kayla's columns)
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="eb-supplies">Supplies</Label>
-                <Input
-                  id="eb-supplies"
-                  type="number"
-                  value={draft.suppliesAmount}
-                  onChange={(e) =>
-                    patch({ suppliesAmount: e.target.value })
-                  }
-                />
-              </div>
+            <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="eb-promo">Promotion &amp; Publicity</Label>
                 <Input
@@ -629,8 +610,9 @@ export function EditActivityBillingModal({
             </div>
           )}
 
-          {/* Status tracks (brief 2026-06-02 §2). Three independent tracks
-              editable here as well as on the row. */}
+          {/* Status tracks (brief 2026-06-12). Activity is read-only (inherited
+              from the event lifecycle); Invoice + Payment are editable here as
+              well as on the row. */}
           <div
             className="rounded-lg border p-4 space-y-3"
             style={{ borderColor: "#E2E8F0", background: "#F8FAFC" }}
@@ -648,24 +630,26 @@ export function EditActivityBillingModal({
             <div className="grid gap-3 md:grid-cols-3">
               <div className="space-y-1.5">
                 <Label htmlFor="eb-activity-track">Activity</Label>
-                <select
+                <div
                   id="eb-activity-track"
-                  value={draft.activityTrackStatus}
-                  onChange={(e) =>
-                    patch({
-                      activityTrackStatus:
-                        e.target.value as Draft["activityTrackStatus"],
-                    })
-                  }
-                  className="rounded-md border h-9 w-full px-3"
-                  style={{ borderColor: "#E2E8F0", fontSize: "0.875rem" }}
+                  className="rounded-md border h-9 w-full px-3 flex items-center justify-between"
+                  title="Inherited from the event lifecycle — read-only"
+                  style={{
+                    borderColor: "#E2E8F0",
+                    background: "#F1F5F9",
+                    fontSize: "0.875rem",
+                    color: "#475569",
+                  }}
                 >
-                  {ACTIVITY_TRACK_STATUSES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                  <span>
+                    {ACTIVITY_TRACK_STATUSES.find(
+                      (o) => o.value === draft.activityTrackStatus,
+                    )?.label ?? draft.activityTrackStatus}
+                  </span>
+                  <span style={{ fontSize: "0.6875rem", color: "#94A3B8" }}>
+                    Inherited
+                  </span>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="eb-invoice-track">Invoice</Label>
