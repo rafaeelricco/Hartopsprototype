@@ -21,6 +21,7 @@ import {
   Filter,
   Pencil,
 } from "lucide-react";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import {
   Tabs,
@@ -111,7 +112,6 @@ import { SetPartialBillModal } from "./set-partial-bill-modal";
 import { ResolveSlaModal } from "./resolve-sla-modal";
 import { QbExportDialog } from "./qb-export-dialog";
 import { InvoiceDetailsModal } from "./invoice-details-modal";
-import { GenerateReportDialog } from "./generate-report-dialog";
 import {
   EditActivityBillingModal,
   type EditActivityBillingPatch,
@@ -744,9 +744,8 @@ export function BillingWorkspacePage() {
     activities: BillingActivity[];
     locked: boolean;
   } | null>(null);
-  const [generateOpen, setGenerateOpen] = useState(false);
-  const [reports, setReports] =
-    useState<GeneratedReport[]>(MOCK_BILLING_REPORTS);
+  // Read-only here now: generation lives in the central Reports section.
+  const [reports] = useState<GeneratedReport[]>(MOCK_BILLING_REPORTS);
   const [schedulePreviewFor, setSchedulePreviewFor] = useState<{
     billedTo: string;
     distributor: string;
@@ -1807,9 +1806,13 @@ export function BillingWorkspacePage() {
               Reports pull from approved activities in the current cycle. Click
               any entry to preview the artefact.
             </p>
-            <Button size="sm" onClick={() => setGenerateOpen(true)}>
-              <FileText size={13} className="mr-1.5" />
-              Generate report
+            {/* Reporting has one home (§5). This deep-links into the shared
+                catalogue rather than opening a second, parallel generator. */}
+            <Button asChild size="sm">
+              <Link to="/ops/dashboard/reports">
+                <FileText size={13} className="mr-1.5" />
+                Generate report
+              </Link>
             </Button>
           </div>
           <div className="grid md:grid-cols-2 gap-3">
@@ -2145,22 +2148,6 @@ export function BillingWorkspacePage() {
         activity={editActivityFor}
         onSave={handleEditActivitySave}
         onApprove={(id) => handleApprove([id])}
-      />
-
-      <GenerateReportDialog
-        open={generateOpen}
-        onClose={() => setGenerateOpen(false)}
-        workspace="billing"
-        cycleId={CURRENT_BILLING_CYCLE.id}
-        defaultRange={{
-          start: CURRENT_BILLING_CYCLE.windowStart,
-          end: CURRENT_BILLING_CYCLE.windowEnd,
-        }}
-        onGenerate={(report) => {
-          setReports([report, ...reports]);
-          setGenerateOpen(false);
-          toast.success(`${report.kind} generated · ${report.format}`);
-        }}
       />
 
       {/* Report preview modal — renders the SLA Report seed artefact */}

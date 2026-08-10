@@ -23,6 +23,8 @@ import {
   CardTitle,
   CardDescription,
 } from "../../shared/components/ui/card";
+import { ReportCatalogue } from "../../shared/components/report-catalogue";
+import { ReportRunner } from "../../shared/components/report-runner";
 import { Badge } from "../../shared/components/ui/badge";
 import { Button } from "../../shared/components/ui/button";
 import {
@@ -550,6 +552,7 @@ function CustomTooltip({ active, payload, label }: any) {
 /* ------------------------------------------------------------------ */
 
 const TAB_EXPORT_LABELS: Record<string, string> = {
+  generate: "Report",
   dashboard: "Dashboard",
   "data-quality": "Quality Report",
 };
@@ -560,7 +563,7 @@ const TAB_EXPORT_LABELS: Record<string, string> = {
 
 export function ReportsPage() {
   const [dateRange, setDateRange] = useState("6m");
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("generate");
 
   const exportLabel = TAB_EXPORT_LABELS[activeTab] || "Report";
 
@@ -569,12 +572,12 @@ export function ReportsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-foreground">Reports & Data Quality</h1>
+          <h1 className="text-foreground">Reports</h1>
           <p
             className="text-muted-foreground mt-1"
             style={{ fontSize: "0.875rem" }}
           >
-            Platform-wide performance metrics and data quality monitoring.
+            Generate reports, and monitor platform performance and data quality.
           </p>
         </div>
         {/* Change #7: contextual export labels */}
@@ -618,7 +621,7 @@ export function ReportsPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          {["Dashboard", "Data Quality"].map((tab) => (
+          {["Generate", "Dashboard", "Data Quality"].map((tab) => (
             <TabsTrigger
               key={tab}
               value={tab.toLowerCase().replace(" ", "-")}
@@ -628,6 +631,15 @@ export function ReportsPage() {
             </TabsTrigger>
           ))}
         </TabsList>
+
+        {/* ============================================================ */}
+        {/* Generate Tab — the shared reporting mechanism                 */}
+        {/* ============================================================ */}
+        {/* Ops is the widest scope, so it sees every registered report:  */}
+        {/* activity, sales, billing, payroll and workforce.              */}
+        <TabsContent value="generate" className="mt-6">
+          <ReportCatalogue basePath="/ops/dashboard/reports" />
+        </TabsContent>
 
         {/* ============================================================ */}
         {/* Dashboard Tab                                                 */}
@@ -1592,4 +1604,9 @@ function DimensionCard({
       </CardContent>
     </Card>
   );
+}
+
+/** Route wrapper — the runner itself is shared with Hart Agency. */
+export function ReportRunnerPage() {
+  return <ReportRunner basePath="/ops/dashboard/reports" />;
 }

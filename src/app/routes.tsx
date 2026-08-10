@@ -13,7 +13,7 @@ import { CampaignDetailPage } from "./ops/components/campaign-detail-page";
 import { OrgActivityDetailPage } from "./ops/components/org-activity-detail-page";
 import { ActivitiesPage as OpsActivitiesPage } from "./ops/components/activities-page";
 import { ActivityDetailPage as OpsActivityDetailPage } from "./ops/components/activity-detail-page";
-import { ReportsPage as OpsReportsPage } from "./ops/components/reports-page";
+import { ReportsPage as OpsReportsPage, ReportRunnerPage as OpsReportRunnerPage } from "./ops/components/reports-page";
 import { SettingsPage as OpsSettingsPage } from "./ops/components/settings-page";
 import { AccountsPage } from "./ops/components/accounts-page";
 import { BrandAmbassadorsPage } from "./ops/components/brand-ambassadors-page";
@@ -39,7 +39,7 @@ import { CampaignDetail } from "./staff/components/campaign-detail";
 import { ActivitiesPage as StaffActivitiesPage } from "./staff/components/activities-page";
 import { ActivityDetailPage as StaffActivityDetailPage } from "./staff/components/activity-detail-page";
 import { ReportsPage as StaffReportsPage } from "./staff/components/reports-page";
-import { ReportRunnerPage as StaffReportRunnerPage } from "./staff/components/report-runner-page";
+import { ReportRunnerPage as StaffReportRunnerPage } from "./staff/components/reports-page";
 import { BrandAssetsPage } from "./staff/components/brand-assets-page";
 import { SettingsPage as StaffSettingsPage } from "./staff/components/settings-page";
 import { CreateActivityPage } from "./staff/components/create-activity-page";
@@ -83,6 +83,7 @@ export const router = createBrowserRouter([
       { path: "billing-codes", Component: BillingCodesPage },
       { path: "payroll", Component: PayrollWorkspacePage },
       { path: "reports", Component: OpsReportsPage },
+      { path: "reports/:reportId", Component: OpsReportRunnerPage },
       { path: "settings", Component: OpsSettingsPage },
       { path: "accounts", Component: AccountsPage },
       { path: "brand-ambassadors", Component: BrandAmbassadorsPage },

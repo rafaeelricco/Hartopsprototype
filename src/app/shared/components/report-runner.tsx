@@ -1,5 +1,5 @@
 // =============================================================================
-// Report runner (reporting brief §6)
+// Report runner (reporting brief §6) — shared by Hart Ops and Hart Agency
 // =============================================================================
 // One shell for every report: parameterise → preview → export. The report
 // changes; the interaction never does.
@@ -87,7 +87,7 @@ function ParamGroup({
   );
 }
 
-export function ReportRunnerPage() {
+export function ReportRunner({ basePath }: { basePath: string }) {
   const { reportId } = useParams();
   const def = reportId ? getReport(reportId) : undefined;
 
@@ -127,7 +127,7 @@ export function ReportRunnerPage() {
       <div className="p-6">
         <p className="text-muted-foreground">
           Unknown report.{" "}
-          <Link to="/staff/reports" className="text-primary underline">
+          <Link to={basePath} className="text-primary underline">
             Back to Reports
           </Link>
         </p>
@@ -207,7 +207,7 @@ export function ReportRunnerPage() {
       {/* Header */}
       <div className="flex items-start gap-3">
         <Button asChild variant="ghost" size="sm" className="mt-0.5">
-          <Link to="/staff/reports" aria-label="Back to Reports">
+          <Link to={basePath} aria-label="Back to Reports">
             <ArrowLeft className="size-4" />
           </Link>
         </Button>

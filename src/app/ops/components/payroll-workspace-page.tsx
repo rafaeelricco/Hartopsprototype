@@ -24,6 +24,7 @@ import {
   Mail,
   CalendarRange,
 } from "lucide-react";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import {
   Tabs,
@@ -84,7 +85,6 @@ import {
   approvePayrollItems,
   rejectPayrollItem,
 } from "./payroll-data";
-import { GenerateReportDialog } from "./generate-report-dialog";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -162,9 +162,8 @@ export function PayrollWorkspacePage() {
   const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
   const [rejectCycleOpen, setRejectCycleOpen] = useState(false);
   const [cycleStatus, setCycleStatus] = useState(CURRENT_PAYROLL_CYCLE.status);
-  const [generateOpen, setGenerateOpen] = useState(false);
-  const [reports, setReports] =
-    useState<GeneratedReport[]>(MOCK_PAYROLL_REPORTS);
+  // Read-only here now: generation lives in the central Reports section.
+  const [reports] = useState<GeneratedReport[]>(MOCK_PAYROLL_REPORTS);
   const [reportPreview, setReportPreview] = useState<string | null>(null);
   function refreshItems() {
     setItems([...MOCK_PAYROLL_LINE_ITEMS]);
@@ -708,9 +707,13 @@ export function PayrollWorkspacePage() {
                 Reports pull from approved line items in the current cycle.
                 Click any entry to preview the artefact.
               </p>
-              <Button size="sm" onClick={() => setGenerateOpen(true)}>
-                <FileText size={13} className="mr-1.5" />
-                Generate report
+              {/* Reporting has one home (§5). This deep-links into the shared
+                  catalogue rather than opening a second, parallel generator. */}
+              <Button asChild size="sm">
+                <Link to="/ops/dashboard/reports">
+                  <FileText size={13} className="mr-1.5" />
+                  Generate report
+                </Link>
               </Button>
             </div>
             <div className="grid md:grid-cols-2 gap-3">
@@ -793,23 +796,6 @@ export function PayrollWorkspacePage() {
           </TabsContent>
         </Tabs>
 
-        <GenerateReportDialog
-          open={generateOpen}
-          onClose={() => setGenerateOpen(false)}
-          workspace="payroll"
-          cycleId={CURRENT_PAYROLL_CYCLE.id}
-          defaultRange={{
-            start: CURRENT_PAYROLL_CYCLE.windowStart,
-            end: CURRENT_PAYROLL_CYCLE.windowEnd,
-          }}
-          splittableTerritories={Array.from(
-            new Set(filtered.map((p) => p.territory)),
-          ).sort()}
-          onGenerate={(report) => {
-            setReports((prev) => [report, ...prev]);
-            toast.success(`${report.kind} generated · ${report.format}`);
-          }}
-        />
 
         <Dialog open={exportConfirmOpen} onOpenChange={setExportConfirmOpen}>
           <DialogContent className="max-w-md">

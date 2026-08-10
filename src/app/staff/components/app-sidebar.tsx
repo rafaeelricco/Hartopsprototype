@@ -45,6 +45,11 @@ const data = {
       icon: LayoutDashboard,
     },
     {
+      title: "Reports",
+      url: "/staff/reports",
+      icon: FileBarChart2,
+    },
+    {
       title: "Campaigns",
       url: "/staff/campaigns",
       icon: Megaphone,
@@ -53,11 +58,6 @@ const data = {
       title: "Activities",
       url: "/staff/activities",
       icon: CalendarDays,
-    },
-    {
-      title: "Reports",
-      url: "/staff/reports",
-      icon: FileBarChart2,
     },
     {
       title: "Brand Assets",

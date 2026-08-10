@@ -18,7 +18,6 @@ import {
 import { useNavigate } from "react-router";
 
 import { NavMain } from "@/app/shared/components/nav-main";
-import { NavProjects } from "@/app/shared/components/nav-projects";
 import { NavUser } from "@/app/shared/components/nav-user";
 import { TeamSwitcher } from "@/app/shared/components/team-switcher";
 import {
@@ -47,6 +46,11 @@ const data = {
       title: "Dashboard",
       url: "/ops/dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Reports",
+      url: "/ops/dashboard/reports",
+      icon: FileBarChart,
     },
     {
       title: "Organizations",
@@ -99,13 +103,6 @@ const data = {
       icon: Settings,
     },
   ],
-  projects: [
-    {
-      name: "Reports",
-      url: "/ops/dashboard/reports",
-      icon: FileBarChart,
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -118,7 +115,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} onLogout={() => navigate("/ops")} />
