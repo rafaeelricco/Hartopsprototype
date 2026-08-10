@@ -1,0 +1,75 @@
+/* =============================================================================
+   Print (IMP-1697 §9)
+   =============================================================================
+   Managers print the week and carry it. Printing renders the *currently active
+   view* — lanes or calendar — with the chrome stripped and a self-describing
+   header line supplied by the page itself.
+
+   Anything the page marks `print:hidden` is already handled by Tailwind; these
+   rules deal with the app shell, which the page cannot reach.
+   ============================================================================= */
+
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  /* Strip the chrome: sidebar, top bar, and any floating UI. */
+  [data-slot="sidebar"],
+  [data-slot="sidebar-container"],
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-trigger"],
+  [data-sonner-toaster],
+  [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+
+  /* The shell's sticky header carries nav affordances, not content. */
+  [data-slot="sidebar-inset"] > header {
+    display: none !important;
+  }
+
+  /* Let the content occupy the full sheet once the sidebar is gone. */
+  [data-slot="sidebar-inset"] {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Flatten cards — borders survive, shadows and hover states do not. */
+  [data-slot="card"] {
+    box-shadow: none !important;
+    border-color: #cbd5e1 !important;
+    break-inside: avoid;
+  }
+
+  /* Lanes break cleanly at lane boundaries rather than mid-row. */
+  [id^="lane-"] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* One week per page for the calendar. Each 7-cell row is a week. */
+  .print-calendar-week {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Colour-encoded chips and status text must survive the printer. */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* No interaction affordances on paper. */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+}

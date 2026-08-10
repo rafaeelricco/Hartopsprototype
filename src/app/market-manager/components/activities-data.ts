@@ -2,6 +2,13 @@
 // Scoped to the manager's assigned brandAmbassador set only
 // Status model per mm-ui-006: 7 lifecycle states
 import { mockBrandAmbassadors } from "./brand-ambassador-roster-data";
+import { isoFromToday } from "./dashboard-domain";
+import type {
+  CheckInException,
+  KitStatus,
+  PremiseType,
+  SlaApproval,
+} from "./dashboard-domain";
 
 export type EventStatus =
   | "Unassigned"
@@ -143,6 +150,23 @@ export interface Activity {
   storeContactName?: string;
   storeContactPhone?: string;
   storeContactEmail?: string;
+  // ── Workflow dashboard fields (IMP-1697) ──────────────────────────────────
+  // Canonical territory. `borough` predates the region model and acts as the
+  // fallback for older records; new records set `territory` directly so
+  // non-borough territories (Nassau, Suffolk, Westchester) can be expressed.
+  territory?: string;
+  premiseType?: PremiseType;
+  // Kit & samples state. Kit collection gates check-in, so an uncollected kit
+  // the day before an activity is a hard blocker.
+  kitStatus?: KitStatus;
+  kitPreparedAt?: string; // ISO — stamped when samples are pulled
+  kitOutOfStockItems?: number;
+  // Pre-execution SLA approval gate (red/green). Distinct from `slaCapture`,
+  // which is the post-activity receipt verification.
+  slaApproval?: SlaApproval;
+  checkInException?: CheckInException;
+  // Stamped when the BA submits their recap. Absent + window lapsed = overdue.
+  recapSubmittedAt?: string;
   // Live event fields
   checkInStatus?: "checked-in" | "pending" | "failed";
   checkInTime?: string;
@@ -280,7 +304,9 @@ export function getEarlyMinutes(event: Activity): number | null {
 
 // --- Mock data ---
 
-export const mockEvents: Activity[] = [
+// Seed records. Dates below are authored on the original March-2026 calendar and
+// rebased relative to TODAY when `mockEvents` is built — see REBASE_OFFSETS.
+const seedEvents: Activity[] = [
   {
     id: "evt-101",
     name: "Absolut Vodka Tasting",
@@ -1209,6 +1235,343 @@ export const mockEvents: Activity[] = [
     cancellationReason: "Retailer Cancellation",
     cancelledAt: "2026-03-16T14:00:00",
   },
+];
+
+// =============================================================================
+// Date rebasing (IMP-1697)
+// =============================================================================
+// The seed above was authored against a fixed March-2026 calendar, which put the
+// whole dataset ~5 months behind "today" and left every dashboard lane empty.
+// Dates are therefore rebased relative to TODAY at module load, so the demo
+// always populates and cannot go stale again.
+//
+// The mapping is explicit rather than a linear shift: it deliberately spreads
+// the completed work backwards (so the backlog lane has real ageing) while
+// keeping Live activities on today and the first unstaffed activity on tomorrow.
+//
+// To pin the demo for reproducible screenshots, fix TODAY in dashboard-domain.
+
+const REBASE_OFFSETS: Record<string, number> = {
+  "2026-03-15": -26,
+  "2026-03-16": -25,
+  "2026-03-17": -18,
+  "2026-03-18": -11,
+  "2026-03-19": -4,
+  "2026-03-20": 0,
+  "2026-03-21": 1,
+  "2026-03-22": 2,
+};
+
+/** Shift an ISO date (or ISO timestamp) by the seed's rebase offset. */
+function rebaseIso(value: string): string {
+  const datePart = value.slice(0, 10);
+  const offset = REBASE_OFFSETS[datePart];
+  if (offset == null) return value;
+  const rebasedDate = isoFromToday(offset);
+  return value.length > 10 ? `${rebasedDate}${value.slice(10)}` : rebasedDate;
+}
+
+function rebaseActivity(a: Activity): Activity {
+  const out: Activity = { ...a, date: rebaseIso(a.date) };
+  const timestampKeys = [
+    "checkInTime",
+    "scheduledStart",
+    "actualCheckIn",
+    "scheduledEnd",
+    "actualCheckOut",
+    "completedAt",
+    "finalizedAt",
+    "cancelledAt",
+    "cancellationRequestedAt",
+    "kitPreparedAt",
+    "recapSubmittedAt",
+  ] as const;
+
+  const mutable = out as unknown as Record<string, unknown>;
+  for (const key of timestampKeys) {
+    const value = mutable[key];
+    if (typeof value === "string") {
+      mutable[key] = rebaseIso(value);
+    }
+  }
+
+  if (out.assignedBrandAmbassadors) {
+    out.assignedBrandAmbassadors = out.assignedBrandAmbassadors.map((x) => ({
+      ...x,
+      ...(x.offeredAt ? { offeredAt: rebaseIso(x.offeredAt) } : {}),
+      ...(x.respondedAt ? { respondedAt: rebaseIso(x.respondedAt) } : {}),
+      ...(x.expiresAt ? { expiresAt: rebaseIso(x.expiresAt) } : {}),
+    }));
+  }
+
+  if (out.slaCapture?.confirmedAt) {
+    out.slaCapture = {
+      ...out.slaCapture,
+      confirmedAt: rebaseIso(out.slaCapture.confirmedAt),
+    };
+  }
+
+  return out;
+}
+
+// --- Workflow-state backfill -------------------------------------------------
+// The seed predates the dashboard's workflow fields. Derive sensible values so
+// existing records participate in the lanes without hand-editing all 27.
+
+function backfillWorkflowState(a: Activity): Activity {
+  const out = { ...a };
+
+  if (!out.territory) out.territory = out.borough ?? "Manhattan";
+
+  if (!out.premiseType) {
+    const onPremise = getPremiseCategory(out.venueType) === "on-premise";
+    out.premiseType = out.slaEligible
+      ? "on-premise SLA"
+      : onPremise
+        ? "on-premise"
+        : "off-premise";
+  }
+
+  // Pre-execution SLA gate: treat a confirmed post-activity capture as evidence
+  // the activity was approved to run; otherwise leave it outstanding.
+  if (out.slaEligible && !out.slaApproval) {
+    out.slaApproval = out.slaCapture?.confirmedAt ? "approved" : "pending";
+  }
+
+  // Kit state for activities that haven't run yet.
+  if (!out.kitStatus && isUpcoming(out.status)) {
+    out.kitStatus = out.status === "Confirmed" ? "prepared" : "not-prepared";
+    if (out.kitStatus === "prepared") {
+      out.kitPreparedAt = `${isoFromToday(-1)}T09:00:00`;
+    }
+  }
+  if (!out.kitStatus) out.kitStatus = "collected";
+
+  // Completed activities: mark the recap submitted unless the seed implies the
+  // BA never filed one (no final notes).
+  if (
+    !out.recapSubmittedAt &&
+    out.completedAt &&
+    out.brandAmbassadorNotesFinal
+  ) {
+    out.recapSubmittedAt = out.completedAt;
+  }
+
+  return out;
+}
+
+// =============================================================================
+// Generated volume
+// =============================================================================
+// The seed alone cannot exercise the dashboard: the lanes need enough depth to
+// show the ~8-row cap and "Show all", and enough geographic spread to make the
+// region filter meaningful (the seed is entirely Metro, since NJ sits under
+// Metro). These records fill the forward window and the Long Island region.
+
+interface GenSpec {
+  offset: number;
+  name: string;
+  campaign: string;
+  brand: string;
+  venue: string;
+  territory: string;
+  state: string;
+  venueType: VenueType;
+  premiseType: PremiseType;
+  status: EventStatus;
+  ba?: string;
+  assignmentStatus?: AssignmentStatus;
+  offeredDaysAgo?: number;
+  kitStatus?: KitStatus;
+  kitOutOfStockItems?: number;
+  noPickupLocation?: boolean;
+  slaEligible?: boolean;
+  slaApproval?: SlaApproval;
+  checkInException?: CheckInException;
+  recapSubmitted?: boolean;
+}
+
+const GEN_SPECS: GenSpec[] = [
+  // ── Needs assignment (unstaffed, spread across the forward window) ─────────
+  { offset: 3, name: "Jameson Black Barrel Tasting", campaign: "Jameson Autumn", brand: "Jameson", venue: "Total Wine & More, Westbury", territory: "Nassau", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 4, name: "Malibu Coconut Sampling", campaign: "Malibu Sunset", brand: "Malibu", venue: "Stew Leonard's, Farmingdale", territory: "Nassau", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 6, name: "Beefeater Gin Pop-up", campaign: "Beefeater Botanical", brand: "Beefeater", venue: "Wine Country, Huntington", territory: "Suffolk", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 9, name: "Absolut Lime Activation", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "ShopRite, Yonkers", territory: "Westchester", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 12, name: "Kahlúa Espresso Martini Bar", campaign: "Kahlúa Late Night", brand: "Kahlúa", venue: "The Grange, Westchester", territory: "Westchester", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Unassigned", slaEligible: true, slaApproval: "pending" },
+  { offset: 15, name: "Avión Reposado Tasting", campaign: "Avión Reserva", brand: "Avión", venue: "Bottle King, Ramsey", territory: "Hackensack", state: "NJ", venueType: "Retail", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 18, name: "Absolut Elyx Premium Pour", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Sherry-Lehmann, Manhattan", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 21, name: "Plymouth Gin Trade Showcase", campaign: "Beefeater Botanical", brand: "Plymouth", venue: "The Dead Rabbit, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Unassigned" },
+  { offset: 24, name: "Jameson Cold Brew Sampling", campaign: "Jameson Autumn", brand: "Jameson", venue: "Trader Joe's, Queens", territory: "Queens", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Unassigned" },
+  { offset: 27, name: "Malibu Beach Series Finale", campaign: "Malibu Sunset", brand: "Malibu", venue: "BevMo!, Staten Island", territory: "Staten Island", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Unassigned" },
+
+  // ── Awaiting BA acceptance (pending + declined) ────────────────────────────
+  { offset: 2, name: "Absolut Citron Tasting", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Whole Foods, Bryant Park", territory: "Manhattan", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Pending", ba: "Sarah Chen", assignmentStatus: "Declined" },
+  { offset: 5, name: "Glenlivet 12 Showcase", campaign: "Glenlivet Heritage", brand: "Glenlivet", venue: "Astor Wines, NoHo", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Pending", ba: "Maria Santos", assignmentStatus: "Pending", offeredDaysAgo: 3 },
+  { offset: 7, name: "Kahlúa Dessert Pairing", campaign: "Kahlúa Late Night", brand: "Kahlúa", venue: "Union Square Cafe, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Pending", ba: "David Kim", assignmentStatus: "Pending", offeredDaysAgo: 5 },
+  { offset: 10, name: "Beefeater Pink Launch", campaign: "Beefeater Botanical", brand: "Beefeater", venue: "Kings Supermarket, Hoboken", territory: "Hoboken", state: "NJ", venueType: "Grocery", premiseType: "off-premise", status: "Pending", ba: "Emily Park", assignmentStatus: "Declined" },
+  { offset: 14, name: "Avión Silver Margarita Bar", campaign: "Avión Reserva", brand: "Avión", venue: "Loosie Rouge, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Pending", ba: "Carlos Mendez", assignmentStatus: "Pending", offeredDaysAgo: 1 },
+  { offset: 19, name: "Jameson Trade Tasting", campaign: "Jameson Autumn", brand: "Jameson", venue: "Gramercy Tavern, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Pending", ba: "Sarah Chen", assignmentStatus: "Pending", offeredDaysAgo: 2 },
+
+  // ── Kit & samples outstanding (all four states, incl. no pickup location) ──
+  { offset: 1, name: "Absolut Vanilia Sampling", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Fairway Market, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Confirmed", ba: "Maria Santos", assignmentStatus: "Accepted", kitStatus: "not-prepared" },
+  { offset: 2, name: "Glenlivet Nàdurra Pour", campaign: "Glenlivet Heritage", brand: "Glenlivet", venue: "Eataly, Flatiron", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Confirmed", ba: "David Kim", assignmentStatus: "Accepted", kitStatus: "out-of-stock", kitOutOfStockItems: 2 },
+  { offset: 3, name: "Malibu Piña Colada Station", campaign: "Malibu Sunset", brand: "Malibu", venue: "Rockaway Beach Club, Queens", territory: "Queens", state: "NY", venueType: "Activity Space", premiseType: "on-premise", status: "Confirmed", ba: "Emily Park", assignmentStatus: "Accepted", kitStatus: "prepared" },
+  { offset: 5, name: "Avión Tequila Flight", campaign: "Avión Reserva", brand: "Avión", venue: "Cantina Rooftop, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Confirmed", ba: "Carlos Mendez", assignmentStatus: "Accepted", kitStatus: "prepared", slaEligible: true, slaApproval: "pending" },
+  { offset: 8, name: "Beefeater 24 Tasting", campaign: "Beefeater Botanical", brand: "Beefeater", venue: "Wegmans, Nassau", territory: "Nassau", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Confirmed", ba: "Sarah Chen", assignmentStatus: "Accepted", kitStatus: "not-prepared", noPickupLocation: true },
+  { offset: 11, name: "Kahlúa Cold Brew Bar", campaign: "Kahlúa Late Night", brand: "Kahlúa", venue: "Devoción, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Confirmed", ba: "Maria Santos", assignmentStatus: "Accepted", kitStatus: "not-prepared" },
+  { offset: 16, name: "Jameson Caskmates Tasting", campaign: "Jameson Autumn", brand: "Jameson", venue: "Threes Brewing, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "beer", status: "Confirmed", ba: "David Kim", assignmentStatus: "Accepted", kitStatus: "prepared" },
+  { offset: 20, name: "Absolut Watermelon Launch", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Stop & Shop, Suffolk", territory: "Suffolk", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Confirmed", ba: "Emily Park", assignmentStatus: "Accepted", kitStatus: "not-prepared" },
+  { offset: 23, name: "Green Thumb Cannabis Pairing", campaign: "Kahlúa Late Night", brand: "Kahlúa", venue: "Cannabis Collective, Manhattan", territory: "Manhattan", state: "NY", venueType: "Pop-up", premiseType: "cannabis", status: "Confirmed", ba: "Carlos Mendez", assignmentStatus: "Accepted", kitStatus: "prepared" },
+
+  // ── Confirmed and clear (populate the calendar, not the lanes) ─────────────
+  { offset: 4, name: "Glenlivet Founder's Reserve", campaign: "Glenlivet Heritage", brand: "Glenlivet", venue: "Zachys, Westchester", territory: "Westchester", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Confirmed", ba: "Sarah Chen", assignmentStatus: "Accepted", kitStatus: "collected" },
+  { offset: 6, name: "Malibu Strawberry Sampling", campaign: "Malibu Sunset", brand: "Malibu", venue: "ShopRite, Jersey City", territory: "Jersey City", state: "NJ", venueType: "Grocery", premiseType: "off-premise", status: "Confirmed", ba: "Maria Santos", assignmentStatus: "Accepted", kitStatus: "collected" },
+  { offset: 6, name: "Absolut Grapefruit Pop-up", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Chelsea Market, Manhattan", territory: "Manhattan", state: "NY", venueType: "Pop-up", premiseType: "off-premise", status: "Confirmed", ba: "David Kim", assignmentStatus: "Accepted", kitStatus: "collected" },
+  { offset: 6, name: "Jameson Orange Tasting", campaign: "Jameson Autumn", brand: "Jameson", venue: "Bierhaus, Queens", territory: "Queens", state: "NY", venueType: "Bar/Restaurant", premiseType: "beer", status: "Confirmed", ba: "Emily Park", assignmentStatus: "Accepted", kitStatus: "collected" },
+  { offset: 13, name: "Avión Cristalino Showcase", campaign: "Avión Reserva", brand: "Avión", venue: "Empire Wines, Newark", territory: "Newark", state: "NJ", venueType: "Retail", premiseType: "off-premise", status: "Confirmed", ba: "Carlos Mendez", assignmentStatus: "Accepted", kitStatus: "collected" },
+  { offset: 17, name: "Beefeater Crown Jewel", campaign: "Beefeater Botanical", brand: "Beefeater", venue: "Union Market, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Confirmed", ba: "Sarah Chen", assignmentStatus: "Accepted", kitStatus: "collected" },
+
+  // ── Awaiting review backlog (ageing; lane 4 ignores the date range) ────────
+  { offset: -31, name: "Absolut Raspberri Sampling", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Whole Foods, Union Square", territory: "Manhattan", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Completed", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true, checkInException: "late-checkout" },
+  { offset: -24, name: "Glenlivet Caribbean Reserve", campaign: "Glenlivet Heritage", brand: "Glenlivet", venue: "Grand Wine, Nassau", territory: "Nassau", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Completed", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: false },
+  { offset: -21, name: "Kahlúa Nitro Tasting", campaign: "Kahlúa Late Night", brand: "Kahlúa", venue: "Clover Club, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Completed", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true, slaEligible: true, slaApproval: "approved" },
+  { offset: -16, name: "Malibu Watermelon Launch", campaign: "Malibu Sunset", brand: "Malibu", venue: "Total Wine, Suffolk", territory: "Suffolk", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Completed", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: false, checkInException: "out-of-area" },
+  { offset: -9, name: "Avión Espadín Flight", campaign: "Avión Reserva", brand: "Avión", venue: "Mission Ceviche, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Completed", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true, slaEligible: true, slaApproval: "approved" },
+  { offset: -6, name: "Beefeater Summer Garden", campaign: "Beefeater Botanical", brand: "Beefeater", venue: "Westville, Hoboken", territory: "Hoboken", state: "NJ", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Completed", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -2, name: "Jameson Stout Edition", campaign: "Jameson Autumn", brand: "Jameson", venue: "Other Half, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "beer", status: "Completed", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true, checkInException: "failed" },
+
+  // ── Finalised (recede in the calendar, absent from every lane) ─────────────
+  { offset: -12, name: "Absolut Mandrin Tasting", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Gristedes, Manhattan", territory: "Manhattan", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -5, name: "Glenlivet Archive Pour", campaign: "Glenlivet Heritage", brand: "Glenlivet", venue: "Vintry Wine, Manhattan", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+];
+
+const GEN_TIMES: { time: string; duration: string }[] = [
+  { time: "11:00 AM – 3:00 PM", duration: "4h" },
+  { time: "12:00 PM – 4:00 PM", duration: "4h" },
+  { time: "2:00 PM – 6:00 PM", duration: "4h" },
+  { time: "4:00 PM – 8:00 PM", duration: "4h" },
+  { time: "5:00 PM – 9:00 PM", duration: "4h" },
+];
+
+const BA_IDS: Record<string, string> = {
+  "Sarah Chen": "edu-2",
+  "Maria Santos": "edu-3",
+  "David Kim": "edu-4",
+  "Emily Park": "edu-5",
+  "Carlos Mendez": "edu-6",
+};
+
+function buildGenerated(spec: GenSpec, index: number): Activity {
+  const date = isoFromToday(spec.offset);
+  const slot = GEN_TIMES[index % GEN_TIMES.length]!;
+  const isCompleted = spec.status === "Completed" || spec.status === "Finalized";
+  const baId = spec.ba ? (BA_IDS[spec.ba] ?? "edu-2") : null;
+
+  const activity: Activity = {
+    id: `evt-g${String(index + 1).padStart(3, "0")}`,
+    name: spec.name,
+    campaignName: spec.campaign,
+    brandName: spec.brand,
+    clientName: "Pernod Ricard",
+    date,
+    time: slot.time,
+    duration: slot.duration,
+    venue: spec.venue,
+    venueAddress: spec.venue,
+    borough: spec.territory,
+    territory: spec.territory,
+    state: spec.state,
+    venueType: spec.venueType,
+    accountType: spec.venueType === "Pop-up" ? "Pop-up" : "Retail",
+    eventType: "Tasting",
+    brandAmbassadorId: spec.assignmentStatus === "Accepted" ? baId : null,
+    brandAmbassadorName:
+      spec.assignmentStatus === "Accepted" ? (spec.ba ?? null) : null,
+    status: spec.status,
+    products: [`${spec.brand} 750ml`],
+    instructions: `Set up the ${spec.brand} station and follow the campaign brief.`,
+    goals: "Sample consumers, drive trial, collect consumer profiles.",
+    premiseType: spec.premiseType,
+    ...(spec.noPickupLocation
+      ? { kitMaterials: { pickupLocation: "", items: [`${spec.brand} kit`] } }
+      : {
+          kitMaterials: {
+            pickupLocation: "Hart Ops Warehouse, 120 W 31st St, NYC",
+            items: [`${spec.brand} branded table cover`, "Tasting cups (200ct)"],
+          },
+        }),
+    ...(spec.kitStatus ? { kitStatus: spec.kitStatus } : {}),
+    ...(spec.kitOutOfStockItems
+      ? { kitOutOfStockItems: spec.kitOutOfStockItems }
+      : {}),
+    ...(spec.kitStatus === "prepared"
+      ? { kitPreparedAt: `${isoFromToday(spec.offset - 2)}T09:00:00` }
+      : {}),
+    ...(spec.slaEligible ? { slaEligible: true } : {}),
+    ...(spec.slaApproval ? { slaApproval: spec.slaApproval } : {}),
+    ...(spec.checkInException ? { checkInException: spec.checkInException } : {}),
+  };
+
+  if (spec.ba && spec.assignmentStatus) {
+    activity.assignedBrandAmbassadors = [
+      {
+        brandAmbassadorId: baId ?? "edu-2",
+        brandAmbassadorName: spec.ba,
+        assignmentStatus: spec.assignmentStatus,
+        ...(spec.offeredDaysAgo != null
+          ? { offeredAt: `${isoFromToday(-spec.offeredDaysAgo)}T09:00:00` }
+          : {}),
+      },
+    ];
+  }
+
+  if (isCompleted) {
+    activity.completedAt = `${date}T20:00:00`;
+    activity.photoCount = 8 + (index % 7);
+    activity.finalStats = {
+      totalSamples: 70 + index,
+      totalInteractions: 90 + index,
+      totalSales: 15 + (index % 10),
+      rating: 4.4 + (index % 5) / 10,
+      photosSubmitted: 8 + (index % 7),
+      duration: slot.duration,
+    };
+    if (spec.recapSubmitted) {
+      activity.recapSubmittedAt = `${date}T21:30:00`;
+      activity.brandAmbassadorNotesFinal =
+        "Strong footfall; consumers responded well to the sampling script.";
+    }
+    if (spec.status === "Finalized") {
+      activity.finalizedAt = `${isoFromToday(spec.offset + 2)}T10:00:00`;
+    } else {
+      activity.finalizedAt = null;
+    }
+    if (spec.slaEligible) {
+      activity.slaCapture = {
+        total: 420 + index * 5,
+        ...(spec.slaApproval === "approved"
+          ? {
+              approvingManager: "Katie Alvarez",
+              confirmedAt: `${isoFromToday(spec.offset + 1)}T11:00:00`,
+            }
+          : {}),
+      };
+    }
+  }
+
+  return activity;
+}
+
+const generatedEvents: Activity[] = GEN_SPECS.map(buildGenerated);
+
+/**
+ * The activity set the whole Market Manager surface reads from. Seed records are
+ * rebased and backfilled; generated records supply the volume and geographic
+ * spread the dashboard needs.
+ */
+export const mockEvents: Activity[] = [
+  ...seedEvents.map((a) => backfillWorkflowState(rebaseActivity(a))),
+  ...generatedEvents,
 ];
 
 // --- Query helpers ---

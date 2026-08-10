@@ -1,516 +1,274 @@
+// =============================================================================
+// Market Manager workflow dashboard (IMP-1697)
+// =============================================================================
+// One purpose: replace the act of opening activities one by one to find out what
+// needs doing. "They can't go in and out of events — no one has time for that."
+//
+// Four stacked regions — controls, metrics strip, view switcher, lanes/calendar.
+// Lanes is the default view; the calendar is a peer tab, not the hero.
+//
+// Desktop-first: managers work on the web platform and do not use mobile for
+// changes. Degrades to tablet; mobile is not a target.
+// =============================================================================
+
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
+import { ChevronRight, LayoutList, CalendarDays } from "lucide-react";
+import { mockEvents } from "./activities-data";
 import {
-  CalendarDays,
-  Radio,
-  AlertTriangle,
-  ArrowUpRight,
-  TrendingUp,
-  TrendingDown,
-  Clock,
-  MapPin,
-  User,
-  ChevronRight,
-  Star,
-} from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/app/shared/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
-} from "@/app/shared/components/ui/chart";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  BarChart,
-  Bar,
-} from "recharts";
-import {
-  dashboardStats,
-  attentionEvents,
-  upcomingEvents,
-  weeklyActivity,
-  eventsTrend,
-  topBrandAmbassadors,
-} from "./dashboard-data";
+  DEFAULT_SHORTCUT,
+  LANES,
+  MANAGER_REGIONS,
+  formatRange,
+  getCampaignOptions,
+  getNeedsActionCounts,
+  getPeriodCounts,
+  matchesScope,
+  matchesScopeAndRange,
+  resolveShortcut,
+  selectLane,
+  type DashboardScope,
+  type LaneId,
+} from "./dashboard-domain";
+import { DashboardControls, type ControlsState } from "./dashboard-controls";
+import { DashboardMetrics } from "./dashboard-metrics";
+import { DashboardLane } from "./dashboard-lane";
+import { DashboardCalendar } from "./dashboard-calendar";
 
-// --- Chart Configs ---
+type ViewTab = "lanes" | "calendar";
 
-const activityChartConfig: ChartConfig = {
-  count: {
-    label: "Activities",
-    color: "#7D152D",
-  },
-};
+const COLLAPSE_KEY = "hart.mm.dashboard.collapsedLanes";
 
-const trendChartConfig: ChartConfig = {
-  events: {
-    label: "Activities",
-    color: "#7D152D",
-  },
-};
-
-// --- Stat Card Icons ---
-
-const statIcons = [CalendarDays, Radio, AlertTriangle];
-
-// --- Stat Card Component (ops pattern) ---
-
-function StatCard({
-  stat,
-  icon: Icon,
-}: {
-  stat: (typeof dashboardStats)[0];
-  icon: React.ElementType;
-}) {
-  return (
-    <Link to={stat.href}>
-      <Card className="gap-0 hover:border-primary/40 transition-colors">
-        <CardHeader className="pb-2 pt-5 px-5">
-          <div className="flex items-center justify-between">
-            <CardDescription style={{ fontSize: "0.8125rem" }}>
-              {stat.label}
-            </CardDescription>
-            <div className="flex items-center justify-center size-8 rounded-md bg-[#7D152D]/8">
-              <Icon className="size-4 text-[#7D152D]" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="px-5 pb-5">
-          <div
-            className="text-foreground"
-            style={{
-              fontSize: "1.75rem",
-              fontWeight: 600,
-              lineHeight: 1.2,
-            }}
-          >
-            {stat.value}
-          </div>
-          {stat.trend && (
-            <div className="flex items-center gap-1 mt-1.5">
-              {stat.trend.value > 0 ? (
-                <TrendingUp className="size-3.5 text-green-600" />
-              ) : stat.trend.value < 0 ? (
-                <TrendingDown className="size-3.5 text-red-500" />
-              ) : (
-                <span
-                  className="text-muted-foreground"
-                  style={{ fontSize: "0.75rem", fontWeight: 500 }}
-                >
-                  —
-                </span>
-              )}
-              <span
-                className={
-                  stat.trend.value > 0
-                    ? "text-green-600"
-                    : stat.trend.value < 0
-                      ? "text-red-500"
-                      : "text-muted-foreground"
-                }
-                style={{ fontSize: "0.75rem", fontWeight: 500 }}
-              >
-                {stat.trend.value > 0 ? "+" : ""}
-                {stat.trend.value !== 0 ? stat.trend.value : ""}
-              </span>
-              <span
-                className="text-muted-foreground"
-                style={{ fontSize: "0.75rem" }}
-              >
-                {stat.trend.label}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </Link>
-  );
+/** Collapse state is preserved across navigation (brief §7). */
+function loadCollapsed(): LaneId[] {
+  try {
+    const raw = window.localStorage.getItem(COLLAPSE_KEY);
+    if (!raw) return [];
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as LaneId[]) : [];
+  } catch {
+    return [];
+  }
 }
 
-// --- Status Badge Colors ---
-
-const statusColors: Record<string, string> = {
-  Upcoming: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  Live: "bg-green-500/10 text-green-400 border-green-500/20",
-  Completed: "bg-muted text-muted-foreground border-border",
-};
-
-// --- Main Dashboard ---
-
 export function Dashboard() {
+  const [controls, setControls] = useState<ControlsState>(() => ({
+    shortcut: DEFAULT_SHORTCUT,
+    range: resolveShortcut(DEFAULT_SHORTCUT),
+    region: null,
+    premiseType: null,
+    campaign: null,
+  }));
+  const [view, setView] = useState<ViewTab>("lanes");
+  const [collapsed, setCollapsed] = useState<LaneId[]>(loadCollapsed);
+  const [expanded, setExpanded] = useState<LaneId[]>([]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed));
+    } catch {
+      /* non-fatal in the prototype */
+    }
+  }, [collapsed]);
+
+  const scope: DashboardScope = useMemo(
+    () => ({
+      range: controls.range,
+      regions: controls.region ? [controls.region] : MANAGER_REGIONS,
+      premiseTypes: controls.premiseType ? [controls.premiseType] : [],
+      campaigns: controls.campaign ? [controls.campaign] : [],
+    }),
+    [controls],
+  );
+
+  const campaignOptions = useMemo(
+    () => getCampaignOptions(mockEvents),
+    [],
+  );
+
+  const needsAction = useMemo(
+    () => getNeedsActionCounts(mockEvents, scope),
+    [scope],
+  );
+  const period = useMemo(() => getPeriodCounts(mockEvents, scope), [scope]);
+
+  const laneActivities = useMemo(
+    () =>
+      LANES.map((meta) => ({
+        meta,
+        activities: selectLane(meta.id, mockEvents, scope),
+      })),
+    [scope],
+  );
+
+  // The calendar obeys the same scope. It reads the whole scoped set (not the
+  // range) so month navigation still shows context; out-of-range days dim.
+  const calendarActivities = useMemo(
+    () => mockEvents.filter((a) => matchesScope(a, scope)),
+    [scope],
+  );
+
+  const toggleCollapsed = useCallback((lane: LaneId) => {
+    setCollapsed((prev) =>
+      prev.includes(lane) ? prev.filter((l) => l !== lane) : [...prev, lane],
+    );
+  }, []);
+
+  const toggleExpanded = useCallback((lane: LaneId) => {
+    setExpanded((prev) =>
+      prev.includes(lane) ? prev.filter((l) => l !== lane) : [...prev, lane],
+    );
+  }, []);
+
+  /** Strip counters are the navigation — jumping opens and scrolls to a lane. */
+  const handleJump = useCallback(
+    (target: { kind: "lane"; lane: LaneId } | { kind: "flag"; flag: string }) => {
+      setView("lanes");
+      const laneId: LaneId =
+        target.kind === "lane"
+          ? target.lane
+          : target.flag === "sla-unverified"
+            ? "needs-assignment"
+            : "awaiting-review";
+      setCollapsed((prev) => prev.filter((l) => l !== laneId));
+      // Let the lane expand before scrolling to it.
+      window.requestAnimationFrame(() => {
+        document
+          .getElementById(`lane-${laneId}`)
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    },
+    [],
+  );
+
+  const scopeSummary = [
+    controls.region ?? "All my regions",
+    controls.premiseType ?? "All premise types",
+    controls.campaign ?? "All campaigns",
+  ].join(" · ");
+
   return (
-    <div className="p-6 space-y-6 w-full">
-      {/* Header */}
-      <div>
-        <h1 className="text-foreground">Dashboard</h1>
-        <p
-          className="text-muted-foreground mt-1"
-          style={{ fontSize: "0.875rem" }}
-        >
-          What needs your attention right now.
+    <div className="p-6 space-y-5 w-full">
+      {/* A. Header + controls */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-foreground">Dashboard</h1>
+          <p
+            className="text-muted-foreground mt-1"
+            style={{ fontSize: "0.875rem" }}
+          >
+            What needs your attention
+          </p>
+        </div>
+      </div>
+
+      <DashboardControls
+        state={controls}
+        campaignOptions={campaignOptions}
+        onChange={setControls}
+        onPrint={() => window.print()}
+      />
+
+      {/* Print-only header line, so a carried sheet is self-describing. */}
+      <div className="hidden print:block">
+        <h1 style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+          Market Manager dashboard — {view === "lanes" ? "Lanes" : "Calendar"}
+        </h1>
+        <p style={{ fontSize: "0.8125rem" }}>
+          {formatRange(controls.range)} · {scopeSummary}
         </p>
       </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dashboardStats.map((stat, index) => (
-          <StatCard key={stat.label} stat={stat} icon={statIcons[index]!} />
-        ))}
-      </div>
+      {/* B. Metrics strip */}
+      <DashboardMetrics
+        needsAction={needsAction}
+        period={period}
+        onJump={handleJump}
+      />
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Events Trend - takes 2 cols */}
-        <Card className="lg:col-span-2 gap-0">
-          <CardHeader className="px-5 pt-5 pb-0">
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                fontWeight: 600,
-              }}
-            >
-              Events Trend
-            </CardTitle>
-            <CardDescription style={{ fontSize: "0.8125rem" }}>
-              Monthly event volume over the last 6 months
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-5 pb-5 pt-4">
-            <ChartContainer
-              config={trendChartConfig}
-              className="h-[260px] w-full"
-            >
-              <AreaChart
-                data={eventsTrend}
-                margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="fillEvents" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7D152D" stopOpacity={0.2} />
-                    <stop
-                      offset="100%"
-                      stopColor="#7D152D"
-                      stopOpacity={0.02}
-                    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#E2E8F0"
-                />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  style={{ fontSize: "0.75rem" }}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={4}
-                  style={{ fontSize: "0.75rem" }}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area
-                  dataKey="events"
-                  type="monotone"
-                  stroke="#7D152D"
-                  strokeWidth={2}
-                  fill="url(#fillEvents)"
-                  dot={false}
-                />
-              </AreaChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        {/* Weekly Activity - 1 col */}
-        <Card className="gap-0">
-          <CardHeader className="px-5 pt-5 pb-0">
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                fontWeight: 600,
-              }}
-            >
-              Weekly Activity
-            </CardTitle>
-            <CardDescription style={{ fontSize: "0.8125rem" }}>
-              Events this week
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-5 pb-5 pt-4">
-            <ChartContainer
-              config={activityChartConfig}
-              className="h-[260px] w-full"
-            >
-              <BarChart
-                data={weeklyActivity}
-                margin={{ top: 4, right: 4, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#E2E8F0"
-                />
-                <XAxis
-                  dataKey="day"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  style={{ fontSize: "0.75rem" }}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={4}
-                  style={{ fontSize: "0.75rem" }}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="count"
-                  fill="#7D152D"
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={32}
-                />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Events Requiring Attention */}
-      <Card className="gap-0">
-        <CardHeader className="px-5 pt-5 pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle
+      {/* C. View switcher — lanes is the default, calendar is a peer */}
+      <div className="flex items-center gap-2 print:hidden">
+        <div className="flex rounded-md border overflow-hidden">
+          {(
+            [
+              { id: "lanes", label: "Lanes", icon: LayoutList },
+              { id: "calendar", label: "Calendar", icon: CalendarDays },
+            ] as const
+          ).map((t) => {
+            const Icon = t.icon;
+            const active = view === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setView(t.id)}
+                className="flex items-center gap-1.5 px-4 py-2 transition-colors"
                 style={{
-                  fontSize: "1rem",
-                  fontWeight: 600,
+                  fontSize: "0.8125rem",
+                  fontWeight: active ? 600 : 400,
+                  background: active ? "#7d152d" : "transparent",
+                  color: active ? "#fff" : "var(--muted-foreground)",
                 }}
               >
-                Events Requiring Attention
-              </CardTitle>
-              <CardDescription style={{ fontSize: "0.8125rem" }}>
-                Unstaffed or awaiting finalization
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link
-                to="/market-manager/activities?mode=finalize"
-                className="text-amber-600 hover:opacity-80 transition-opacity flex items-center gap-1"
-                style={{ fontSize: "0.8125rem" }}
-              >
-                Start Finalization Queue
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/market-manager/activities"
-                className="text-primary hover:opacity-80 transition-opacity flex items-center gap-1"
-                style={{ fontSize: "0.8125rem" }}
-              >
-                View all events
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="px-0 pb-0">
-          {attentionEvents.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              <AlertTriangle className="w-8 h-8 mx-auto mb-3 opacity-40" />
-              <p>No activities requiring attention right now.</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {attentionEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  to={`/market-manager/activities/${event.id}`}
-                  className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/50 transition-colors group"
-                >
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-foreground font-medium truncate">
-                        {event.name}
-                      </p>
-                      <span
-                        className={`inline-flex items-center rounded-full border px-2 py-0.5 font-medium ${statusColors[event.status]}`}
-                        style={{ fontSize: "0.6875rem" }}
-                      >
-                        {event.status}
-                      </span>
-                    </div>
-                    <div
-                      className="flex items-center gap-4 text-muted-foreground"
-                      style={{ fontSize: "0.8125rem" }}
-                    >
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        {event.date} · {event.time}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {event.venue}
-                      </span>
-                      {event.brandAmbassador && (
-                        <span className="flex items-center gap-1">
-                          <User className="w-3.5 h-3.5" />
-                          {event.brandAmbassador}
-                        </span>
-                      )}
-                    </div>
-                    {event.attentionReason && (
-                      <p
-                        className="flex items-center gap-1.5 text-amber-500 font-medium"
-                        style={{ fontSize: "0.75rem" }}
-                      >
-                        <AlertTriangle className="w-3 h-3" />
-                        {event.attentionReason}
-                      </p>
-                    )}
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-4" />
-                </Link>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Bottom Row: BrandAmbassador Performance + Upcoming Events */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* BrandAmbassador Performance */}
-        <Card className="gap-0">
-          <CardHeader className="px-5 pt-5 pb-4">
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                fontWeight: 600,
-              }}
-            >
-              Brand Ambassador Performance
-            </CardTitle>
-            <CardDescription style={{ fontSize: "0.8125rem" }}>
-              Top brandAmbassadors ranked by average rating
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="space-y-3">
-              {topBrandAmbassadors.map((edu, i) => (
-                <div
-                  key={edu.name}
-                  className="flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span
-                      className="flex items-center justify-center size-7 rounded-md bg-muted text-muted-foreground shrink-0"
-                      style={{ fontSize: "0.75rem", fontWeight: 500 }}
-                    >
-                      {i + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <p
-                        className="text-foreground truncate"
-                        style={{ fontSize: "0.875rem", fontWeight: 500 }}
-                      >
-                        {edu.name}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span
-                      className="flex items-center gap-1 text-foreground"
-                      style={{ fontSize: "0.8125rem" }}
-                    >
-                      <Star className="size-3.5 text-amber-400" />
-                      {edu.avgRating}
-                    </span>
-                    <span
-                      className="text-muted-foreground tabular-nums"
-                      style={{ fontSize: "0.8125rem" }}
-                    >
-                      {edu.eventsThisMonth} events
-                    </span>
-                    {edu.trend === "up" ? (
-                      <ArrowUpRight className="size-3.5 text-green-600" />
-                    ) : (
-                      <TrendingDown className="size-3.5 text-red-500" />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Events */}
-        <Card className="gap-0">
-          <CardHeader className="px-5 pt-5 pb-4">
-            <CardTitle
-              style={{
-                fontSize: "1rem",
-                fontWeight: 600,
-              }}
-            >
-              Upcoming Events
-            </CardTitle>
-            <CardDescription style={{ fontSize: "0.8125rem" }}>
-              Next scheduled events for your team
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-0 pb-0">
-            <div className="divide-y divide-border">
-              {upcomingEvents
-                .filter((e) => e.status === "Upcoming")
-                .map((event) => (
-                  <Link
-                    key={event.id}
-                    to={`/market-manager/activities/${event.id}`}
-                    className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/50 transition-colors group"
-                  >
-                    <div className="flex-1 min-w-0 space-y-1">
-                      <p className="text-foreground font-medium truncate">
-                        {event.name}
-                      </p>
-                      <div
-                        className="flex items-center gap-4 text-muted-foreground"
-                        style={{ fontSize: "0.8125rem" }}
-                      >
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          {event.date} · {event.time}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5" />
-                          {event.venue}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <User className="w-3.5 h-3.5" />
-                          {event.brandAmbassador || "Unassigned"}
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-4" />
-                  </Link>
-                ))}
-            </div>
-          </CardContent>
-        </Card>
+                <Icon className="size-4" />
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+        <span
+          className="text-muted-foreground"
+          style={{ fontSize: "0.75rem" }}
+        >
+          {view === "lanes"
+            ? "Your work queue, ordered by urgency"
+            : "Schedule shape — workflow state encoded on each chip"}
+        </span>
       </div>
+
+      {/* D. Lanes / Calendar */}
+      {view === "lanes" ? (
+        <div className="space-y-3">
+          {laneActivities.map(({ meta, activities }) => (
+            <DashboardLane
+              key={meta.id}
+              meta={meta}
+              activities={activities}
+              collapsed={collapsed.includes(meta.id)}
+              expanded={expanded.includes(meta.id)}
+              onToggleCollapsed={() => toggleCollapsed(meta.id)}
+              onToggleExpanded={() => toggleExpanded(meta.id)}
+              headerAction={
+                meta.id === "awaiting-review" ? (
+                  <Link
+                    to="/market-manager/activities?mode=finalize"
+                    className="flex items-center gap-1 shrink-0 hover:opacity-80 transition-opacity print:hidden"
+                    style={{ fontSize: "0.75rem", color: "#7d152d" }}
+                  >
+                    Finalization Queue
+                    <ChevronRight className="size-3.5" />
+                  </Link>
+                ) : undefined
+              }
+            />
+          ))}
+        </div>
+      ) : (
+        <DashboardCalendar
+          activities={calendarActivities}
+          range={controls.range}
+        />
+      )}
+
+      {/* Scoped-count footnote — makes the active window legible at the bottom
+          of a long page without re-reading the controls. */}
+      <p
+        className="text-muted-foreground print:hidden"
+        style={{ fontSize: "0.75rem" }}
+      >
+        {mockEvents.filter((a) => matchesScopeAndRange(a, scope)).length}{" "}
+        activities in {formatRange(controls.range)} · {scopeSummary}
+      </p>
     </div>
   );
 }
