@@ -280,7 +280,7 @@ export function runReport(
   def: ReportDefinition,
   params: ReportParameters,
 ): ReportResult {
-  const grain: Grain = params.grain ?? def.defaultGrain ?? "activity";
+  const grain: Grain = params.grain ?? def.fixedGrain ?? "activity";
   const includeUnapproved = params.toggles["includeUnapproved"] === true;
 
   const inWindow = REPORT_ACTIVITIES.filter((a) => inRange(a.date, params.range));

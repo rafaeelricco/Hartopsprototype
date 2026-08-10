@@ -15,6 +15,7 @@ import {
 import { useNavigate } from "react-router";
 
 import { NavMain } from "@/app/shared/components/nav-main";
+import { NavProjects } from "@/app/shared/components/nav-projects";
 import { NavUser } from "@/app/shared/components/nav-user";
 import { TeamSwitcher } from "@/app/shared/components/team-switcher";
 import {
@@ -45,11 +46,6 @@ const data = {
       icon: LayoutDashboard,
     },
     {
-      title: "Reports",
-      url: "/staff/reports",
-      icon: FileBarChart2,
-    },
-    {
       title: "Campaigns",
       url: "/staff/campaigns",
       icon: Megaphone,
@@ -68,6 +64,23 @@ const data = {
       title: "Settings",
       url: "/staff/settings",
       icon: Settings,
+    },
+  ],
+  reports: [
+    {
+      name: "Activity Detail",
+      url: "/staff/reports/activity-detail",
+      icon: FileBarChart2,
+    },
+    {
+      name: "Company Sales",
+      url: "/staff/reports/company-sales",
+      icon: FileBarChart2,
+    },
+    {
+      name: "Supplier Activities",
+      url: "/staff/reports/supplier-based",
+      icon: FileBarChart2,
     },
   ],
 };
@@ -99,6 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavProjects projects={data.reports} label="Reports" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser

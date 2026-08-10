@@ -23,8 +23,6 @@ import {
   CardTitle,
   CardDescription,
 } from "../../shared/components/ui/card";
-import { ReportCatalogue } from "../../shared/components/report-catalogue";
-import { ReportRunner } from "../../shared/components/report-runner";
 import { Badge } from "../../shared/components/ui/badge";
 import { Button } from "../../shared/components/ui/button";
 import {
@@ -552,7 +550,6 @@ function CustomTooltip({ active, payload, label }: any) {
 /* ------------------------------------------------------------------ */
 
 const TAB_EXPORT_LABELS: Record<string, string> = {
-  generate: "Report",
   dashboard: "Dashboard",
   "data-quality": "Quality Report",
 };
@@ -563,7 +560,7 @@ const TAB_EXPORT_LABELS: Record<string, string> = {
 
 export function ReportsPage() {
   const [dateRange, setDateRange] = useState("6m");
-  const [activeTab, setActiveTab] = useState("generate");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const exportLabel = TAB_EXPORT_LABELS[activeTab] || "Report";
 
@@ -572,15 +569,15 @@ export function ReportsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-foreground">Reports</h1>
+          <h1 className="text-foreground">Analytics &amp; Data Quality</h1>
           <p
             className="text-muted-foreground mt-1"
             style={{ fontSize: "0.875rem" }}
           >
-            Generate reports, and monitor platform performance and data quality.
+            Platform-wide performance metrics and data quality monitoring.
           </p>
         </div>
-        {/* Change #7: contextual export labels */}
+        {/* Contextual export — hidden on Generate, which has its own Export. */}
         <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="outline"
@@ -601,8 +598,12 @@ export function ReportsPage() {
         </div>
       </div>
 
-      {/* Change #6: Date range selector above tabs — shared across both */}
-      <div className="flex items-center justify-end">
+      {/* Date range for the analytics tabs. The Generate tab carries the
+          shared date-range control instead, so this is hidden there. */}
+      <div
+        className="flex items-center justify-end"
+        style={{ display: activeTab === "generate" ? "none" : undefined }}
+      >
         <Select value={dateRange} onValueChange={setDateRange}>
           <SelectTrigger
             className="w-[160px] cursor-pointer"
@@ -621,7 +622,7 @@ export function ReportsPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          {["Generate", "Dashboard", "Data Quality"].map((tab) => (
+          {["Dashboard", "Data Quality"].map((tab) => (
             <TabsTrigger
               key={tab}
               value={tab.toLowerCase().replace(" ", "-")}
@@ -632,14 +633,6 @@ export function ReportsPage() {
           ))}
         </TabsList>
 
-        {/* ============================================================ */}
-        {/* Generate Tab — the shared reporting mechanism                 */}
-        {/* ============================================================ */}
-        {/* Ops is the widest scope, so it sees every registered report:  */}
-        {/* activity, sales, billing, payroll and workforce.              */}
-        <TabsContent value="generate" className="mt-6">
-          <ReportCatalogue basePath="/ops/dashboard/reports" />
-        </TabsContent>
 
         {/* ============================================================ */}
         {/* Dashboard Tab                                                 */}
@@ -1604,9 +1597,4 @@ function DimensionCard({
       </CardContent>
     </Card>
   );
-}
-
-/** Route wrapper — the runner itself is shared with Hart Agency. */
-export function ReportRunnerPage() {
-  return <ReportRunner basePath="/ops/dashboard/reports" />;
 }

@@ -18,6 +18,7 @@ import {
 import { useNavigate } from "react-router";
 
 import { NavMain } from "@/app/shared/components/nav-main";
+import { NavProjects } from "@/app/shared/components/nav-projects";
 import { NavUser } from "@/app/shared/components/nav-user";
 import { TeamSwitcher } from "@/app/shared/components/team-switcher";
 import {
@@ -46,11 +47,6 @@ const data = {
       title: "Dashboard",
       url: "/ops/dashboard",
       icon: LayoutDashboard,
-    },
-    {
-      title: "Reports",
-      url: "/ops/dashboard/reports",
-      icon: FileBarChart,
     },
     {
       title: "Organizations",
@@ -103,6 +99,28 @@ const data = {
       icon: Settings,
     },
   ],
+  reports: [
+    {
+      name: "Activity Detail",
+      url: "/ops/dashboard/reports/activity-detail",
+      icon: FileBarChart,
+    },
+    {
+      name: "Company Sales",
+      url: "/ops/dashboard/reports/company-sales",
+      icon: FileBarChart,
+    },
+    {
+      name: "Supplier Activities",
+      url: "/ops/dashboard/reports/supplier-based",
+      icon: FileBarChart,
+    },
+    {
+      name: "Analytics & Data Quality",
+      url: "/ops/dashboard/reports",
+      icon: FileBarChart,
+    },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -115,6 +133,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavProjects projects={data.reports} label="Reports" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} onLogout={() => navigate("/ops")} />

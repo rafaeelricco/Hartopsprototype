@@ -16,7 +16,6 @@ import {
   type ReportFormat,
   type ReportParameters,
   type SectionId,
-  type ToggleDef,
 } from "./report-parameters";
 import { REPORTING_SHORTCUTS, resolveShortcut, type RangeShortcut } from "./date-range";
 
@@ -31,9 +30,10 @@ export const REPORT_CATEGORIES = [
 export type ReportCategory = (typeof REPORT_CATEGORIES)[number];
 
 /**
- * A column in the report's output. `section` ties it to an Include checkbox —
- * columns whose section is unticked drop out of the preview and the file.
- * `grain: "product"` marks columns that only exist at product grain.
+ * A column in the report's output. Every column a report declares is emitted:
+ * the export is the raw material, and the client slices it in Excel. `section`
+ * only groups columns for readability; `grain` marks columns that exist at one
+ * grain only.
  */
 export interface ReportColumn {
   key: string;
@@ -57,20 +57,18 @@ export interface ReportDefinition {
   /** Shortcuts offered. Defaults to the reporting set. */
   shortcuts?: RangeShortcut[];
   defaultShortcut?: RangeShortcut;
-  /** Entity dimensions this report can be scoped by. Empty = no scope control. */
+  /** Top-level filters offered. Empty = no filter controls. */
   scopeBy?: EntityType[];
-  /** Offered groupings. Omitted = no grouping control. */
-  groupings?: Grouping[];
-  defaultGrouping?: Grouping;
-  /** True when the report supports the activity/product grain choice. */
-  supportsGrain?: boolean;
-  defaultGrain?: Grain;
-  /** Sections offered as Include checkboxes, and which start ticked. */
+  /**
+   * Output shape, DECLARED not asked. Users pick a report, a date range and a
+   * few filters — they do not configure grain or grouping. Activity Detail
+   * declares product grain so the export carries per-bottle detail; roll-up
+   * reports declare a grouping.
+   */
+  fixedGrain?: Grain;
+  fixedGrouping?: Grouping;
+  /** Groups columns for readability only — not a user control. */
   sections?: SectionId[];
-  defaultSections?: SectionId[];
-  toggles?: ToggleDef[];
-  /** Dimensions the report can be split one-file-per-value by. */
-  splitBy?: EntityType[];
   formats: ReportFormat[];
   defaultFormat?: ReportFormat;
 
@@ -95,14 +93,10 @@ export function defaultParameters(def: ReportDefinition): ReportParameters {
     shortcut,
     range: resolveShortcut(shortcut),
     scope: {},
-    ...(def.groupings?.length
-      ? { grouping: def.defaultGrouping ?? def.groupings[0]! }
-      : {}),
-    ...(def.supportsGrain ? { grain: def.defaultGrain ?? "activity" } : {}),
-    sections: def.defaultSections ?? def.sections ?? [],
-    toggles: Object.fromEntries(
-      (def.toggles ?? []).map((t) => [t.id, t.default]),
-    ),
+    ...(def.fixedGrouping ? { grouping: def.fixedGrouping } : {}),
+    ...(def.fixedGrain ? { grain: def.fixedGrain } : {}),
+    sections: def.sections ?? [],
+    toggles: {},
     splitBy: null,
     format: def.defaultFormat ?? def.formats[0]!,
   };
@@ -112,18 +106,14 @@ export function shortcutsFor(def: ReportDefinition): RangeShortcut[] {
   return def.shortcuts ?? REPORTING_SHORTCUTS;
 }
 
-/** Columns actually emitted for a given parameter set. */
-export function visibleColumns(
-  def: ReportDefinition,
-  params: ReportParameters,
-): ReportColumn[] {
-  const grain = params.grain ?? "activity";
-  return def.columns.filter((c) => {
-    if (c.grain && c.grain !== grain) return false;
-    // A column with no section is structural and always shown.
-    if (!def.sections?.includes(c.section)) return true;
-    return params.sections.includes(c.section);
-  });
+/**
+ * Columns emitted. Every declared column is included — the point of the export
+ * is to hand over the data whole, so there is nothing to tick or untick. Only
+ * the report's declared grain filters the set.
+ */
+export function visibleColumns(def: ReportDefinition): ReportColumn[] {
+  const grain = def.fixedGrain ?? "activity";
+  return def.columns.filter((c) => !c.grain || c.grain === grain);
 }
 
 // =============================================================================
@@ -143,18 +133,11 @@ const ACTIVITY_DETAIL: ReportDefinition = {
   category: "Activity",
   legacyName: "Event Detailed",
   defaultShortcut: "last-month",
-  scopeBy: [
-    "supplier",
-    "brand",
-    "campaign",
-    "account",
-    "distributor",
-    "premiseType",
-    "region",
-    "territory",
-  ],
-  supportsGrain: true,
-  defaultGrain: "activity",
+  scopeBy: ["campaign", "supplier", "distributor", "premiseType", "region"],
+  // Fixed, not asked. Product grain is the finest cut, so the CSV carries
+  // per-bottle detail and Excel can roll it up any way the client wants —
+  // which is what Leah was asking for, without a control to get wrong.
+  fixedGrain: "product",
   sections: [
     "activity",
     "commercial",
@@ -166,30 +149,6 @@ const ACTIVITY_DETAIL: ReportDefinition = {
     "photos",
     "kpis",
   ],
-  defaultSections: [
-    "activity",
-    "commercial",
-    "geography",
-    "staffing",
-    "demographics",
-    "productResults",
-    "kpis",
-  ],
-  toggles: [
-    {
-      id: "includePhotos",
-      label: "Include photos",
-      hint: "Embeds up to 10 images. PDF only.",
-      default: false,
-    },
-    {
-      id: "includeUnapproved",
-      label: "Include unapproved activities",
-      hint: "Reports normally cover approved and finalised activities only.",
-      default: false,
-    },
-  ],
-  splitBy: ["region", "territory"],
   formats: ["Excel", "CSV", "PDF"],
   defaultFormat: "Excel",
   columns: [
@@ -200,6 +159,69 @@ const ACTIVITY_DETAIL: ReportDefinition = {
     { key: "endTime", label: "End", section: "activity" },
     { key: "duration", label: "Duration", section: "activity" },
     { key: "premiseType", label: "Premise type", section: "activity" },
+
+    // Product detail sits directly after the activity identity: at product
+    // grain consecutive rows share an activity, so the distinguishing column
+    // has to be visible without scrolling.
+    {
+      key: "productName",
+      label: "Product",
+      section: "productResults",
+      grain: "product",
+    },
+    {
+      key: "productSize",
+      label: "Size",
+      section: "productResults",
+      grain: "product",
+    },
+    {
+      key: "bottlesSold",
+      label: "Bottles sold",
+      section: "productResults",
+      align: "right",
+    },
+    {
+      key: "price",
+      label: "Price",
+      section: "productResults",
+      grain: "product",
+      align: "right",
+    },
+    {
+      key: "featuredPrice",
+      label: "Featured price",
+      section: "productResults",
+      grain: "product",
+      align: "right",
+    },
+    {
+      key: "startingInventory",
+      label: "Starting inv.",
+      section: "productResults",
+      grain: "product",
+      align: "right",
+    },
+    {
+      key: "drinksPurchased",
+      label: "Drinks purchased",
+      section: "productResults",
+      grain: "product",
+      align: "right",
+    },
+    {
+      key: "endingInventory",
+      label: "Ending inv.",
+      section: "productResults",
+      grain: "product",
+      align: "right",
+    },
+    {
+      key: "productsCollapsed",
+      label: "Products",
+      section: "productResults",
+      grain: "activity",
+    },
 
     { key: "campaign", label: "Campaign", section: "commercial" },
     { key: "supplier", label: "Supplier", section: "commercial" },
@@ -236,70 +258,6 @@ const ACTIVITY_DETAIL: ReportDefinition = {
     { key: "age40_49", label: "40–49 %", section: "demographics", align: "right" },
     { key: "age50plus", label: "50+ %", section: "demographics", align: "right" },
     { key: "ethnicity", label: "Ethnicity mix", section: "demographics" },
-
-    // Product-grain columns — one row per product per activity.
-    {
-      key: "productName",
-      label: "Product",
-      section: "productResults",
-      grain: "product",
-    },
-    {
-      key: "productSize",
-      label: "Size",
-      section: "productResults",
-      grain: "product",
-    },
-    {
-      key: "startingInventory",
-      label: "Starting inv.",
-      section: "productResults",
-      grain: "product",
-      align: "right",
-    },
-    {
-      key: "drinksPurchased",
-      label: "Drinks purchased",
-      section: "productResults",
-      grain: "product",
-      align: "right",
-    },
-    {
-      key: "endingInventory",
-      label: "Ending inv.",
-      section: "productResults",
-      grain: "product",
-      align: "right",
-    },
-    {
-      key: "price",
-      label: "Price",
-      section: "productResults",
-      grain: "product",
-      align: "right",
-    },
-    {
-      key: "featuredPrice",
-      label: "Featured price",
-      section: "productResults",
-      grain: "product",
-      align: "right",
-    },
-    {
-      key: "bottlesSold",
-      label: "Bottles sold",
-      section: "productResults",
-      align: "right",
-    },
-    // At activity grain the products collapse into one cell — the legacy
-    // behaviour Leah is complaining about, kept visible so the contrast is
-    // legible when you flip the grain.
-    {
-      key: "productsCollapsed",
-      label: "Products",
-      section: "productResults",
-      grain: "activity",
-    },
 
     { key: "barSpend", label: "Bar spend", section: "other", align: "right" },
     { key: "consumerEducation", label: "Consumer education", section: "other" },
@@ -348,21 +306,9 @@ const COMPANY_SALES: ReportDefinition = {
   category: "Sales",
   legacyName: "Company Sales",
   defaultShortcut: "last-3-months",
-  scopeBy: [
-    "supplier",
-    "distributor",
-    "account",
-    "brand",
-    "region",
-    "territory",
-  ],
-  groupings: ["company", "supplier", "distributor", "account", "month"],
-  defaultGrouping: "company",
-  supportsGrain: true,
-  defaultGrain: "activity",
+  scopeBy: ["campaign", "supplier", "distributor", "premiseType", "region"],
+  fixedGrouping: "company",
   sections: ["commercial", "geography", "productResults", "kpis"],
-  defaultSections: ["commercial", "productResults", "kpis"],
-  splitBy: ["region", "territory"],
   formats: ["Excel", "CSV", "PDF"],
   defaultFormat: "Excel",
   provisionalColumns:
@@ -432,11 +378,9 @@ const SUPPLIER_BASED: ReportDefinition = {
   category: "Activity",
   legacyName: "Supplier-Based Events",
   defaultShortcut: "last-3-months",
-  scopeBy: ["supplier"],
-  groupings: ["supplier", "month"],
-  defaultGrouping: "supplier",
+  scopeBy: ["campaign", "supplier", "distributor", "premiseType", "region"],
+  fixedGrouping: "supplier",
   sections: ["commercial", "productResults", "kpis"],
-  defaultSections: ["commercial", "productResults"],
   formats: ["Excel", "CSV", "PDF"],
   defaultFormat: "Excel",
   columns: [
@@ -487,9 +431,7 @@ function billingReport(
     description,
     category: "Billing",
     defaultShortcut: "last-month",
-    scopeBy: ["distributor", "supplier", "account", "region", "territory"],
-    sections: ["commercial", "geography"],
-    defaultSections: ["commercial"],
+    scopeBy: ["campaign", "supplier", "distributor", "premiseType", "region"],
     formats: ["Excel", "CSV", "PDF"],
     defaultFormat: "Excel",
     columns: [
@@ -517,9 +459,7 @@ function payrollReport(
     description,
     category: "Payroll",
     defaultShortcut: "last-month",
-    scopeBy: ["region", "territory"],
-    sections: ["staffing", "geography"],
-    defaultSections: ["staffing"],
+    scopeBy: ["premiseType", "region"],
     formats: ["Excel", "CSV", "PDF"],
     defaultFormat: "Excel",
     columns: [
@@ -552,14 +492,6 @@ export const REPORTS: ReportDefinition[] = [
   billingReport("sla-report", "SLA Report", "SGWS bar-spend receipts and verification status.", {
     // Ethan flagged Excel as build-relevant for the SLA file specifically.
     formats: ["Excel", "CSV"],
-    toggles: [
-      {
-        id: "liquorLicence",
-        label: "Include liquor licence details",
-        hint: "Mirrors the HEMS 1.0 export toggle.",
-        default: true,
-      },
-    ],
   }),
   billingReport(
     "cancellation-adjustment",
@@ -577,13 +509,11 @@ export const REPORTS: ReportDefinition[] = [
     "payroll-complete",
     "Payroll Report — Complete",
     "Full payroll cycle by Brand Ambassador.",
-    { splitBy: ["region", "territory"] },
   ),
   payrollReport(
     "master-journal",
     "Master Journal",
     "Printable reconciliation journal grouped by manager.",
-    { splitBy: ["region", "territory"] },
   ),
   payrollReport(
     "missing-payments",
