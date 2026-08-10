@@ -26,24 +26,22 @@ import {
   SelectValue,
 } from "@/app/shared/components/ui/select";
 import type { GeneratedReport } from "@/app/shared/data/billing-types";
+import { REPORTS } from "@/app/shared/data/report-registry";
 
 type ReportKind = GeneratedReport["kind"];
 type ReportFormat = GeneratedReport["format"];
 
-const BILLING_KINDS: ReportKind[] = [
-  "Billing Report",
-  "Not in QB Report",
-  "SLA Report",
-  "Cancellation Adjustment Report",
-  "Customer Schedule",
-];
+// Report kinds come from the shared registry (reporting brief §3.1) rather than
+// a list maintained here. Billing and payroll keep their in-workspace Generate
+// button, but there is now one source of truth for what reports exist — adding
+// one to the registry surfaces it here and in the Reports catalogue at once.
+const BILLING_KINDS = REPORTS.filter((r) => r.category === "Billing").map(
+  (r) => r.name,
+) as ReportKind[];
 
-const PAYROLL_KINDS: ReportKind[] = [
-  "Payroll Report — Complete",
-  "Master Journal",
-  "Missing Brand Ambassador Payments",
-  "Override Summary",
-];
+const PAYROLL_KINDS = REPORTS.filter((r) => r.category === "Payroll").map(
+  (r) => r.name,
+) as ReportKind[];
 
 const FORMATS: ReportFormat[] = ["Excel", "PDF", "CSV"];
 

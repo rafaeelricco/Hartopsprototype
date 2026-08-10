@@ -39,6 +39,7 @@ import { CampaignDetail } from "./staff/components/campaign-detail";
 import { ActivitiesPage as StaffActivitiesPage } from "./staff/components/activities-page";
 import { ActivityDetailPage as StaffActivityDetailPage } from "./staff/components/activity-detail-page";
 import { ReportsPage as StaffReportsPage } from "./staff/components/reports-page";
+import { ReportRunnerPage as StaffReportRunnerPage } from "./staff/components/report-runner-page";
 import { BrandAssetsPage } from "./staff/components/brand-assets-page";
 import { SettingsPage as StaffSettingsPage } from "./staff/components/settings-page";
 import { CreateActivityPage } from "./staff/components/create-activity-page";
@@ -109,6 +110,7 @@ export const router = createBrowserRouter([
       { path: "activities/create", Component: CreateActivityPage },
       { path: "activities/:activityId", Component: StaffActivityDetailPage },
       { path: "reports", Component: StaffReportsPage },
+      { path: "reports/:reportId", Component: StaffReportRunnerPage },
       { path: "brand-assets", Component: BrandAssetsPage },
       { path: "settings", Component: StaffSettingsPage },
     ],

@@ -1443,6 +1443,48 @@ const GEN_SPECS: GenSpec[] = [
   // ── Finalised (recede in the calendar, absent from every lane) ─────────────
   { offset: -12, name: "Absolut Mandrin Tasting", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Gristedes, Manhattan", territory: "Manhattan", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
   { offset: -5, name: "Glenlivet Archive Pour", campaign: "Glenlivet Heritage", brand: "Glenlivet", venue: "Vintry Wine, Manhattan", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+
+  // ── Historical finalised work (reporting depth) ────────────────────────────
+  // Reports look BACKWARDS — "last month", "last 3 months" — where the triage
+  // dashboard looks forwards. Without a real history every report renders empty.
+  // These are all Finalized, so they are absent from every task group and only
+  // recede in the calendar: reporting depth without disturbing IMP-1697.
+  { offset: -13, name: "Absolut Peach Sampling", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Whole Foods, Union Square", territory: "Manhattan", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -15, name: "Jameson Ginger Trade Pour", campaign: "Jameson Spring Push", brand: "Jameson", venue: "Gramercy Tavern, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -17, name: "Malibu Mango Tasting", campaign: "Malibu Summer Vibes", brand: "Malibu", venue: "Stew Leonard's, Farmingdale", territory: "Nassau", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -19, name: "Glenlivet 18 Reserve Pour", campaign: "Glenlivet Prestige Series", brand: "Glenlivet", venue: "Astor Wines, NoHo", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -22, name: "Avión Añejo Flight", campaign: "Avión Elevation Campaign", brand: "Avión", venue: "Cantina Rooftop, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Finalized", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true, slaEligible: true, slaApproval: "approved" },
+  { offset: -25, name: "Beefeater Blood Orange Pop-up", campaign: "Beefeater London Dry", brand: "Beefeater", venue: "Chelsea Market, Manhattan", territory: "Manhattan", state: "NY", venueType: "Pop-up", premiseType: "off-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -27, name: "Kahlúa Salted Caramel Bar", campaign: "Kahlúa Mixology Tour", brand: "Kahlúa", venue: "Clover Club, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -29, name: "Hendrick's Lunar Tasting", campaign: "Hendrick's Curiosities", brand: "Hendrick's", venue: "Loosie Rouge, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -30, name: "Maker's Mark Private Select", campaign: "Maker's Mark Spring", brand: "Maker's Mark", venue: "Zachys, Westchester", territory: "Westchester", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -32, name: "Absolut Lime Trade Showcase", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "The Dead Rabbit, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Finalized", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true, slaEligible: true, slaApproval: "approved" },
+  { offset: -33, name: "Jameson Cold Brew Bar", campaign: "Jameson Spring Push", brand: "Jameson", venue: "Devoción, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -35, name: "Malibu Pineapple Launch", campaign: "Malibu Summer Vibes", brand: "Malibu", venue: "ShopRite, Yonkers", territory: "Westchester", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -36, name: "Glenlivet Single Cask Pour", campaign: "Glenlivet Prestige Series", brand: "Glenlivet", venue: "Grand Wine, Nassau", territory: "Nassau", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -37, name: "Beefeater Gin & Tonic Garden", campaign: "Beefeater London Dry", brand: "Beefeater", venue: "Westville, Hoboken", territory: "Hoboken", state: "NJ", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -38, name: "Absolut Original Sampling", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Whole Foods, Tribeca", territory: "Manhattan", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -41, name: "Jameson Caskmates Pour", campaign: "Jameson Spring Push", brand: "Jameson", venue: "Clover Club, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -44, name: "Malibu Original Tasting", campaign: "Malibu Summer Vibes", brand: "Malibu", venue: "Stew Leonard's, Yonkers", territory: "Westchester", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -47, name: "Glenlivet 15 Showcase", campaign: "Glenlivet Prestige Series", brand: "Glenlivet", venue: "Zachys, Westchester", territory: "Westchester", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -52, name: "Avión Silver Flight", campaign: "Avión Elevation Campaign", brand: "Avión", venue: "Cantina Rooftop, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Finalized", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true, slaEligible: true, slaApproval: "approved" },
+  { offset: -55, name: "Beefeater London Dry Pop-up", campaign: "Beefeater London Dry", brand: "Beefeater", venue: "Eataly, Flatiron", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -58, name: "Kahlúa Espresso Bar", campaign: "Kahlúa Mixology Tour", brand: "Kahlúa", venue: "Devoción, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -63, name: "Absolut Elyx Trade Tasting", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Gramercy Tavern, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -67, name: "Hendrick's Botanical Bar", campaign: "Hendrick's Curiosities", brand: "Hendrick's", venue: "The Dead Rabbit, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise SLA", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true, slaEligible: true, slaApproval: "approved" },
+  { offset: -71, name: "Maker's Mark Cask Tasting", campaign: "Maker's Mark Spring", brand: "Maker's Mark", venue: "Astor Wines, NoHo", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -76, name: "Jameson Black Barrel Trade", campaign: "Jameson Spring Push", brand: "Jameson", venue: "Threes Brewing, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "beer", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -82, name: "Malibu Coconut Beach Series", campaign: "Malibu Summer Vibes", brand: "Malibu", venue: "Rockaway Beach Club, Queens", territory: "Queens", state: "NY", venueType: "Activity Space", premiseType: "on-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -88, name: "Glenlivet Founder's Pour", campaign: "Glenlivet Prestige Series", brand: "Glenlivet", venue: "Grand Wine, Nassau", territory: "Nassau", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -94, name: "Avión Reposado Showcase", campaign: "Avión Elevation Campaign", brand: "Avión", venue: "Mission Ceviche, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -101, name: "Beefeater Pink Sampling", campaign: "Beefeater London Dry", brand: "Beefeater", venue: "Kings Supermarket, Hoboken", territory: "Hoboken", state: "NJ", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -108, name: "Absolut Citron Launch", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "ShopRite, Jersey City", territory: "Jersey City", state: "NJ", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -115, name: "Kahlúa Dessert Pairing", campaign: "Kahlúa Mixology Tour", brand: "Kahlúa", venue: "Union Square Cafe, Manhattan", territory: "Manhattan", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -123, name: "Hendrick's Orbium Tasting", campaign: "Hendrick's Curiosities", brand: "Hendrick's", venue: "Loosie Rouge, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Bar/Restaurant", premiseType: "on-premise", status: "Finalized", ba: "David Kim", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -131, name: "Maker's Mark 46 Pour", campaign: "Maker's Mark Spring", brand: "Maker's Mark", venue: "Sherry-Lehmann, Manhattan", territory: "Manhattan", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Emily Park", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -140, name: "Jameson Orange Sampling", campaign: "Jameson Spring Push", brand: "Jameson", venue: "Bierhaus, Queens", territory: "Queens", state: "NY", venueType: "Bar/Restaurant", premiseType: "beer", status: "Finalized", ba: "Carlos Mendez", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -152, name: "Malibu Strawberry Launch", campaign: "Malibu Summer Vibes", brand: "Malibu", venue: "Fairway Market, Brooklyn", territory: "Brooklyn", state: "NY", venueType: "Grocery", premiseType: "off-premise", status: "Finalized", ba: "Sarah Chen", assignmentStatus: "Accepted", recapSubmitted: true },
+  { offset: -165, name: "Absolut Vanilia Trade Pour", campaign: "Absolut Summer 2026", brand: "Absolut", venue: "Wine Country, Huntington", territory: "Suffolk", state: "NY", venueType: "Retail", premiseType: "off-premise", status: "Finalized", ba: "Maria Santos", assignmentStatus: "Accepted", recapSubmitted: true },
 ];
 
 const GEN_TIMES: { time: string; duration: string }[] = [
@@ -1452,6 +1494,47 @@ const GEN_TIMES: { time: string; duration: string }[] = [
   { time: "4:00 PM – 8:00 PM", duration: "4h" },
   { time: "5:00 PM – 9:00 PM", duration: "4h" },
 ];
+
+/**
+ * Product line-ups a generated activity can carry. Varying the count (1–4) is
+ * what makes the reporting grain choice legible: `18 activities × 4 products`
+ * only means something if activities differ.
+ */
+const GEN_PRODUCT_VARIANTS: { variant: string; price: number }[][] = [
+  [{ variant: "750ml", price: 28 }],
+  [
+    { variant: "750ml", price: 28 },
+    { variant: "1L", price: 36 },
+  ],
+  [
+    { variant: "750ml", price: 32 },
+    { variant: "1L", price: 41 },
+    { variant: "375ml", price: 19 },
+  ],
+  [
+    { variant: "750ml", price: 45 },
+    { variant: "1L", price: 58 },
+    { variant: "375ml", price: 26 },
+    { variant: "Gift Pack", price: 62 },
+  ],
+];
+
+/**
+ * Brand → supplier. The real portfolio split, so supplier-scoped reporting has
+ * more than one value to group by.
+ */
+const BRAND_SUPPLIER: Record<string, string> = {
+  Absolut: "Pernod Ricard",
+  Jameson: "Pernod Ricard",
+  Malibu: "Pernod Ricard",
+  Kahlúa: "Pernod Ricard",
+  Beefeater: "Pernod Ricard",
+  Avión: "Pernod Ricard",
+  Plymouth: "Pernod Ricard",
+  Glenlivet: "William Grant & Sons",
+  "Hendrick's": "William Grant & Sons",
+  "Maker's Mark": "Beam Suntory",
+};
 
 const BA_IDS: Record<string, string> = {
   "Sarah Chen": "edu-2",
@@ -1472,7 +1555,7 @@ function buildGenerated(spec: GenSpec, index: number): Activity {
     name: spec.name,
     campaignName: spec.campaign,
     brandName: spec.brand,
-    clientName: "Pernod Ricard",
+    clientName: BRAND_SUPPLIER[spec.brand] ?? "Pernod Ricard",
     date,
     time: slot.time,
     duration: slot.duration,
@@ -1528,10 +1611,33 @@ function buildGenerated(spec: GenSpec, index: number): Activity {
   if (isCompleted) {
     activity.completedAt = `${date}T20:00:00`;
     activity.photoCount = 8 + (index % 7);
+
+    // Per-product sales. Reporting's product grain (one row per product per
+    // activity) is only meaningful if activities actually carry more than one
+    // product — a single collapsed count is the legacy behaviour being fixed.
+    const variants = GEN_PRODUCT_VARIANTS[index % GEN_PRODUCT_VARIANTS.length]!;
+    const totalSales = 15 + (index % 10);
+    const salesByProduct: TrackedProductSale[] = variants.map((v, i) => {
+      const share = variants.length === 1 ? 1 : (variants.length - i) / ((variants.length * (variants.length + 1)) / 2);
+      return {
+        productId: `${activity.id}-p${i + 1}`,
+        productName: `${spec.brand} ${v.variant}`,
+        quantity: Math.max(1, Math.round(totalSales * share)),
+        unitPrice: v.price,
+      };
+    });
+    activity.campaignProducts = variants.map((v, i) => ({
+      id: `${activity.id}-p${i + 1}`,
+      name: `${spec.brand} ${v.variant}`,
+      unitPrice: v.price,
+    }));
+    activity.products = salesByProduct.map((p) => p.productName);
+
     activity.finalStats = {
       totalSamples: 70 + index,
       totalInteractions: 90 + index,
-      totalSales: 15 + (index % 10),
+      totalSales: salesByProduct.reduce((s, p) => s + p.quantity, 0),
+      salesByProduct,
       rating: 4.4 + (index % 5) / 10,
       photosSubmitted: 8 + (index % 7),
       duration: slot.duration,
