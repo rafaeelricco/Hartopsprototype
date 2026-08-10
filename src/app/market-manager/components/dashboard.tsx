@@ -4,8 +4,12 @@
 // One purpose: replace the act of opening activities one by one to find out what
 // needs doing. "They can't go in and out of events — no one has time for that."
 //
-// Four stacked regions — controls, metrics strip, view switcher, lanes/calendar.
-// Lanes is the default view; the calendar is a peer tab, not the hero.
+// Four stacked regions — controls, metrics strip, view switcher, and the view.
+//
+// Three peer views: Activities (what's on this period), Tasks (what needs me),
+// Calendar (the shape of the schedule). Tasks is the landing view — the client
+// was explicit that a manager arriving here should see their work queue, not a
+// schedule — even though Activities reads first in the switcher.
 //
 // Desktop-first: managers work on the web platform and do not use mobile for
 // changes. Degrades to tablet; mobile is not a target.
@@ -13,11 +17,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { ChevronRight, LayoutList, CalendarDays } from "lucide-react";
+import { ChevronRight, LayoutList, CalendarDays, Table2 } from "lucide-react";
 import { mockEvents } from "./activities-data";
 import {
   DEFAULT_SHORTCUT,
-  LANES,
+  TASK_GROUPS,
   MANAGER_REGIONS,
   formatRange,
   getCampaignOptions,
@@ -26,26 +30,48 @@ import {
   matchesScope,
   matchesScopeAndRange,
   resolveShortcut,
-  selectLane,
+  selectTaskGroup,
   type DashboardScope,
-  type LaneId,
+  type TaskGroupId,
 } from "./dashboard-domain";
 import { DashboardControls, type ControlsState } from "./dashboard-controls";
 import { DashboardMetrics } from "./dashboard-metrics";
-import { DashboardLane } from "./dashboard-lane";
+import { DashboardTaskGroup } from "./dashboard-task-group";
 import { DashboardCalendar } from "./dashboard-calendar";
+import { DashboardActivities } from "./dashboard-activities";
 
-type ViewTab = "lanes" | "calendar";
+type ViewTab = "activities" | "tasks" | "calendar";
 
-const COLLAPSE_KEY = "hart.mm.dashboard.collapsedLanes";
+const VIEW_TABS: { id: ViewTab; label: string; icon: React.ElementType; hint: string }[] = [
+  {
+    id: "activities",
+    label: "Activities",
+    icon: Table2,
+    hint: "Everything on in this period, with its campaign",
+  },
+  {
+    id: "tasks",
+    label: "Tasks",
+    icon: LayoutList,
+    hint: "Your work queue, ordered by urgency",
+  },
+  {
+    id: "calendar",
+    label: "Calendar",
+    icon: CalendarDays,
+    hint: "Schedule shape — workflow state encoded on each chip",
+  },
+];
+
+const COLLAPSE_KEY = "hart.mm.dashboard.collapsedTaskGroups";
 
 /** Collapse state is preserved across navigation (brief §7). */
-function loadCollapsed(): LaneId[] {
+function loadCollapsed(): TaskGroupId[] {
   try {
     const raw = window.localStorage.getItem(COLLAPSE_KEY);
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as LaneId[]) : [];
+    return Array.isArray(parsed) ? (parsed as TaskGroupId[]) : [];
   } catch {
     return [];
   }
@@ -59,9 +85,9 @@ export function Dashboard() {
     premiseType: null,
     campaign: null,
   }));
-  const [view, setView] = useState<ViewTab>("lanes");
-  const [collapsed, setCollapsed] = useState<LaneId[]>(loadCollapsed);
-  const [expanded, setExpanded] = useState<LaneId[]>([]);
+  const [view, setView] = useState<ViewTab>("tasks");
+  const [collapsed, setCollapsed] = useState<TaskGroupId[]>(loadCollapsed);
+  const [expanded, setExpanded] = useState<TaskGroupId[]>([]);
 
   useEffect(() => {
     try {
@@ -92,11 +118,11 @@ export function Dashboard() {
   );
   const period = useMemo(() => getPeriodCounts(mockEvents, scope), [scope]);
 
-  const laneActivities = useMemo(
+  const taskGroupActivities = useMemo(
     () =>
-      LANES.map((meta) => ({
+      TASK_GROUPS.map((meta) => ({
         meta,
-        activities: selectLane(meta.id, mockEvents, scope),
+        activities: selectTaskGroup(meta.id, mockEvents, scope),
       })),
     [scope],
   );
@@ -108,33 +134,40 @@ export function Dashboard() {
     [scope],
   );
 
-  const toggleCollapsed = useCallback((lane: LaneId) => {
+  // The Activities table is the period view, so it honours the range as well as
+  // the scope — the same set the "This period" card counts.
+  const periodActivities = useMemo(
+    () => mockEvents.filter((a) => matchesScopeAndRange(a, scope)),
+    [scope],
+  );
+
+  const toggleCollapsed = useCallback((taskGroup: TaskGroupId) => {
     setCollapsed((prev) =>
-      prev.includes(lane) ? prev.filter((l) => l !== lane) : [...prev, lane],
+      prev.includes(taskGroup) ? prev.filter((l) => l !== taskGroup) : [...prev, taskGroup],
     );
   }, []);
 
-  const toggleExpanded = useCallback((lane: LaneId) => {
+  const toggleExpanded = useCallback((taskGroup: TaskGroupId) => {
     setExpanded((prev) =>
-      prev.includes(lane) ? prev.filter((l) => l !== lane) : [...prev, lane],
+      prev.includes(taskGroup) ? prev.filter((l) => l !== taskGroup) : [...prev, taskGroup],
     );
   }, []);
 
-  /** Strip counters are the navigation — jumping opens and scrolls to a lane. */
+  /** Strip counters are the navigation — jumping opens and scrolls to a task group. */
   const handleJump = useCallback(
-    (target: { kind: "lane"; lane: LaneId } | { kind: "flag"; flag: string }) => {
-      setView("lanes");
-      const laneId: LaneId =
-        target.kind === "lane"
-          ? target.lane
+    (target: { kind: "taskGroup"; taskGroup: TaskGroupId } | { kind: "flag"; flag: string }) => {
+      setView("tasks");
+      const taskGroupId: TaskGroupId =
+        target.kind === "taskGroup"
+          ? target.taskGroup
           : target.flag === "sla-unverified"
             ? "needs-assignment"
             : "awaiting-review";
-      setCollapsed((prev) => prev.filter((l) => l !== laneId));
-      // Let the lane expand before scrolling to it.
+      setCollapsed((prev) => prev.filter((l) => l !== taskGroupId));
+      // Let the task group expand before scrolling to it.
       window.requestAnimationFrame(() => {
         document
-          .getElementById(`lane-${laneId}`)
+          .getElementById(`task-${taskGroupId}`)
           ?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     },
@@ -172,7 +205,8 @@ export function Dashboard() {
       {/* Print-only header line, so a carried sheet is self-describing. */}
       <div className="hidden print:block">
         <h1 style={{ fontSize: "1.25rem", fontWeight: 600 }}>
-          Market Manager dashboard — {view === "lanes" ? "Lanes" : "Calendar"}
+          Market Manager dashboard —{" "}
+          {VIEW_TABS.find((t) => t.id === view)?.label}
         </h1>
         <p style={{ fontSize: "0.8125rem" }}>
           {formatRange(controls.range)} · {scopeSummary}
@@ -186,15 +220,10 @@ export function Dashboard() {
         onJump={handleJump}
       />
 
-      {/* C. View switcher — lanes is the default, calendar is a peer */}
+      {/* C. View switcher — three peers. Tasks is the landing view. */}
       <div className="flex items-center gap-2 print:hidden">
         <div className="flex rounded-md border overflow-hidden">
-          {(
-            [
-              { id: "lanes", label: "Lanes", icon: LayoutList },
-              { id: "calendar", label: "Calendar", icon: CalendarDays },
-            ] as const
-          ).map((t) => {
+          {VIEW_TABS.map((t) => {
             const Icon = t.icon;
             const active = view === t.id;
             return (
@@ -220,17 +249,17 @@ export function Dashboard() {
           className="text-muted-foreground"
           style={{ fontSize: "0.75rem" }}
         >
-          {view === "lanes"
-            ? "Your work queue, ordered by urgency"
-            : "Schedule shape — workflow state encoded on each chip"}
+          {VIEW_TABS.find((t) => t.id === view)?.hint}
         </span>
       </div>
 
-      {/* D. Lanes / Calendar */}
-      {view === "lanes" ? (
+      {/* D. The active view */}
+      {view === "activities" ? (
+        <DashboardActivities activities={periodActivities} />
+      ) : view === "tasks" ? (
         <div className="space-y-3">
-          {laneActivities.map(({ meta, activities }) => (
-            <DashboardLane
+          {taskGroupActivities.map(({ meta, activities }) => (
+            <DashboardTaskGroup
               key={meta.id}
               meta={meta}
               activities={activities}

@@ -134,19 +134,19 @@ export const PREMISE_TYPES: PremiseType[] = [
 // Workflow state added for the dashboard
 // -----------------------------------------------------------------------------
 
-/** Kit & samples lifecycle. Kit collection gates check-in (brief §7 lane 3). */
+/** Kit & samples lifecycle. Kit collection gates check-in (brief §7 task group 3). */
 export type KitStatus =
   | "not-prepared" // samples not yet pulled
   | "out-of-stock" // samples unavailable — escalation, not a delay
   | "prepared" // ready for collection, BA hasn't picked it up
-  | "collected"; // cleared — exits the lane
+  | "collected"; // cleared — exits the task group
 
 /**
  * Pre-execution SLA approval gate. On-premise-SLA activities carry a red/green
  * approval status and cannot execute until green (brief §6).
  *
  * Distinct from `Activity.slaCapture`, which is the *post-activity* receipt
- * verification surfaced in lane 4. Both exist by design (confirmed 2026-08-10).
+ * verification surfaced in task group 4. Both exist by design (confirmed 2026-08-10).
  */
 export type SlaApproval = "pending" | "approved";
 
@@ -307,7 +307,7 @@ export function formatRelativeDays(isoDate: string): string {
   return `${n} days`;
 }
 
-/** Ageing read for the backlog lane — oldest first, so age is the signal. */
+/** Ageing read for the backlog task group — oldest first, so age is the signal. */
 export function formatAge(isoDate: string): string {
   const n = Math.abs(daysUntil(isoDate));
   if (n === 0) return "today";
@@ -315,7 +315,7 @@ export function formatAge(isoDate: string): string {
   return `${n} days old`;
 }
 
-/** Rows inside this horizon take the destructive treatment (brief §7 lane 1). */
+/** Rows inside this horizon take the destructive treatment (brief §7 task group 1). */
 export const URGENT_HORIZON_DAYS = 3;
 
 export function isUrgent(isoDate: string): boolean {
@@ -332,8 +332,8 @@ function inRange(isoDate: string, range: DateRange): boolean {
 }
 
 /**
- * Non-date scope: region, premise, campaign. Applied to every lane — including
- * the backlog lane, which ignores only *dates* (confirmed 2026-08-10).
+ * Non-date scope: region, premise, campaign. Applied to every task group — including
+ * the backlog task group, which ignores only *dates* (confirmed 2026-08-10).
  */
 export function matchesScope(a: Activity, scope: DashboardScope): boolean {
   const regions = scope.regions.length ? scope.regions : MANAGER_REGIONS;
@@ -349,7 +349,7 @@ export function matchesScope(a: Activity, scope: DashboardScope): boolean {
   return true;
 }
 
-/** Scope + date range. Used by the three forward lanes and the calendar. */
+/** Scope + date range. Used by the three forward task groups and the calendar. */
 export function matchesScopeAndRange(
   a: Activity,
   scope: DashboardScope,
@@ -358,7 +358,7 @@ export function matchesScopeAndRange(
 }
 
 // -----------------------------------------------------------------------------
-// Flags — ride on activities inside the lanes rather than owning a lane
+// Flags — ride on activities inside the task groups rather than owning a task group
 // -----------------------------------------------------------------------------
 
 export type FlagKind = "sla-unverified" | "check-in-exception" | "recap-overdue";
@@ -425,27 +425,27 @@ export function getFlags(a: Activity): Flag[] {
 }
 
 // -----------------------------------------------------------------------------
-// Lanes
+// Task groups
 // -----------------------------------------------------------------------------
 
-export type LaneId =
+export type TaskGroupId =
   | "needs-assignment"
   | "awaiting-acceptance"
   | "kit-outstanding"
   | "awaiting-review";
 
-export interface LaneMeta {
-  id: LaneId;
+export interface TaskGroupMeta {
+  id: TaskGroupId;
   title: string;
   /** Quiet label in the header stating the sort direction. */
   sortLabel: string;
   /** Empty state copy — a win, not a shrug. */
   emptyLabel: string;
-  /** True for the backlog lane, which ignores the date range. */
+  /** True for the backlog task group, which ignores the date range. */
   ignoresDateRange: boolean;
 }
 
-export const LANES: LaneMeta[] = [
+export const TASK_GROUPS: TaskGroupMeta[] = [
   {
     id: "needs-assignment",
     title: "Needs assignment",
@@ -487,7 +487,7 @@ export interface BlockingCondition {
 
 const byDateAsc = (a: Activity, b: Activity) => a.date.localeCompare(b.date);
 
-// ── Lane 1 — Needs assignment ────────────────────────────────────────────────
+// ── Task group 1 — Needs assignment ────────────────────────────────────────────────
 
 export function selectNeedsAssignment(
   activities: Activity[],
@@ -499,7 +499,7 @@ export function selectNeedsAssignment(
     .sort(byDateAsc);
 }
 
-// ── Lane 2 — Awaiting BA acceptance ──────────────────────────────────────────
+// ── Task group 2 — Awaiting BA acceptance ──────────────────────────────────────────
 
 /** Declined outright — the assignment is dead and needs redoing. */
 export function isDeclined(a: Activity): boolean {
@@ -520,14 +520,14 @@ export function selectAwaitingAcceptance(
     .sort(byDateAsc);
 }
 
-// ── Lane 3 — Kit & samples outstanding ───────────────────────────────────────
+// ── Task group 3 — Kit & samples outstanding ───────────────────────────────────────
 
 const KIT_OUTSTANDING: KitStatus[] = ["not-prepared", "out-of-stock", "prepared"];
 
 /**
  * Kit becomes the blocking condition only once staffing is resolved. An
  * unassigned activity's real blocker is the staffing, and listing it in both
- * lanes would put one activity in two lanes at once — the same duplication the
+ * task groups would put one activity in two task groups at once — the same duplication the
  * brief avoids for SLA (§12).
  *
  * This is a sequencing rule, not a prep workflow: it says nothing about *how* a
@@ -544,7 +544,7 @@ export function selectKitOutstanding(
     .sort(byDateAsc);
 }
 
-// ── Lane 4 — Awaiting review & finalisation ──────────────────────────────────
+// ── Task group 4 — Awaiting review & finalisation ──────────────────────────────────
 // Ignores the date range entirely (brief §5): a narrowed window must never hide
 // unapproved work. Still respects region / premise / campaign scope.
 
@@ -558,12 +558,12 @@ export function selectAwaitingReview(
     .sort(byDateAsc); // oldest first — ageing is the urgency signal here
 }
 
-export function selectLane(
-  lane: LaneId,
+export function selectTaskGroup(
+  taskGroup: TaskGroupId,
   activities: Activity[],
   scope: DashboardScope,
 ): Activity[] {
-  switch (lane) {
+  switch (taskGroup) {
     case "needs-assignment":
       return selectNeedsAssignment(activities, scope);
     case "awaiting-acceptance":
@@ -576,7 +576,7 @@ export function selectLane(
 }
 
 // -----------------------------------------------------------------------------
-// Blocking conditions — stated as facts, per lane
+// Blocking conditions — stated as facts, per task group
 // -----------------------------------------------------------------------------
 
 function offeredAgo(a: Activity): string | null {
@@ -594,9 +594,9 @@ function offeredAgo(a: Activity): string | null {
 
 export function getBlockingCondition(
   a: Activity,
-  lane: LaneId,
+  taskGroup: TaskGroupId,
 ): BlockingCondition {
-  switch (lane) {
+  switch (taskGroup) {
     case "needs-assignment":
       return {
         text: "No Brand Ambassador assigned",
@@ -717,15 +717,15 @@ export interface PeriodCounts {
 }
 
 /**
- * Lane counters are computed from the same selectors the lanes render, so a
- * counter can never disagree with its lane.
+ * Task-group counters are computed from the same selectors the task groups render, so a
+ * counter can never disagree with its task group.
  */
 export function getNeedsActionCounts(
   activities: Activity[],
   scope: DashboardScope,
 ): NeedsActionCounts {
   // SLA is a forward-looking gate: it blocks an activity from executing, so it
-  // is counted inside the range alongside the forward lanes.
+  // is counted inside the range alongside the forward task groups.
   const slaUnverified = activities.filter(
     (a) =>
       matchesScopeAndRange(a, scope) &&
@@ -734,7 +734,7 @@ export function getNeedsActionCounts(
 
   // Check-in exceptions and overdue recaps are backlog-shaped — they attach to
   // work that has already run, so a forward range would always report zero.
-  // Counted scope-wide, matching the date-independence of lane 4.
+  // Counted scope-wide, matching the date-independence of task group 4.
   const checkInExceptions = activities.filter(
     (a) =>
       matchesScope(a, scope) &&

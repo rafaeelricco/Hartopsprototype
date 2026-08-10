@@ -30,29 +30,29 @@ import {
   TooltipTrigger,
 } from "@/app/shared/components/ui/tooltip";
 import type {
-  LaneId,
+  TaskGroupId,
   NeedsActionCounts,
   PeriodCounts,
 } from "./dashboard-domain";
 
-type Target = { kind: "lane"; lane: LaneId } | { kind: "flag"; flag: string };
+type Target = { kind: "taskGroup"; taskGroup: TaskGroupId } | { kind: "flag"; flag: string };
 
 interface CounterDef {
   key: keyof NeedsActionCounts;
   label: string;
   icon: React.ElementType;
   target: Target;
-  /** Flags are visually distinct from lane counts — they ride on activities. */
+  /** Flags are visually distinct from task-group counts — they ride on activities. */
   isFlag: boolean;
   hint: string;
 }
 
-const LANE_COUNTERS: CounterDef[] = [
+const TASK_COUNTERS: CounterDef[] = [
   {
     key: "needsAssignment",
     label: "Unassigned",
     icon: UserPlus,
-    target: { kind: "lane", lane: "needs-assignment" },
+    target: { kind: "taskGroup", taskGroup: "needs-assignment" },
     isFlag: false,
     hint: "Activities in range with no Brand Ambassador assigned",
   },
@@ -60,7 +60,7 @@ const LANE_COUNTERS: CounterDef[] = [
     key: "awaitingAcceptance",
     label: "Awaiting BA",
     icon: UserCheck,
-    target: { kind: "lane", lane: "awaiting-acceptance" },
+    target: { kind: "taskGroup", taskGroup: "awaiting-acceptance" },
     isFlag: false,
     hint: "Assigned and notified, but not yet accepted",
   },
@@ -68,7 +68,7 @@ const LANE_COUNTERS: CounterDef[] = [
     key: "kitOutstanding",
     label: "Kit outstanding",
     icon: Package,
-    target: { kind: "lane", lane: "kit-outstanding" },
+    target: { kind: "taskGroup", taskGroup: "kit-outstanding" },
     isFlag: false,
     hint: "Kit not prepared, out of stock, or awaiting collection",
   },
@@ -76,7 +76,7 @@ const LANE_COUNTERS: CounterDef[] = [
     key: "awaitingReview",
     label: "Review",
     icon: ClipboardCheck,
-    target: { kind: "lane", lane: "awaiting-review" },
+    target: { kind: "taskGroup", taskGroup: "awaiting-review" },
     isFlag: false,
     hint: "Completed activities waiting on you — full outstanding backlog",
   },
@@ -121,7 +121,7 @@ function Counter({
   const active = value > 0;
   const Icon = def.icon;
 
-  // Zero reads calm. Flags are amber-forward; lane counts use brand burgundy.
+  // Zero reads calm. Flags are amber-forward; task-group counts use brand burgundy.
   const tint = !active
     ? { bg: "#f1f5f9", fg: "#94a3b8" }
     : def.isFlag
@@ -216,7 +216,7 @@ export function DashboardMetrics({ needsAction, period, onJump }: Props) {
 
           {/* Two-up on tablet so labels keep their words; four-up on desktop. */}
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-border">
-            {LANE_COUNTERS.map((def) => (
+            {TASK_COUNTERS.map((def) => (
               <Counter
                 key={def.key}
                 def={def}
@@ -226,8 +226,8 @@ export function DashboardMetrics({ needsAction, period, onJump }: Props) {
             ))}
           </div>
 
-          {/* Flags sit below a rule — they ride on activities in the lanes
-              rather than owning a lane of their own. */}
+          {/* Flags sit below a rule — they ride on activities in the task groups
+              rather than owning a task group of their own. */}
           <div
             className="mt-2 pt-2 grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-border"
             style={{ borderTop: "1px solid var(--border)" }}

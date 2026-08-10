@@ -1,11 +1,11 @@
 // =============================================================================
-// Lanes + row (IMP-1697 §7) — the core of the dashboard
+// Task groups + row (IMP-1697 §7) — the core of the dashboard
 // =============================================================================
-// Four collapsible lanes ordered by date so urgency surfaces naturally. Not a
+// Four collapsible task groups ordered by date so urgency surfaces naturally. Not a
 // tab set: a manager should be able to scan all four and see the shape of the
 // day. Read-only — every row deep-links into the activity.
 //
-// One row shape across all four lanes so the eye learns it once.
+// One row shape across all four task groups so the eye learns it once.
 // =============================================================================
 
 import { Link } from "react-router";
@@ -33,13 +33,13 @@ import {
   isUrgent,
   regionForTerritory,
   type FlagKind,
-  type LaneId,
-  type LaneMeta,
+  type TaskGroupId,
+  type TaskGroupMeta,
   type Severity,
 } from "./dashboard-domain";
 
 /** Rows visible before "Show all" — guards against the "huge 1000 rows" risk. */
-export const LANE_VISIBLE_CAP = 8;
+export const TASK_VISIBLE_CAP = 8;
 
 const SEVERITY_COLOR: Record<Severity, string> = {
   urgent: "#b91c1c",
@@ -57,17 +57,17 @@ const FLAG_ICON: Record<FlagKind, React.ElementType> = {
 // Row
 // -----------------------------------------------------------------------------
 
-function LaneRow({
+function TaskRow({
   activity,
-  lane,
-  /** The backlog lane reads age, not countdown — ageing is its urgency signal. */
+  taskGroup,
+  /** The backlog task group reads age, not countdown — ageing is its urgency signal. */
   showAge,
 }: {
   activity: Activity;
-  lane: LaneId;
+  taskGroup: TaskGroupId;
   showAge: boolean;
 }) {
-  const blocking = getBlockingCondition(activity, lane);
+  const blocking = getBlockingCondition(activity, taskGroup);
   const flags = getFlags(activity);
   const urgent = showAge ? false : isUrgent(activity.date);
   const territory = activity.territory ?? activity.borough ?? "—";
@@ -147,7 +147,7 @@ function LaneRow({
       </div>
 
       {/* Flags — so a manager can see an unassigned activity is *also*
-          SLA-blocked without leaving the lane. */}
+          SLA-blocked without leaving the task group. */}
       <div className="flex items-center gap-1.5 shrink-0">
         {flags.map((f) => {
           const Icon = FLAG_ICON[f.kind];
@@ -180,11 +180,11 @@ function LaneRow({
 }
 
 // -----------------------------------------------------------------------------
-// Lane
+// Task group
 // -----------------------------------------------------------------------------
 
-interface LaneProps {
-  meta: LaneMeta;
+interface TaskGroupProps {
+  meta: TaskGroupMeta;
   activities: Activity[];
   collapsed: boolean;
   expanded: boolean;
@@ -194,7 +194,7 @@ interface LaneProps {
   headerAction?: React.ReactNode;
 }
 
-export function DashboardLane({
+export function DashboardTaskGroup({
   meta,
   activities,
   collapsed,
@@ -202,16 +202,16 @@ export function DashboardLane({
   onToggleCollapsed,
   onToggleExpanded,
   headerAction,
-}: LaneProps) {
+}: TaskGroupProps) {
   const count = activities.length;
   const visible = expanded
     ? activities
-    : activities.slice(0, LANE_VISIBLE_CAP);
+    : activities.slice(0, TASK_VISIBLE_CAP);
   const hidden = count - visible.length;
   const showAge = meta.id === "awaiting-review";
 
   return (
-    <Card className="gap-0 break-inside-avoid" id={`lane-${meta.id}`}>
+    <Card className="gap-0 break-inside-avoid" id={`task-${meta.id}`}>
       <CardContent className="p-0">
         {/* Header — name, count, sort direction as a quiet label */}
         <div className="flex items-center gap-3 px-5 py-3">
@@ -220,7 +220,7 @@ export function DashboardLane({
             onClick={onToggleCollapsed}
             className="flex items-center gap-2 min-w-0 flex-1 text-left"
             aria-expanded={!collapsed}
-            aria-controls={`lane-body-${meta.id}`}
+            aria-controls={`task-body-${meta.id}`}
           >
             {collapsed ? (
               <ChevronRight className="size-4 text-muted-foreground shrink-0 print:hidden" />
@@ -248,7 +248,7 @@ export function DashboardLane({
             >
               ({count})
             </span>
-            {/* The backlog lane ignores the date filter — say so, loudly enough
+            {/* The backlog task group ignores the date filter — say so, loudly enough
                 that nobody thinks narrowing the range emptied it. */}
             {meta.ignoresDateRange && (
               <span
@@ -275,9 +275,9 @@ export function DashboardLane({
         </div>
 
         {!collapsed && (
-          <div id={`lane-body-${meta.id}`} className="border-t border-border">
+          <div id={`task-body-${meta.id}`} className="border-t border-border">
             {count === 0 ? (
-              // Empty state is a win. Managers should be able to empty a lane
+              // Empty state is a win. Managers should be able to empty a task group
               // and feel it.
               <div className="flex items-center justify-center gap-2 py-7">
                 <CheckCircle2 className="size-4" style={{ color: "#0f766e" }} />
@@ -289,10 +289,10 @@ export function DashboardLane({
               <>
                 <div className="divide-y divide-border">
                   {visible.map((a) => (
-                    <LaneRow
+                    <TaskRow
                       key={a.id}
                       activity={a}
-                      lane={meta.id}
+                      taskGroup={meta.id}
                       showAge={showAge}
                     />
                   ))}
