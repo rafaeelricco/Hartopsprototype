@@ -38,7 +38,11 @@ import { Campaigns } from "./staff/components/campaigns";
 import { CampaignDetail } from "./staff/components/campaign-detail";
 import { ActivitiesPage as StaffActivitiesPage } from "./staff/components/activities-page";
 import { ActivityDetailPage as StaffActivityDetailPage } from "./staff/components/activity-detail-page";
-import { ReportsPage as StaffReportsPage } from "./staff/components/reports-page";
+import {
+  ActivityDetailReportPage,
+  CompanySalesReportPage,
+  SupplierBasedReportPage,
+} from "./shared/components/report-pages";
 import { BrandAssetsPage } from "./staff/components/brand-assets-page";
 import { SettingsPage as StaffSettingsPage } from "./staff/components/settings-page";
 import { CreateActivityPage } from "./staff/components/create-activity-page";
@@ -82,6 +86,9 @@ export const router = createBrowserRouter([
       { path: "billing-codes", Component: BillingCodesPage },
       { path: "payroll", Component: PayrollWorkspacePage },
       { path: "reports", Component: OpsReportsPage },
+      { path: "reports/activity-detail", Component: ActivityDetailReportPage },
+      { path: "reports/company-sales", Component: CompanySalesReportPage },
+      { path: "reports/supplier-based", Component: SupplierBasedReportPage },
       { path: "settings", Component: OpsSettingsPage },
       { path: "accounts", Component: AccountsPage },
       { path: "brand-ambassadors", Component: BrandAmbassadorsPage },
@@ -108,7 +115,9 @@ export const router = createBrowserRouter([
       { path: "activities", Component: StaffActivitiesPage },
       { path: "activities/create", Component: CreateActivityPage },
       { path: "activities/:activityId", Component: StaffActivityDetailPage },
-      { path: "reports", Component: StaffReportsPage },
+      { path: "reports/activity-detail", Component: ActivityDetailReportPage },
+      { path: "reports/company-sales", Component: CompanySalesReportPage },
+      { path: "reports/supplier-based", Component: SupplierBasedReportPage },
       { path: "brand-assets", Component: BrandAssetsPage },
       { path: "settings", Component: StaffSettingsPage },
     ],

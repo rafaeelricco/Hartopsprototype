@@ -99,9 +99,24 @@ const data = {
       icon: Settings,
     },
   ],
-  projects: [
+  reports: [
     {
-      name: "Reports",
+      name: "Activity Detail",
+      url: "/ops/dashboard/reports/activity-detail",
+      icon: FileBarChart,
+    },
+    {
+      name: "Company Sales",
+      url: "/ops/dashboard/reports/company-sales",
+      icon: FileBarChart,
+    },
+    {
+      name: "Supplier Activities",
+      url: "/ops/dashboard/reports/supplier-based",
+      icon: FileBarChart,
+    },
+    {
+      name: "Analytics & Data Quality",
       url: "/ops/dashboard/reports",
       icon: FileBarChart,
     },
@@ -118,7 +133,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavProjects projects={data.reports} label="Reports" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} onLogout={() => navigate("/ops")} />

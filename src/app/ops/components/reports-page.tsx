@@ -569,7 +569,7 @@ export function ReportsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-foreground">Reports & Data Quality</h1>
+          <h1 className="text-foreground">Analytics &amp; Data Quality</h1>
           <p
             className="text-muted-foreground mt-1"
             style={{ fontSize: "0.875rem" }}
@@ -577,7 +577,7 @@ export function ReportsPage() {
             Platform-wide performance metrics and data quality monitoring.
           </p>
         </div>
-        {/* Change #7: contextual export labels */}
+        {/* Contextual export — hidden on Generate, which has its own Export. */}
         <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="outline"
@@ -598,8 +598,12 @@ export function ReportsPage() {
         </div>
       </div>
 
-      {/* Change #6: Date range selector above tabs — shared across both */}
-      <div className="flex items-center justify-end">
+      {/* Date range for the analytics tabs. The Generate tab carries the
+          shared date-range control instead, so this is hidden there. */}
+      <div
+        className="flex items-center justify-end"
+        style={{ display: activeTab === "generate" ? "none" : undefined }}
+      >
         <Select value={dateRange} onValueChange={setDateRange}>
           <SelectTrigger
             className="w-[160px] cursor-pointer"
@@ -628,6 +632,7 @@ export function ReportsPage() {
             </TabsTrigger>
           ))}
         </TabsList>
+
 
         {/* ============================================================ */}
         {/* Dashboard Tab                                                 */}

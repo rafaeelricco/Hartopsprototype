@@ -6,14 +6,8 @@
 // beside the shortcut label so the active window is never ambiguous.
 // =============================================================================
 
-import { CalendarRange, Printer, SlidersHorizontal } from "lucide-react";
+import { Printer, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/app/shared/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/app/shared/components/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -21,13 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/shared/components/ui/select";
+import { DateRangeControl } from "@/app/shared/components/date-range-control";
+import { TRIAGE_SHORTCUTS } from "@/app/shared/data/date-range";
 import {
-  ALL_SHORTCUTS,
   MANAGER_REGIONS,
   PREMISE_TYPES,
-  SHORTCUT_LABELS,
-  formatRange,
-  resolveShortcut,
   type DateRange,
   type PremiseType,
   type RangeShortcut,
@@ -57,94 +49,17 @@ export function DashboardControls({
   onChange,
   onPrint,
 }: Props) {
-  function pickShortcut(shortcut: RangeShortcut) {
-    onChange({ ...state, shortcut, range: resolveShortcut(shortcut) });
-  }
-
-  // Editing either endpoint drops the shortcut label — the range is now custom.
-  function setBound(which: "from" | "to", value: string) {
-    if (!value) return;
-    const next = { ...state.range, [which]: value };
-    if (next.from > next.to) {
-      if (which === "from") next.to = value;
-      else next.from = value;
-    }
-    onChange({ ...state, shortcut: null, range: next });
-  }
-
-  const rangeLabel = state.shortcut
-    ? SHORTCUT_LABELS[state.shortcut]
-    : "Custom range";
-
   return (
     <div className="flex flex-wrap items-center gap-2 print:hidden">
-      {/* Date range shortcut + resolved dates */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2">
-            <CalendarRange className="size-4 text-primary" />
-            <span style={{ fontWeight: 500 }}>{rangeLabel}</span>
-            <span className="text-muted-foreground">
-              · {formatRange(state.range)}
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-64">
-          {ALL_SHORTCUTS.map((s) => {
-            const r = resolveShortcut(s);
-            return (
-              <DropdownMenuItem
-                key={s}
-                onClick={() => pickShortcut(s)}
-                className="flex items-center justify-between gap-3"
-              >
-                <span
-                  style={{
-                    fontWeight: state.shortcut === s ? 600 : 400,
-                    color: state.shortcut === s ? "#7d152d" : undefined,
-                  }}
-                >
-                  {SHORTCUT_LABELS[s]}
-                </span>
-                <span
-                  className="text-muted-foreground"
-                  style={{ fontSize: "0.75rem" }}
-                >
-                  {formatRange(r)}
-                </span>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      {/* Explicit inclusive from/to */}
-      <div
-        className="flex items-center gap-1.5 rounded-md border px-2"
-        style={{ borderColor: "var(--border)", height: 36 }}
-      >
-        <input
-          type="date"
-          aria-label="Range start"
-          value={state.range.from}
-          max={state.range.to}
-          onChange={(e) => setBound("from", e.target.value)}
-          className="bg-transparent outline-none"
-          style={{ fontSize: "0.8125rem" }}
-        />
-        <span className="text-muted-foreground" style={{ fontSize: "0.8125rem" }}>
-          →
-        </span>
-        <input
-          type="date"
-          aria-label="Range end"
-          value={state.range.to}
-          min={state.range.from}
-          onChange={(e) => setBound("to", e.target.value)}
-          className="bg-transparent outline-none"
-          style={{ fontSize: "0.8125rem" }}
-        />
-      </div>
+      {/* The shared date-range control — same component the Reports runner
+          uses; only the offered shortcuts differ (triage looks forwards). */}
+      <DateRangeControl
+        value={{ shortcut: state.shortcut, range: state.range }}
+        shortcuts={TRIAGE_SHORTCUTS}
+        onChange={(v) =>
+          onChange({ ...state, shortcut: v.shortcut, range: v.range })
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-1.5 ml-1">
         <SlidersHorizontal className="size-3.5 text-muted-foreground" />
