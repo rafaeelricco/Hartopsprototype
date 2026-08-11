@@ -5,8 +5,9 @@
 // They share the period/filter/export shell and the data engine; everything
 // below that is the report's own.
 //
-// Read-first: the page is meant to be looked at. Export hands over the raw rows
-// for anyone who wants to dissect them in Excel.
+// The table IS the page. An earlier pass led with per-activity summary cards
+// above the grid; they duplicated the table's content and were dropped. Export
+// hands over the raw rows for anyone who wants to dissect them in Excel.
 // =============================================================================
 
 import { Card, CardContent } from "@/app/shared/components/ui/card";
@@ -48,10 +49,17 @@ function RowTable({
   columns,
   rows,
   limit = ROWS_ON_SCREEN,
+  groupBy,
 }: {
   columns: { key: string; label: string; align?: "left" | "right" }[];
   rows: ReportRow[];
   limit?: number;
+  /**
+   * Column key whose value marks a logical group. At product grain one activity
+   * spans several rows; a rule between groups stops that reading as duplicated
+   * content. Presentational only — the export still carries every value.
+   */
+  groupBy?: string;
 }) {
   return (
     <Card>
@@ -74,11 +82,18 @@ function RowTable({
               </tr>
             </thead>
             <tbody>
-              {rows.slice(0, limit).map((row, i) => (
+              {rows.slice(0, limit).map((row, i, shown) => {
+                const startsGroup =
+                  !!groupBy &&
+                  (i === 0 || shown[i - 1]![groupBy] !== row[groupBy]);
+                return (
                 <tr
                   key={i}
                   className="border-t"
-                  style={{ borderColor: "#f1f5f9" }}
+                  style={{
+                    borderColor: startsGroup ? "#cbd5e1" : "#f1f5f9",
+                    borderTopWidth: startsGroup && i > 0 ? 2 : 1,
+                  }}
                 >
                   {columns.map((c) => (
                     <td
@@ -91,7 +106,8 @@ function RowTable({
                     </td>
                   ))}
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -112,9 +128,9 @@ function RowTable({
 // =============================================================================
 // Activity Detail — the wide operational export
 // =============================================================================
-// 47 columns nobody reads on screen, so the page leads with a readable summary
-// of each activity and keeps the full grid below for spot-checking. The export
-// is the real artefact here.
+// One row per product per activity, grouped visually by activity so the
+// repeated identity columns don't read as duplicate rows. The export is the
+// real artefact here.
 
 export function ActivityDetailReportPage() {
   const def = getReport("activity-detail")!;
@@ -122,128 +138,22 @@ export function ActivityDetailReportPage() {
 
   return (
     <ReportPageShell def={def}>
-      {({ result }) => {
-        // Group product rows back under their activity for the on-screen read.
-        const byActivity = new Map<string, ReportRow[]>();
-        for (const r of result.rows) {
-          const key = String(r["activityId"]);
-          const bucket = byActivity.get(key);
-          if (bucket) bucket.push(r);
-          else byActivity.set(key, [r]);
-        }
-
-        return (
-          <div className="space-y-4">
-            <TotalsStrip totals={result.totals} />
-
-            <SectionHeading
-              title="Activities"
-              hint={`${byActivity.size} in this period`}
-            />
-            <div className="space-y-2">
-              {Array.from(byActivity.values())
-                .slice(0, 12)
-                .map((rows) => {
-                  const a = rows[0]!;
-                  const bottles = rows.reduce(
-                    (s, r) => s + (Number(r["bottlesSold"]) || 0),
-                    0,
-                  );
-                  const revenue = rows.reduce(
-                    (s, r) => s + (Number(r["revenueAtRetail"]) || 0),
-                    0,
-                  );
-                  return (
-                    <Card key={String(a["activityId"])}>
-                      <CardContent className="p-4">
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div
-                              className="text-foreground"
-                              style={{ fontSize: "0.9375rem", fontWeight: 600 }}
-                            >
-                              {String(a["activityName"])}
-                            </div>
-                            <div
-                              className="text-muted-foreground mt-0.5"
-                              style={{ fontSize: "0.75rem" }}
-                            >
-                              {String(a["date"])} · {String(a["account"])} ·{" "}
-                              {String(a["region"])} · {String(a["territory"])} ·{" "}
-                              {String(a["premiseType"])} ·{" "}
-                              {String(a["campaign"])}
-                            </div>
-                          </div>
-                          <div className="flex gap-5 shrink-0">
-                            {[
-                              {
-                                label: "Sampled",
-                                value: formatCell(
-                                  "consumersSampled",
-                                  rows.reduce(
-                                    (s, r) =>
-                                      s + (Number(r["consumersSampled"]) || 0),
-                                    0,
-                                  ),
-                                ),
-                              },
-                              { label: "Bottles", value: bottles.toLocaleString("en-US") },
-                              {
-                                label: "Revenue",
-                                value: formatCell("revenueAtRetail", revenue),
-                              },
-                            ].map((m) => (
-                              <div key={m.label} className="text-right">
-                                <div
-                                  className="text-muted-foreground"
-                                  style={{ fontSize: "0.6875rem" }}
-                                >
-                                  {m.label}
-                                </div>
-                                <div
-                                  className="text-foreground tabular-nums"
-                                  style={{ fontSize: "0.875rem", fontWeight: 600 }}
-                                >
-                                  {m.value}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Per-product detail — the by-bottle cut Leah asked for. */}
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {rows.map((r, i) => (
-                            <span
-                              key={i}
-                              className="rounded px-2 py-1"
-                              style={{
-                                fontSize: "0.6875rem",
-                                background: "#f8fafc",
-                                border: "1px solid #e2e8f0",
-                                color: "#475569",
-                              }}
-                            >
-                              {String(r["productName"])} ·{" "}
-                              <strong>{String(r["bottlesSold"])}</strong> sold ·{" "}
-                              {formatCell("price", r["price"] ?? 0)}
-                            </span>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-            </div>
-
-            <SectionHeading
-              title="Full detail"
-              hint={`${result.rowCount} rows · ${columns.length} columns · what the export contains`}
-            />
-            <RowTable columns={columns} rows={result.rows} />
-          </div>
-        );
-      }}
+      {({ result }) => (
+        <div className="space-y-4">
+          <TotalsStrip totals={result.totals} />
+          <SectionHeading
+            title="Activity detail"
+            hint={`${result.rowCount} rows · ${columns.length} columns · one row per product per activity`}
+          />
+          {/* Grouped by activity so the per-product rows don't read as
+              duplicates — the same data the export carries. */}
+          <RowTable
+            columns={columns}
+            rows={result.rows}
+            groupBy="activityId"
+          />
+        </div>
+      )}
     </ReportPageShell>
   );
 }
